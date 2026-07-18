@@ -352,6 +352,26 @@
         <!-- 中央：幸運扭蛋機核心 -->
         <div class="lg:col-span-6 order-1 lg:order-2 flex flex-col items-center">
             <h1 class="gacha-title text-4xl md:text-5xl mb-6">呆呆幸運扭蛋機</h1>
+
+            <!-- 🎮 輸入控制面板 -->
+            <div class="w-full max-w-sm bg-white/80 backdrop-blur-md rounded-3xl p-6 shadow-xl border border-white mt-2 md:mt-8 space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1.5 ml-1">🔑 請輸入群組密語解鎖名單</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="secretPass" placeholder="請輸入密語..." class="flex-grow bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-rose-400 transition-all text-center">
+                        <button onclick="verifyGroupPass()" class="bg-gray-800 text-white text-xs font-bold px-4 py-2 rounded-xl hover:bg-gray-700 active:scale-95 transition-all flex-shrink-0">解鎖</button>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1.5 ml-1">👤 選擇你的名字 (每個名字限抽一次)</label>
+                    <select id="playerName" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm font-semibold text-center focus:outline-none focus:ring-2 focus:ring-rose-400 transition-all">
+                        <option value="" disabled selected>🔒 請先解鎖群組名單 🔒</option>
+                    </select>
+                </div>
+
+                <button id="spinBtn" onclick="startDraw()" class="w-full bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white font-black py-3 rounded-2xl shadow-lg shadow-rose-500/20 active:scale-98 transition-all tracking-wider text-sm mt-2 cursor-pointer">啟動幸運扭蛋</button>
+            </div>
             
             <!-- 🎪 實體扭蛋機結構 -->
             <div class="gacha-machine">
@@ -382,26 +402,6 @@
                         <div class="gacha-lucky-egg" id="luckyEgg"></div>
                     </div>
                 </div>
-            </div>
-
-            <!-- 🎮 輸入控制面板 -->
-            <div class="w-full max-w-sm bg-white/80 backdrop-blur-md rounded-3xl p-6 shadow-xl border border-white mt-2 md:mt-8 space-y-4">
-                <div>
-                    <label class="block text-xs font-bold text-gray-500 mb-1.5 ml-1">🔑 請輸入群組密語解鎖名單</label>
-                    <div class="flex gap-2">
-                        <input type="text" id="secretPass" placeholder="請輸入密語..." class="flex-grow bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-rose-400 transition-all text-center">
-                        <button onclick="verifyGroupPass()" class="bg-gray-800 text-white text-xs font-bold px-4 py-2 rounded-xl hover:bg-gray-700 active:scale-95 transition-all flex-shrink-0">解鎖</button>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-gray-500 mb-1.5 ml-1">👤 選擇你的名字 (每個名字限抽一次)</label>
-                    <select id="playerName" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm font-semibold text-center focus:outline-none focus:ring-2 focus:ring-rose-400 transition-all">
-                        <option value="" disabled selected>🔒 請先解鎖群組名單 🔒</option>
-                    </select>
-                </div>
-
-                <button id="spinBtn" onclick="startDraw()" class="w-full bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white font-black py-3 rounded-2xl shadow-lg shadow-rose-500/20 active:scale-98 transition-all tracking-wider text-sm mt-2 cursor-pointer">啟動幸運扭蛋</button>
             </div>
         </div>
 
