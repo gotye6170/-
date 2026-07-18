@@ -107,8 +107,17 @@
         localPrizesData = prizes;
 
         let html = '<span class="prize-title-text">📋 目前的禮物：</span>';
+        let hasVisiblePrize = false;
+
         for (let id in prizes) {
             const p = prizes[id];
+            
+            // 🛡️ 關鍵隱藏邏輯：只要獎品名稱包含「銘謝惠顧」，就跳過不渲染到看板上
+            if (p.name && p.name.includes("銘謝惠顧")) {
+                continue; 
+            }
+
+            hasVisiblePrize = true;
             
             // 處理商品圖：若後台有填 image 網址就秀圖，沒有就用灰底預防空圖
             const imgHtml = p.image ? `<img class="prize-thumb" src="${p.image}" alt="${p.name}">` : `<div class="prize-thumb" style="background:rgba(255,255,255,0.15);"></div>`;
@@ -133,6 +142,11 @@
                 </div>`;
             }
         }
+
+        if (!hasVisiblePrize) {
+            html += '<div style="color: #aaa; font-size: 13px; padding: 10px;">目前無公開好禮。</div>';
+        }
+
         document.getElementById("statusBoard").innerHTML = html;
     });
 
@@ -224,7 +238,7 @@
         });
     }
 
-    // 拉霸滾動效果
+    // 拉霸滾動效果（保留您修改的精采名單）
     function runSlotMachineAnimation(finalResult, callback) {
         const track = document.getElementById("slotTrack");
         track.innerHTML = "";
@@ -262,10 +276,11 @@
         animate();
     }
 
+    // 重設按鈕狀態
     function resetButtonState() {
         isDrawing = false;
         document.getElementById("spinBtn").disabled = false;
-        document.getElementById("spinBtn").innerText = "啟動拉霸，試試手氣！";
+        document.getElementById("spinBtn").innerText = "點我啟動拉霸機";
         document.getElementById("playerName").disabled = false;
     }
 
@@ -293,7 +308,7 @@
             } else {
                 ticketBox.style.border = "2px dashed #00f2fe";
                 ticketBox.style.color = "#008b9b";
-                hintBox.innerText = "↑ 點擊可複製序號，請立刻截圖保存！";
+                hintBox.innerText = "↑ 點擊後輸入密碼「3064」，請截圖保存！";
                 hintBox.style.display = "block";
             }
         }
