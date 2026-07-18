@@ -600,7 +600,7 @@
                     </div>`;
                 });
             } else {
-                html += '<div id="honorList" style="color: #9ca3af; font-size: 13px; text-align: center; padding: 20px; width: 100%;">目前尚無人奪得大獎，虛位以待！</div>';
+                honorHtml += '<div id="honorList" style="color: #9ca3af; font-size: 13px; text-align: center; padding: 20px; width: 100%;">目前尚無人奪得大獎，虛位以待！</div>';
             }
 
             document.getElementById("prizeMarquee").innerText = marqueeText;
@@ -750,11 +750,49 @@
                 luckyEgg.classList.add("dropped-egg");
             }, 400);
 
+            // 動態完畢後，移除暫時加入的 class 並執行回呼函式打開 Modal
             setTimeout(() => {
-                crank.classList.remove("rotating-crank");
                 glass.classList.remove("settling");
-                callback();
-            }, 1500); 
+                crank.classList.remove("rotating-crank");
+                if (callback) callback();
+            }, 1300);
+        }
+
+        function showWinModal(title, prizeName, ticketCode, isLose) {
+            document.getElementById("modalTitle").innerText = title;
+            document.getElementById("modalPrizeName").innerText = prizeName;
+            
+            const codeEl = document.getElementById("modalTicketCode");
+            codeEl.innerText = ticketCode;
+
+            if (isLose) {
+                codeEl.style.background = "#374151";
+                codeEl.style.color = "#9ca3af";
+                codeEl.style.borderColor = "transparent";
+                document.getElementById("copyHint").style.display = "none";
+            } else {
+                codeEl.style.background = "#0f172a";
+                codeEl.style.color = "#22d3ee";
+                codeEl.style.borderColor = "rgba(6,182,212,0.3)";
+                document.getElementById("copyHint").style.display = "block";
+            }
+
+            document.getElementById("winModal").style.display = "flex";
+        }
+
+        function closeModal() {
+            document.getElementById("winModal").style.display = "none";
+        }
+
+        function clickTicket() {
+            const text = document.getElementById("modalTicketCode").innerText;
+            if (text.includes("請再接再厲") || text.includes("無可用票券")) return;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                alert("📋 序號已成功複製到剪貼簿囉！");
+            }).catch(() => {
+                alert("複製失敗，請手動選取複製。");
+            });
         }
 
         function resetButtonState() {
@@ -763,51 +801,6 @@
             document.getElementById("spinBtn").innerText = "啟動幸運扭蛋";
             document.getElementById("playerName").disabled = false;
             document.getElementById("secretPass").disabled = false;
-        }
-
-        function showWinModal(title, prizeName, ticketCode, isSad = false) {
-            document.getElementById("modalTitle").innerText = title;
-            document.getElementById("modalPrizeName").innerText = prizeName;
-            
-            const ticketEl = document.getElementById("modalTicketCode");
-            ticketEl.innerText = ticketCode;
-            
-            if (isSad) {
-                document.getElementById("modalTitle").className = "text-2xl font-black text-gray-500 mb-2";
-                ticketEl.className = "bg-gray-100 text-gray-500 font-sans text-sm font-medium py-3 px-4 rounded-xl border border-gray-200 text-center select-none cursor-default";
-                document.getElementById("copyHint").style.display = "none";
-            } else {
-                document.getElementById("modalTitle").className = "text-2xl font-black text-rose-500 mb-2";
-                ticketEl.className = "bg-slate-900 text-cyan-400 font-mono text-base font-bold py-3 px-4 rounded-xl cursor-pointer hover:bg-slate-800 active:scale-98 transition-all border border-cyan-500/30 break-all select-all";
-                document.getElementById("copyHint").style.display = "block";
-            }
-            
-            document.getElementById("winModal").style.display = "flex";
-        }
-
-        function closeModal() {
-            document.getElementById("winModal").style.display = "none";
-            // 視窗關閉時順便將掉落孔的扭蛋重設隱藏
-            document.getElementById("luckyEgg").className = "gacha-lucky-egg";
-        }
-
-        function clickTicket() {
-            const ticketEl = document.getElementById("modalTicketCode");
-            if (ticketEl.classList.contains("select-none")) return;
-            
-            const codeText = ticketEl.innerText;
-            navigator.clipboard.writeText(codeText).then(() => {
-                const origBg = ticketEl.style.background;
-                const origColor = ticketEl.style.color;
-                ticketEl.innerText = "✨ 複製成功！ ✨";
-                ticketEl.style.color = "#10b981";
-                setTimeout(() => {
-                    ticketEl.innerText = codeText;
-                    ticketEl.style.color = origColor;
-                }, 1200);
-            }).catch(() => {
-                alert("複製失敗，請手動全選複製。");
-            });
         }
     </script>
 </body>
