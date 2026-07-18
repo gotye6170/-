@@ -3,13 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎰 升級版：客製化機率與庫存抽獎系統 🎟️</title>
+    <title>🎰 呆呆抽獎 🎟️</title>
     <style>
         * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background: radial-gradient(circle, #0f2027, #203a43, #2c5364); color: white; min-height: 100vh; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
         .container { background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(12px); padding: 30px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); width: 100%; max-width: 520px; text-align: center; border: 1px solid rgba(255, 255, 255, 0.15); }
-        h1 { margin-top: 0; color: #ff007f; text-shadow: 0 0 12px rgba(255,0,127,0.5); font-size: 26px; }
+        h1 { margin-top: 0; color: #ff007f; text-shadow: 0 0 12px rgba(255,0,127,0.5); font-size: 28px; }
+        
+        /* 獎品即時看板與商品圖 */
         .status-board { background: rgba(0,0,0,0.5); padding: 15px; border-radius: 12px; margin-bottom: 20px; border-left: 5px solid #ff007f; text-align: left; font-size: 14px; line-height: 1.6; }
+        .prize-item-row { display: flex; align-items: center; margin: 8px 0; background: rgba(255,255,255,0.05); padding: 8px; border-radius: 8px; }
+        .prize-thumb { width: 50px; height: 50px; object-fit: cover; border-radius: 6px; margin-right: 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); }
+        .prize-info { flex-grow: 1; }
+
         .login-box { margin-bottom: 15px; }
         input { width: 85%; padding: 12px; border-radius: 8px; border: none; font-size: 16px; text-align: center; background: rgba(255,255,255,0.9); color: #222; font-weight: bold; }
         
@@ -27,7 +33,8 @@
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); align-items: center; justify-content: center; z-index: 100; }
         .modal-content { background: #fff; color: #222; padding: 30px; border-radius: 20px; width: 90%; max-width: 420px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3); animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .modal h2 { color: #ff007f; margin-top: 0; font-size: 24px; }
-        .ticket-box { background: #f9f9f9; border: 2px dashed #00f2fe; padding: 15px; font-size: 22px; font-weight: bold; letter-spacing: 1px; color: #008b9b; margin: 15px 0; border-radius: 8px; cursor: pointer; word-break: break-all; }
+        .ticket-box { background: #f9f9f9; border: 2px dashed #00f2fe; padding: 15px; font-size: 22px; font-weight: bold; letter-spacing: 1px; color: #008b9b; margin: 15px 0; border-radius: 8px; cursor: pointer; word-break: break-all; transition: 0.2s; }
+        .ticket-box:hover { background: #f0fbfd; filter: brightness(0.98); }
         .close-btn { background: #333; font-size: 14px; padding: 10px 20px; width: auto; margin-top: 10px; }
         @keyframes pop { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
     </style>
@@ -35,10 +42,10 @@
 <body>
 
 <div class="container">
-    <h1>🎰 機率即時庫存拉霸機 🎟️</h1>
+    <h1>🎰 呆呆抽獎 🎟️</h1>
     
-    <!-- 剩餘獎品與機率即時看板 -->
-    <div class="status-board" id="statusBoard">正在精密計算雲端庫存與權重...</div>
+    <!-- 剩餘獎品與即時看板 -->
+    <div class="status-board" id="statusBoard">正在精密計算雲端庫存...</div>
 
     <!-- 暱稱輸入區 -->
     <div class="login-box" id="loginBox">
@@ -63,7 +70,7 @@
         <h2 id="modalTitle">🎉 恭喜中獎！</h2>
         <p style="font-weight: bold; font-size: 18px;" id="modalPrizeName">獲得獎項</p>
         <div class="ticket-box" id="modalTicketCode" onclick="copyTicket()">TICKET-CODE</div>
-        <p style="font-size: 12px; color: #666; id="copyHint"">↑ 點擊可複製序號，請立刻截圖保存！</p>
+        <p style="font-size: 12px; color: #666;" id="copyHint">↑ 點擊即可操作，請截圖保存！</p>
         <button class="close-btn" onclick="closeModal()">關閉視窗</button>
     </div>
 </div>
@@ -74,7 +81,7 @@
 
     // ⚠️【請替換成你的 Firebase Realtime Database 網址】
     const firebaseConfig = {
-        databaseURL: "https://daidaikunbao-default-rtdb.firebaseio.com/"
+        databaseURL: "https://YOUR-PROJECT-ID-default-rtdb.firebaseio.com/"
     };
 
     const app = initializeApp(firebaseConfig);
@@ -87,7 +94,7 @@
     let isDrawing = false;
     let localPrizesData = {};
 
-    // 即時同步看板：算出目前每樣獎品的真實中獎機率與庫存
+    // 即時同步看板：只顯示名稱、商品照與剩餘份數（隱藏中獎機率）
     onValue(ref(db, 'prizes'), (snapshot) => {
         const prizes = snapshot.val();
         if (!prizes) {
@@ -96,23 +103,31 @@
         }
         localPrizesData = prizes;
 
-        // 計算目前有效的總權重
-        let totalWeight = 0;
-        for (let id in prizes) {
-            if (prizes[id].quantity > 0) {
-                totalWeight += Number(prizes[id].weight || 0);
-            }
-        }
-
-        let html = "📋 目前即時庫存與中獎率：<br>";
+        let html = "📋 目前即時剩餘獎品：<br>";
         for (let id in prizes) {
             const p = prizes[id];
+            
+            // 判斷是否有填寫商品圖片網址，若無則用透明占位
+            const imgHtml = p.image ? `<img class="prize-thumb" src="${p.image}" alt="${p.name}">` : `<div class="prize-thumb" style="background:rgba(255,255,255,0.1)"></div>`;
+
             if (p.quantity > 0) {
-                // 機率 = (該獎品權重 / 總有效權重) * 100
-                const probability = totalWeight > 0 ? ((p.weight / totalWeight) * 100).toFixed(1) : 0;
-                html += `• <b>${p.name}</b>：🟢 剩餘 <b>${p.quantity}</b> 份 (機率 ${probability}%)<br>`;
+                html += `
+                <div class="prize-item-row">
+                    ${imgHtml}
+                    <div class="prize-info">
+                        <b>${p.name}</b><br>
+                        <span style="color:#00f2fe;">🟢 剩餘 <b>${p.quantity}</b> 份</span>
+                    </div>
+                </div>`;
             } else {
-                html += `• <b>${p.name}</b>：🔴 <b>已全數送完</b> (機率 0%)<br>`;
+                html += `
+                <div class="prize-item-row" style="opacity: 0.5;">
+                    ${imgHtml}
+                    <div class="prize-info">
+                        <del><b>${p.name}</b></del><br>
+                        <span style="color:#ff007f;">🔴 已全數送完</span>
+                    </div>
+                </div>`;
             }
         }
         document.getElementById("statusBoard").innerHTML = html;
@@ -129,7 +144,7 @@
         
         isDrawing = true;
         document.getElementById("spinBtn").disabled = true;
-        document.getElementById("spinBtn").innerText = "機房精算機率中...";
+        document.getElementById("spinBtn").innerText = "機房精算中...";
         document.getElementById("playerName").disabled = true;
 
         const prizesRef = ref(db, 'prizes');
@@ -138,7 +153,6 @@
         runTransaction(prizesRef, (currentPrizes) => {
             if (!currentPrizes) return currentPrizes;
 
-            // 1. 篩選出還有庫存的獎品，並計算當前的總權重
             let pool = [];
             let totalW = 0;
             for (let id in currentPrizes) {
@@ -148,9 +162,8 @@
                 }
             }
 
-            if (pool.length === 0 || totalW === 0) return; // 沒東西可抽了
+            if (pool.length === 0 || totalW === 0) return;
 
-            // 2. 進行加權隨機抽獎（Weighted Random Algorithm）
             let randomNum = Math.floor(Math.random() * totalW);
             let selectedId = null;
             
@@ -162,25 +175,21 @@
                 }
             }
 
-            if (!selectedId) selectedId = pool[0].id; // 安全防呆
+            if (!selectedId) selectedId = pool[0].id;
 
-            // 3. 扣除該獎品庫存，並依序取出電子票券序號
             const prize = currentPrizes[selectedId];
-            prize.quantity = prize.quantity - 1; // 庫存減 1
+            prize.quantity = prize.quantity - 1;
 
             let assignedCode = "無可用票券";
-            // 如果後台有塞電子序號陣列，依庫存順序把對應的序號吐出來
             if (prize.ticketCodes && prize.ticketCodes.length > 0) {
-                // 拿走最後一個或依庫存索引拿取
                 const codeIndex = prize.ticketCodes.length - 1 - prize.quantity;
                 if (prize.ticketCodes[codeIndex] !== undefined) {
                     assignedCode = prize.ticketCodes[codeIndex];
                 } else {
-                    assignedCode = prize.ticketCodes[0]; // 超過範圍的防呆
+                    assignedCode = prize.ticketCodes[0];
                 }
             }
 
-            // 記錄贏家歷史（可選：此處將贏家附加在獎品節點裡以便辨識，或者你可以去雲端看誰扣掉的）
             if(!prize.recentWinners) prize.recentWinners = [];
             prize.recentWinners.push({ user: nameInput, code: assignedCode, time: Date.now() });
 
@@ -189,10 +198,9 @@
                 code: assignedCode
             };
 
-            return currentPrizes; // 回傳修改後的狀態鎖死資料庫
+            return currentPrizes;
         }).then((result) => {
             if (result.committed && finalWonPrize) {
-                // 成功抽到，執行視覺拉霸
                 runSlotMachineAnimation(finalWonPrize.name, () => {
                     if (finalWonPrize.name.includes("銘謝惠顧")) {
                         showWinModal("😭 哎呀可惜！", finalWonPrize.name, "請再接再厲！", true);
@@ -258,20 +266,34 @@
         document.getElementById("playerName").disabled = false;
     }
 
+    // 智能處理：文字序號與圖片網址判斷
     function showWinModal(title, prizeName, code, isLose) {
         document.getElementById("modalTitle").innerText = title;
         document.getElementById("modalPrizeName").innerText = prizeName;
-        document.getElementById("modalTicketCode").innerText = code;
         
         const ticketBox = document.getElementById("modalTicketCode");
-        if(isLose) {
-            ticketBox.style.border = "2px dashed #999";
-            ticketBox.style.color = "#666";
-            document.getElementById("copyHint").style.display = "none";
+        const hintBox = document.getElementById("copyHint");
+        
+        if (code.startsWith("http")) {
+            ticketBox.innerText = "👉 點我查看/下載票券截圖 👈";
+            ticketBox.style.color = "#ff007f";
+            ticketBox.style.border = "2px solid #ff007f";
+            ticketBox.setAttribute("data-url", code);
+            hintBox.innerText = "↑ 點擊上方按鈕將開啟圖片，長按即可儲存截圖！";
+            hintBox.style.display = "block";
         } else {
-            ticketBox.style.border = "2px dashed #00f2fe";
-            ticketBox.style.color = "#008b9b";
-            document.getElementById("copyHint").style.display = "block";
+            ticketBox.innerText = code;
+            ticketBox.removeAttribute("data-url");
+            if(isLose) {
+                ticketBox.style.border = "2px dashed #999";
+                ticketBox.style.color = "#666";
+                hintBox.style.display = "none";
+            } else {
+                ticketBox.style.border = "2px dashed #00f2fe";
+                ticketBox.style.color = "#008b9b";
+                hintBox.innerText = "↑ 點擊可複製序號，請立刻截圖保存！";
+                hintBox.style.display = "block";
+            }
         }
         document.getElementById("winModal").style.display = "flex";
     }
@@ -281,7 +303,15 @@
     }
 
     function copyTicket() {
-        const code = document.getElementById("modalTicketCode").innerText;
+        const ticketBox = document.getElementById("modalTicketCode");
+        const imgUrl = ticketBox.getAttribute("data-url");
+        
+        if (imgUrl) {
+            window.open(imgUrl, '_blank');
+            return;
+        }
+        
+        const code = ticketBox.innerText;
         if(code.includes("請再接再厲") || code.includes("重新再試")) return;
         navigator.clipboard.writeText(code).then(() => {
             alert("序號複製成功！可以去兌換囉！");
