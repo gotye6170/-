@@ -45,7 +45,24 @@
             letter-spacing: 1px;
             filter: drop-shadow(0 2px 4px rgba(255, 255, 255, 0.8));
         }
+
+        /* 📢 注意事項公告欄樣式 */
+        .notice-board {
+            background: linear-gradient(135deg, #fff7ed, #fff1f2);
+            padding: 15px;
+            border-radius: 16px;
+            margin-bottom: 15px;
+            border: 2px dashed #fda4af;
+            text-align: left;
+            font-size: 14px;
+            line-height: 1.6;
+            box-shadow: 0 4px 10px rgba(251, 113, 133, 0.05);
+        }
+        .notice-title { font-weight: bold; color: #e11d48; margin-bottom: 6px; display: block; font-size: 15px; }
+        .notice-list { margin: 0; padding-left: 20px; color: #4c1d95; }
+        .notice-list li { margin-bottom: 4px; }
         
+        /* 溫柔風獎品看板 */
         .status-board { 
             background: rgba(255, 255, 255, 0.9); 
             padding: 15px; 
@@ -103,6 +120,7 @@
             overflow: hidden;
             box-shadow: 0 3px 5px rgba(0,0,0,0.12), inset 0 2px 4px rgba(255,255,255,0.6);
             transform-origin: center;
+            transition: opacity 0.4s ease-out; /* 減少時淡出 */
         }
         .gacha-egg::before {
             content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 50%;
@@ -179,7 +197,7 @@
             background: #ffffff; border-top: 1px solid rgba(0,0,0,0.1);
         }
 
-        /* 🎬 核心變更：重力沉降與推擠碎步動態（分成三層模擬錯落滑落感） */
+        /* 核心變更：重力沉降與推擠碎步動態 */
         @keyframes settleLayerA {
             0% { transform: translateY(0) rotate(var(--init-rot)); }
             30% { transform: translateY(2px) rotate(calc(var(--init-rot) - 3deg)); }
@@ -199,16 +217,13 @@
             100% { transform: translateY(4px) rotate(calc(var(--init-rot) + 2deg)); }
         }
 
-        /* 執行沉降動畫 */
         .settling .egg-layer-a { animation: settleLayerA 0.5s ease-in-out forwards; }
         .settling .egg-layer-b { animation: settleLayerB 0.55s ease-in-out forwards; }
         .settling .egg-layer-c { animation: settleLayerC 0.48s ease-in-out forwards; }
 
-        /* 旋鈕旋轉 */
         @keyframes crankRotate { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .rotating-crank { animation: crankRotate 0.6s ease-in-out forwards; }
 
-        /* 扭蛋自然滾落出洞 */
         @keyframes eggDrop {
             0% { transform: translateY(-40px) scale(0.4) rotate(0deg); opacity: 0; }
             50% { transform: translateY(0) scale(1) rotate(120deg); opacity: 1; }
@@ -239,7 +254,17 @@
 <body>
 
 <div class="container">
-    <h1>🌸 落英繽紛扭蛋機 🎟️</h1>
+    <h1>🐹 呆呆扭蛋機 🎟️</h1>
+    
+    <div class="notice-board">
+        <span class="notice-title">✨ 扭蛋小叮嚀：</span>
+        <ol class="notice-list">
+            <li>請務必先<b>選擇自己的名字</b>，才能啟動扭蛋唷！</li>
+            <li>每個人<b>限制抽取一次</b>，雲端後台會自動鎖定防重複。</li>
+            <li>扭蛋開獎後，請點擊序號區<b>截圖保存</b>，以免遺失。</li>
+            <li>若是抽到銘謝惠顧，請多給主辦人一些溫暖的擁抱。</li>
+        </ol>
+    </div>
     
     <div class="status-board" id="statusBoard">正在讀取雲端禮物庫存...</div>
 
@@ -254,7 +279,7 @@
         </select>
     </div>
 
-    <!-- 🌸 經典重力櫥窗：馬卡龍無序堆疊 -->
+    <!-- 🌸 經典重力櫥窗 -->
     <div class="gachapon-machine">
         <div class="gacha-ball-container" id="gachaGlass">
             <!-- 底層扭蛋 (Layer A) -->
@@ -287,7 +312,6 @@
         <div class="gacha-body">
             <div class="gacha-crank" id="gachaCrank"></div>
             <div class="gacha-outlet">
-                <!-- 一致外觀的馬卡龍幸運蛋 -->
                 <div class="gacha-lucky-egg" id="luckyEgg"></div>
             </div>
         </div>
@@ -444,7 +468,6 @@
             }
 
             if (result.committed && finalWonPrize) {
-                // 執行重力物理感擬真動畫
                 runGachaponAnimation(() => {
                     if (finalWonPrize.name.includes("銘謝惠顧")) {
                         showWinModal("😭 哎呀可惜！", finalWonPrize.name, "請再接再厲！", true);
@@ -465,29 +488,34 @@
         });
     }
 
-    // 🎬 擬真重力微幅沉降動畫
     function runGachaponAnimation(callback) {
         const glass = document.getElementById("gachaGlass");
         const crank = document.getElementById("gachaCrank");
         const luckyEgg = document.getElementById("luckyEgg");
 
-        // 1. 轉動把手
         crank.classList.add("rotating-crank");
 
-        // 2. 轉動一陣子後，裡面的扭蛋堆因為少了一顆，開始產生向下沉降、微幅滾動推擠的效果
         setTimeout(() => {
             glass.classList.add("settling");
+            
+            // 💡 核心新增細節：當轉動時，隨機選取櫥窗內還存在的一顆扭蛋，讓它淡出並移除
+            const remainingEggs = glass.querySelectorAll('.gacha-egg');
+            if (remainingEggs.length > 0) {
+                const randomIndex = Math.floor(Math.random() * remainingEggs.length);
+                const eggToRemove = remainingEggs[randomIndex];
+                eggToRemove.style.opacity = '0'; // 觸發淡出動畫
+                setTimeout(() => {
+                    eggToRemove.remove(); // 動畫完後從網頁結構中彻底移除
+                }, 400);
+            }
         }, 200);
 
-        // 3. 沉降的同時，幸運扭蛋順暢滾落出洞
         setTimeout(() => {
             luckyEgg.classList.add("dropped-egg");
         }, 400);
 
-        // 結束動畫並呈現結果彈窗
         setTimeout(() => {
             crank.classList.remove("rotating-crank");
-            // 彈窗出現後不急著重設內殼位置，保持沉降後的靜止狀態
             callback();
         }, 1200); 
     }
@@ -497,8 +525,6 @@
         document.getElementById("spinBtn").disabled = false;
         document.getElementById("spinBtn").innerText = "啟動幸運扭蛋";
         document.getElementById("playerName").disabled = false;
-        
-        // 下一位玩家準備玩之前，重置回初始堆疊位置
         document.getElementById("gachaGlass").classList.remove("settling");
     }
 
