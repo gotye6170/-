@@ -86,7 +86,7 @@
         }
         input::placeholder { color: rgba(255,255,255,0.4); font-weight: normal; }
         
-        /* 高級拉霸滾動區 (改為黑金奢華風格) */
+        /* 高級拉霸滾動區 (黑金奢華風格) */
         .slot-machine { 
             background: #0d0614; 
             border: 4px solid #ff007f; 
@@ -101,7 +101,7 @@
         }
         .slot-window { 
             background: linear-gradient(180deg, #1a1a2e 0%, #0f0f1a 100%); 
-            color: #ffd700; /* 金黃色文字更有高級感 */
+            color: #ffd700; 
             text-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
             width: 95%; 
             height: 100%; 
@@ -268,7 +268,7 @@
         document.getElementById("statusBoard").innerHTML = html;
     });
 
-    // 核心強奪鎖
+    // 核心強奪鎖 ＆ 限制一人抽一次機制
     function startDraw() {
         const nameInput = document.getElementById("playerName").value.trim();
         if (!nameInput) {
@@ -282,12 +282,23 @@
         document.getElementById("spinBtn").innerText = "好運計算中...";
         document.getElementById("playerName").disabled = true;
 
-        const prizesRef = ref(db, 'prizes');
+        // 我們把檢查和扣除獎品綁在同一個 root transaction，確保萬無一失
+        const rootRef = ref(db);
         let finalWonPrize = null;
+        let isAlreadyPlayed = false;
 
-        runTransaction(prizesRef, (currentPrizes) => {
-            if (!currentPrizes) return currentPrizes;
+        runTransaction(rootRef, (currentData) => {
+            if (!currentData) return currentData;
+            if (!currentData.prizes) currentData.prizes = {};
+            if (!currentData.playedUsers) currentData.playedUsers = {};
 
+            // 🚫 1. 檢查這個名字是否已經在雲端抽過獎了
+            if (currentData.playedUsers[nameInput]) {
+                isAlreadyPlayed = true;
+                return; // 終止交易，不做任何改動
+            }
+
+            let currentPrizes = currentData.prizes;
             let pool = [];
             let totalW = 0;
             for (let id in currentPrizes) {
@@ -328,13 +339,26 @@
             if(!prize.recentWinners) prize.recentWinners = [];
             prize.recentWinners.push({ user: nameInput, code: assignedCode, time: Date.now() });
 
+            // 📝 2. 將名字寫入雲端黑名單，紀錄他已經抽過了
+            currentData.playedUsers[nameInput] = {
+                time: Date.now(),
+                won: prize.name
+            };
+
             finalWonPrize = {
                 name: prize.name,
                 code: assignedCode
             };
 
-            return currentPrizes;
+            return currentData;
         }).then((result) => {
+            // 如果是被抓到重覆抽獎
+            if (isAlreadyPlayed) {
+                alert(`⚠️ 提示：【${nameInput}】你已經抽過囉！不能太貪心哦～`);
+                resetButtonState();
+                return;
+            }
+
             if (result.committed && finalWonPrize) {
                 runSlotMachineAnimation(finalWonPrize.name, () => {
                     if (finalWonPrize.name.includes("銘謝惠顧")) {
@@ -385,7 +409,6 @@
             if(count > 60) speed = 3;
 
             if (count > 68) {
-                // 🎯 精準位移量修正，文字絕對置中
                 track.style.top = `-${(track.children.length - 1) * 76 - 2}px`;
                 setTimeout(callback, 400);
             } else {
