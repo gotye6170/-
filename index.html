@@ -36,7 +36,7 @@
         }
         
         h1 { 
-            margin-top: 0; 
+            margin: 0 0 15px 0; 
             background: linear-gradient(135deg, #ec4899, #f43f5e, #10b981);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -81,55 +81,81 @@
         .prize-info { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; }
         .prize-name-label { font-size: 15px; font-weight: bold; color: #4c1d95; margin-bottom: 2px; }
 
-        .login-box { margin-bottom: 20px; }
+        /* 🔒 密碼與名字區塊 */
+        .login-box { 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px; 
+            background: rgba(255, 255, 255, 0.5);
+            padding: 15px;
+            border-radius: 16px;
+            border: 1px solid rgba(251, 113, 133, 0.2);
+        }
         
+        .secret-input-group {
+            display: flex;
+            width: 85%;
+            gap: 8px;
+        }
+
+        input[type="text"] {
+            flex-grow: 1;
+            padding: 10px 15px;
+            border-radius: 50px;
+            border: 2px solid #fbcfe8;
+            font-size: 14px;
+            outline: none;
+            text-align: center;
+            font-weight: bold;
+            color: #4c1d95;
+            transition: 0.3s;
+        }
+        input[type="text"]:focus { border-color: #f43f5e; }
+
+        .unlock-btn {
+            width: auto;
+            padding: 10px 20px;
+            font-size: 14px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            box-shadow: 0 3px 8px rgba(16, 185, 129, 0.2);
+        }
+        .unlock-btn:hover { transform: scale(1.03); }
+
         select { 
             width: 85%; padding: 12px; border-radius: 50px; border: 2px solid #fbcfe8; 
-            font-size: 15px; text-align: center; text-align-last: center; background: white; 
+            font-size: 15px; background: white; 
             color: #4c1d95; font-weight: bold; transition: 0.3s; cursor: pointer;
             box-shadow: 0 3px 6px rgba(0,0,0,0.05); appearance: none; -webkit-appearance: none;
+            text-align: center; text-align-last: center;
         }
         select:focus { outline: none; border-color: #f43f5e; box-shadow: 0 0 10px rgba(244,63,94,0.2); }
+        
+        optgroup { font-weight: bold; color: #db2777; background: #fff1f2; text-align: left; }
+        option { color: #4c1d95; font-weight: normal; background: white; }
+        option:disabled { color: #cbd5e1 !important; background: #f1f5f9; cursor: not-allowed; }
+
+        /* 💡 預設將所有分組隱藏 */
+        .hidden-group { display: none !important; }
 
         /* 🌸 扭蛋機外觀 */
-        .gachapon-machine {
-            width: 240px;
-            margin: 20px auto;
-        }
-        
-        /* 透明壓克力櫥窗 */
+        .gachapon-machine { width: 240px; margin: 20px auto; }
         .gacha-ball-container {
-            width: 220px;
-            height: 190px;
+            width: 220px; height: 190px;
             background: linear-gradient(to bottom, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.3) 100%);
-            border: 5px solid #ffffff;
-            border-top: 15px solid #f43f5e; 
-            border-radius: 16px 16px 8px 8px;
-            margin: 0 auto;
-            position: relative;
-            overflow: hidden;
+            border: 5px solid #ffffff; border-top: 15px solid #f43f5e; border-radius: 16px 16px 8px 8px;
+            margin: 0 auto; position: relative; overflow: hidden;
             box-shadow: 0 8px 20px rgba(0,0,0,0.08), inset 0 0 15px rgba(255,255,255,0.5);
         }
 
-        /* 馬卡龍色系雙色扭蛋 */
         .gacha-egg {
-            width: 36px;
-            height: 36px;
-            position: absolute;
-            border-radius: 50%;
-            overflow: hidden;
+            width: 36px; height: 36px; position: absolute; border-radius: 50%; overflow: hidden;
             box-shadow: 0 3px 5px rgba(0,0,0,0.12), inset 0 2px 4px rgba(255,255,255,0.6);
-            transform-origin: center;
-            transition: opacity 0.4s ease-out; /* 減少時淡出 */
+            transform-origin: center; transition: opacity 0.4s ease-out;
         }
-        .gacha-egg::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 50%;
-        }
-        .gacha-egg::after {
-            content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 50%;
-            background: #ffffff;
-            border-top: 1px solid rgba(0,0,0,0.1);
-        }
+        .gacha-egg::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 50%; }
+        .gacha-egg::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 50%; background: #ffffff; border-top: 1px solid rgba(0,0,0,0.1); }
 
         .egg-pink::before   { background: #ff49db; }
         .egg-blue::before   { background: #3b82f6; }
@@ -138,84 +164,18 @@
         .egg-orange::before { background: #f97316; }
         .egg-purple::before { background: #a855f7; }
 
-        /* 機身底座 */
-        .gacha-body {
-            width: 230px;
-            background: #f43f5e; 
-            border-radius: 8px 8px 24px 24px;
-            margin: -2px auto 0;
-            padding: 18px 10px;
-            box-shadow: 0 8px 20px rgba(244,63,94,0.3);
-            position: relative;
-            border: 3px solid #ffffff;
-        }
-        
-        /* 旋鈕 */
-        .gacha-crank {
-            width: 65px;
-            height: 65px;
-            background: radial-gradient(circle, #ffe066 30%, #f59e0b 100%);
-            border: 3px solid #ffffff;
-            border-radius: 50%;
-            margin: 0 auto 12px;
-            position: relative;
-            cursor: pointer;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.15);
-        }
-        .gacha-crank::before {
-            content: '扭蛋';
-            position: absolute; width: 85%; height: 20px; background: #ffffff;
-            top: 50%; left: 7.5%; transform: translateY(-50%); border-radius: 4px;
-            color: #d97706; font-size: 11px; font-weight: bold; line-height: 20px; text-align: center;
-        }
-        
-        /* 出蛋口 */
-        .gacha-outlet {
-            width: 75px; height: 55px; background: #991b1b; border: 3px solid #ffffff;
-            margin: 0 auto; border-radius: 12px 12px 6px 6px; box-shadow: inset 0 4px 8px rgba(0,0,0,0.4);
-            position: relative;
-        }
+        .gacha-body { width: 230px; background: #f43f5e; border-radius: 8px 8px 24px 24px; margin: -2px auto 0; padding: 18px 10px; box-shadow: 0 8px 20px rgba(244,63,94,0.3); position: relative; border: 3px solid #ffffff; }
+        .gacha-crank { width: 65px; height: 65px; background: radial-gradient(circle, #ffe066 30%, #f59e0b 100%); border: 3px solid #ffffff; border-radius: 50%; margin: 0 auto 12px; position: relative; cursor: pointer; box-shadow: 0 3px 6px rgba(0,0,0,0.15); }
+        .gacha-crank::before { content: '扭蛋'; position: absolute; width: 85%; height: 20px; background: #ffffff; top: 50%; left: 7.5%; transform: translateY(-50%); border-radius: 4px; color: #d97706; font-size: 11px; font-weight: bold; line-height: 20px; text-align: center; }
+        .gacha-outlet { width: 75px; height: 55px; background: #991b1b; border: 3px solid #ffffff; margin: 0 auto; border-radius: 12px 12px 6px 6px; box-shadow: inset 0 4px 8px rgba(0,0,0,0.4); position: relative; }
 
-        /* 滾出來的幸運雙色扭蛋 */
-        .gacha-lucky-egg {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            position: absolute;
-            top: 3px; left: 13px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3), inset 0 2px 4px rgba(255,255,255,0.6);
-            display: none;
-            z-index: 10;
-            overflow: hidden;
-        }
-        .gacha-lucky-egg::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 50%;
-            background: #ff49db; 
-        }
-        .gacha-lucky-egg::after {
-            content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 50%;
-            background: #ffffff; border-top: 1px solid rgba(0,0,0,0.1);
-        }
+        .gacha-lucky-egg { width: 44px; height: 44px; border-radius: 50%; position: absolute; top: 3px; left: 13px; box-shadow: 0 4px 10px rgba(0,0,0,0.3), inset 0 2px 4px rgba(255,255,255,0.6); display: none; z-index: 10; overflow: hidden; }
+        .gacha-lucky-egg::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 50%; }
+        .gacha-lucky-egg::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 50%; background: #ffffff; border-top: 1px solid rgba(0,0,0,0.1); }
 
-        /* 核心變更：重力沉降與推擠碎步動態 */
-        @keyframes settleLayerA {
-            0% { transform: translateY(0) rotate(var(--init-rot)); }
-            30% { transform: translateY(2px) rotate(calc(var(--init-rot) - 3deg)); }
-            70% { transform: translateY(7px) rotate(calc(var(--init-rot) + 5deg)); }
-            100% { transform: translateY(6px) rotate(calc(var(--init-rot) + 3deg)); }
-        }
-        @keyframes settleLayerB {
-            0% { transform: translateY(0) rotate(var(--init-rot)); }
-            40% { transform: translateY(3px) rotate(calc(var(--init-rot) + 4deg)); }
-            80% { transform: translateY(8px) rotate(calc(var(--init-rot) - 6deg)); }
-            100% { transform: translateY(7px) rotate(calc(var(--init-rot) - 4deg)); }
-        }
-        @keyframes settleLayerC {
-            0% { transform: translateY(0) rotate(var(--init-rot)); }
-            20% { transform: translateY(1px) rotate(calc(var(--init-rot) - 2deg)); }
-            60% { transform: translateY(5px) rotate(calc(var(--init-rot) + 4deg)); }
-            100% { transform: translateY(4px) rotate(calc(var(--init-rot) + 2deg)); }
-        }
+        @keyframes settleLayerA { 0% { transform: translateY(0) rotate(var(--init-rot)); } 30% { transform: translateY(2px) rotate(calc(var(--init-rot) - 3deg)); } 70% { transform: translateY(7px) rotate(calc(var(--init-rot) + 5deg)); } 100% { transform: translateY(6px) rotate(calc(var(--init-rot) + 3deg)); } }
+        @keyframes settleLayerB { 0% { transform: translateY(0) rotate(var(--init-rot)); } 40% { transform: translateY(3px) rotate(calc(var(--init-rot) + 4deg)); } 80% { transform: translateY(8px) rotate(calc(var(--init-rot) - 6deg)); } 100% { transform: translateY(7px) rotate(calc(var(--init-rot) - 4deg)); } }
+        @keyframes settleLayerC { 0% { transform: translateY(0) rotate(var(--init-rot)); } 20% { transform: translateY(1px) rotate(calc(var(--init-rot) - 2deg)); } 60% { transform: translateY(5px) rotate(calc(var(--init-rot) + 4deg)); } 100% { transform: translateY(4px) rotate(calc(var(--init-rot) + 2deg)); } }
 
         .settling .egg-layer-a { animation: settleLayerA 0.5s ease-in-out forwards; }
         .settling .egg-layer-b { animation: settleLayerB 0.55s ease-in-out forwards; }
@@ -224,11 +184,7 @@
         @keyframes crankRotate { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .rotating-crank { animation: crankRotate 0.6s ease-in-out forwards; }
 
-        @keyframes eggDrop {
-            0% { transform: translateY(-40px) scale(0.4) rotate(0deg); opacity: 0; }
-            50% { transform: translateY(0) scale(1) rotate(120deg); opacity: 1; }
-            100% { transform: translateY(4px) scale(1.3) rotate(180deg); filter: drop-shadow(0 0 6px rgba(255,73,219,0.3)); }
-        }
+        @keyframes eggDrop { 0% { transform: translateY(-40px) scale(0.4) rotate(0deg); opacity: 0; } 50% { transform: translateY(0) scale(1) rotate(120deg); opacity: 1; } 100% { transform: translateY(4px) scale(1.3) rotate(180deg); filter: drop-shadow(0 0 6px rgba(255,73,219,0.3)); } }
         .dropped-egg { display: block !important; animation: eggDrop 0.5s ease-out forwards; }
 
         button { 
@@ -240,7 +196,6 @@
         button:hover { transform: scale(1.02); box-shadow: 0 7px 20px rgba(244,63,94,0.4); }
         button:disabled { background: #cbd5e1; color: #94a3b8; cursor: not-allowed; box-shadow: none; transform: none; }
 
-        /* 彈窗 */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(76, 29, 149, 0.3); backdrop-filter: blur(5px); align-items: center; justify-content: center; z-index: 100; }
         .modal-content { background: #ffffff; color: #4c1d95; padding: 30px; border-radius: 24px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 15px 40px rgba(0,0,0,0.15); border: 3px solid #fbcfe8; animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.2); }
         .modal h2 { color: #e11d48; margin-top: 0; font-size: 24px; }
@@ -259,22 +214,38 @@
     <div class="notice-board">
         <span class="notice-title">✨ 注意事項</span>
         <ol class="notice-list">
-            <li>請<b>選擇自己的名字</b>就好，不要亂選別人名字</li>
-            <li>每個人<b>限抽一次</b>，想再偷抽會有驚喜</li>
+            <li>請先<b>輸入群組密語</b>來解鎖專屬名單</li>
+            <li>每個人<b>限抽一次</b>，選過的名字會自動反灰鎖定</li>
             <li>若幸運中獎，請<b>妥善保存截圖</b></li>
         </ol>
     </div>
     
     <div class="status-board" id="statusBoard">正在讀取雲端禮物庫存...</div>
 
+    <!-- 🔒 密碼驗證區與選擇器 -->
     <div class="login-box" id="loginBox">
+        <div class="secret-input-group">
+            <input type="text" id="secretPass" placeholder="🔑 請輸入群組通關密語">
+            <button class="unlock-btn" onclick="verifyGroupPass()">解鎖</button>
+        </div>
+
         <select id="playerName">
-            <option value="" disabled selected>▼ 請選擇你的名字 ▼</option>
-            <option value="貝果">貝果</option>
-            <option value="怡蒨">怡蒨</option>
-            <option value="77">77</option>
-            <option value="安鴻">安鴻</option>
-            <option value="當家">當家</option>
+            <option value="" disabled selected>🔒 請先解鎖群組名單 🔒</option>
+            
+            <!-- 💡 每個群組都綁定對應的 id，並加上預設隱藏類別 hidden-group -->
+            <optgroup label="✨ 皮皮群" id="group-pipi" class="hidden-group">
+                <option value="貝果">貝果</option>
+                <option value="怡蒨">怡蒨</option>
+                <option value="77">77</option>
+                <option value="安鴻">安鴻</option>
+                <option value="當家">當家</option>
+            </optgroup>
+            
+            <optgroup label="🎓 大學朋友群" id="group-college" class="hidden-group">
+                <option value="彥伶">彥伶</option>
+                <option value="亮昀">亮昀</option>
+                <option value="芳瑜">芳瑜</option>
+            </optgroup>
         </select>
     </div>
 
@@ -344,55 +315,105 @@
     window.startDraw = startDraw;
     window.closeModal = closeModal;
     window.copyTicket = copyTicket;
+    window.verifyGroupPass = verifyGroupPass;
 
     let isDrawing = false;
 
-    // 即時看板監聽
-    onValue(ref(db, 'prizes'), (snapshot) => {
-        const prizes = snapshot.val();
-        if (!prizes) {
-            document.getElementById("statusBoard").innerHTML = "❌ 後台尚未配置獎品結構。";
-            return;
+    // 💡 密語對應設定（可在此自由擴充密碼與對應的 HTML 元素 id）
+    const groupPasswords = {
+        "皮皮": "group-pipi",
+        "GM": "group-college"
+    };
+
+    // 💡 密語驗證主邏輯
+    function verifyGroupPass() {
+        const inputPass = document.getElementById("secretPass").value.trim();
+        const selectEl = document.getElementById("playerName");
+        
+        // 預設先隱藏所有分組
+        document.getElementById("group-pipi").classList.add("hidden-group");
+        document.getElementById("group-college").classList.add("hidden-group");
+        
+        if (groupPasswords[inputPass]) {
+            const targetGroupId = groupPasswords[inputPass];
+            // 成功解鎖：移除隱藏類別
+            document.getElementById(targetGroupId).classList.remove("hidden-group");
+            selectEl.options[0].innerText = "▼ 請選擇你的名字 ▼";
+            alert(`🔓 【${inputPass}】名單已成功解鎖！`);
+        } else {
+            selectEl.value = "";
+            selectEl.options[0].innerText = "🔒 請先解鎖群組名單 🔒";
+            alert("❌ 密語錯誤，無法解鎖任何群組名單！");
+        }
+    }
+
+    // 即時看板與已抽過名字的反灰監聽
+    onValue(ref(db), (snapshot) => {
+        const rootData = snapshot.val();
+        if (!rootData) return;
+
+        const prizes = rootData.prizes;
+        const playedUsers = rootData.playedUsers || {};
+
+        // 1. 更新剩餘好禮看板
+        if (prizes) {
+            let html = '<span class="prize-title-text">📋 目前剩餘好禮：</span>';
+            let hasVisiblePrize = false;
+
+            for (let id in prizes) {
+                const p = prizes[id];
+                if (p.name && p.name.includes("銘謝惠顧")) continue; 
+
+                hasVisiblePrize = true;
+                const imgHtml = p.image ? `<img class="prize-thumb" src="${p.image}" alt="${p.name}">` : `<div class="prize-thumb" style="background:#f3f4f6;"></div>`;
+
+                if (Number(p.quantity) > 0) {
+                    html += `
+                    <div class="prize-item-row">
+                        ${imgHtml}
+                        <div class="prize-info">
+                            <span class="prize-name-label">${p.name}</span>
+                            <span style="color:#059669; font-size:13px; font-weight:bold;">🟢 剩餘 <b>${p.quantity}</b> 份</span>
+                        </div>
+                    </div>`;
+                } else {
+                    html += `
+                    <div class="prize-item-row" style="opacity: 0.4;">
+                        ${imgHtml}
+                        <div class="prize-info">
+                            <span class="prize-name-label" style="text-decoration: line-through; color:#9ca3af;">${p.name}</span>
+                            <span style="color:#dc2626; font-size:13px; font-weight:bold;">🔴 已全數送完</span>
+                        </div>
+                    </div>`;
+                }
+            }
+            if (!hasVisiblePrize) html += '<div style="color: #9ca3af; font-size: 13px; padding: 10px;">目前無公開好禮。</div>';
+            document.getElementById("statusBoard").innerHTML = html;
         }
 
-        let html = '<span class="prize-title-text">📋 目前剩餘好禮：</span>';
-        let hasVisiblePrize = false;
-
-        for (let id in prizes) {
-            const p = prizes[id];
-            if (p.name && p.name.includes("銘謝惠顧")) continue; 
-
-            hasVisiblePrize = true;
-            const imgHtml = p.image ? `<img class="prize-thumb" src="${p.image}" alt="${p.name}">` : `<div class="prize-thumb" style="background:#f3f4f6;"></div>`;
-
-            if (Number(p.quantity) > 0) {
-                html += `
-                <div class="prize-item-row">
-                    ${imgHtml}
-                    <div class="prize-info">
-                        <span class="prize-name-label">${p.name}</span>
-                        <span style="color:#059669; font-size:13px; font-weight:bold;">🟢 剩餘 <b>${p.quantity}</b> 份</span>
-                    </div>
-                </div>`;
+        // 2. 比對資料庫，將已抽過的人在下拉選單中「反灰並禁用」
+        const nameSelect = document.getElementById("playerName");
+        const options = nameSelect.getElementsByTagName("option");
+        
+        for (let option of options) {
+            if (option.value === "") continue; 
+            
+            if (playedUsers[option.value]) {
+                option.disabled = true;
+                if (!option.innerText.includes(" (已抽過)")) {
+                    option.innerText = option.value + " (已抽過)";
+                }
             } else {
-                html += `
-                <div class="prize-item-row" style="opacity: 0.4;">
-                    ${imgHtml}
-                    <div class="prize-info">
-                        <span class="prize-name-label" style="text-decoration: line-through; color:#9ca3af;">${p.name}</span>
-                        <span style="color:#dc2626; font-size:13px; font-weight:bold;">🔴 已全數送完</span>
-                    </div>
-                </div>`;
+                option.disabled = false;
+                option.innerText = option.value;
             }
         }
-        if (!hasVisiblePrize) html += '<div style="color: #9ca3af; font-size: 13px; padding: 10px;">目前無公開好禮。</div>';
-        document.getElementById("statusBoard").innerHTML = html;
     });
 
     function startDraw() {
         const nameInput = document.getElementById("playerName").value;
         if (!nameInput) {
-            alert("請先選擇你的名字喔！");
+            alert("請先輸入通關密語並選擇你的名字喔！");
             return;
         }
         if (isDrawing) return;
@@ -401,6 +422,7 @@
         document.getElementById("spinBtn").disabled = true;
         document.getElementById("spinBtn").innerText = "轉動中...";
         document.getElementById("playerName").disabled = true;
+        document.getElementById("secretPass").disabled = true;
 
         document.getElementById("luckyEgg").classList.remove("dropped-egg");
 
@@ -492,19 +514,28 @@
         const crank = document.getElementById("gachaCrank");
         const luckyEgg = document.getElementById("luckyEgg");
 
+        luckyEgg.className = "gacha-lucky-egg";
         crank.classList.add("rotating-crank");
 
         setTimeout(() => {
             glass.classList.add("settling");
             
-            // 💡 核心新增細節：當轉動時，隨機選取櫥窗內還存在的一顆扭蛋，讓它淡出並移除
             const remainingEggs = glass.querySelectorAll('.gacha-egg');
             if (remainingEggs.length > 0) {
                 const randomIndex = Math.floor(Math.random() * remainingEggs.length);
                 const eggToRemove = remainingEggs[randomIndex];
-                eggToRemove.style.opacity = '0'; // 觸發淡出動畫
+
+                let targetColorClass = "egg-pink";
+                eggToRemove.classList.forEach(cls => {
+                    if (cls.startsWith('egg-') && cls !== 'egg-layer-a' && cls !== 'egg-layer-b' && cls !== 'egg-layer-c') {
+                        targetColorClass = cls;
+                    }
+                });
+
+                luckyEgg.classList.add(targetColorClass);
+                eggToRemove.style.opacity = '0';
                 setTimeout(() => {
-                    eggToRemove.remove(); // 動畫完後從網頁結構中彻底移除
+                    eggToRemove.remove();
                 }, 400);
             }
         }, 200);
@@ -524,6 +555,15 @@
         document.getElementById("spinBtn").disabled = false;
         document.getElementById("spinBtn").innerText = "啟動幸運扭蛋";
         document.getElementById("playerName").disabled = false;
+        document.getElementById("secretPass").disabled = false;
+        
+        // 抽完後重設為全面鎖定狀態（徹底保障隱私）
+        document.getElementById("playerName").value = "";
+        document.getElementById("playerName").options[0].innerText = "🔒 請先解鎖群組名單 🔒";
+        document.getElementById("secretPass").value = "";
+        document.getElementById("group-pipi").classList.add("hidden-group");
+        document.getElementById("group-college").classList.add("hidden-group");
+
         document.getElementById("gachaGlass").classList.remove("settling");
     }
 
