@@ -572,6 +572,7 @@
         let globalPlayedDevices = {};
         let honorUnlockedGroup = null; // 幸運中獎者欄位目前解鎖的群組（null = 尚未解鎖）
         let lastPlayedList = [];       // 最近一次從 Firebase 算出的完整得獎名單（未過濾群組）
+        let lastPrizes = null;         // 最近一次從 Firebase 拿到的獎品資料（用來重繪禮物列表）
 
         let deviceId =
             localStorage.getItem("gachaDeviceId");
@@ -605,6 +606,63 @@
                 if (groupLists[key].names.includes(name)) return key;
             }
             return null;
+        }
+
+        // 🔎 判斷某個已送完的獎品，是否完全沒被「目前解鎖的群組」抽中過
+        // （用來在禮物列表加註「已被其他組抽走」，說明庫存跟中獎名單看起來不一致的原因）
+        function isPrizeTakenByOtherGroup(prizeName) {
+            if (!honorUnlockedGroup) return false; // 尚未解鎖任何群組時，不做這個判斷
+
+            for (const user in globalPlayedUsers) {
+                const rec = globalPlayedUsers[user];
+                if (rec.won === prizeName && rec.group === honorUnlockedGroup) {
+                    return false; // 自己這組也有人抽中過，不算「被其他組拿走」
+                }
+            }
+            return true;
+        }
+
+        // 📋 畫出「禮物列表」欄位，已送完且非本組抽中的獎品會加註提示
+        function renderStatusBoard(prizes) {
+            const board = document.getElementById("statusBoard");
+            if (!board || !prizes) return;
+
+            let html = '<span class="prize-title-text">📋 禮物列表</span>';
+            let hasVisiblePrize = false;
+
+            for (let id in prizes) {
+                const p = prizes[id];
+                if (p.name && p.name.includes("銘謝惠顧")) continue;
+
+                hasVisiblePrize = true;
+                const imgHtml = p.image ? `<img class="prize-thumb" src="${p.image}" alt="${p.name}">` : `<div class="prize-thumb" style="background:#f3f4f6;"></div>`;
+
+                if (Number(p.quantity) > 0) {
+                    html += `
+                    <div class="prize-item-row">
+                        ${imgHtml}
+                        <div class="prize-info">
+                            <span class="prize-name-label">${p.name}</span>
+                            <span style="color:#059669; font-size:13px; font-weight:bold;">🟢 剩餘 <b>${p.quantity}</b> 份</span>
+                        </div>
+                    </div>`;
+                } else {
+                    const otherGroupNote = isPrizeTakenByOtherGroup(p.name)
+                        ? '<div style="color:#f97316; font-size:11px; font-weight:bold; margin-top:1px;">🔸 已被其他組抽走</div>'
+                        : '';
+                    html += `
+                    <div class="prize-item-row" style="opacity: 0.4;">
+                        ${imgHtml}
+                        <div class="prize-info">
+                            <span class="prize-name-label" style="text-decoration: line-through; color:#9ca3af;">${p.name}</span>
+                            <span style="color:#dc2626; font-size:13px; font-weight:bold;">🔴 已全數送完</span>
+                            ${otherGroupNote}
+                        </div>
+                    </div>`;
+                }
+            }
+            if (!hasVisiblePrize) html += '<div style="color: #9ca3af; font-size: 13px; padding: 10px;">目前無公開好禮。</div>';
+            board.innerHTML = html;
         }
 
 
@@ -655,6 +713,7 @@
                 honorUnlockedGroup = inputPass;
                 renderHonorBoard(lastPlayedList);
                 updateMarquee(buildMarqueeText(lastPlayedList));
+                if (lastPrizes) renderStatusBoard(lastPrizes);
 
                 alert(`🔓 【${inputPass}】名單已成功解鎖！`);
             } else {
@@ -677,38 +736,8 @@
             globalPlayedDevices = rootData.playedDevices || {}; 
 
             if (prizes) {
-                let html = '<span class="prize-title-text">📋 禮物列表</span>';
-                let hasVisiblePrize = false;
-
-                for (let id in prizes) {
-                    const p = prizes[id];
-                    if (p.name && p.name.includes("銘謝惠顧")) continue; 
-
-                    hasVisiblePrize = true;
-                    const imgHtml = p.image ? `<img class="prize-thumb" src="${p.image}" alt="${p.name}">` : `<div class="prize-thumb" style="background:#f3f4f6;"></div>`;
-
-                    if (Number(p.quantity) > 0) {
-                        html += `
-                        <div class="prize-item-row">
-                            ${imgHtml}
-                            <div class="prize-info">
-                                <span class="prize-name-label">${p.name}</span>
-                                <span style="color:#059669; font-size:13px; font-weight:bold;">🟢 剩餘 <b>${p.quantity}</b> 份</span>
-                            </div>
-                        </div>`;
-                    } else {
-                        html += `
-                        <div class="prize-item-row" style="opacity: 0.4;">
-                            ${imgHtml}
-                            <div class="prize-info">
-                                <span class="prize-name-label" style="text-decoration: line-through; color:#9ca3af;">${p.name}</span>
-                                <span style="color:#dc2626; font-size:13px; font-weight:bold;">🔴 已全數送完</span>
-                            </div>
-                        </div>`;
-                    }
-                }
-                if (!hasVisiblePrize) html += '<div style="color: #9ca3af; font-size: 13px; padding: 10px;">目前無公開好禮。</div>';
-                document.getElementById("statusBoard").innerHTML = html;
+                lastPrizes = prizes;
+                renderStatusBoard(prizes);
             }
 
             const nameSelect = document.getElementById("playerName");
