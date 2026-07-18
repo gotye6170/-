@@ -238,7 +238,7 @@
         });
     }
 
-    // 拉霸滾動效果（保留您修改的精采名單）
+    // 拉霸滾動效果（精準座標置中修正）
     function runSlotMachineAnimation(finalResult, callback) {
         const track = document.getElementById("slotTrack");
         track.innerHTML = "";
@@ -267,7 +267,8 @@
             if(count > 60) speed = 3;
 
             if (count > 68) {
-                track.style.top = `-${(track.children.length - 1) * 76 - 15}px`;
+                // 🎯 修正關鍵：微調精準位移量，使最終文字達到上下完美絕對置中
+                track.style.top = `-${(track.children.length - 1) * 76 - 2}px`;
                 setTimeout(callback, 400);
             } else {
                 requestAnimationFrame(animate);
