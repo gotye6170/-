@@ -214,7 +214,7 @@
                 });
             } else {
                 runSlotMachineAnimation("💔 沒中獎", () => {
-                    showWinModal("庫存異動", "剛才那一瞬間庫存正好被搶光囉！", "請重新再試一次", true);
+                    showWinModal("沒中獎", "不要氣餒！", "下次再加油", true);
                     resetButtonState();
                 });
             }
@@ -229,7 +229,7 @@
         const track = document.getElementById("slotTrack");
         track.innerHTML = "";
 
-        const dummyPool = ["🎁 超商禮券", "☕ 冰美式", "🍿 爆米花", "🎬 電影票", "✨ 隱藏大獎"];
+        const dummyPool = ["睏寶", "怡蒨", "77", "安鴻", "當家"];
         for(let i=0; i<25; i++) {
             const item = document.createElement("div");
             item.className = "slot-item";
