@@ -162,7 +162,7 @@
             100% { transform: rotate(720deg); }
         }
 
-        /* 🕳️ 出蛋口與掉落蛋 */
+        /* 🕳️ 出蛋口外部結構 */
         .gacha-gate {
             width: 75px;
             height: 75px;
@@ -171,38 +171,66 @@
             border: 4px solid #4b5563;
             position: relative;
             box-shadow: inset 0 5px 10px rgba(0,0,0,0.5);
+            overflow: hidden; /* 確保蛋是從內部上面管道掉落出來 */
         }
 
-        /* 🥚 出蛋口隱藏的獲獎蛋 (恢復原版 CSS 扭蛋圖案球體造型) */
+        /* 🥚 出蛋口內部隱藏的獲獎蛋（初始位於出蛋口上方的暗處管道中） */
         .gacha-lucky-egg {
             position: absolute;
-            width: 44px;
-            height: 44px;
+            width: 46px;
+            height: 46px;
             border-radius: 50%;
-            top: -50px;
-            left: 12px;
+            top: -60px; /* 藏在上方管道深處 */
+            left: 11px;
             opacity: 0;
             z-index: 10;
-            box-shadow: inset -5px -5px 10px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.3);
+            box-shadow: inset -5px -5px 10px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.4);
         }
         .gacha-lucky-egg::after {
             content: '';
             position: absolute;
             top: 0; left: 0; width: 100%; height: 50%;
             background: rgba(255,255,255,0.35);
-            border-radius: 22px 22px 0 0;
+            border-radius: 23px 23px 0 0;
         }
 
-        /* 🌠 重力掉落、彈跳與旋轉動畫 */
+        /* 🌠 徹底重構：真實重力加速墜落、硬殼砸地強力回彈動畫 */
         .dropped-egg {
-            animation: dropEggAnimation 0.8s cubic-bezier(0.25, 1, 0.5, 1) 0.4s forwards;
+            animation: realGravityDrop 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.3s forwards;
         }
-        @keyframes dropEggAnimation {
-            0% { top: -50px; opacity: 0; transform: scale(0.3) rotate(0deg); }
-            40% { top: 12px; opacity: 1; transform: scale(1.1) rotate(180deg); }
-            60% { top: 16px; opacity: 1; transform: scale(0.95); }
-            80% { top: 12px; opacity: 1; transform: scale(1.02); }
-            100% { top: 14px; opacity: 1; transform: scale(1) rotate(360deg); }
+        
+        @keyframes realGravityDrop {
+            0% { 
+                top: -60px; 
+                opacity: 0; 
+                transform: scaleY(1.1) scaleX(0.9) rotate(0deg); /* 快速下墜時的微拉伸 */
+            }
+            30% { 
+                top: 12px; /* 第一次高速砸到出蛋口底部 */
+                opacity: 1; 
+                transform: scaleY(0.8) scaleX(1.15) rotate(120deg); /* 撞擊瞬間硬殼被壓縮扁化 */
+            }
+            48% { 
+                top: -12px; /* 第一次強烈反彈彈起 */
+                transform: scaleY(1.05) scaleX(0.95) rotate(190deg); 
+            }
+            65% { 
+                top: 12px; /* 第二次落下砸地 */
+                transform: scaleY(0.92) scaleX(1.06) rotate(260deg); /* 輕微二次撞擊壓縮 */
+            }
+            78% { 
+                top: 2px; /* 第二次微幅彈起 */
+                transform: scaleY(1.02) scaleX(0.98) rotate(310deg); 
+            }
+            90% {
+                top: 12px; /* 最終落地定點穩定 */
+                transform: scaleY(1) scaleX(1) rotate(350deg);
+            }
+            100% { 
+                top: 12px; 
+                opacity: 1; 
+                transform: scaleY(1) scaleX(1) rotate(360deg); /* 完全靜止 */
+            }
         }
 
         /* 📋 數據看板通用外觀 */
@@ -432,7 +460,7 @@
             </div>
             
             <div id="modalTicketCode" onclick="clickTicket()" class="bg-slate-900 text-cyan-400 font-mono text-base font-bold py-3 px-4 rounded-xl cursor-pointer hover:bg-slate-800 active:scale-98 transition-all border border-cyan-500/30 break-all select-all">🎟️ CODE-XXXX-XXXX</div>
-            <p id="copyHint" class="text-[11px] text-gray-400 mt-1.5 font-medium">💡 點擊黑色號碼框即可一鍵複製兌獎序號</p>
+            <p id="copyHint" class="text-[11px] text-gray-400 mt-1.5 font-medium">💡 點擊並輸入密碼「3064」即可開啟獎品</p>
 
             <button onclick="closeModal()" class="w-full bg-gray-800 hover:bg-gray-700 text-white font-bold py-2.5 rounded-xl text-sm transition-all mt-5">收下好禮</button>
         </div>
@@ -622,7 +650,7 @@
             document.getElementById("playerName").disabled = true;
             document.getElementById("secretPass").disabled = true;
 
-            // 確保每次抽獎前清除掉落蛋的舊顏色 class，只保留基本外觀基礎
+            // 每次抽獎前，徹底把掉落蛋的 class 洗乾淨，使其回到 -60px 高度隱藏狀態
             document.getElementById("luckyEgg").className = "gacha-lucky-egg";
 
             const rootRef = ref(db);
@@ -713,20 +741,19 @@
             const crank = document.getElementById("gachaCrank");
             const luckyEgg = document.getElementById("luckyEgg");
 
-            // 重設掉落球的基礎屬性
-            luckyEgg.className = "gacha-lucky-egg";
+            // 手把開始轉動
             crank.classList.add("rotating-crank");
 
             setTimeout(() => {
+                // 機艙內部蛋群開始快速晃動攪拌
                 glass.classList.add("settling");
                 
                 const remainingEggs = glass.querySelectorAll('.gacha-egg');
                 if (remainingEggs.length > 0) {
-                    // 隨機選中一顆要淡出消失的機艙內扭蛋
                     const randomIndex = Math.floor(Math.random() * remainingEggs.length);
                     const eggToRemove = remainingEggs[randomIndex];
 
-                    // 精準捕捉該消失扭蛋的顏色樣式（例如 egg-pink, egg-blue 等）
+                    // 捕捉抽中消失扭蛋的顏色
                     let targetColorClass = "egg-pink";
                     eggToRemove.classList.forEach(cls => {
                         if (cls.startsWith('egg-') && cls !== 'egg-layer-a' && cls !== 'egg-layer-b' && cls !== 'egg-layer-c') {
@@ -734,10 +761,10 @@
                         }
                     });
 
-                    // 同步：讓掉落球（luckyEgg）套用同一個顏色樣式
+                    // 出蛋口的幸運扭蛋繼承該顏色
                     luckyEgg.classList.add(targetColorClass);
                     
-                    // 執行消失扭蛋的淡出
+                    // 上方玻璃罩內的扭蛋淡出
                     eggToRemove.style.opacity = '0';
                     setTimeout(() => {
                         eggToRemove.remove();
@@ -745,17 +772,17 @@
                 }
             }, 200);
 
-            // 在第 400 毫秒時，啟動掉落蛋往下掉、旋轉、與出蛋口彈跳重力動畫
+            // 在第 400 毫秒時，扭蛋從上方管道以「重力加速度」猛烈砸落到出蛋口底部
             setTimeout(() => {
                 luckyEgg.classList.add("dropped-egg");
             }, 400);
 
-            // 動態完畢後，移除暫時加入的 class 並執行回呼函式打開 Modal
+            // 落地回彈穩定後，關閉晃動並跳出中獎視窗
             setTimeout(() => {
                 glass.classList.remove("settling");
                 crank.classList.remove("rotating-crank");
                 if (callback) callback();
-            }, 1300);
+            }, 1400);
         }
 
         function showWinModal(title, prizeName, ticketCode, isLose) {
