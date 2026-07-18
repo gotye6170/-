@@ -3,212 +3,233 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎉 跨界連線！線上即時拉霸抽獎 🎁</title>
+    <title>🎰 升級版：客製化機率與庫存抽獎系統 🎟️</title>
     <style>
         * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background: radial-gradient(circle, #2b1055, #7597de); color: white; min-height: 100vh; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
-        .container { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); padding: 30px; border-radius: 20px; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); width: 100%; max-width: 500px; text-align: center; border: 1px solid rgba(255, 255, 255, 0.2); }
-        h1 { margin-top: 0; color: #ffd700; text-shadow: 0 0 10px rgba(255,215,0,0.5); }
-        .status-board { background: rgba(0,0,0,0.4); padding: 10px; border-radius: 10px; margin-bottom: 20px; border-left: 5px solid #00ffcc; text-align: left; font-size: 14px; }
+        body { background: radial-gradient(circle, #0f2027, #203a43, #2c5364); color: white; min-height: 100vh; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+        .container { background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(12px); padding: 30px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); width: 100%; max-width: 520px; text-align: center; border: 1px solid rgba(255, 255, 255, 0.15); }
+        h1 { margin-top: 0; color: #ff007f; text-shadow: 0 0 12px rgba(255,0,127,0.5); font-size: 26px; }
+        .status-board { background: rgba(0,0,0,0.5); padding: 15px; border-radius: 12px; margin-bottom: 20px; border-left: 5px solid #ff007f; text-align: left; font-size: 14px; line-height: 1.6; }
+        .login-box { margin-bottom: 15px; }
+        input { width: 85%; padding: 12px; border-radius: 8px; border: none; font-size: 16px; text-align: center; background: rgba(255,255,255,0.9); color: #222; font-weight: bold; }
         
-        /* 登入區 */
-        .login-box { margin-bottom: 20px; }
-        input { width: 80%; padding: 12px; border-radius: 8px; border: none; font-size: 16px; margin-bottom: 10px; text-align: center; }
-        
-        /* 拉霸機本體 */
-        .slot-machine { background: #4a0e17; border: 8px solid #ffd700; border-radius: 15px; padding: 20px; margin: 25px 0; box-shadow: 0 0 20px #ffd700; display: flex; justify-content: center; overflow: hidden; position: relative; height: 120px; }
-        .slot-window { background: white; color: #333; width: 80%; height: 100%; border-radius: 8px; font-size: 24px; font-weight: bold; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; border: 3px solid #333; }
-        .slot-track { display: flex; flex-direction: column; position: absolute; top: 0; transition: top 0.1s ease-out; }
-        .slot-item { height: 80px; display: flex; align-items: center; justify-content: center; width: 100%; text-align: center; white-space: nowrap; padding: 0 10px; }
+        /* 拉霸滾動區 */
+        .slot-machine { background: #111; border: 6px solid #ff007f; border-radius: 15px; padding: 15px; margin: 20px 0; box-shadow: 0 0 25px rgba(255,0,127,0.4); display: flex; justify-content: center; overflow: hidden; height: 110px; }
+        .slot-window { background: #fff; color: #222; width: 90%; height: 100%; border-radius: 6px; font-size: 22px; font-weight: bold; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; border: 2px solid #333; }
+        .slot-track { display: flex; flex-direction: column; position: absolute; top: 0; }
+        .slot-item { height: 76px; display: flex; align-items: center; justify-content: center; width: 100%; text-align: center; white-space: nowrap; padding: 0 10px; }
 
-        /* 按鈕樣式 */
-        button { background: linear-gradient(135deg, #ff416c, #ff4b2b); color: white; border: none; padding: 15px 35px; font-size: 18px; font-weight: bold; border-radius: 50px; cursor: pointer; box-shadow: 0 5px 15px rgba(255,75,43,0.4); transition: 0.2s; width: 80%; }
-        button:hover { transform: scale(1.05); background: linear-gradient(135deg, #ff4b2b, #ff416c); }
-        button:disabled { background: #666; cursor: not-allowed; box-shadow: none; transform: none; }
+        button { background: linear-gradient(135deg, #00f2fe, #4facfe); color: white; border: none; padding: 15px 35px; font-size: 18px; font-weight: bold; border-radius: 50px; cursor: pointer; box-shadow: 0 5px 20px rgba(79,172,254,0.4); transition: 0.2s; width: 85%; }
+        button:hover { transform: scale(1.03); filter: brightness(1.1); }
+        button:disabled { background: #444; color: #888; cursor: not-allowed; box-shadow: none; transform: none; }
 
         /* 中獎彈窗 */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); align-items: center; justify-content: center; z-index: 100; }
-        .modal-content { background: #fff; color: #333; padding: 30px; border-radius: 15px; width: 90%; max-width: 400px; text-align: center; position: relative; animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .modal h2 { color: #ff416c; margin-top: 0; }
-        .ticket-box { background: #f4f4f4; border: 2px dashed #ff416c; padding: 15px; font-size: 20px; font-weight: bold; letter-spacing: 2px; color: #111; margin: 15px 0; border-radius: 5px; cursor: pointer; }
-        .close-btn { background: #333; font-size: 14px; padding: 10px 20px; }
-
-        @keyframes pop { from { transform: scale(0.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); align-items: center; justify-content: center; z-index: 100; }
+        .modal-content { background: #fff; color: #222; padding: 30px; border-radius: 20px; width: 90%; max-width: 420px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3); animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .modal h2 { color: #ff007f; margin-top: 0; font-size: 24px; }
+        .ticket-box { background: #f9f9f9; border: 2px dashed #00f2fe; padding: 15px; font-size: 22px; font-weight: bold; letter-spacing: 1px; color: #008b9b; margin: 15px 0; border-radius: 8px; cursor: pointer; word-break: break-all; }
+        .close-btn { background: #333; font-size: 14px; padding: 10px 20px; width: auto; margin-top: 10px; }
+        @keyframes pop { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>🎁 線上幸運拉霸 🎁</h1>
+    <h1>🎰 機率即時庫存拉霸機 🎟️</h1>
     
-    <!-- 剩餘獎品實時看板 -->
-    <div class="status-board" id="statusBoard">正在連線雲端機房...</div>
+    <!-- 剩餘獎品與機率即時看板 -->
+    <div class="status-board" id="statusBoard">正在精密計算雲端庫存與權重...</div>
 
     <!-- 暱稱輸入區 -->
     <div class="login-box" id="loginBox">
-        <input type="text" id="playerName" placeholder="請輸入你的名字/暱稱" maxlength="10">
+        <input type="text" id="playerName" placeholder="請先輸入你的名字/暱稱" maxlength="10">
     </div>
 
-    <!-- 拉霸視覺區 -->
+    <!-- 拉霸機 -->
     <div class="slot-machine">
         <div class="slot-window">
             <div class="slot-track" id="slotTrack">
-                <div class="slot-item" style="height:80px;">🎰 按下抽獎 🎰</div>
+                <div class="slot-item" style="height:76px;">💎 祝你中大獎 💎</div>
             </div>
         </div>
     </div>
 
-    <!-- 抽獎按鈕 -->
-    <button id="spinBtn" onclick="startDraw()">啟動拉霸機！</button>
+    <button id="spinBtn" onclick="startDraw()">啟動拉霸，試試手氣！</button>
 </div>
 
-<!-- 電子票券彈窗 -->
+<!-- 獎券發放彈窗 -->
 <div class="modal" id="winModal">
     <div class="modal-content">
         <h2 id="modalTitle">🎉 恭喜中獎！</h2>
-        <p id="modalPrizeName">獲得獎項</p>
+        <p style="font-weight: bold; font-size: 18px;" id="modalPrizeName">獲得獎項</p>
         <div class="ticket-box" id="modalTicketCode" onclick="copyTicket()">TICKET-CODE</div>
-        <p style="font-size: 12px; color: #666;">↑ 點擊可複製序號，請立刻截圖保存！</p>
+        <p style="font-size: 12px; color: #666; id="copyHint"">↑ 點擊可複製序號，請立刻截圖保存！</p>
         <button class="close-btn" onclick="closeModal()">關閉視窗</button>
     </div>
 </div>
 
-<!-- 載入 Firebase SDK (使用免費原生的 Web 模組) -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
     import { getDatabase, ref, runTransaction, onValue } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
 
-    // ⚠️【請替換成你第一步申請的 Firebase 資料庫網址】
+    // ⚠️【請替換成你的 Firebase Realtime Database 網址】
     const firebaseConfig = {
-        databaseURL: "https://daidaikunbao-default-rtdb.firebaseio.com/" 
+        databaseURL: "https://daidaikunbao-default-rtdb.firebaseio.com/"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // 綁定全域函數讓 HTML 鈕扣能觸發
     window.startDraw = startDraw;
     window.closeModal = closeModal;
     window.copyTicket = copyTicket;
 
     let isDrawing = false;
-    let availablePrizesSnapshot = [];
+    let localPrizesData = {};
 
-    // 【即時更新機制】實時監聽雲端剩餘多少獎品
+    // 即時同步看板：算出目前每樣獎品的真實中獎機率與庫存
     onValue(ref(db, 'prizes'), (snapshot) => {
         const prizes = snapshot.val();
-        availablePrizesSnapshot = [];
-        let totalCount = 0;
-        let availableCount = 0;
-
-        let html = "📋 獎品剩餘狀態更新：<br>";
-        for (let id in prizes) {
-            totalCount++;
-            if (prizes[id].status === "available") {
-                availableCount++;
-                availablePrizesSnapshot.push({ id: id, name: prizes[id].name });
-                html += `• ${prizes[id].name}：🟢 剩餘 1 份<br>`;
-            } else {
-                html += `• ${prizes[id].name}：🔴 已被【${prizes[id].winner}】抽走<br>`;
-            }
-        }
-        
-        if(totalCount === 0) {
-            document.getElementById("statusBoard").innerHTML = "❌ 系統提示：後台尚未配置任何獎品序號。";
-            document.getElementById("spinBtn").disabled = true;
+        if (!prizes) {
+            document.getElementById("statusBoard").innerHTML = "❌ 系統提示：後台尚未配置任何獎品結構。";
             return;
         }
+        localPrizesData = prizes;
 
-        document.getElementById("statusBoard").innerHTML = html + `<br>📊 目前尚有 <b>${availableCount}</b> / ${totalCount} 個獎品可抽。`;
-        
-        if (availableCount === 0) {
-            document.getElementById("spinBtn").innerText = "已被全數抽完！";
-            document.getElementById("spinBtn").disabled = true;
+        // 計算目前有效的總權重
+        let totalWeight = 0;
+        for (let id in prizes) {
+            if (prizes[id].quantity > 0) {
+                totalWeight += Number(prizes[id].weight || 0);
+            }
         }
+
+        let html = "📋 目前即時庫存與中獎率：<br>";
+        for (let id in prizes) {
+            const p = prizes[id];
+            if (p.quantity > 0) {
+                // 機率 = (該獎品權重 / 總有效權重) * 100
+                const probability = totalWeight > 0 ? ((p.weight / totalWeight) * 100).toFixed(1) : 0;
+                html += `• <b>${p.name}</b>：🟢 剩餘 <b>${p.quantity}</b> 份 (機率 ${probability}%)<br>`;
+            } else {
+                html += `• <b>${p.name}</b>：🔴 <b>已全數送完</b> (機率 0%)<br>`;
+            }
+        }
+        document.getElementById("statusBoard").innerHTML = html;
     });
 
-    // 【核心高難度防超賣邏輯】先搶先贏原子鎖
+    // 核心強奪鎖：兼顧權重機率計算與庫存即時扣除
     function startDraw() {
         const nameInput = document.getElementById("playerName").value.trim();
         if (!nameInput) {
-            alert("請先輸入你的暱稱，不然中獎不知道是誰喔！");
+            alert("請先輸入你的暱稱再抽獎喔！");
             return;
         }
         if (isDrawing) return;
         
         isDrawing = true;
         document.getElementById("spinBtn").disabled = true;
-        document.getElementById("spinBtn").innerText = "連線機房中...";
-
-        // 鎖定使用者輸入名字，防止中途竄改
+        document.getElementById("spinBtn").innerText = "機房精算機率中...";
         document.getElementById("playerName").disabled = true;
 
         const prizesRef = ref(db, 'prizes');
-        let wonPrizeData = null;
+        let finalWonPrize = null;
 
-        // 利用 Transaction 確保不論多少人同時按，同一時間只有一個請求會成功修改庫存
         runTransaction(prizesRef, (currentPrizes) => {
             if (!currentPrizes) return currentPrizes;
 
-            // 挑選出此毫秒雲端上真正還有效的獎品
-            const activeIds = Object.keys(currentPrizes).filter(id => currentPrizes[id].status === "available");
-            
-            if (activeIds.length === 0) return; // 沒獎品就退出
+            // 1. 篩選出還有庫存的獎品，並計算當前的總權重
+            let pool = [];
+            let totalW = 0;
+            for (let id in currentPrizes) {
+                if (currentPrizes[id].quantity > 0) {
+                    pool.push({ id: id, weight: Number(currentPrizes[id].weight || 0) });
+                    totalW += Number(currentPrizes[id].weight || 0);
+                }
+            }
 
-            // 隨機選一個
-            const randomId = activeIds[Math.floor(Math.random() * activeIds.length)];
-            
-            // 佔為己有！改狀態為 claimed
-            currentPrizes[randomId].status = "claimed";
-            currentPrizes[randomId].winner = nameInput;
+            if (pool.length === 0 || totalW === 0) return; // 沒東西可抽了
 
-            // 暫存下來等一下給前端播動畫看
-            wonPrizeData = {
-                name: currentPrizes[randomId].name,
-                code: currentPrizes[randomId].ticketCode
+            // 2. 進行加權隨機抽獎（Weighted Random Algorithm）
+            let randomNum = Math.floor(Math.random() * totalW);
+            let selectedId = null;
+            
+            for (let i = 0; i < pool.length; i++) {
+                randomNum -= pool[i].weight;
+                if (randomNum < 0) {
+                    selectedId = pool[i].id;
+                    break;
+                }
+            }
+
+            if (!selectedId) selectedId = pool[0].id; // 安全防呆
+
+            // 3. 扣除該獎品庫存，並依序取出電子票券序號
+            const prize = currentPrizes[selectedId];
+            prize.quantity = prize.quantity - 1; // 庫存減 1
+
+            let assignedCode = "無可用票券";
+            // 如果後台有塞電子序號陣列，依庫存順序把對應的序號吐出來
+            if (prize.ticketCodes && prize.ticketCodes.length > 0) {
+                // 拿走最後一個或依庫存索引拿取
+                const codeIndex = prize.ticketCodes.length - 1 - prize.quantity;
+                if (prize.ticketCodes[codeIndex] !== undefined) {
+                    assignedCode = prize.ticketCodes[codeIndex];
+                } else {
+                    assignedCode = prize.ticketCodes[0]; // 超過範圍的防呆
+                }
+            }
+
+            // 記錄贏家歷史（可選：此處將贏家附加在獎品節點裡以便辨識，或者你可以去雲端看誰扣掉的）
+            if(!prize.recentWinners) prize.recentWinners = [];
+            prize.recentWinners.push({ user: nameInput, code: assignedCode, time: Date.now() });
+
+            finalWonPrize = {
+                name: prize.name,
+                code: assignedCode
             };
 
-            return currentPrizes;
+            return currentPrizes; // 回傳修改後的狀態鎖死資料庫
         }).then((result) => {
-            if (result.committed && wonPrizeData) {
-                // 成功搶到！執行拉霸滾動動畫
-                runSlotMachineAnimation(wonPrizeData.name, () => {
-                    showWinModal("🎉 恭喜你抽中囉！", wonPrizeData.name, wonPrizeData.code);
+            if (result.committed && finalWonPrize) {
+                // 成功抽到，執行視覺拉霸
+                runSlotMachineAnimation(finalWonPrize.name, () => {
+                    if (finalWonPrize.name.includes("銘謝惠顧")) {
+                        showWinModal("😭 哎呀可惜！", finalWonPrize.name, "請再接再厲！", true);
+                    } else {
+                        showWinModal("🎉 恭喜你中獎了！", finalWonPrize.name, finalWonPrize.code, false);
+                    }
                     resetButtonState();
                 });
             } else {
-                // 沒搶到（可能在 0.001 秒內被別人先扣走了）
-                runSlotMachineAnimation("💔 銘謝惠顧", () => {
-                    showWinModal("😭 哎呀！慢了一步", "獎品剛剛好被別人搶走，或是已經被抽完囉！", "無可用票券");
+                runSlotMachineAnimation("💔 沒中獎", () => {
+                    showWinModal("庫存異動", "剛才那一瞬間庫存正好被搶光囉！", "請重新再試一次", true);
                     resetButtonState();
                 });
             }
         }).catch((err) => {
-            alert("連線發生異常：" + err.message);
+            alert("系統錯誤：" + err.message);
             resetButtonState();
         });
     }
 
-    // CSS 拉霸機滾動效果模擬
+    // 拉霸滾動效果
     function runSlotMachineAnimation(finalResult, callback) {
         const track = document.getElementById("slotTrack");
-        track.innerHTML = ""; // 清空
+        track.innerHTML = "";
 
-        // 隨機塞入一堆假資料，讓它看起來在滾動
-        const pool = ["✨ 虛擬寶物", "🎁 神秘大獎", "☕ 星巴克", "🎬 電影票", "🎵 唱片", finalResult];
-        for(let i=0; i<30; i++) {
+        const dummyPool = ["🎁 超商禮券", "☕ 冰美式", "🍿 爆米花", "🎬 電影票", "✨ 隱藏大獎"];
+        for(let i=0; i<25; i++) {
             const item = document.createElement("div");
             item.className = "slot-item";
-            item.style.height = "80px";
-            item.innerText = pool[Math.floor(Math.random() * pool.length)];
+            item.style.height = "76px";
+            item.innerText = dummyPool[Math.floor(Math.random() * dummyPool.length)];
             track.appendChild(item);
         }
-        // 最後一個絕對是正確答案
         track.lastElementChild.innerText = finalResult;
 
-        // 用動畫往下捲動
         let currentTop = 0;
-        let speed = 40;
+        let speed = 35;
         let count = 0;
 
         function animate() {
@@ -216,14 +237,13 @@
             track.style.top = currentTop + "px";
             count++;
 
-            if(count > 40) { speed = 20; }
-            if(count > 60) { speed = 10; }
-            if(count > 70) { speed = 5; }
+            if(count > 30) speed = 15;
+            if(count > 50) speed = 6;
+            if(count > 60) speed = 3;
 
-            // 停止點（對齊最後一格）
-            if (count > 80) {
-                track.style.top = `-${(track.children.length - 1) * 80 - 20}px`;
-                setTimeout(callback, 500);
+            if (count > 68) {
+                track.style.top = `-${(track.children.length - 1) * 76 - 15}px`;
+                setTimeout(callback, 400);
             } else {
                 requestAnimationFrame(animate);
             }
@@ -234,14 +254,25 @@
     function resetButtonState() {
         isDrawing = false;
         document.getElementById("spinBtn").disabled = false;
-        document.getElementById("spinBtn").innerText = "再抽一次！";
+        document.getElementById("spinBtn").innerText = "啟動拉霸，試試手氣！";
         document.getElementById("playerName").disabled = false;
     }
 
-    function showWinModal(title, prizeName, code) {
+    function showWinModal(title, prizeName, code, isLose) {
         document.getElementById("modalTitle").innerText = title;
         document.getElementById("modalPrizeName").innerText = prizeName;
         document.getElementById("modalTicketCode").innerText = code;
+        
+        const ticketBox = document.getElementById("modalTicketCode");
+        if(isLose) {
+            ticketBox.style.border = "2px dashed #999";
+            ticketBox.style.color = "#666";
+            document.getElementById("copyHint").style.display = "none";
+        } else {
+            ticketBox.style.border = "2px dashed #00f2fe";
+            ticketBox.style.color = "#008b9b";
+            document.getElementById("copyHint").style.display = "block";
+        }
         document.getElementById("winModal").style.display = "flex";
     }
 
@@ -251,8 +282,9 @@
 
     function copyTicket() {
         const code = document.getElementById("modalTicketCode").innerText;
+        if(code.includes("請再接再厲") || code.includes("重新再試")) return;
         navigator.clipboard.writeText(code).then(() => {
-            alert("序號已複製到剪貼簿！");
+            alert("序號複製成功！可以去兌換囉！");
         });
     }
 </script>
