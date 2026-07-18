@@ -12,6 +12,32 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght=900&display=swap" rel="stylesheet">
     
     <style>
+        /* 手機版 */
+    @media (max-width: 640px){
+
+    .gacha-title{
+        font-size:2rem !important;
+        -webkit-text-stroke:6px #fff;
+    }
+
+    .gacha-machine{
+        transform:scale(.72);
+        transform-origin:top center;
+        margin-bottom:-90px;
+    }
+
+    .dashboard-panel{
+        height:auto;
+        min-height:250px;
+    }
+
+    .music-control-btn{
+        bottom:15px;
+        right:15px;
+        font-size:12px;
+        padding:8px 14px;
+    }
+}
         body {
             background: linear-gradient(135deg, #fbcfe8, #e0e7ff, #ccfbf1);
             background-size: 400% 400%;
@@ -447,6 +473,20 @@
         let isMuted = true;
         let currentPrizeUrl = ""; 
         let globalPlayedUsers = {}; 
+        let globalPlayedDevices = {};
+
+        let deviceId =
+            localStorage.getItem("gachaDeviceId");
+
+        if(!deviceId){
+
+            deviceId = crypto.randomUUID();
+
+            localStorage.setItem(
+                "gachaDeviceId",
+                deviceId
+            );
+        }
 
         const groupLists = {
             "皮皮": {
@@ -480,6 +520,15 @@
         }
 
         function verifyGroupPass() {
+            if(globalPlayedDevices[deviceId]){
+
+            const user =
+                globalPlayedDevices[deviceId].user;
+
+            alert(`此裝置已由【${user}】抽過獎囉！`);
+
+            return;
+        }
             const inputPass = document.getElementById("secretPass").value.trim();
             const selectEl = document.getElementById("playerName");
             
@@ -529,7 +578,8 @@
             if (!rootData) return;
 
             const prizes = rootData.prizes;
-            globalPlayedUsers = rootData.playedUsers || {}; 
+            globalPlayedUsers = rootData.playedUsers || {};
+            globalPlayedDevices = rootData.playedDevices || {}; 
 
             if (prizes) {
                 let html = '<span class="prize-title-text">📋 目前剩餘好禮：</span>';
@@ -624,7 +674,12 @@
                 alert("請先輸入通關密語並選擇你的名字喔！");
                 return;
             }
-
+            
+            if(globalPlayedDevices[deviceId]){
+                alert("此裝置已經抽過獎囉！");
+                return;
+            }
+            
             if (isDrawing) return;
             isDrawing = true;
 
@@ -633,10 +688,15 @@
             runTransaction(dbRef, (currentData) => {
                 if (!currentData) return currentData;
                 if (!currentData.playedUsers) currentData.playedUsers = {};
+                if (!currentData.playedDevices) currentData.playedDevices = {};
                 
                 // 檢查是否抽過
-                if (currentData.playedUsers[nameInput]) {
-                    return; 
+                if(currentData.playedUsers[nameInput]){
+                    return;
+                }
+
+                if(currentData.playedDevices[deviceId]){
+                    return;
                 }
 
                 // 1. 篩選出「數量大於0」且「權重大於0」的有效獎品
@@ -706,6 +766,10 @@
                     won: targetPrize.name,
                     code: wonCode, 
                     time: Date.now()
+                };
+                    currentData.playedDevices[deviceId] = {
+                    user:nameInput,
+                    time:Date.now()
                 };
 
                 return currentData;
