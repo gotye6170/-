@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎰 呆呆抽獎 🎟️</title>
+    <title>🎰 呆呆扭蛋機 🎟️</title>
     <style>
         * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         
@@ -75,13 +75,13 @@
             border: 1px solid rgba(255,255,255,0.1); 
             font-size: 16px; 
             text-align: center; 
-            text-align-last: center; /* 讓下拉選單文字居中 */
+            text-align-last: center; 
             background: rgba(255,255,255,0.08); 
             color: #fff; 
             font-weight: bold; 
             transition: 0.3s;
             cursor: pointer;
-            appearance: none; /* 移除瀏覽器預設箭頭 */
+            appearance: none; 
             -webkit-appearance: none;
         }
         select:focus {
@@ -94,38 +94,137 @@
             background: #161124;
             color: #fff;
         }
-        
-        /* 高級拉霸滾動區 (黑金奢華風格) */
-        .slot-machine { 
-            background: #0d0614; 
-            border: 4px solid #ff007f; 
-            border-radius: 20px; 
-            padding: 15px; 
-            margin: 25px 0; 
-            box-shadow: 0 0 35px rgba(255,0,127,0.5), inset 0 0 20px rgba(0,0,0,0.9); 
-            display: flex; 
-            justify-content: center; 
-            overflow: hidden; 
-            height: 114px; 
+
+        /* 🔮 核心變更：全新霓虹扭蛋機外觀 */
+        .gachapon-machine {
+            width: 240px;
+            margin: 25px auto;
+            perspective: 1000px;
         }
-        .slot-window { 
-            background: linear-gradient(180deg, #1a1a2e 0%, #0f0f1a 100%); 
-            color: #ffd700; 
-            text-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
-            width: 95%; 
-            height: 100%; 
-            border-radius: 10px; 
-            font-size: 24px; 
-            font-weight: 800; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            position: relative; 
-            overflow: hidden; 
-            border: 1px solid rgba(255, 215, 0, 0.3); 
+        /* 扭蛋大玻璃球體 */
+        .gacha-ball-container {
+            width: 220px;
+            height: 200px;
+            background: radial-gradient(circle at 50% 30%, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.02) 60%, rgba(255, 0, 127, 0.2) 100%);
+            border: 4px solid #ff007f;
+            border-radius: 110px 110px 100px 100px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(255, 0, 127, 0.4), inset 0 0 20px rgba(255,255,255,0.2);
+            display: flex;
+            flex-wrap: wrap;
+            align-content: flex-end;
+            justify-content: center;
+            padding: 15px;
+            gap: 6px;
         }
-        .slot-track { display: flex; flex-direction: column; position: absolute; top: 0; }
-        .slot-item { height: 76px; display: flex; align-items: center; justify-content: center; width: 100%; text-align: center; white-space: nowrap; padding: 0 10px; }
+        /* 裡面的小彩球 */
+        .gacha-mini-ball {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            box-shadow: inset -4px -4px 8px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.4);
+        }
+        /* 彩球顏色隨機感 */
+        .gacha-mini-ball:nth-child(4n+1) { background: radial-gradient(circle at 30% 30%, #ff0055, #990033); }
+        .gacha-mini-ball:nth-child(4n+2) { background: radial-gradient(circle at 30% 30%, #00f2fe, #006677); }
+        .gacha-mini-ball:nth-child(4n+3) { background: radial-gradient(circle at 30% 30%, #ffd700, #aa8800); }
+        .gacha-mini-ball:nth-child(4n+4) { background: radial-gradient(circle at 30% 30%, #a855f7, #6b21a8); }
+
+        /* 扭蛋機下半部機身 */
+        .gacha-body {
+            width: 230px;
+            background: linear-gradient(135deg, #1f0b35 0%, #0d0614 100%);
+            border: 4px solid #ff007f;
+            border-top: none;
+            border-radius: 0 0 20px 20px;
+            margin: -2px auto 0;
+            padding: 20px 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5), 0 0 20px rgba(255, 0, 127, 0.2);
+            position: relative;
+        }
+        /* 扭轉旋鈕 */
+        .gacha-crank {
+            width: 70px;
+            height: 70px;
+            background: radial-gradient(circle, #2a1f42 30%, #161124 100%);
+            border: 3px solid #00f2fe;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            position: relative;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(0,242,254,0.4);
+        }
+        .gacha-crank::before {
+            content: '';
+            position: absolute;
+            width: 80%;
+            height: 16px;
+            background: #00f2fe;
+            top: 50%;
+            left: 10%;
+            transform: translateY(-50%);
+            border-radius: 4px;
+        }
+        /* 出蛋口 */
+        .gacha-outlet {
+            width: 75px;
+            height: 55px;
+            background: #05020a;
+            border: 3px solid #ff007f;
+            margin: 0 auto;
+            border-radius: 10px 10px 5px 5px;
+            box-shadow: inset 0 5px 10px rgba(0,0,0,0.9);
+            position: relative;
+            overflow: visible;
+        }
+        /* 掉落出來的幸運扭蛋球 */
+        .gacha-lucky-ball {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff007f 50%, #fff 50%);
+            position: absolute;
+            top: 5px;
+            left: 12px;
+            box-shadow: inset -5px -5px 10px rgba(0,0,0,0.4), 0 5px 15px rgba(255,0,127,0.6);
+            display: none;
+            z-index: 10;
+        }
+
+        /* 🎬 各種動畫效果 */
+        /* 彩球在機器內瘋狂震動 */
+        @keyframes ballShake {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            20% { transform: translate(-2px, 3px) rotate(-5deg); }
+            40% { transform: translate(3px, -2px) rotate(5deg); }
+            60% { transform: translate(-3px, -1px) rotate(-3deg); }
+            80% { transform: translate(2px, 2px) rotate(3deg); }
+            100% { transform: translate(0, 0) rotate(0deg); }
+        }
+        .shaking .gacha-mini-ball {
+            animation: ballShake 0.15s infinite alternate;
+        }
+        /* 旋鈕旋轉 */
+        @keyframes crankRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .rotating-crank {
+            animation: crankRotate 0.6s ease-in-out forwards;
+        }
+        /* 扭蛋滾出並放大跳躍動畫 */
+        @keyframes ballDrop {
+            0% { transform: translateY(-40px) scale(0.3); opacity: 0; }
+            40% { transform: translateY(0) scale(1); opacity: 1; }
+            70% { transform: translateY(-25px) scale(1.2); box-shadow: 0 0 30px #00f2fe; }
+            100% { transform: translateY(0) scale(1.5); box-shadow: 0 0 40px #ff007f; }
+        }
+        .dropped-ball {
+            display: block !important;
+            animation: ballDrop 0.9s cubic-bezier(0.175, 0.885, 0.32, 1.2) forwards;
+        }
 
         /* 炫彩流光強烈發光按鍵 */
         button { 
@@ -172,7 +271,7 @@
 
 <div class="container">
     <!-- 1. 頂部名稱 -->
-    <h1>🎰 呆呆抽獎 🎟️</h1>
+    <h1>🎰 呆呆扭蛋機 🎟️</h1>
     
     <!-- 2. 獎品清單看板 -->
     <div class="status-board" id="statusBoard">正在載入雲端禮品庫存...</div>
@@ -181,7 +280,6 @@
     <div class="login-box" id="loginBox">
         <select id="playerName">
             <option value="" disabled selected>▼ 請選擇你的名字 ▼</option>
-            <!-- ⚙️ 你可以在下面自由修改、新增或刪除朋友的名字 -->
             <option value="貝果">貝果</option>
             <option value="怡蒨">怡蒨</option>
             <option value="77">77</option>
@@ -190,16 +288,34 @@
         </select>
     </div>
 
-    <!-- 拉霸機 -->
-    <div class="slot-machine">
-        <div class="slot-window">
-            <div class="slot-track" id="slotTrack">
-                <div class="slot-item" style="height:76px;">💎 祝你中獎 💎</div>
+    <!-- 🔮 核心變更：扭蛋機外觀架構 -->
+    <div class="gachapon-machine">
+        <!-- 玻璃外殼與裡面的小球們 -->
+        <div class="gacha-ball-container" id="gachaGlass">
+            <div class="gacha-mini-ball"></div>
+            <div class="gacha-mini-ball"></div>
+            <div class="gacha-mini-ball"></div>
+            <div class="gacha-mini-ball"></div>
+            <div class="gacha-mini-ball"></div>
+            <div class="gacha-mini-ball"></div>
+            <div class="gacha-mini-ball"></div>
+            <div class="gacha-mini-ball"></div>
+            <div class="gacha-mini-ball"></div>
+            <div class="gacha-mini-ball"></div>
+            <div class="gacha-mini-ball"></div>
+            <div class="gacha-mini-ball"></div>
+        </div>
+        <!-- 機身、旋鈕與出口 -->
+        <div class="gacha-body">
+            <div class="gacha-crank" id="gachaCrank"></div>
+            <div class="gacha-outlet">
+                <!-- 掉出來的幸運大扭蛋 -->
+                <div class="gacha-lucky-ball" id="luckyBall"></div>
             </div>
         </div>
     </div>
 
-    <button id="spinBtn" onclick="startDraw()">點我啟動拉霸機</button>
+    <button id="spinBtn" onclick="startDraw()">點我扭轉幸運蛋</button>
 </div>
 
 <!-- 獎券發放彈窗 -->
@@ -232,7 +348,7 @@
     let isDrawing = false;
     let localPrizesData = {};
 
-    // 即時更新看板：僅顯示商品圖、品名、剩餘數量。
+    // 即時更新看板
     onValue(ref(db, 'prizes'), (snapshot) => {
         const prizes = snapshot.val();
         if (!prizes) {
@@ -252,7 +368,6 @@
             }
 
             hasVisiblePrize = true;
-            
             const imgHtml = p.image ? `<img class="prize-thumb" src="${p.image}" alt="${p.name}">` : `<div class="prize-thumb" style="background:rgba(255,255,255,0.15);"></div>`;
 
             if (Number(p.quantity) > 0) {
@@ -294,8 +409,11 @@
         
         isDrawing = true;
         document.getElementById("spinBtn").disabled = true;
-        document.getElementById("spinBtn").innerText = "好運計算中...";
+        document.getElementById("spinBtn").innerText = "好運扭轉中...";
         document.getElementById("playerName").disabled = true;
+
+        // 隱藏上一次掉落的球
+        document.getElementById("luckyBall").classList.remove("dropped-ball");
 
         const rootRef = ref(db);
         let finalWonPrize = null;
@@ -373,7 +491,8 @@
             }
 
             if (result.committed && finalWonPrize) {
-                runSlotMachineAnimation(finalWonPrize.name, () => {
+                // 執行扭蛋動畫
+                runGachaponAnimation(() => {
                     if (finalWonPrize.name.includes("銘謝惠顧")) {
                         showWinModal("😭 哎呀可惜！", finalWonPrize.name, "請再接再厲！", true);
                     } else {
@@ -382,7 +501,7 @@
                     resetButtonState();
                 });
             } else {
-                runSlotMachineAnimation("💔 沒中獎", () => {
+                runGachaponAnimation(() => {
                     showWinModal("沒中獎", "不要氣餒！", "下次再加油", true);
                     resetButtonState();
                 });
@@ -393,49 +512,35 @@
         });
     }
 
-    // 拉霸滾動效果
-    function runSlotMachineAnimation(finalResult, callback) {
-        const track = document.getElementById("slotTrack");
-        track.innerHTML = "";
+    // 🔮 核心變更：全新扭蛋動畫處理
+    function runGachaponAnimation(callback) {
+        const glass = document.getElementById("gachaGlass");
+        const crank = document.getElementById("gachaCrank");
+        const luckyBall = document.getElementById("luckyBall");
 
-        const dummyPool = ["睏寶", "怡蒨", "77", "安鴻", "當家"];
-        for(let i=0; i<25; i++) {
-            const item = document.createElement("div");
-            item.className = "slot-item";
-            item.style.height = "76px";
-            item.innerText = dummyPool[Math.floor(Math.random() * dummyPool.length)];
-            track.appendChild(item);
-        }
-        track.lastElementChild.innerText = finalResult;
+        // 1. 旋鈕轉動
+        crank.classList.add("rotating-crank");
+        // 2. 玻璃罐內的扭蛋開始震動
+        glass.classList.add("shaking");
 
-        let currentTop = 0;
-        let speed = 35;
-        let count = 0;
+        // 3. 震動 1.2 秒後停止，並讓大扭蛋掉出來
+        setTimeout(() => {
+            glass.classList.remove("shaking");
+            crank.classList.remove("rotating-crank");
+            
+            // 讓幸運球執行掉落放大動畫
+            luckyBall.classList.add("dropped-ball");
 
-        function animate() {
-            currentTop -= speed;
-            track.style.top = currentTop + "px";
-            count++;
-
-            if(count > 30) speed = 15;
-            if(count > 50) speed = 6;
-            if(count > 60) speed = 3;
-
-            if (count > 68) {
-                track.style.top = `-${(track.children.length - 1) * 76 - 2}px`;
-                setTimeout(callback, 400);
-            } else {
-                requestAnimationFrame(animate);
-            }
-        }
-        animate();
+            // 4. 動畫播完後顯示中獎 Modal
+            setTimeout(callback, 1000);
+        }, 1200);
     }
 
     // 重設按鈕狀態
     function resetButtonState() {
         isDrawing = false;
         document.getElementById("spinBtn").disabled = false;
-        document.getElementById("spinBtn").innerText = "點我啟動拉霸機";
+        document.getElementById("spinBtn").innerText = "點我扭轉幸運蛋";
         document.getElementById("playerName").disabled = false;
     }
 
