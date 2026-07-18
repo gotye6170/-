@@ -353,8 +353,8 @@
         <div class="lg:col-span-6 order-1 lg:order-2 flex flex-col items-center">
             <h1 class="gacha-title text-4xl md:text-5xl mb-6">呆呆幸運扭蛋機</h1>
 
-            <!-- 🎮 輸入控制面板 -->
-            <div class="w-full max-w-sm bg-white/80 backdrop-blur-md rounded-3xl p-6 shadow-xl border border-white mt-4 md:mt-6 space-y-4">
+            <!-- 🎮 輸入控制面板 (一開始只顯示這個) -->
+            <div id="controlPanel" class="w-full max-w-sm bg-white/80 backdrop-blur-md rounded-3xl p-6 shadow-xl border border-white mt-4 md:mt-6 space-y-4">
                 <div>
                     <label class="block text-xs font-bold text-gray-500 mb-1.5 ml-1">🔑 請輸入群組密語解鎖名單</label>
                     <div class="flex gap-2">
@@ -365,41 +365,43 @@
 
                 <div>
                     <label class="block text-xs font-bold text-gray-500 mb-1.5 ml-1">👤 選擇你的名字 (每個名字限抽一次)</label>
-                    <select id="playerName" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm font-semibold text-center focus:outline-none focus:ring-2 focus:ring-rose-400 transition-all">
+                    <select id="playerName" onchange="handleNameChange()" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm font-semibold text-center focus:outline-none focus:ring-2 focus:ring-rose-400 transition-all">
                         <option value="" disabled selected>🔒 請先解鎖群組名單 🔒</option>
                     </select>
                 </div>
-
-                <button id="spinBtn" onclick="startDraw()" class="w-full bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white font-black py-3 rounded-2xl shadow-lg shadow-rose-500/20 active:scale-98 transition-all tracking-wider text-sm mt-2 cursor-pointer">啟動幸運扭蛋</button>
             </div>
-            
-            <!-- 🎪 實體扭蛋機結構 -->
-            <div class="gacha-machine mt-6 md:mt-6">
-                <div class="gacha-glass" id="gachaGlass">
-                    <!-- 底層蛋 -->
-                    <div class="gacha-egg egg-pink egg-layer-a" style="left: 15px;"></div>
-                    <div class="gacha-egg egg-blue egg-layer-a" style="left: 60px;"></div>
-                    <div class="gacha-egg egg-yellow egg-layer-a" style="left: 110px;"></div>
-                    <div class="gacha-egg egg-green egg-layer-a" style="left: 155px;"></div>
-                    <div class="gacha-egg egg-purple egg-layer-a" style="left: 200px;"></div>
-                    <div class="gacha-egg egg-orange egg-layer-a" style="left: 245px;"></div>
-                    <!-- 中層蛋 -->
-                    <div class="gacha-egg egg-yellow egg-layer-b" style="left: 35px;"></div>
-                    <div class="gacha-egg egg-pink egg-layer-b" style="left: 85px;"></div>
-                    <div class="gacha-egg egg-green egg-layer-b" style="left: 130px;"></div>
-                    <div class="gacha-egg egg-blue egg-layer-b" style="left: 175px;"></div>
-                    <div class="gacha-egg egg-orange egg-layer-b" style="left: 220px;"></div>
-                    <!-- 頂層蛋 -->
-                    <div class="gacha-egg egg-purple egg-layer-c" style="left: 55px;"></div>
-                    <div class="gacha-egg egg-blue egg-layer-c" style="left: 105px;"></div>
-                    <div class="gacha-egg egg-pink egg-layer-c" style="left: 150px;"></div>
-                    <div class="gacha-egg egg-yellow egg-layer-c" style="left: 195px;"></div>
-                </div>
 
-                <div class="gacha-panel">
-                    <div class="gacha-crank" id="gachaCrank" onclick="startDraw()"></div>
-                    <div class="gacha-gate">
-                        <div class="gacha-lucky-egg" id="luckyEgg"></div>
+            <!-- 🎪 扭蛋機區塊：選好名字後才會出現 -->
+            <div id="machineSection" class="hidden w-full max-w-sm flex flex-col items-center mt-4 md:mt-6">
+                <button id="spinBtn" onclick="startDraw()" class="w-full bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white font-black py-3 rounded-2xl shadow-lg shadow-rose-500/20 active:scale-98 transition-all tracking-wider text-sm cursor-pointer">啟動幸運扭蛋</button>
+
+                <div class="gacha-machine mt-6">
+                    <div class="gacha-glass" id="gachaGlass">
+                        <!-- 底層蛋 -->
+                        <div class="gacha-egg egg-pink egg-layer-a" style="left: 15px;"></div>
+                        <div class="gacha-egg egg-blue egg-layer-a" style="left: 60px;"></div>
+                        <div class="gacha-egg egg-yellow egg-layer-a" style="left: 110px;"></div>
+                        <div class="gacha-egg egg-green egg-layer-a" style="left: 155px;"></div>
+                        <div class="gacha-egg egg-purple egg-layer-a" style="left: 200px;"></div>
+                        <div class="gacha-egg egg-orange egg-layer-a" style="left: 245px;"></div>
+                        <!-- 中層蛋 -->
+                        <div class="gacha-egg egg-yellow egg-layer-b" style="left: 35px;"></div>
+                        <div class="gacha-egg egg-pink egg-layer-b" style="left: 85px;"></div>
+                        <div class="gacha-egg egg-green egg-layer-b" style="left: 130px;"></div>
+                        <div class="gacha-egg egg-blue egg-layer-b" style="left: 175px;"></div>
+                        <div class="gacha-egg egg-orange egg-layer-b" style="left: 220px;"></div>
+                        <!-- 頂層蛋 -->
+                        <div class="gacha-egg egg-purple egg-layer-c" style="left: 55px;"></div>
+                        <div class="gacha-egg egg-blue egg-layer-c" style="left: 105px;"></div>
+                        <div class="gacha-egg egg-pink egg-layer-c" style="left: 150px;"></div>
+                        <div class="gacha-egg egg-yellow egg-layer-c" style="left: 195px;"></div>
+                    </div>
+
+                    <div class="gacha-panel">
+                        <div class="gacha-crank" id="gachaCrank" onclick="startDraw()"></div>
+                        <div class="gacha-gate">
+                            <div class="gacha-lucky-egg" id="luckyEgg"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -448,6 +450,22 @@
         window.closeModal = closeModal;
         window.clickTicket = clickTicket;
         window.verifyGroupPass = verifyGroupPass;
+        window.handleNameChange = handleNameChange;
+
+        // 🔀 選好名字後：隱藏「密語解鎖/名字選擇」面板，顯示「扭蛋機」
+        function handleNameChange() {
+            const val = document.getElementById("playerName").value;
+            if (val) {
+                document.getElementById("controlPanel").classList.add("hidden");
+                document.getElementById("machineSection").classList.remove("hidden");
+            }
+        }
+
+        // 🔙 切回「密語解鎖/名字選擇」畫面 (讓下一位玩家可以繼續使用)
+        function showControlPanel() {
+            document.getElementById("machineSection").classList.add("hidden");
+            document.getElementById("controlPanel").classList.remove("hidden");
+        }
 
         let isDrawing = false;
         let currentPrizeUrl = ""; 
@@ -835,6 +853,9 @@
             const selectEl = document.getElementById("playerName");
             selectEl.innerHTML = '<option value="" disabled selected>🔒 請先解鎖群組名單 🔒</option>';
             document.getElementById("secretPass").value = "";
+
+            // 🔄 切回選單畫面，準備給下一位玩家使用
+            showControlPanel();
         }
     </script>
 </body>
