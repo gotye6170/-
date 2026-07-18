@@ -69,7 +69,7 @@
             height: 38px;
             border-radius: 50%;
             box-shadow: inset -4px -4px 8px rgba(0,0,0,0.2), 2px 4px 6px rgba(0,0,0,0.1);
-            transition: opacity 0.4s ease;
+            transition: transform 0.3s ease, opacity 0.5s ease;
         }
         .gacha-egg::after {
             content: '';
@@ -87,25 +87,30 @@
         .egg-purple { background: #a855f7; }
         .egg-orange { background: #f97316; }
 
-        /* 🥚 隨機分佈扭蛋群 (靜態堆疊) */
-        .egg-layer-a { bottom: 8px; animation: bounceA 3s ease-in-out infinite alternate; }
-        .egg-layer-b { bottom: 25px; animation: bounceB 3.5s ease-in-out infinite alternate; }
-        .egg-layer-c { bottom: 42px; animation: bounceC 2.8s ease-in-out infinite alternate; }
+        /* 🥚 隨機分佈扭蛋群 (基礎圖層) */
+        .egg-layer-a { bottom: 8px; }
+        .egg-layer-b { bottom: 25px; }
+        .egg-layer-c { bottom: 42px; }
 
-        @keyframes bounceA { 0% { transform: translateY(0); } 100% { transform: translateY(-3px) rotate(5deg); } }
-        @keyframes bounceB { 0% { transform: translateY(0) rotate(0); } 100% { transform: translateY(-4px) rotate(-5deg); } }
-        @keyframes bounceC { 0% { transform: translateY(0); } 100% { transform: translateY(-2px) rotate(3deg); } }
-
-        /* 🔄 攪拌晃動動畫 (啟動時玻璃罩內群體晃動) */
-        .settling .gacha-egg {
-            animation: shakeEggs 0.15s linear infinite !important;
+        /* 🎬 被抽中的那顆蛋：往下掉並淡出消失 */
+        .egg-falling-out {
+            animation: eggFallOut 0.8s cubic-bezier(0.55, 0.055, 0.675, 0.19) forwards !important;
         }
-        @keyframes shakeEggs {
-            0% { transform: translate(0, 0) rotate(0deg); }
-            25% { transform: translate(4px, -6px) rotate(10deg); }
-            50% { transform: translate(-4px, 4px) rotate(-10deg); }
-            75% { transform: translate(3px, 5px) rotate(5deg); }
-            100% { transform: translate(-2px, -3px) rotate(0deg); }
+        @keyframes eggFallOut {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            50% { transform: translateY(60px) scale(0.9); opacity: 0.6; }
+            100% { transform: translateY(120px) scale(0.7); opacity: 0; }
+        }
+
+        /* 🎬 剩餘的所有扭蛋：集體輕微往下沉（重力合理化補位） */
+        .eggs-drop-down .gacha-egg:not(.egg-falling-out) {
+            animation: gravitySettle 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.3s forwards;
+        }
+        @keyframes gravitySettle {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(6px); }
+            75% { transform: translateY(3px); }
+            100% { transform: translateY(4px); }
         }
 
         /* ⚙️ 控制面板區 */
@@ -382,7 +387,6 @@
                 <div>
                     <label class="block text-xs font-bold text-gray-500 mb-1.5 ml-1">👤 選擇你的名字 (每個名字限抽一次)</label>
                     <select id="playerName" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm font-semibold text-center focus:outline-none focus:ring-2 focus:ring-rose-400 transition-all">
-                        <!-- 🚀 初始狀態空空如也，絕不留給手機瀏覽器任何洩漏名字的機會 -->
                         <option value="" disabled selected>🔒 請先解鎖群組名單 🔒</option>
                     </select>
                 </div>
@@ -442,9 +446,8 @@
         let isDrawing = false;
         let isMuted = true;
         let currentPrizeUrl = ""; 
-        let globalPlayedUsers = {}; // 暫存已抽過名單
+        let globalPlayedUsers = {}; 
 
-        // 🛠️ 將名單改為完整的 JS 物件字典，完全脫離原 HTML DOM
         const groupLists = {
             "皮皮": {
                 label: "✨ 皮皮群",
@@ -455,6 +458,8 @@
                 names: ["彥伶", "亮昀", "芳瑜"]
             }
         };
+
+        const eggColors = ["egg-pink", "egg-blue", "egg-yellow", "egg-green", "egg-purple", "egg-orange"];
 
         function toggleMusic() {
             const iframe = document.getElementById("bgMusic");
@@ -474,18 +479,15 @@
             }
         }
 
-        // 🛠️ 動態生成下拉選單內容，徹底根除手機端 CSS 無法隱藏 option 的 bug
         function verifyGroupPass() {
             const inputPass = document.getElementById("secretPass").value.trim();
             const selectEl = document.getElementById("playerName");
             
-            // 先清空選單
             selectEl.innerHTML = "";
             
             if (groupLists[inputPass]) {
                 const group = groupLists[inputPass];
                 
-                // 建立提示選項
                 const defaultOpt = document.createElement("option");
                 defaultOpt.value = "";
                 defaultOpt.disabled = true;
@@ -493,16 +495,13 @@
                 defaultOpt.innerText = "▼ 請選擇你的名字 ▼";
                 selectEl.appendChild(defaultOpt);
 
-                // 建立動態 optgroup
                 const optGroup = document.createElement("optgroup");
                 optGroup.label = group.label;
 
-                // 塞入該群組專屬名字
                 group.names.forEach(name => {
                     const opt = document.createElement("option");
                     opt.value = name;
                     
-                    // 根據即時 Firebase 狀態判斷是否已抽過
                     if (globalPlayedUsers[name]) {
                         opt.disabled = true;
                         opt.innerText = `${name} (已抽過)`;
@@ -515,7 +514,6 @@
                 selectEl.appendChild(optGroup);
                 alert(`🔓 【${inputPass}】名單已成功解鎖！`);
             } else {
-                // 密碼錯誤或未輸入，回復為全鎖定空狀態
                 const lockOpt = document.createElement("option");
                 lockOpt.value = "";
                 lockOpt.disabled = true;
@@ -526,15 +524,13 @@
             }
         }
 
-        // 即時讀取與渲染更新
         onValue(ref(db), (snapshot) => {
             const rootData = snapshot.val();
             if (!rootData) return;
 
             const prizes = rootData.prizes;
-            globalPlayedUsers = rootData.playedUsers || {}; // 儲存至全域變數供解鎖判斷
+            globalPlayedUsers = rootData.playedUsers || {}; 
 
-            // 1. 渲染剩餘好禮庫存
             if (prizes) {
                 let html = '<span class="prize-title-text">📋 目前剩餘好禮：</span>';
                 let hasVisiblePrize = false;
@@ -570,7 +566,6 @@
                 document.getElementById("statusBoard").innerHTML = html;
             }
 
-            // 2. 如果當前選單已經解鎖，配合 Firebase 更新「已抽過」狀態
             const nameSelect = document.getElementById("playerName");
             const options = nameSelect.getElementsByTagName("option");
             for (let option of options) {
@@ -583,7 +578,6 @@
                 }
             }
 
-            // 3. 處理「跑馬燈」與「中獎者榮譽榜」
             let honorHtml = '<span class="board-title-text honor-title-text">👑 中獎者榮譽榜：</span>';
             let marqueeText = "🎉 歡迎來到呆呆扭蛋機！快來試試手氣！ 🎟️ ";
             let playedList = [];
@@ -623,7 +617,7 @@
             document.getElementById("honorBoard").innerHTML = honorHtml;
         });
 
-        // 抽獎流程
+        // 抽獎與真實掉落連動核心
         function startDraw() {
             const nameInput = document.getElementById("playerName").value;
             if (!nameInput) {
@@ -684,31 +678,47 @@
 
                 const container = document.getElementById("gachaGlass");
                 const luckyEgg = document.getElementById("luckyEgg");
-                
-                container.classList.add("settling");
-                luckyEgg.className = "gacha-lucky-egg"; 
-                luckyEgg.style.opacity = "0";
-
-                const eggColors = ["egg-pink","egg-blue","egg-yellow","egg-green","egg-purple","egg-orange"];
-                const randomColor = eggColors[Math.floor(Math.random() * eggColors.length)];
-                luckyEgg.classList.add(randomColor);
-
                 const crank = document.getElementById("gachaCrank");
+
+                // 隨機決定出蛋口扭蛋的顏色
+                const chosenColor = eggColors[Math.floor(Math.random() * eggColors.length)];
+                
+                // 🛠️ 尋找大玻璃罩內「對應顏色且還沒被刪除」的其中一顆靜態蛋
+                const matchingEggsInGlass = container.querySelectorAll(`.gacha-egg.${chosenColor}:not(.egg-falling-out)`);
+                
                 crank.classList.add("rotating-crank");
 
-                setTimeout(() => {
-                    container.classList.remove("settling");
-                    luckyEgg.classList.add("dropped-egg");
-                }, 1200);
+                // 🛠️ 執行符合常理的實體物理表現：
+                if (matchingEggsInGlass.length > 0) {
+                    // 讓其中隨機一顆同色蛋往下墜並淡出（模擬它從機器裡滾出去了）
+                    const targetEgg = matchingEggsInGlass[Math.floor(Math.random() * matchingEggsInGlass.length)];
+                    targetEgg.classList.add("egg-falling-out");
+                }
 
+                // 讓其餘所有扭蛋集體向下微微位移下墜，模擬重力補位
+                container.classList.add("eggs-drop-down");
+
+                // 初始化下方出口獲獎蛋
+                luckyEgg.className = "gacha-lucky-egg"; 
+                luckyEgg.style.opacity = "0";
+                luckyEgg.classList.add(chosenColor);
+
+                // 出蛋動畫時機點
+                setTimeout(() => {
+                    luckyEgg.classList.add("dropped-egg");
+                }, 1000);
+
+                // 彈出中獎視窗時機點
                 setTimeout(() => {
                     document.getElementById("modalPrizeName").innerText = myResult.won;
-                    
                     currentPrizeUrl = myResult.code; 
                     document.getElementById("modalTicketCode").innerText = "點我打開獎品連結";
                     
                     document.getElementById("winModal").style.display = "flex";
                     crank.classList.remove("rotating-crank");
+                    
+                    // 清除下墜狀態，保留被抽掉蛋的消失狀態
+                    container.classList.remove("eggs-drop-down");
                     isDrawing = false;
                 }, 2100);
 
@@ -736,7 +746,6 @@
             luckyEgg.className = "gacha-lucky-egg";
             luckyEgg.style.opacity = "0";
             
-            // 抽完後重設選單為鎖定狀態
             const selectEl = document.getElementById("playerName");
             selectEl.innerHTML = '<option value="" disabled selected>🔒 請先解鎖群組名單 🔒</option>';
             document.getElementById("secretPass").value = "";
