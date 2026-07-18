@@ -9,7 +9,7 @@
     <!-- 引入支援繁體中文的 Noto Sans TC -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght=900&display=swap" rel="stylesheet">
     
     <style>
         body {
@@ -153,6 +153,9 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
+        /* 👑 控制組件隱藏樣式 */
+        .hidden-group { display: none !important; }
+
         /* 🌀 手把旋轉動畫 */
         .rotating-crank {
             animation: rotateCrank 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
@@ -171,16 +174,16 @@
             border: 4px solid #4b5563;
             position: relative;
             box-shadow: inset 0 5px 10px rgba(0,0,0,0.5);
-            overflow: hidden; /* 確保蛋是從內部上面管道掉落出來 */
+            overflow: hidden;
         }
 
-        /* 🥚 出蛋口內部隱藏的獲獎蛋（初始位於出蛋口上方的暗處管道中） */
+        /* 🥚 出蛋口內部隱藏的獲獎蛋 */
         .gacha-lucky-egg {
             position: absolute;
             width: 46px;
             height: 46px;
             border-radius: 50%;
-            top: -60px; /* 藏在上方管道深處 */
+            top: -60px;
             left: 11px;
             opacity: 0;
             z-index: 10;
@@ -194,43 +197,19 @@
             border-radius: 23px 23px 0 0;
         }
 
-        /* 🌠 徹底重構：真實重力加速墜落、硬殼砸地強力回彈動畫 */
+        /* 🌠 出蛋重力動畫 */
         .dropped-egg {
             animation: realGravityDrop 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.3s forwards;
         }
         
         @keyframes realGravityDrop {
-            0% { 
-                top: -60px; 
-                opacity: 0; 
-                transform: scaleY(1.1) scaleX(0.9) rotate(0deg); /* 快速下墜時的微拉伸 */
-            }
-            30% { 
-                top: 12px; /* 第一次高速砸到出蛋口底部 */
-                opacity: 1; 
-                transform: scaleY(0.8) scaleX(1.15) rotate(120deg); /* 撞擊瞬間硬殼被壓縮扁化 */
-            }
-            48% { 
-                top: -12px; /* 第一次強烈反彈彈起 */
-                transform: scaleY(1.05) scaleX(0.95) rotate(190deg); 
-            }
-            65% { 
-                top: 12px; /* 第二次落下砸地 */
-                transform: scaleY(0.92) scaleX(1.06) rotate(260deg); /* 輕微二次撞擊壓縮 */
-            }
-            78% { 
-                top: 2px; /* 第二次微幅彈起 */
-                transform: scaleY(1.02) scaleX(0.98) rotate(310deg); 
-            }
-            90% {
-                top: 12px; /* 最終落地定點穩定 */
-                transform: scaleY(1) scaleX(1) rotate(350deg);
-            }
-            100% { 
-                top: 12px; 
-                opacity: 1; 
-                transform: scaleY(1) scaleX(1) rotate(360deg); /* 完全靜止 */
-            }
+            0% { top: -60px; opacity: 0; transform: scaleY(1.1) scaleX(0.9) rotate(0deg); }
+            30% { top: 12px; opacity: 1; transform: scaleY(0.8) scaleX(1.15) rotate(120deg); }
+            48% { top: -12px; transform: scaleY(1.05) scaleX(0.95) rotate(190deg); }
+            65% { top: 12px; transform: scaleY(0.92) scaleX(1.06) rotate(260deg); }
+            78% { top: 2px; transform: scaleY(1.02) scaleX(0.98) rotate(310deg); }
+            90% { top: 12px; transform: scaleY(1) scaleX(1) rotate(350deg); }
+            100% { top: 12px; opacity: 1; transform: scaleY(1) scaleX(1) rotate(360deg); }
         }
 
         /* 📋 數據看板通用外觀 */
@@ -278,7 +257,6 @@
             margin-bottom: 8px;
             border: 1px solid #f3f4f6;
             box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-            transition: all 0.2s;
         }
         .prize-thumb {
             width: 40px;
@@ -321,9 +299,6 @@
         }
         .honor-info { font-size: 13px; color: #4b5563; }
 
-        /* 🔒 暗黑防線：名單遮罩 */
-        .hidden-group { display: none !important; }
-
         /* 🎵 音樂控制按鈕固定在右下角 */
         .music-control-btn {
             position: fixed;
@@ -340,9 +315,6 @@
             z-index: 100;
             border: 2px solid white;
             transition: all 0.3s ease;
-        }
-        .music-control-btn:hover {
-            transform: scale(1.05);
         }
     </style>
 </head>
@@ -371,7 +343,6 @@
             
             <!-- 🎪 實體扭蛋機結構 -->
             <div class="gacha-machine">
-                <!-- 🔮 玻璃罩與內部蛋群 -->
                 <div class="gacha-glass" id="gachaGlass">
                     <!-- 底層蛋 -->
                     <div class="gacha-egg egg-pink egg-layer-a" style="left: 15px;"></div>
@@ -393,11 +364,9 @@
                     <div class="gacha-egg egg-yellow egg-layer-c" style="left: 195px;"></div>
                 </div>
 
-                <!-- ⚙️ 下方控制面板 -->
                 <div class="gacha-panel">
                     <div class="gacha-crank" id="gachaCrank" onclick="startDraw()"></div>
                     <div class="gacha-gate">
-                        <!-- 隱藏的驚喜幸運蛋 -->
                         <div class="gacha-lucky-egg" id="luckyEgg"></div>
                     </div>
                 </div>
@@ -428,7 +397,7 @@
                         </optgroup>
 
                         <!-- 🎓 龜蜜 -->
-                        <optgroup label="龜蜜" id="group-college" class="hidden-group">
+                        <optgroup label="✨ 龜蜜群" id="group-college" class="hidden-group">
                             <option value="彥伶">彥伶</option>
                             <option value="亮昀">亮昀</option>
                             <option value="芳瑜">芳瑜</option>
@@ -459,8 +428,8 @@
                 <p id="modalPrizeName" class="text-xl font-extrabold text-slate-800">載入中...</p>
             </div>
             
-            <div id="modalTicketCode" onclick="clickTicket()" class="bg-slate-900 text-cyan-400 font-mono text-base font-bold py-3 px-4 rounded-xl cursor-pointer hover:bg-slate-800 active:scale-98 transition-all border border-cyan-500/30 break-all select-all">🎟️ CODE-XXXX-XXXX</div>
-            <p id="copyHint" class="text-[11px] text-gray-400 mt-1.5 font-medium">💡 點擊並輸入密碼「3064」即可開啟獎品</p>
+            <div id="modalTicketCode" onclick="clickTicket()" class="bg-slate-900 text-cyan-400 font-mono text-base font-bold py-3 px-4 rounded-xl cursor-pointer hover:bg-slate-800 active:scale-98 transition-all border border-cyan-500/30 break-all select-none">點我打開獎品連結</div>
+            <p id="copyHint" class="text-[11px] text-gray-400 mt-1.5 font-medium">💡 點擊上方並輸入密碼「3064」即可查看獎品</p>
 
             <button onclick="closeModal()" class="w-full bg-gray-800 hover:bg-gray-700 text-white font-bold py-2.5 rounded-xl text-sm transition-all mt-5">收下好禮</button>
         </div>
@@ -490,6 +459,7 @@
 
         let isDrawing = false;
         let isMuted = true;
+        let currentPrizeUrl = ""; 
 
         const groupPasswords = {
             "皮皮": "group-pipi",
@@ -518,18 +488,20 @@
             const inputPass = document.getElementById("secretPass").value.trim();
             const selectEl = document.getElementById("playerName");
             
+            // 🛡️ 核心修復點：先強制將所有群組 DOM 隱藏，並將下拉選單拉回最上面預設選項
             document.getElementById("group-pipi").classList.add("hidden-group");
             document.getElementById("group-college").classList.add("hidden-group");
+            selectEl.selectedIndex = 0; 
             
+            // 根據正確密語，僅將該目標群組的展示類別移除
             if (groupPasswords[inputPass]) {
                 const targetGroupId = groupPasswords[inputPass];
                 document.getElementById(targetGroupId).classList.remove("hidden-group");
                 selectEl.options[0].innerText = "▼ 請選擇你的名字 ▼";
                 alert(`🔓 【${inputPass}】名單已成功解鎖！`);
             } else {
-                selectEl.value = "";
                 selectEl.options[0].innerText = "🔒 請先解鎖群組名單 🔒";
-                alert("❌ 密語錯誤，無法解鎖 any 群組名單！");
+                alert("❌ 密語錯誤，無法解鎖群組名單！");
             }
         }
 
@@ -642,192 +614,112 @@
                 alert("請先輸入通關密語並選擇你的名字喔！");
                 return;
             }
+
             if (isDrawing) return;
-            
             isDrawing = true;
-            document.getElementById("spinBtn").disabled = true;
-            document.getElementById("spinBtn").innerText = "轉動中...";
-            document.getElementById("playerName").disabled = true;
-            document.getElementById("secretPass").disabled = true;
 
-            // 每次抽獎前，徹底把掉落蛋的 class 洗乾淨，使其回到 -60px 高度隱藏狀態
-            document.getElementById("luckyEgg").className = "gacha-lucky-egg";
-
-            const rootRef = ref(db);
-            let finalWonPrize = null;
-            let isAlreadyPlayed = false;
-
-            runTransaction(rootRef, (currentData) => {
+            const dbRef = ref(db);
+            
+            runTransaction(dbRef, (currentData) => {
                 if (!currentData) return currentData;
-                if (!currentData.prizes) currentData.prizes = {};
                 if (!currentData.playedUsers) currentData.playedUsers = {};
-
+                
                 if (currentData.playedUsers[nameInput]) {
-                    isAlreadyPlayed = true;
                     return; 
                 }
 
-                let currentPrizes = currentData.prizes;
-                let pool = [];
-                let totalW = 0;
-                for (let id in currentPrizes) {
-                    if (Number(currentPrizes[id].quantity) > 0) {
-                        pool.push({ id: id, weight: Number(currentPrizes[id].weight || 0) });
-                        totalW += Number(currentPrizes[id].weight || 0);
+                let availablePrizes = [];
+                for (let id in currentData.prizes) {
+                    let p = currentData.prizes[id];
+                    if (Number(p.quantity) > 0) {
+                        for (let i = 0; i < Number(p.quantity); i++) {
+                            availablePrizes.push({ id: id, name: p.name, code: p.code || "" });
+                        }
                     }
                 }
 
-                if (pool.length === 0 || totalW === 0) return;
-
-                let randomNum = Math.floor(Math.random() * totalW);
-                let selectedId = null;
-                
-                for (let i = 0; i < pool.length; i++) {
-                    randomNum -= pool[i].weight;
-                    if (randomNum < 0) {
-                        selectedId = pool[i].id;
-                        break;
-                    }
-                }
-
-                if (!selectedId) selectedId = pool[0].id;
-
-                const prize = currentPrizes[selectedId];
-                prize.quantity = Number(prize.quantity) - 1;
-
-                let assignedCode = "無可用票券";
-                if (prize.ticketCodes && prize.ticketCodes.length > 0) {
-                    const codeIndex = prize.ticketCodes.length - 1 - prize.quantity;
-                    assignedCode = prize.ticketCodes[codeIndex] !== undefined ? prize.ticketCodes[codeIndex] : prize.ticketCodes[0];
-                }
-
-                if(!prize.recentWinners) prize.recentWinners = [];
-                prize.recentWinners.push({ user: nameInput, code: assignedCode, time: Date.now() });
-
-                currentData.playedUsers[nameInput] = { time: Date.now(), won: prize.name };
-                finalWonPrize = { name: prize.name, code: assignedCode };
-
-                return currentData;
-            }).then((result) => {
-                if (isAlreadyPlayed) {
-                    alert(`⚠️ 提示：【${nameInput}】你已經抽過囉！不能重複扭蛋哦～`);
-                    resetButtonState();
+                if (availablePrizes.length === 0) {
+                    alert("庫存已被抽光囉！");
                     return;
                 }
 
-                if (result.committed && finalWonPrize) {
-                    runGachaponAnimation(() => {
-                        if (finalWonPrize.name.includes("銘謝惠顧")) {
-                            showWinModal("😭 哎呀可惜！", finalWonPrize.name, "請再接再厲！", true);
-                        } else {
-                            showWinModal("🎉 恭喜你中獎了！", finalWonPrize.name, finalWonPrize.code, false);
-                        }
-                        resetButtonState();
-                    });
-                } else {
-                    runGachaponAnimation(() => {
-                        showWinModal("😭 哎呀可惜！", "銘謝惠顧", "請再接再厲！", true);
-                        resetButtonState();
-                    });
+                let randomIndex = Math.floor(Math.random() * availablePrizes.length);
+                let chosenPrize = availablePrizes[randomIndex];
+
+                currentData.prizes[chosenPrize.id].quantity = Number(currentData.prizes[chosenPrize.id].quantity) - 1;
+                
+                currentData.playedUsers[nameInput] = {
+                    won: chosenPrize.name,
+                    code: chosenPrize.code, 
+                    time: Date.now()
+                };
+
+                return currentData;
+            })
+            .then((result) => {
+                if (!result.committed) {
+                    alert("糟糕，這個名字已經抽過或是發生同步錯誤囉！");
+                    isDrawing = false;
+                    return;
                 }
-            }).catch((err) => {
-                alert("系統錯誤：" + err.message);
-                resetButtonState();
+
+                const snapshot = result.snapshot.val();
+                const myResult = snapshot.playedUsers[nameInput];
+
+                const container = document.getElementById("gachaGlass");
+                const luckyEgg = document.getElementById("luckyEgg");
+                
+                container.classList.add("settling");
+                luckyEgg.className = "gacha-lucky-egg"; 
+                luckyEgg.style.opacity = "0";
+
+                const eggColors = ["egg-pink","egg-blue","egg-yellow","egg-green","egg-purple","egg-orange"];
+                const randomColor = eggColors[Math.floor(Math.random() * eggColors.length)];
+                luckyEgg.classList.add(randomColor);
+
+                const crank = document.getElementById("gachaCrank");
+                crank.classList.add("rotating-crank");
+
+                setTimeout(() => {
+                    container.classList.remove("settling");
+                    luckyEgg.classList.add("dropped-egg");
+                }, 1200);
+
+                setTimeout(() => {
+                    document.getElementById("modalPrizeName").innerText = myResult.won;
+                    
+                    currentPrizeUrl = myResult.code; 
+                    document.getElementById("modalTicketCode").innerText = "點我打開獎品連結";
+                    
+                    document.getElementById("winModal").style.display = "flex";
+                    crank.classList.remove("rotating-crank");
+                    isDrawing = false;
+                }, 2100);
+
+            })
+            .catch((error) => {
+                console.error("交易失敗: ", error);
+                alert("伺服器擁擠，請稍後再試！");
+                isDrawing = false;
             });
         }
 
-        function runGachaponAnimation(callback) {
-            const glass = document.getElementById("gachaGlass");
-            const crank = document.getElementById("gachaCrank");
-            const luckyEgg = document.getElementById("luckyEgg");
-
-            // 手把開始轉動
-            crank.classList.add("rotating-crank");
-
-            setTimeout(() => {
-                // 機艙內部蛋群開始快速晃動攪拌
-                glass.classList.add("settling");
-                
-                const remainingEggs = glass.querySelectorAll('.gacha-egg');
-                if (remainingEggs.length > 0) {
-                    const randomIndex = Math.floor(Math.random() * remainingEggs.length);
-                    const eggToRemove = remainingEggs[randomIndex];
-
-                    // 捕捉抽中消失扭蛋的顏色
-                    let targetColorClass = "egg-pink";
-                    eggToRemove.classList.forEach(cls => {
-                        if (cls.startsWith('egg-') && cls !== 'egg-layer-a' && cls !== 'egg-layer-b' && cls !== 'egg-layer-c') {
-                            targetColorClass = cls;
-                        }
-                    });
-
-                    // 出蛋口的幸運扭蛋繼承該顏色
-                    luckyEgg.classList.add(targetColorClass);
-                    
-                    // 上方玻璃罩內的扭蛋淡出
-                    eggToRemove.style.opacity = '0';
-                    setTimeout(() => {
-                        eggToRemove.remove();
-                    }, 400);
-                }
-            }, 200);
-
-            // 在第 400 毫秒時，扭蛋從上方管道以「重力加速度」猛烈砸落到出蛋口底部
-            setTimeout(() => {
-                luckyEgg.classList.add("dropped-egg");
-            }, 400);
-
-            // 落地回彈穩定後，關閉晃動並跳出中獎視窗
-            setTimeout(() => {
-                glass.classList.remove("settling");
-                crank.classList.remove("rotating-crank");
-                if (callback) callback();
-            }, 1400);
-        }
-
-        function showWinModal(title, prizeName, ticketCode, isLose) {
-            document.getElementById("modalTitle").innerText = title;
-            document.getElementById("modalPrizeName").innerText = prizeName;
-            
-            const codeEl = document.getElementById("modalTicketCode");
-            codeEl.innerText = ticketCode;
-
-            if (isLose) {
-                codeEl.style.background = "#374151";
-                codeEl.style.color = "#9ca3af";
-                codeEl.style.borderColor = "transparent";
-                document.getElementById("copyHint").style.display = "none";
+        function clickTicket() {
+            if (currentPrizeUrl && currentPrizeUrl.startsWith("http")) {
+                window.open(currentPrizeUrl, "_blank");
+            } else if (currentPrizeUrl) {
+                alert(`獎品內容為：${currentPrizeUrl}`);
             } else {
-                codeEl.style.background = "#0f172a";
-                codeEl.style.color = "#22d3ee";
-                codeEl.style.borderColor = "rgba(6,182,212,0.3)";
-                document.getElementById("copyHint").style.display = "block";
+                alert("未偵測到有效的連結！");
             }
-
-            document.getElementById("winModal").style.display = "flex";
         }
 
         function closeModal() {
             document.getElementById("winModal").style.display = "none";
-        }
-
-        function clickTicket() {
-            const text = document.getElementById("modalTicketCode").innerText;
-            if (text.includes("請再接再厲") || text.includes("無可用票券")) return;
-            
-            navigator.clipboard.writeText(text).then(() => {
-                alert("📋 序號已成功複製到剪貼簿囉！");
-            }).catch(() => {
-                alert("複製失敗，請手動選取複製。");
-            });
-        }
-
-        function resetButtonState() {
-            isDrawing = false;
-            document.getElementById("spinBtn").disabled = false;
-            document.getElementById("spinBtn").innerText = "啟動幸運扭蛋";
-            document.getElementById("playerName").disabled = false;
-            document.getElementById("secretPass").disabled = false;
+            const luckyEgg = document.getElementById("luckyEgg");
+            luckyEgg.className = "gacha-lucky-egg";
+            luckyEgg.style.opacity = "0";
+            document.getElementById("playerName").value = "";
         }
     </script>
 </body>
