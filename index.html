@@ -405,7 +405,7 @@
 
     </div>
 
-    <!-- 🏆 獲獎彈出視窗 (Modal) -->
+    <!-- 🏆 獲獎與狀態彈出視窗 (Modal) -->
     <div id="winModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" style="display: none;">
         <div class="bg-white rounded-3xl w-full max-w-sm p-6 text-center shadow-2xl border-4 border-amber-400 transform scale-100 transition-all">
             <h2 id="modalTitle" class="text-2xl font-black text-rose-500 mb-2">🎉 恭喜中獎！</h2>
@@ -617,7 +617,7 @@
             document.getElementById("honorBoard").innerHTML = honorHtml;
         });
 
-        // 抽獎與真實掉落連動核心
+        // 抽獎與真實物理連動核心
         function startDraw() {
             const nameInput = document.getElementById("playerName").value;
             if (!nameInput) {
@@ -683,12 +683,11 @@
                 // 隨機決定出蛋口扭蛋的顏色
                 const chosenColor = eggColors[Math.floor(Math.random() * eggColors.length)];
                 
-                // 🛠️ 尋找大玻璃罩內「對應顏色且還沒被刪除」的其中一顆靜態蛋
+                // 尋找大玻璃罩內「對應顏色且還沒被刪除」的其中一顆靜態蛋
                 const matchingEggsInGlass = container.querySelectorAll(`.gacha-egg.${chosenColor}:not(.egg-falling-out)`);
                 
                 crank.classList.add("rotating-crank");
 
-                // 🛠️ 執行符合常理的實體物理表現：
                 if (matchingEggsInGlass.length > 0) {
                     // 讓其中隨機一顆同色蛋往下墜並淡出（模擬它從機器裡滾出去了）
                     const targetEgg = matchingEggsInGlass[Math.floor(Math.random() * matchingEggsInGlass.length)];
@@ -708,16 +707,49 @@
                     luckyEgg.classList.add("dropped-egg");
                 }, 1000);
 
-                // 彈出中獎視窗時機點
+                // 彈出結果視窗時機點（加入銘謝惠顧判定）
                 setTimeout(() => {
-                    document.getElementById("modalPrizeName").innerText = myResult.won;
+                    const modalTitle = document.getElementById("modalTitle");
+                    const modalPrizeName = document.getElementById("modalPrizeName");
+                    const modalTicketCode = document.getElementById("modalTicketCode");
+                    const copyHint = document.getElementById("copyHint");
+                    const closeBtn = document.querySelector("#winModal button:last-child");
+                    const labelPrize = modalPrizeName.previousElementSibling; 
+
+                    modalPrizeName.innerText = myResult.won;
                     currentPrizeUrl = myResult.code; 
-                    document.getElementById("modalTicketCode").innerText = "點我打開獎品連結";
+
+                    // 🎯 判斷是否為銘謝惠顧
+                    if (myResult.won && myResult.won.includes("銘謝惠顧")) {
+                        modalTitle.innerText = "😢 差一點點！";
+                        modalTitle.className = "text-2xl font-black text-gray-500 mb-2"; 
+                        if (labelPrize) labelPrize.innerText = "💨 本次結果";
+                        
+                        // 隱藏不需要的連結與提示
+                        modalTicketCode.style.display = "none";
+                        copyHint.style.display = "none";
+                        
+                        // 修改底部關閉按鈕文字
+                        closeBtn.innerText = "再接再厲";
+                    } else {
+                        // 正常中獎狀態
+                        modalTitle.innerText = "🎉 恭喜中獎！";
+                        modalTitle.className = "text-2xl font-black text-rose-500 mb-2";
+                        if (labelPrize) labelPrize.innerText = "🎁 抽中獎品";
+                        
+                        // 顯示連結與提示
+                        modalTicketCode.style.display = "block";
+                        modalTicketCode.innerText = "點我打開獎品連結";
+                        copyHint.style.display = "block";
+                        
+                        // 修改底部關閉按鈕文字
+                        closeBtn.innerText = "收下好禮";
+                    }
                     
                     document.getElementById("winModal").style.display = "flex";
                     crank.classList.remove("rotating-crank");
                     
-                    // 清除下墜狀態，保留被抽掉蛋的消失狀態
+                    // 清除下墜狀態，保留被抽掉蛋的虛空狀態
                     container.classList.remove("eggs-drop-down");
                     isDrawing = false;
                 }, 2100);
@@ -745,6 +777,10 @@
             const luckyEgg = document.getElementById("luckyEgg");
             luckyEgg.className = "gacha-lucky-egg";
             luckyEgg.style.opacity = "0";
+            
+            // 🔄 重置 Modal 元素的預設顯示狀態，確保下次中獎能正常運作
+            document.getElementById("modalTicketCode").style.display = "block";
+            document.getElementById("copyHint").style.display = "block";
             
             const selectEl = document.getElementById("playerName");
             selectEl.innerHTML = '<option value="" disabled selected>🔒 請先解鎖群組名單 🔒</option>';
