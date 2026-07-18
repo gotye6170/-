@@ -438,7 +438,7 @@
         <div class="lg:col-span-3 order-3">
             <div class="dashboard-panel" id="honorBoard">
                 <span class="board-title-text honor-title-text">👑 幸運中獎者</span>
-                <div class="scroller-content text-gray-400 text-sm italic p-2 text-center">正在載入得獎英雄榜...</div>
+                <div class="scroller-content text-gray-400 text-sm italic p-2 text-center">連線中，正在載入...</div>
             </div>
         </div>
 
@@ -454,7 +454,7 @@
             </div>
             
             <div id="modalTicketCode" onclick="clickTicket()" class="bg-slate-900 text-cyan-400 font-mono text-base font-bold py-3 px-4 rounded-xl cursor-pointer hover:bg-slate-800 active:scale-98 transition-all border border-cyan-500/30 break-all select-none">點我打開獎品連結</div>
-            <p id="copyHint" class="text-[11px] text-gray-400 mt-1.5 font-medium">💡 點擊上方並輸入密碼(若需要)「3064」即可查看獎品</p>
+            <p id="copyHint" class="text-[11px] text-gray-400 mt-1.5 font-medium">💡 點擊上方並輸入密碼「3064」即可查看獎品</p>
 
             <button onclick="closeModal()" class="w-full bg-gray-800 hover:bg-gray-700 text-white font-bold py-2.5 rounded-xl text-sm transition-all mt-5">收下好禮</button>
         </div>
@@ -478,6 +478,7 @@
         window.clickTicket = clickTicket;
         window.verifyGroupPass = verifyGroupPass;
         window.handleNameChange = handleNameChange;
+        window.verifyHonorPass = verifyHonorPass;
 
         // 🔀 選好名字後：隱藏「密語解鎖/名字選擇」面板，顯示「扭蛋機」
         function handleNameChange() {
@@ -492,6 +493,75 @@
         function showControlPanel() {
             document.getElementById("machineSection").classList.add("hidden");
             document.getElementById("controlPanel").classList.remove("hidden");
+        }
+
+        // 🔑 驗證「幸運中獎者」欄位的解鎖密語，成功後只顯示同群組的中獎紀錄
+        function verifyHonorPass() {
+            const inputEl = document.getElementById("honorPass");
+            if (!inputEl) return;
+            const inputPass = inputEl.value.trim();
+
+            if (groupLists[inputPass]) {
+                honorUnlockedGroup = inputPass;
+                renderHonorBoard(lastPlayedList);
+                updateMarquee(buildMarqueeText(lastPlayedList));
+            } else {
+                alert("❌ 密語錯誤，無法解鎖中獎名單！");
+            }
+        }
+
+        // 📣 依目前解鎖的群組，組出跑馬燈文字（未解鎖時不透露任何姓名）
+        function buildMarqueeText(playedList) {
+            const defaultText = "🎉 歡迎來到呆呆扭蛋機！快來試試手氣！ 🎟️ ";
+
+            if (!honorUnlockedGroup) return defaultText;
+
+            const filtered = playedList.filter(item => item.group === honorUnlockedGroup);
+            if (filtered.length === 0) return defaultText;
+
+            let marqueeItems = filtered.map(item => `【${item.user}】喜獲大獎：${item.won}！`);
+            return "🔥 中獎快報 🔥 " + marqueeItems.join(" 🌟 ") + " 歡慶連連，好運不斷！";
+        }
+
+        // 👑 依目前解鎖狀態，畫出「幸運中獎者」欄位內容
+        function renderHonorBoard(playedList) {
+            const board = document.getElementById("honorBoard");
+            if (!board) return;
+
+            let html = '<span class="board-title-text honor-title-text">👑 幸運中獎者</span>';
+
+            if (!honorUnlockedGroup) {
+                html += `
+                <div class="flex-grow flex flex-col items-center justify-center text-center gap-3 px-2">
+                    <p class="text-xs text-gray-400 leading-relaxed">🔒 為保護個資<br>請輸入密語才能查看中獎名單</p>
+                    <div class="flex gap-2 w-full max-w-[220px]">
+                        <input type="text" id="honorPass" placeholder="請輸入密語..." class="flex-grow bg-gray-50 border border-gray-200 rounded-xl px-3 py-1.5 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-pink-400 transition-all text-center">
+                        <button onclick="verifyHonorPass()" class="bg-gray-800 text-white text-xs font-bold px-3 py-1.5 rounded-xl hover:bg-gray-700 active:scale-95 transition-all flex-shrink-0">解鎖</button>
+                    </div>
+                </div>`;
+                board.innerHTML = html;
+                return;
+            }
+
+            const filtered = playedList.filter(item => item.group === honorUnlockedGroup);
+
+            html += '<div class="scroller-content">';
+            if (filtered.length > 0) {
+                filtered.forEach(item => {
+                    html += `
+                    <div class="honor-item-row">
+                        <span class="honor-badge">已得獎</span>
+                        <div class="honor-info">
+                            <span class="honor-name-label">恭喜 <b style="color:#ec4899;">${item.user}</b> 抽中了 🎁 <b style="color:#7c3aed;">${item.won}</b></span>
+                        </div>
+                    </div>`;
+                });
+            } else {
+                html += '<div style="color: #9ca3af; font-size: 13px; text-align: center; padding: 20px; width: 100%;">目前還沒有人中獎哦！快來成為首位幸運兒</div>';
+            }
+            html += '</div>';
+
+            board.innerHTML = html;
         }
 
         // 📣 更新跑馬燈內容，並依文字長度重新計算捲動速度，確保順暢無跳動
@@ -519,6 +589,8 @@
         let currentPrizeUrl = ""; 
         let globalPlayedUsers = {}; 
         let globalPlayedDevices = {};
+        let honorUnlockedGroup = null; // 幸運中獎者欄位目前解鎖的群組（null = 尚未解鎖）
+        let lastPlayedList = [];       // 最近一次從 Firebase 算出的完整得獎名單（未過濾群組）
 
         let deviceId =
             localStorage.getItem("gachaDeviceId");
@@ -545,6 +617,14 @@
         };
 
         const eggColors = ["egg-pink", "egg-blue", "egg-yellow", "egg-green", "egg-purple", "egg-orange"];
+
+        // 🔎 依名字反查該名字屬於哪個群組（用來把中獎紀錄標記群組）
+        function getGroupKeyForName(name) {
+            for (const key in groupLists) {
+                if (groupLists[key].names.includes(name)) return key;
+            }
+            return null;
+        }
 
 
         function verifyGroupPass() {
@@ -656,8 +736,6 @@
                 }
             }
 
-            let honorHtml = '<span class="board-title-text honor-title-text">👑 幸運中獎者</span>';
-            let marqueeText = "🎉 歡迎來到呆呆扭蛋機！快來試試手氣！ 🎟️ ";
             let playedList = [];
 
             for (let user in globalPlayedUsers) {
@@ -668,31 +746,16 @@
                 playedList.push({
                     user: user,
                     won: globalPlayedUsers[user].won,
-                    time: globalPlayedUsers[user].time || 0
+                    time: globalPlayedUsers[user].time || 0,
+                    group: globalPlayedUsers[user].group || null
                 });
             }
 
             playedList.sort((a, b) => b.time - a.time);
 
-            if (playedList.length > 0) {
-                let marqueeItems = playedList.map(item => `【${item.user}】喜獲大獎：${item.won}！`);
-                marqueeText = "🔥 中獎快報 🔥 " + marqueeItems.join(" 🌟 ") + " 歡慶連連，好運不斷！";
-
-                playedList.forEach(item => {
-                    honorHtml += `
-                    <div class="honor-item-row">
-                        <span class="honor-badge">已得獎</span>
-                        <div class="honor-info">
-                            <span class="honor-name-label">恭喜 <b style="color:#ec4899;">${item.user}</b> 抽中了 🎁 <b style="color:#7c3aed;">${item.won}</b></span>
-                        </div>
-                    </div>`;
-                });
-            } else {
-                honorHtml += '<div id="honorList" style="color: #9ca3af; font-size: 13px; text-align: center; padding: 20px; width: 100%;">目前還沒有人中獎哦！快來成為首位幸運兒</div>';
-            }
-
-            updateMarquee(marqueeText);
-            document.getElementById("honorBoard").innerHTML = honorHtml;
+            lastPlayedList = playedList;
+            updateMarquee(buildMarqueeText(playedList));
+            renderHonorBoard(playedList);
         });
 
         // ⚖️ 修正版：依權重(weight)計算機率的抽獎核心
@@ -793,7 +856,8 @@
                 currentData.playedUsers[nameInput] = {
                     won: targetPrize.name,
                     code: wonCode, 
-                    time: Date.now()
+                    time: Date.now(),
+                    group: getGroupKeyForName(nameInput)
                 };
                     currentData.playedDevices[deviceId] = {
                     user:nameInput,
