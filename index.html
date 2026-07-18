@@ -590,7 +590,7 @@
         const groupLists = {
             "皮皮": {
                 label: "✨ 皮皮群",
-                names: ["貝果", "怡蒨", "７７", "安鴻", "當家", "皮夾", "立涵"]
+                names: ["貝果", "怡蒨", "７７", "安鴻", "當家", "立涵", "皮夾"]
             },
             "GM": {
                 label: "✨ 龜蜜群",
@@ -637,25 +637,35 @@
                 hasVisiblePrize = true;
                 const imgHtml = p.image ? `<img class="prize-thumb" src="${p.image}" alt="${p.name}">` : `<div class="prize-thumb" style="background:#f3f4f6;"></div>`;
 
-                if (Number(p.quantity) > 0) {
+                const remain = Number(p.quantity || 0);
+                const total = Number(p.totalQuantity || 0);
+                const showTotal = total > 1; // 只有原始總數大於 1 份時，才顯示「共 X 份」
+
+                if (remain > 0) {
+                    const qtyLabel = showTotal
+                        ? `🟢 剩餘 <b>${remain}</b> 份 / 共 <b>${total}</b> 份`
+                        : `🟢 剩餘 <b>${remain}</b> 份`;
                     html += `
                     <div class="prize-item-row">
                         ${imgHtml}
                         <div class="prize-info">
                             <span class="prize-name-label">${p.name}</span>
-                            <span style="color:#059669; font-size:13px; font-weight:bold;">🟢 剩餘 <b>${p.quantity}</b> 份</span>
+                            <span style="color:#059669; font-size:13px; font-weight:bold;">${qtyLabel}</span>
                         </div>
                     </div>`;
                 } else {
                     const otherGroupNote = isPrizeTakenByOtherGroup(p.name)
                         ? '<div style="color:#f97316; font-size:11px; font-weight:bold; margin-top:1px;">🔸 已被其他組抽走</div>'
                         : '';
+                    const soldOutLabel = showTotal
+                        ? `🔴 已全數送完（共 <b>${total}</b> 份）`
+                        : `🔴 已全數送完`;
                     html += `
                     <div class="prize-item-row" style="opacity: 0.4;">
                         ${imgHtml}
                         <div class="prize-info">
                             <span class="prize-name-label" style="text-decoration: line-through; color:#9ca3af;">${p.name}</span>
-                            <span style="color:#dc2626; font-size:13px; font-weight:bold;">🔴 已全數送完</span>
+                            <span style="color:#dc2626; font-size:13px; font-weight:bold;">${soldOutLabel}</span>
                             ${otherGroupNote}
                         </div>
                     </div>`;
