@@ -66,25 +66,34 @@
         .prize-name-label { font-size: 16px; font-weight: bold; color: #ffffff; margin-bottom: 2px; }
 
         .login-box { margin-bottom: 20px; }
-        input { 
+        
+        /* 高級下拉選單樣式 */
+        select { 
             width: 85%; 
             padding: 14px; 
             border-radius: 12px; 
             border: 1px solid rgba(255,255,255,0.1); 
             font-size: 16px; 
             text-align: center; 
+            text-align-last: center; /* 讓下拉選單文字居中 */
             background: rgba(255,255,255,0.08); 
             color: #fff; 
             font-weight: bold; 
             transition: 0.3s;
+            cursor: pointer;
+            appearance: none; /* 移除瀏覽器預設箭頭 */
+            -webkit-appearance: none;
         }
-        input:focus {
+        select:focus {
             outline: none;
-            background: rgba(255,255,255,0.15);
+            background: rgba(30, 20, 50, 0.9);
             border-color: #00f2fe;
             box-shadow: 0 0 15px rgba(0,242,254,0.4);
         }
-        input::placeholder { color: rgba(255,255,255,0.4); font-weight: normal; }
+        select option {
+            background: #161124;
+            color: #fff;
+        }
         
         /* 高級拉霸滾動區 (黑金奢華風格) */
         .slot-machine { 
@@ -168,9 +177,17 @@
     <!-- 2. 獎品清單看板 -->
     <div class="status-board" id="statusBoard">正在載入雲端禮品庫存...</div>
 
-    <!-- 暱稱輸入區 -->
+    <!-- 朋友名字下拉選單區 -->
     <div class="login-box" id="loginBox">
-        <input type="text" id="playerName" placeholder="請先輸入你的名字" maxlength="10">
+        <select id="playerName">
+            <option value="" disabled selected>▼ 請選擇你的名字 ▼</option>
+            <!-- ⚙️ 你可以在下面自由修改、新增或刪除朋友的名字 -->
+            <option value="貝果">貝果</option>
+            <option value="怡蒨">怡蒨</option>
+            <option value="77">77</option>
+            <option value="安鴻">安鴻</option>
+            <option value="當家">當家</option>
+        </select>
     </div>
 
     <!-- 拉霸機 -->
@@ -215,7 +232,7 @@
     let isDrawing = false;
     let localPrizesData = {};
 
-    // 即時更新看板：僅顯示商品圖、品名、剩餘數量。機率完全拔除！
+    // 即時更新看板：僅顯示商品圖、品名、剩餘數量。
     onValue(ref(db, 'prizes'), (snapshot) => {
         const prizes = snapshot.val();
         if (!prizes) {
@@ -230,14 +247,12 @@
         for (let id in prizes) {
             const p = prizes[id];
             
-            // 🛡️ 關鍵隱藏邏輯：只要獎品名稱包含「銘謝惠顧」，就跳過不渲染到看板上
             if (p.name && p.name.includes("銘謝惠顧")) {
                 continue; 
             }
 
             hasVisiblePrize = true;
             
-            // 處理商品圖：若後台有填 image 網址就秀圖，沒有就用灰底預防空圖
             const imgHtml = p.image ? `<img class="prize-thumb" src="${p.image}" alt="${p.name}">` : `<div class="prize-thumb" style="background:rgba(255,255,255,0.15);"></div>`;
 
             if (Number(p.quantity) > 0) {
@@ -270,9 +285,9 @@
 
     // 核心強奪鎖 ＆ 限制一人抽一次機制
     function startDraw() {
-        const nameInput = document.getElementById("playerName").value.trim();
+        const nameInput = document.getElementById("playerName").value;
         if (!nameInput) {
-            alert("請先輸入你的名字喔！");
+            alert("請先選擇你的名字喔！");
             return;
         }
         if (isDrawing) return;
@@ -282,7 +297,6 @@
         document.getElementById("spinBtn").innerText = "好運計算中...";
         document.getElementById("playerName").disabled = true;
 
-        // 我們把檢查和扣除獎品綁在同一個 root transaction，確保萬無一失
         const rootRef = ref(db);
         let finalWonPrize = null;
         let isAlreadyPlayed = false;
@@ -295,7 +309,7 @@
             // 🚫 1. 檢查這個名字是否已經在雲端抽過獎了
             if (currentData.playedUsers[nameInput]) {
                 isAlreadyPlayed = true;
-                return; // 終止交易，不做任何改動
+                return; 
             }
 
             let currentPrizes = currentData.prizes;
@@ -339,7 +353,7 @@
             if(!prize.recentWinners) prize.recentWinners = [];
             prize.recentWinners.push({ user: nameInput, code: assignedCode, time: Date.now() });
 
-            // 📝 2. 將名字寫入雲端黑名單，紀錄他已經抽過了
+            // 📝 2. 將名字寫入雲端黑名單
             currentData.playedUsers[nameInput] = {
                 time: Date.now(),
                 won: prize.name
@@ -352,7 +366,6 @@
 
             return currentData;
         }).then((result) => {
-            // 如果是被抓到重覆抽獎
             if (isAlreadyPlayed) {
                 alert(`⚠️ 提示：【${nameInput}】你已經抽過囉！不能太貪心哦～`);
                 resetButtonState();
@@ -380,7 +393,7 @@
         });
     }
 
-    // 拉霸滾動效果（精準座標置中修正）
+    // 拉霸滾動效果
     function runSlotMachineAnimation(finalResult, callback) {
         const track = document.getElementById("slotTrack");
         track.innerHTML = "";
