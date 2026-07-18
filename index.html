@@ -10,11 +10,13 @@
         .container { background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(12px); padding: 30px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); width: 100%; max-width: 520px; text-align: center; border: 1px solid rgba(255, 255, 255, 0.15); }
         h1 { margin-top: 0; color: #ff007f; text-shadow: 0 0 12px rgba(255,0,127,0.5); font-size: 28px; }
         
-        /* 獎品即時看板與商品圖 */
+        /* 獎品即時看板（已移除任何機率字眼） */
         .status-board { background: rgba(0,0,0,0.5); padding: 15px; border-radius: 12px; margin-bottom: 20px; border-left: 5px solid #ff007f; text-align: left; font-size: 14px; line-height: 1.6; }
-        .prize-item-row { display: flex; align-items: center; margin: 8px 0; background: rgba(255,255,255,0.05); padding: 8px; border-radius: 8px; }
-        .prize-thumb { width: 50px; height: 50px; object-fit: cover; border-radius: 6px; margin-right: 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); }
-        .prize-info { flex-grow: 1; }
+        .prize-title-text { font-weight: bold; margin-bottom: 8px; color: #ff007f; display: block; font-size: 15px; }
+        .prize-item-row { display: flex; align-items: center; margin: 8px 0; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); }
+        .prize-thumb { width: 55px; height: 55px; object-fit: cover; border-radius: 8px; margin-right: 15px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); display: block; }
+        .prize-info { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; }
+        .prize-name-label { font-size: 16px; font-weight: bold; color: #ffffff; margin-bottom: 2px; }
 
         .login-box { margin-bottom: 15px; }
         input { width: 85%; padding: 12px; border-radius: 8px; border: none; font-size: 16px; text-align: center; background: rgba(255,255,255,0.9); color: #222; font-weight: bold; }
@@ -42,10 +44,11 @@
 <body>
 
 <div class="container">
+    <!-- 1. 頂部名稱已確實更改為：呆呆抽獎 -->
     <h1>🎰 呆呆抽獎 🎟️</h1>
     
-    <!-- 剩餘獎品與即時看板 -->
-    <div class="status-board" id="statusBoard">正在精密計算雲端庫存...</div>
+    <!-- 2. 獎品清單看板（絕不顯示任何中獎率與 % 數） -->
+    <div class="status-board" id="statusBoard">正在載入雲端禮品庫存...</div>
 
     <!-- 暱稱輸入區 -->
     <div class="login-box" id="loginBox">
@@ -79,9 +82,9 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
     import { getDatabase, ref, runTransaction, onValue } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
 
-    // ⚠️【請替換成你的 Firebase Realtime Database 網址】
+    // 🔗 您的專屬 Firebase 網址
     const firebaseConfig = {
-        databaseURL: "https://YOUR-PROJECT-ID-default-rtdb.firebaseio.com/"
+        databaseURL: "https://daidaikunbao-default-rtdb.firebaseio.com/"
     };
 
     const app = initializeApp(firebaseConfig);
@@ -94,7 +97,7 @@
     let isDrawing = false;
     let localPrizesData = {};
 
-    // 即時同步看板：只顯示名稱、商品照與剩餘份數（隱藏中獎機率）
+    // 即時更新看板：僅顯示商品圖、品名、剩餘數量。機率完全拔除！
     onValue(ref(db, 'prizes'), (snapshot) => {
         const prizes = snapshot.val();
         if (!prizes) {
@@ -103,29 +106,29 @@
         }
         localPrizesData = prizes;
 
-        let html = "📋 目前即時剩餘獎品：<br>";
+        let html = '<span class="prize-title-text">📋 目前好禮剩餘庫存：</span>';
         for (let id in prizes) {
             const p = prizes[id];
             
-            // 判斷是否有填寫商品圖片網址，若無則用透明占位
-            const imgHtml = p.image ? `<img class="prize-thumb" src="${p.image}" alt="${p.name}">` : `<div class="prize-thumb" style="background:rgba(255,255,255,0.1)"></div>`;
+            // 處理商品圖：若後台有填 image 網址就秀圖，沒有就用灰底預防空圖
+            const imgHtml = p.image ? `<img class="prize-thumb" src="${p.image}" alt="${p.name}">` : `<div class="prize-thumb" style="background:rgba(255,255,255,0.15);"></div>`;
 
-            if (p.quantity > 0) {
+            if (Number(p.quantity) > 0) {
                 html += `
                 <div class="prize-item-row">
                     ${imgHtml}
                     <div class="prize-info">
-                        <b>${p.name}</b><br>
-                        <span style="color:#00f2fe;">🟢 剩餘 <b>${p.quantity}</b> 份</span>
+                        <span class="prize-name-label">${p.name}</span>
+                        <span style="color:#00f2fe; font-size:13px;">🟢 剩餘 <b>${p.quantity}</b> 份</span>
                     </div>
                 </div>`;
             } else {
                 html += `
-                <div class="prize-item-row" style="opacity: 0.5;">
+                <div class="prize-item-row" style="opacity: 0.4;">
                     ${imgHtml}
                     <div class="prize-info">
-                        <del><b>${p.name}</b></del><br>
-                        <span style="color:#ff007f;">🔴 已全數送完</span>
+                        <span class="prize-name-label" style="text-decoration: line-through; color:#aaa;">${p.name}</span>
+                        <span style="color:#ff007f; font-size:13px;">🔴 已全數送完</span>
                     </div>
                 </div>`;
             }
@@ -133,7 +136,7 @@
         document.getElementById("statusBoard").innerHTML = html;
     });
 
-    // 核心強奪鎖：兼顧權重機率計算與庫存即時扣除
+    // 核心強奪鎖
     function startDraw() {
         const nameInput = document.getElementById("playerName").value.trim();
         if (!nameInput) {
@@ -144,7 +147,7 @@
         
         isDrawing = true;
         document.getElementById("spinBtn").disabled = true;
-        document.getElementById("spinBtn").innerText = "機房精算中...";
+        document.getElementById("spinBtn").innerText = "好運計算中...";
         document.getElementById("playerName").disabled = true;
 
         const prizesRef = ref(db, 'prizes');
@@ -156,7 +159,7 @@
             let pool = [];
             let totalW = 0;
             for (let id in currentPrizes) {
-                if (currentPrizes[id].quantity > 0) {
+                if (Number(currentPrizes[id].quantity) > 0) {
                     pool.push({ id: id, weight: Number(currentPrizes[id].weight || 0) });
                     totalW += Number(currentPrizes[id].weight || 0);
                 }
@@ -178,7 +181,7 @@
             if (!selectedId) selectedId = pool[0].id;
 
             const prize = currentPrizes[selectedId];
-            prize.quantity = prize.quantity - 1;
+            prize.quantity = Number(prize.quantity) - 1;
 
             let assignedCode = "無可用票券";
             if (prize.ticketCodes && prize.ticketCodes.length > 0) {
@@ -266,7 +269,6 @@
         document.getElementById("playerName").disabled = false;
     }
 
-    // 智能處理：文字序號與圖片網址判斷
     function showWinModal(title, prizeName, code, isLose) {
         document.getElementById("modalTitle").innerText = title;
         document.getElementById("modalPrizeName").innerText = prizeName;
@@ -302,6 +304,7 @@
         document.getElementById("winModal").style.display = "none";
     }
 
+    // 點擊卡片動作
     function copyTicket() {
         const ticketBox = document.getElementById("modalTicketCode");
         const imgUrl = ticketBox.getAttribute("data-url");
