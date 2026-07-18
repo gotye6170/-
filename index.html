@@ -329,6 +329,27 @@
         }
         .honor-info { font-size: 13px; color: #4b5563; }
 
+        /* 📣 跑馬燈 (改用 CSS transform 動畫，手機上比 <marquee> 順很多) */
+        .marquee-viewport {
+            flex: 1 1 auto;
+            min-width: 0;
+            overflow: hidden;
+            position: relative;
+        }
+        .marquee-track {
+            display: inline-flex;
+            white-space: nowrap;
+            will-change: transform;
+            animation: marqueeScroll 20s linear infinite;
+        }
+        .marquee-item {
+            padding-right: 60px;
+        }
+        @keyframes marqueeScroll {
+            from { transform: translateX(0); }
+            to { transform: translateX(-50%); }
+        }
+
     </style>
 </head>
 <body class="p-4 md:p-8 min-h-screen flex flex-col items-center justify-center">
@@ -336,7 +357,12 @@
     <!-- 🏷️ 頂部霓虹跑馬燈 -->
     <div class="w-full max-w-5xl bg-slate-900 text-cyan-400 font-bold px-4 py-2.5 rounded-full shadow-lg overflow-hidden border-2 border-cyan-500/30 mb-8 flex items-center gap-3">
         <span class="bg-cyan-500 text-slate-950 text-xs px-2.5 py-1 rounded-full flex-shrink-0 animate-pulse">📢 最新動態</span>
-        <marquee id="prizeMarquee" scrollamount="5" class="text-sm tracking-wide">🎉 歡迎來到呆呆扭蛋機！快來試試手氣！ 🎟️</marquee>
+        <div class="marquee-viewport">
+            <div class="marquee-track" id="marqueeTrack">
+                <span class="marquee-item text-sm tracking-wide" id="marqueeItem1">🎉 歡迎來到呆呆扭蛋機！快來試試手氣！ 🎟️</span>
+                <span class="marquee-item text-sm tracking-wide" id="marqueeItem2">🎉 歡迎來到呆呆扭蛋機！快來試試手氣！ 🎟️</span>
+            </div>
+        </div>
     </div>
 
     <!-- 🌌 主舞台佈局 -->
@@ -466,6 +492,27 @@
         function showControlPanel() {
             document.getElementById("machineSection").classList.add("hidden");
             document.getElementById("controlPanel").classList.remove("hidden");
+        }
+
+        // 📣 更新跑馬燈內容，並依文字長度重新計算捲動速度，確保順暢無跳動
+        function updateMarquee(text) {
+            const item1 = document.getElementById("marqueeItem1");
+            const item2 = document.getElementById("marqueeItem2");
+            const track = document.getElementById("marqueeTrack");
+
+            item1.textContent = text;
+            item2.textContent = text;
+
+            requestAnimationFrame(() => {
+                const singleWidth = item1.offsetWidth;
+                const pxPerSecond = 70; // 捲動速度，數字越大跑越快
+                const duration = Math.max(singleWidth / pxPerSecond, 8); // 最短 8 秒，避免短文字轉太快
+
+                // 重新套用動畫，避免文字換內容時位移對不齊
+                track.style.animation = "none";
+                void track.offsetWidth; // 強制 reflow 以重置動畫
+                track.style.animation = `marqueeScroll ${duration}s linear infinite`;
+            });
         }
 
         let isDrawing = false;
@@ -644,7 +691,7 @@
                 honorHtml += '<div id="honorList" style="color: #9ca3af; font-size: 13px; text-align: center; padding: 20px; width: 100%;">目前還沒有人中獎哦！快來成為首位幸運兒</div>';
             }
 
-            document.getElementById("prizeMarquee").innerText = marqueeText;
+            updateMarquee(marqueeText);
             document.getElementById("honorBoard").innerHTML = honorHtml;
         });
 
