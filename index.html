@@ -3,328 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎰 呆呆扭蛋機 🎟️</title>
+    <title>🎰 呆呆抽獎 🎟️</title>
     <style>
         * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: radial-gradient(circle, #0f2027, #203a43, #2c5364); color: white; min-height: 100vh; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+        .container { background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(12px); padding: 30px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); width: 100%; max-width: 520px; text-align: center; border: 1px solid rgba(255, 255, 255, 0.15); }
+        h1 { margin-top: 0; color: #ff007f; text-shadow: 0 0 12px rgba(255,0,127,0.5); font-size: 28px; }
         
-        /* 高級感深色流光背景 */
-        body { 
-            background: radial-gradient(circle at 20% 20%, #1a0b2e, #0b0f19 60%, #05161e); 
-            color: white; 
-            min-height: 100vh; 
-            margin: 0; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            padding: 20px;
-            overflow-x: hidden;
-        }
-        
-        /* 奢華毛玻璃霓虹容器 */
-        .container { 
-            background: rgba(18, 11, 32, 0.65); 
-            backdrop-filter: blur(20px); 
-            -webkit-backdrop-filter: blur(20px);
-            padding: 35px 30px; 
-            border-radius: 24px; 
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 30px rgba(255, 0, 127, 0.15), inset 0 0 15px rgba(255,255,255,0.05); 
-            width: 100%; 
-            max-width: 520px; 
-            text-align: center; 
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-        }
-        
-        h1 { 
-            margin-top: 0; 
-            background: linear-gradient(135deg, #ff007f, #ff7700, #00f2fe);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 8px rgba(255,0,127,0.6));
-            font-size: 32px; 
-            font-weight: 800;
-            letter-spacing: 2px;
-        }
-        
-        /* 獎品即時看板高級化 */
-        .status-board { 
-            background: rgba(5, 5, 10, 0.7); 
-            padding: 18px; 
-            border-radius: 16px; 
-            margin-bottom: 20px; 
-            border: 1px solid rgba(255, 0, 127, 0.3);
-            box-shadow: inset 0 0 10px rgba(255, 0, 127, 0.1);
-            text-align: left; 
-            font-size: 14px; 
-            line-height: 1.6; 
-        }
-        .prize-title-text { font-weight: bold; margin-bottom: 10px; color: #ff007f; display: block; font-size: 15px; text-shadow: 0 0 5px rgba(255,0,127,0.3); }
-        .prize-item-row { display: flex; align-items: center; margin: 10px 0; background: rgba(255,255,255,0.03); padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; }
-        .prize-item-row:hover { background: rgba(255,255,255,0.06); border-color: rgba(0, 242, 254, 0.3); }
-        .prize-thumb { width: 55px; height: 55px; object-fit: cover; border-radius: 10px; margin-right: 15px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); display: block; }
+        /* 獎品即時看板（已移除任何機率字眼） */
+        .status-board { background: rgba(0,0,0,0.5); padding: 15px; border-radius: 12px; margin-bottom: 20px; border-left: 5px solid #ff007f; text-align: left; font-size: 14px; line-height: 1.6; }
+        .prize-title-text { font-weight: bold; margin-bottom: 8px; color: #ff007f; display: block; font-size: 15px; }
+        .prize-item-row { display: flex; align-items: center; margin: 8px 0; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); }
+        .prize-thumb { width: 55px; height: 55px; object-fit: cover; border-radius: 8px; margin-right: 15px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); display: block; }
         .prize-info { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; }
         .prize-name-label { font-size: 16px; font-weight: bold; color: #ffffff; margin-bottom: 2px; }
 
-        .login-box { margin-bottom: 20px; }
+        .login-box { margin-bottom: 15px; }
+        input { width: 85%; padding: 12px; border-radius: 8px; border: none; font-size: 16px; text-align: center; background: rgba(255,255,255,0.9); color: #222; font-weight: bold; }
         
-        /* 高級下拉選單樣式 */
-        select { 
-            width: 85%; 
-            padding: 14px; 
-            border-radius: 12px; 
-            border: 1px solid rgba(255,255,255,0.1); 
-            font-size: 16px; 
-            text-align: center; 
-            text-align-last: center; 
-            background: rgba(255,255,255,0.08); 
-            color: #fff; 
-            font-weight: bold; 
-            transition: 0.3s;
-            cursor: pointer;
-            appearance: none; 
-            -webkit-appearance: none;
-        }
-        select:focus {
-            outline: none;
-            background: rgba(30, 20, 50, 0.9);
-            border-color: #00f2fe;
-            box-shadow: 0 0 15px rgba(0,242,254,0.4);
-        }
-        select option {
-            background: #161124;
-            color: #fff;
-        }
+        /* 拉霸滾動區 */
+        .slot-machine { background: #111; border: 6px solid #ff007f; border-radius: 15px; padding: 15px; margin: 20px 0; box-shadow: 0 0 25px rgba(255,0,127,0.4); display: flex; justify-content: center; overflow: hidden; height: 110px; }
+        .slot-window { background: #fff; color: #222; width: 90%; height: 100%; border-radius: 6px; font-size: 22px; font-weight: bold; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; border: 2px solid #333; }
+        .slot-track { display: flex; flex-direction: column; position: absolute; top: 0; }
+        .slot-item { height: 76px; display: flex; align-items: center; justify-content: center; width: 100%; text-align: center; white-space: nowrap; padding: 0 10px; }
 
-        /* 🔮 核心變更：全新霓虹扭蛋機外觀 */
-        .gachapon-machine {
-            width: 240px;
-            margin: 25px auto;
-            perspective: 1000px;
-        }
-        /* 扭蛋大玻璃球體 */
-        .gacha-ball-container {
-            width: 220px;
-            height: 200px;
-            background: radial-gradient(circle at 50% 30%, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.02) 60%, rgba(255, 0, 127, 0.2) 100%);
-            border: 4px solid #ff007f;
-            border-radius: 110px 110px 100px 100px;
-            margin: 0 auto;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 0 30px rgba(255, 0, 127, 0.4), inset 0 0 20px rgba(255,255,255,0.2);
-            display: flex;
-            flex-wrap: wrap;
-            align-content: flex-end;
-            justify-content: center;
-            padding: 15px;
-            gap: 6px;
-        }
-        /* 裡面的小彩球 */
-        .gacha-mini-ball {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            box-shadow: inset -4px -4px 8px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.4);
-        }
-        /* 彩球顏色隨機感 */
-        .gacha-mini-ball:nth-child(4n+1) { background: radial-gradient(circle at 30% 30%, #ff0055, #990033); }
-        .gacha-mini-ball:nth-child(4n+2) { background: radial-gradient(circle at 30% 30%, #00f2fe, #006677); }
-        .gacha-mini-ball:nth-child(4n+3) { background: radial-gradient(circle at 30% 30%, #ffd700, #aa8800); }
-        .gacha-mini-ball:nth-child(4n+4) { background: radial-gradient(circle at 30% 30%, #a855f7, #6b21a8); }
+        button { background: linear-gradient(135deg, #00f2fe, #4facfe); color: white; border: none; padding: 15px 35px; font-size: 18px; font-weight: bold; border-radius: 50px; cursor: pointer; box-shadow: 0 5px 20px rgba(79,172,254,0.4); transition: 0.2s; width: 85%; }
+        button:hover { transform: scale(1.03); filter: brightness(1.1); }
+        button:disabled { background: #444; color: #888; cursor: not-allowed; box-shadow: none; transform: none; }
 
-        /* 扭蛋機下半部機身 */
-        .gacha-body {
-            width: 230px;
-            background: linear-gradient(135deg, #1f0b35 0%, #0d0614 100%);
-            border: 4px solid #ff007f;
-            border-top: none;
-            border-radius: 0 0 20px 20px;
-            margin: -2px auto 0;
-            padding: 20px 10px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5), 0 0 20px rgba(255, 0, 127, 0.2);
-            position: relative;
-        }
-        /* 扭轉旋鈕 */
-        .gacha-crank {
-            width: 70px;
-            height: 70px;
-            background: radial-gradient(circle, #2a1f42 30%, #161124 100%);
-            border: 3px solid #00f2fe;
-            border-radius: 50%;
-            margin: 0 auto 15px;
-            position: relative;
-            cursor: pointer;
-            box-shadow: 0 0 15px rgba(0,242,254,0.4);
-        }
-        .gacha-crank::before {
-            content: '';
-            position: absolute;
-            width: 80%;
-            height: 16px;
-            background: #00f2fe;
-            top: 50%;
-            left: 10%;
-            transform: translateY(-50%);
-            border-radius: 4px;
-        }
-        /* 出蛋口 */
-        .gacha-outlet {
-            width: 75px;
-            height: 55px;
-            background: #05020a;
-            border: 3px solid #ff007f;
-            margin: 0 auto;
-            border-radius: 10px 10px 5px 5px;
-            box-shadow: inset 0 5px 10px rgba(0,0,0,0.9);
-            position: relative;
-            overflow: visible;
-        }
-        /* 掉落出來的幸運扭蛋球 */
-        .gacha-lucky-ball {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #ff007f 50%, #fff 50%);
-            position: absolute;
-            top: 5px;
-            left: 12px;
-            box-shadow: inset -5px -5px 10px rgba(0,0,0,0.4), 0 5px 15px rgba(255,0,127,0.6);
-            display: none;
-            z-index: 10;
-        }
-
-        /* 🎬 各種動畫效果 */
-        /* 彩球在機器內瘋狂震動 */
-        @keyframes ballShake {
-            0% { transform: translate(0, 0) rotate(0deg); }
-            20% { transform: translate(-2px, 3px) rotate(-5deg); }
-            40% { transform: translate(3px, -2px) rotate(5deg); }
-            60% { transform: translate(-3px, -1px) rotate(-3deg); }
-            80% { transform: translate(2px, 2px) rotate(3deg); }
-            100% { transform: translate(0, 0) rotate(0deg); }
-        }
-        .shaking .gacha-mini-ball {
-            animation: ballShake 0.15s infinite alternate;
-        }
-        /* 旋鈕旋轉 */
-        @keyframes crankRotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .rotating-crank {
-            animation: crankRotate 0.6s ease-in-out forwards;
-        }
-        /* 扭蛋滾出並放大跳躍動畫 */
-        @keyframes ballDrop {
-            0% { transform: translateY(-40px) scale(0.3); opacity: 0; }
-            40% { transform: translateY(0) scale(1); opacity: 1; }
-            70% { transform: translateY(-25px) scale(1.2); box-shadow: 0 0 30px #00f2fe; }
-            100% { transform: translateY(0) scale(1.5); box-shadow: 0 0 40px #ff007f; }
-        }
-        .dropped-ball {
-            display: block !important;
-            animation: ballDrop 0.9s cubic-bezier(0.175, 0.885, 0.32, 1.2) forwards;
-        }
-
-        /* 炫彩流光強烈發光按鍵 */
-        button { 
-            background: linear-gradient(135deg, #ff007f, #7928ca, #00f2fe); 
-            background-size: 200% auto;
-            color: white; 
-            border: none; 
-            padding: 16px 35px; 
-            font-size: 18px; 
-            font-weight: bold; 
-            border-radius: 50px; 
-            cursor: pointer; 
-            box-shadow: 0 5px 25px rgba(255,0,127,0.4), 0 0 15px rgba(0,242,254,0.2); 
-            transition: 0.3s; 
-            width: 85%; 
-            letter-spacing: 1px;
-            animation: pulseGlow 2s infinite;
-        }
-        button:hover { 
-            transform: scale(1.03); 
-            background-position: right center;
-            box-shadow: 0 8px 30px rgba(255,0,127,0.6), 0 0 25px rgba(0,242,254,0.4); 
-        }
-        button:disabled { background: #222; color: #555; cursor: not-allowed; box-shadow: none; transform: none; animation: none; border: 1px solid #333; }
-
-        @keyframes pulseGlow {
-            0% { box-shadow: 0 5px 20px rgba(255,0,127,0.4), 0 0 10px rgba(0,242,254,0.2); }
-            50% { box-shadow: 0 5px 30px rgba(255,0,127,0.7), 0 0 25px rgba(0,242,254,0.5); }
-            100% { box-shadow: 0 5px 20px rgba(255,0,127,0.4), 0 0 10px rgba(0,242,254,0.2); }
-        }
-
-        /* 中獎彈窗高級感 */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5,3,10,0.9); backdrop-filter: blur(8px); align-items: center; justify-content: center; z-index: 100; }
-        .modal-content { background: #161124; color: #fff; padding: 35px; border-radius: 24px; width: 90%; max-width: 420px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 30px rgba(0,242,254,0.2); border: 1px solid rgba(255,255,255,0.1); animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .modal h2 { color: #ff007f; margin-top: 0; font-size: 26px; text-shadow: 0 0 10px rgba(255,0,127,0.5); }
-        .ticket-box { background: rgba(0,0,0,0.4); border: 2px dashed #00f2fe; padding: 18px; font-size: 22px; font-weight: bold; letter-spacing: 1px; color: #00f2fe; margin: 20px 0; border-radius: 12px; cursor: pointer; word-break: break-all; transition: 0.2s; box-shadow: 0 0 15px rgba(0,242,254,0.1); }
-        .ticket-box:hover { background: rgba(0,242,254,0.05); box-shadow: 0 0 20px rgba(0,242,254,0.3); }
-        .close-btn { background: #2a1f42; font-size: 14px; padding: 12px 25px; width: auto; margin-top: 15px; border: 1px solid rgba(255,255,255,0.05); }
-        .close-btn:hover { background: #3d2d5e; }
+        /* 中獎彈窗 */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); align-items: center; justify-content: center; z-index: 100; }
+        .modal-content { background: #fff; color: #222; padding: 30px; border-radius: 20px; width: 90%; max-width: 420px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3); animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .modal h2 { color: #ff007f; margin-top: 0; font-size: 24px; }
+        .ticket-box { background: #f9f9f9; border: 2px dashed #00f2fe; padding: 15px; font-size: 22px; font-weight: bold; letter-spacing: 1px; color: #008b9b; margin: 15px 0; border-radius: 8px; cursor: pointer; word-break: break-all; transition: 0.2s; }
+        .ticket-box:hover { background: #f0fbfd; filter: brightness(0.98); }
+        .close-btn { background: #333; font-size: 14px; padding: 10px 20px; width: auto; margin-top: 10px; }
         @keyframes pop { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <!-- 1. 頂部名稱 -->
-    <h1>🎰 呆呆扭蛋機 🎟️</h1>
+    <!-- 1. 頂部名稱已確實更改為：呆呆抽獎 -->
+    <h1>🎰 呆呆抽獎 🎟️</h1>
     
-    <!-- 2. 獎品清單看板 -->
+    <!-- 2. 獎品清單看板（絕不顯示任何中獎率與 % 數） -->
     <div class="status-board" id="statusBoard">正在載入雲端禮品庫存...</div>
 
-    <!-- 朋友名字下拉選單區 -->
+    <!-- 暱稱輸入區 -->
     <div class="login-box" id="loginBox">
-        <select id="playerName">
-            <option value="" disabled selected>▼ 請選擇你的名字 ▼</option>
-            <option value="貝果">貝果</option>
-            <option value="怡蒨">怡蒨</option>
-            <option value="77">77</option>
-            <option value="安鴻">安鴻</option>
-            <option value="當家">當家</option>
-        </select>
+        <input type="text" id="playerName" placeholder="請先輸入你的名字/暱稱" maxlength="10">
     </div>
 
-    <!-- 🔮 核心變更：扭蛋機外觀架構 -->
-    <div class="gachapon-machine">
-        <!-- 玻璃外殼與裡面的小球們 -->
-        <div class="gacha-ball-container" id="gachaGlass">
-            <div class="gacha-mini-ball"></div>
-            <div class="gacha-mini-ball"></div>
-            <div class="gacha-mini-ball"></div>
-            <div class="gacha-mini-ball"></div>
-            <div class="gacha-mini-ball"></div>
-            <div class="gacha-mini-ball"></div>
-            <div class="gacha-mini-ball"></div>
-            <div class="gacha-mini-ball"></div>
-            <div class="gacha-mini-ball"></div>
-            <div class="gacha-mini-ball"></div>
-            <div class="gacha-mini-ball"></div>
-            <div class="gacha-mini-ball"></div>
-        </div>
-        <!-- 機身、旋鈕與出口 -->
-        <div class="gacha-body">
-            <div class="gacha-crank" id="gachaCrank"></div>
-            <div class="gacha-outlet">
-                <!-- 掉出來的幸運大扭蛋 -->
-                <div class="gacha-lucky-ball" id="luckyBall"></div>
+    <!-- 拉霸機 -->
+    <div class="slot-machine">
+        <div class="slot-window">
+            <div class="slot-track" id="slotTrack">
+                <div class="slot-item" style="height:76px;">💎 祝你中大獎 💎</div>
             </div>
         </div>
     </div>
 
-    <button id="spinBtn" onclick="startDraw()">點我扭轉幸運蛋</button>
+    <button id="spinBtn" onclick="startDraw()">啟動拉霸，試試手氣！</button>
 </div>
 
 <!-- 獎券發放彈窗 -->
 <div class="modal" id="winModal">
     <div class="modal-content">
         <h2 id="modalTitle">🎉 恭喜中獎！</h2>
-        <p style="font-weight: bold; font-size: 18px; color: #ffd700;" id="modalPrizeName">獲得獎項</p>
+        <p style="font-weight: bold; font-size: 18px;" id="modalPrizeName">獲得獎項</p>
         <div class="ticket-box" id="modalTicketCode" onclick="copyTicket()">TICKET-CODE</div>
-        <p style="font-size: 12px; color: #aaa;" id="copyHint">↑ 點擊後輸入密碼「3064」，請截圖保存！</p>
+        <p style="font-size: 12px; color: #666;" id="copyHint">↑ 點擊即可操作，請截圖保存！</p>
         <button class="close-btn" onclick="closeModal()">關閉視窗</button>
     </div>
 </div>
@@ -348,7 +97,7 @@
     let isDrawing = false;
     let localPrizesData = {};
 
-    // 即時更新看板
+    // 即時更新看板：僅顯示商品圖、品名、剩餘數量。機率完全拔除！
     onValue(ref(db, 'prizes'), (snapshot) => {
         const prizes = snapshot.val();
         if (!prizes) {
@@ -357,17 +106,11 @@
         }
         localPrizesData = prizes;
 
-        let html = '<span class="prize-title-text">📋 目前的禮物：</span>';
-        let hasVisiblePrize = false;
-
+        let html = '<span class="prize-title-text">📋 目前好禮剩餘庫存：</span>';
         for (let id in prizes) {
             const p = prizes[id];
             
-            if (p.name && p.name.includes("銘謝惠顧")) {
-                continue; 
-            }
-
-            hasVisiblePrize = true;
+            // 處理商品圖：若後台有填 image 網址就秀圖，沒有就用灰底預防空圖
             const imgHtml = p.image ? `<img class="prize-thumb" src="${p.image}" alt="${p.name}">` : `<div class="prize-thumb" style="background:rgba(255,255,255,0.15);"></div>`;
 
             if (Number(p.quantity) > 0) {
@@ -381,56 +124,38 @@
                 </div>`;
             } else {
                 html += `
-                <div class="prize-item-row" style="opacity: 0.3;">
+                <div class="prize-item-row" style="opacity: 0.4;">
                     ${imgHtml}
                     <div class="prize-info">
-                        <span class="prize-name-label" style="text-decoration: line-through; color:#888;">${p.name}</span>
+                        <span class="prize-name-label" style="text-decoration: line-through; color:#aaa;">${p.name}</span>
                         <span style="color:#ff007f; font-size:13px;">🔴 已全數送完</span>
                     </div>
                 </div>`;
             }
         }
-
-        if (!hasVisiblePrize) {
-            html += '<div style="color: #aaa; font-size: 13px; padding: 10px;">目前無公開好禮。</div>';
-        }
-
         document.getElementById("statusBoard").innerHTML = html;
     });
 
-    // 核心強奪鎖 ＆ 限制一人抽一次機制
+    // 核心強奪鎖
     function startDraw() {
-        const nameInput = document.getElementById("playerName").value;
+        const nameInput = document.getElementById("playerName").value.trim();
         if (!nameInput) {
-            alert("請先選擇你的名字喔！");
+            alert("請先輸入你的暱稱再抽獎喔！");
             return;
         }
         if (isDrawing) return;
         
         isDrawing = true;
         document.getElementById("spinBtn").disabled = true;
-        document.getElementById("spinBtn").innerText = "好運扭轉中...";
+        document.getElementById("spinBtn").innerText = "好運計算中...";
         document.getElementById("playerName").disabled = true;
 
-        // 隱藏上一次掉落的球
-        document.getElementById("luckyBall").classList.remove("dropped-ball");
-
-        const rootRef = ref(db);
+        const prizesRef = ref(db, 'prizes');
         let finalWonPrize = null;
-        let isAlreadyPlayed = false;
 
-        runTransaction(rootRef, (currentData) => {
-            if (!currentData) return currentData;
-            if (!currentData.prizes) currentData.prizes = {};
-            if (!currentData.playedUsers) currentData.playedUsers = {};
+        runTransaction(prizesRef, (currentPrizes) => {
+            if (!currentPrizes) return currentPrizes;
 
-            // 🚫 1. 檢查這個名字是否已經在雲端抽過獎了
-            if (currentData.playedUsers[nameInput]) {
-                isAlreadyPlayed = true;
-                return; 
-            }
-
-            let currentPrizes = currentData.prizes;
             let pool = [];
             let totalW = 0;
             for (let id in currentPrizes) {
@@ -471,28 +196,15 @@
             if(!prize.recentWinners) prize.recentWinners = [];
             prize.recentWinners.push({ user: nameInput, code: assignedCode, time: Date.now() });
 
-            // 📝 2. 將名字寫入雲端黑名單
-            currentData.playedUsers[nameInput] = {
-                time: Date.now(),
-                won: prize.name
-            };
-
             finalWonPrize = {
                 name: prize.name,
                 code: assignedCode
             };
 
-            return currentData;
+            return currentPrizes;
         }).then((result) => {
-            if (isAlreadyPlayed) {
-                alert(`⚠️ 提示：【${nameInput}】你已經抽過囉！不能太貪心哦～`);
-                resetButtonState();
-                return;
-            }
-
             if (result.committed && finalWonPrize) {
-                // 執行扭蛋動畫
-                runGachaponAnimation(() => {
+                runSlotMachineAnimation(finalWonPrize.name, () => {
                     if (finalWonPrize.name.includes("銘謝惠顧")) {
                         showWinModal("😭 哎呀可惜！", finalWonPrize.name, "請再接再厲！", true);
                     } else {
@@ -501,8 +213,8 @@
                     resetButtonState();
                 });
             } else {
-                runGachaponAnimation(() => {
-                    showWinModal("沒中獎", "不要氣餒！", "下次再加油", true);
+                runSlotMachineAnimation("💔 沒中獎", () => {
+                    showWinModal("庫存異動", "剛才那一瞬間庫存正好被搶光囉！", "請重新再試一次", true);
                     resetButtonState();
                 });
             }
@@ -512,35 +224,48 @@
         });
     }
 
-    // 🔮 核心變更：全新扭蛋動畫處理
-    function runGachaponAnimation(callback) {
-        const glass = document.getElementById("gachaGlass");
-        const crank = document.getElementById("gachaCrank");
-        const luckyBall = document.getElementById("luckyBall");
+    // 拉霸滾動效果
+    function runSlotMachineAnimation(finalResult, callback) {
+        const track = document.getElementById("slotTrack");
+        track.innerHTML = "";
 
-        // 1. 旋鈕轉動
-        crank.classList.add("rotating-crank");
-        // 2. 玻璃罐內的扭蛋開始震動
-        glass.classList.add("shaking");
+        const dummyPool = ["🎁 超商禮券", "☕ 冰美式", "🍿 爆米花", "🎬 電影票", "✨ 隱藏大獎"];
+        for(let i=0; i<25; i++) {
+            const item = document.createElement("div");
+            item.className = "slot-item";
+            item.style.height = "76px";
+            item.innerText = dummyPool[Math.floor(Math.random() * dummyPool.length)];
+            track.appendChild(item);
+        }
+        track.lastElementChild.innerText = finalResult;
 
-        // 3. 震動 1.2 秒後停止，並讓大扭蛋掉出來
-        setTimeout(() => {
-            glass.classList.remove("shaking");
-            crank.classList.remove("rotating-crank");
-            
-            // 讓幸運球執行掉落放大動畫
-            luckyBall.classList.add("dropped-ball");
+        let currentTop = 0;
+        let speed = 35;
+        let count = 0;
 
-            // 4. 動畫播完後顯示中獎 Modal
-            setTimeout(callback, 1000);
-        }, 1200);
+        function animate() {
+            currentTop -= speed;
+            track.style.top = currentTop + "px";
+            count++;
+
+            if(count > 30) speed = 15;
+            if(count > 50) speed = 6;
+            if(count > 60) speed = 3;
+
+            if (count > 68) {
+                track.style.top = `-${(track.children.length - 1) * 76 - 15}px`;
+                setTimeout(callback, 400);
+            } else {
+                requestAnimationFrame(animate);
+            }
+        }
+        animate();
     }
 
-    // 重設按鈕狀態
     function resetButtonState() {
         isDrawing = false;
         document.getElementById("spinBtn").disabled = false;
-        document.getElementById("spinBtn").innerText = "點我扭轉幸運蛋";
+        document.getElementById("spinBtn").innerText = "啟動拉霸，試試手氣！";
         document.getElementById("playerName").disabled = false;
     }
 
@@ -552,23 +277,23 @@
         const hintBox = document.getElementById("copyHint");
         
         if (code.startsWith("http")) {
-            ticketBox.innerText = "👉 點我並輸入密碼「3064」，即可查看獎品 👈";
+            ticketBox.innerText = "👉 點我查看/下載票券截圖 👈";
             ticketBox.style.color = "#ff007f";
             ticketBox.style.border = "2px solid #ff007f";
             ticketBox.setAttribute("data-url", code);
-            hintBox.innerText = "長按即可儲存截圖！";
+            hintBox.innerText = "↑ 點擊上方按鈕將開啟圖片，長按即可儲存截圖！";
             hintBox.style.display = "block";
         } else {
             ticketBox.innerText = code;
             ticketBox.removeAttribute("data-url");
             if(isLose) {
-                ticketBox.style.border = "2px dashed #555";
-                ticketBox.style.color = "#888";
+                ticketBox.style.border = "2px dashed #999";
+                ticketBox.style.color = "#666";
                 hintBox.style.display = "none";
             } else {
                 ticketBox.style.border = "2px dashed #00f2fe";
-                ticketBox.style.color = "#00f2fe";
-                hintBox.innerText = "↑ 點擊後輸入密碼「3064」，請截圖保存！";
+                ticketBox.style.color = "#008b9b";
+                hintBox.innerText = "↑ 點擊可複製序號，請立刻截圖保存！";
                 hintBox.style.display = "block";
             }
         }
