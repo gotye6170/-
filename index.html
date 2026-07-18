@@ -6,17 +6,17 @@
     <title>呆呆扭蛋機 🌟</title>
     <!-- Tailwind CSS (用於快速美化外觀) -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <!-- Google Fonts 藝術字型 -->
+    <!-- 引入支援繁體中文的 Noto Sans TC -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@900&display=swap" rel="stylesheet">
     
     <style>
         body {
             background: linear-gradient(135deg, #fbcfe8, #e0e7ff, #ccfbf1);
             background-size: 400% 400%;
             animation: gradientBG 15s ease infinite;
-            font-family: Arial, sans-serif;
+            font-family: 'Noto Sans TC', sans-serif;
             overflow-x: hidden;
         }
 
@@ -26,9 +26,16 @@
             100% { background-position: 0% 50%; }
         }
 
+        /* 🎪 統一且富有設計感的大標題 (完美描邊不咬字) */
         .gacha-title {
-            font-family: 'ZCOOL KuaiLe', cursive;
-            text-shadow: 3px 3px 0px #fff, -1px -1px 0px #fff, 1px -1px 0px #fff, -1px 1px 0px #fff, 4px 4px 10px rgba(0,0,0,0.15);
+            font-family: 'Noto Sans TC', sans-serif;
+            font-weight: 900;
+            color: #ff3366;
+            letter-spacing: 2px;
+            /* 運用 paint-order 讓白色描邊粗而不吃字 */
+            -webkit-text-stroke: 10px #ffffff;
+            paint-order: stroke fill;
+            filter: drop-shadow(4px 4px 0px rgba(0, 0, 0, 0.08)) drop-shadow(0px 8px 15px rgba(244, 63, 94, 0.2));
         }
 
         /* 🎪 扭蛋機核心造型 */
@@ -211,7 +218,7 @@
         }
         .board-title-text {
             font-size: 18px;
-            font-weight: 800;
+            font-weight: 900;
             display: flex;
             align-items: center;
             padding-bottom: 10px;
@@ -331,7 +338,7 @@
 
         <!-- 中央：幸運扭蛋機核心 -->
         <div class="lg:col-span-6 order-1 lg:order-2 flex flex-col items-center">
-            <h1 class="gacha-title text-4xl md:text-5xl font-black text-center text-rose-500 tracking-wider mb-6">呆呆幸運扭蛋機</h1>
+            <h1 class="gacha-title text-4xl md:text-5xl mb-6">呆呆幸運扭蛋機</h1>
             
             <!-- 🎪 實體扭蛋機結構 -->
             <div class="gacha-machine">
@@ -372,7 +379,7 @@
                 <div>
                     <label class="block text-xs font-bold text-gray-500 mb-1.5 ml-1">🔑 請輸入群組密語解鎖名單</label>
                     <div class="flex gap-2">
-                        <input type="password" id="secretPass" placeholder="請輸入密語..." class="flex-grow bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-rose-400 transition-all text-center">
+                        <input type="text" id="secretPass" placeholder="請輸入密語..." class="flex-grow bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-rose-400 transition-all text-center">
                         <button onclick="verifyGroupPass()" class="bg-gray-800 text-white text-xs font-bold px-4 py-2 rounded-xl hover:bg-gray-700 active:scale-95 transition-all flex-shrink-0">解鎖</button>
                     </div>
                 </div>
@@ -564,13 +571,12 @@
                 }
             }
 
-            // 3. 處理「跑馬燈」與「中獎者榮譽榜」 (加入過濾銘謝惠顧核心邏輯)
+            // 3. 處理「跑馬燈」與「中獎者榮譽榜」
             let honorHtml = '<span class="board-title-text honor-title-text">👑 中獎者榮譽榜：</span>';
             let marqueeText = "🎉 歡迎來到呆呆扭蛋機！快來試試手氣！ 🎟️ ";
             let playedList = [];
 
             for (let user in playedUsers) {
-                // 🛑 關鍵改動：如果抽中名稱包含 "銘謝惠顧"，直接跳過不抓進清單
                 if (playedUsers[user].won && playedUsers[user].won.includes("銘謝惠顧")) {
                     continue;
                 }
@@ -582,15 +588,12 @@
                 });
             }
 
-            // 依時間新舊排序
             playedList.sort((a, b) => b.time - a.time);
 
             if (playedList.length > 0) {
-                // 跑馬燈組裝 (此時已不含銘謝惠顧)
                 let marqueeItems = playedList.map(item => `【${item.user}】喜獲大獎：${item.won}！`);
                 marqueeText = "🔥 中獎快報 🔥 " + marqueeItems.join(" 🌟 ") + " 歡慶連連，好運不斷！";
 
-                // 榮譽榜組裝 (此時已不含銘謝惠顧)
                 playedList.forEach(item => {
                     honorHtml += `
                     <div class="honor-item-row">
