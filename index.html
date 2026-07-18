@@ -7,7 +7,7 @@
     <style>
         * { box-sizing: border-box; font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif; }
         
-        /* 🌸 夢幻亮色系：晴空與櫻花漸層背景 */
+        /* 🌸 夢幻亮色系背景 */
         body { 
             background: linear-gradient(135deg, #e0f2fe 0%, #fce7f3 50%, #fbcfe8 100%); 
             color: #4c1d95; 
@@ -21,7 +21,7 @@
             overflow-x: hidden;
         }
         
-        /* 日系清新毛玻璃容器 */
+        /* 日系清新容器 */
         .container { 
             background: rgba(255, 255, 255, 0.75); 
             backdrop-filter: blur(15px); 
@@ -35,7 +35,6 @@
             border: 2px solid rgba(255, 255, 255, 0.8); 
         }
         
-        /* 櫻花繽紛感標題 */
         h1 { 
             margin-top: 0; 
             background: linear-gradient(135deg, #ec4899, #f43f5e, #10b981);
@@ -47,7 +46,6 @@
             filter: drop-shadow(0 2px 4px rgba(255, 255, 255, 0.8));
         }
         
-        /* 溫柔風獎品看板 */
         .status-board { 
             background: rgba(255, 255, 255, 0.9); 
             padding: 15px; 
@@ -68,39 +66,27 @@
 
         .login-box { margin-bottom: 20px; }
         
-        /* 清新風下拉選單 */
         select { 
-            width: 85%; 
-            padding: 12px; 
-            border-radius: 50px; 
-            border: 2px solid #fbcfe8; 
-            font-size: 15px; 
-            text-align: center; 
-            text-align-last: center; 
-            background: white; 
-            color: #4c1d95; 
-            font-weight: bold; 
-            transition: 0.3s;
-            cursor: pointer;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.05);
-            appearance: none; 
-            -webkit-appearance: none;
+            width: 85%; padding: 12px; border-radius: 50px; border: 2px solid #fbcfe8; 
+            font-size: 15px; text-align: center; text-align-last: center; background: white; 
+            color: #4c1d95; font-weight: bold; transition: 0.3s; cursor: pointer;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.05); appearance: none; -webkit-appearance: none;
         }
         select:focus { outline: none; border-color: #f43f5e; box-shadow: 0 0 10px rgba(244,63,94,0.2); }
 
-        /* 🌸 經典紅白/粉紅日系扭蛋機外觀 */
+        /* 🌸 扭蛋機外觀 */
         .gachapon-machine {
             width: 240px;
             margin: 20px auto;
         }
         
-        /* 透明壓克力透明櫥窗 (白色亮頂蓋) */
+        /* 透明壓克力櫥窗 */
         .gacha-ball-container {
             width: 220px;
             height: 190px;
             background: linear-gradient(to bottom, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.3) 100%);
             border: 5px solid #ffffff;
-            border-top: 15px solid #f43f5e; /* 圖片上的紅色頂蓋蓋子效果 */
+            border-top: 15px solid #f43f5e; 
             border-radius: 16px 16px 8px 8px;
             margin: 0 auto;
             position: relative;
@@ -108,7 +94,7 @@
             box-shadow: 0 8px 20px rgba(0,0,0,0.08), inset 0 0 15px rgba(255,255,255,0.5);
         }
 
-        /* 🎨 馬卡龍色系雙色扭蛋 */
+        /* 馬卡龍色系雙色扭蛋 */
         .gacha-egg {
             width: 36px;
             height: 36px;
@@ -118,7 +104,6 @@
             box-shadow: 0 3px 5px rgba(0,0,0,0.12), inset 0 2px 4px rgba(255,255,255,0.6);
             transform-origin: center;
         }
-        /* 上半部馬卡龍亮色，下半部純白 */
         .gacha-egg::before {
             content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 50%;
         }
@@ -128,7 +113,6 @@
             border-top: 1px solid rgba(0,0,0,0.1);
         }
 
-        /* 圖片同款繽紛色彩 */
         .egg-pink::before   { background: #ff49db; }
         .egg-blue::before   { background: #3b82f6; }
         .egg-yellow::before { background: #facc15; }
@@ -136,10 +120,10 @@
         .egg-orange::before { background: #f97316; }
         .egg-purple::before { background: #a855f7; }
 
-        /* 經典日系紅/粉底座 */
+        /* 機身底座 */
         .gacha-body {
             width: 230px;
-            background: #f43f5e; /* 溫暖的櫻花紅底座 */
+            background: #f43f5e; 
             border-radius: 8px 8px 24px 24px;
             margin: -2px auto 0;
             padding: 18px 10px;
@@ -148,7 +132,7 @@
             border: 3px solid #ffffff;
         }
         
-        /* 金黃色經典投幣旋鈕 */
+        /* 旋鈕 */
         .gacha-crank {
             width: 65px;
             height: 65px;
@@ -174,7 +158,7 @@
             position: relative;
         }
 
-        /* 🎬 滾出來的幸運雙色扭蛋 */
+        /* 滾出來的幸運雙色扭蛋 */
         .gacha-lucky-egg {
             width: 44px;
             height: 44px;
@@ -188,56 +172,60 @@
         }
         .gacha-lucky-egg::before {
             content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 50%;
-            background: #ff49db; /* 預設掉落粉紅幸運蛋 */
+            background: #ff49db; 
         }
         .gacha-lucky-egg::after {
             content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 50%;
             background: #ffffff; border-top: 1px solid rgba(0,0,0,0.1);
         }
 
-        /* 🎬 馬卡龍扭蛋無序混亂大翻滾動畫 */
-        @keyframes rollLayerA {
-            0% { transform: translate(0, 0) rotate(0deg); }
-            20% { transform: translate(-12px, -30px) rotate(120deg); }
-            40% { transform: translate(20px, -10px) rotate(-80deg); }
-            60% { transform: translate(-18px, -40px) rotate(200deg); }
-            80% { transform: translate(12px, -8px) rotate(35deg); }
-            100% { transform: translate(0, 0) rotate(360deg); }
+        /* 🎬 核心變更：重力沉降與推擠碎步動態（分成三層模擬錯落滑落感） */
+        @keyframes settleLayerA {
+            0% { transform: translateY(0) rotate(var(--init-rot)); }
+            30% { transform: translateY(2px) rotate(calc(var(--init-rot) - 3deg)); }
+            70% { transform: translateY(7px) rotate(calc(var(--init-rot) + 5deg)); }
+            100% { transform: translateY(6px) rotate(calc(var(--init-rot) + 3deg)); }
         }
-        @keyframes rollLayerB {
-            0% { transform: translate(0, 0) rotate(0deg); }
-            25% { transform: translate(18px, -40px) rotate(-110deg); }
-            50% { transform: translate(-20px, -15px) rotate(160deg); }
-            75% { transform: translate(8px, -35px) rotate(-35deg); }
-            100% { transform: translate(0, 0) rotate(-360deg); }
+        @keyframes settleLayerB {
+            0% { transform: translateY(0) rotate(var(--init-rot)); }
+            40% { transform: translateY(3px) rotate(calc(var(--init-rot) + 4deg)); }
+            80% { transform: translateY(8px) rotate(calc(var(--init-rot) - 6deg)); }
+            100% { transform: translateY(7px) rotate(calc(var(--init-rot) - 4deg)); }
+        }
+        @keyframes settleLayerC {
+            0% { transform: translateY(0) rotate(var(--init-rot)); }
+            20% { transform: translateY(1px) rotate(calc(var(--init-rot) - 2deg)); }
+            60% { transform: translateY(5px) rotate(calc(var(--init-rot) + 4deg)); }
+            100% { transform: translateY(4px) rotate(calc(var(--init-rot) + 2deg)); }
         }
 
-        .shaking .egg-group-a { animation: rollLayerA 0.24s infinite linear; }
-        .shaking .egg-group-b { animation: rollLayerB 0.2s infinite linear; }
+        /* 執行沉降動畫 */
+        .settling .egg-layer-a { animation: settleLayerA 0.5s ease-in-out forwards; }
+        .settling .egg-layer-b { animation: settleLayerB 0.55s ease-in-out forwards; }
+        .settling .egg-layer-c { animation: settleLayerC 0.48s ease-in-out forwards; }
 
+        /* 旋鈕旋轉 */
         @keyframes crankRotate { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .rotating-crank { animation: crankRotate 0.6s ease-in-out forwards; }
 
+        /* 扭蛋自然滾落出洞 */
         @keyframes eggDrop {
-            0% { transform: translateY(-50px) scale(0.2) rotate(0deg); opacity: 0; }
-            40% { transform: translateY(0) scale(1) rotate(180deg); opacity: 1; }
-            70% { transform: translateY(-25px) scale(1.1) rotate(270deg); }
-            100% { transform: translateY(3px) scale(1.3) rotate(360deg); filter: drop-shadow(0 0 8px rgba(255,73,219,0.5)); }
+            0% { transform: translateY(-40px) scale(0.4) rotate(0deg); opacity: 0; }
+            50% { transform: translateY(0) scale(1) rotate(120deg); opacity: 1; }
+            100% { transform: translateY(4px) scale(1.3) rotate(180deg); filter: drop-shadow(0 0 6px rgba(255,73,219,0.3)); }
         }
-        .dropped-egg { display: block !important; animation: eggDrop 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.1) forwards; }
+        .dropped-egg { display: block !important; animation: eggDrop 0.5s ease-out forwards; }
 
-        /* 明亮粉嫩的粉色大按鍵 */
         button { 
             background: linear-gradient(135deg, #f43f5e, #ec4899); 
             color: white; border: none; padding: 15px 32px; 
             font-size: 17px; font-weight: bold; border-radius: 50px; cursor: pointer; 
-            box-shadow: 0 5px 15px rgba(244,63,94,0.3); 
-            transition: 0.3s; width: 85%; letter-spacing: 1px;
+            box-shadow: 0 5px 15px rgba(244,63,94,0.3); transition: 0.3s; width: 85%; letter-spacing: 1px;
         }
         button:hover { transform: scale(1.02); box-shadow: 0 7px 20px rgba(244,63,94,0.4); }
         button:disabled { background: #cbd5e1; color: #94a3b8; cursor: not-allowed; box-shadow: none; transform: none; }
 
-        /* 夢幻中獎彈窗 */
+        /* 彈窗 */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(76, 29, 149, 0.3); backdrop-filter: blur(5px); align-items: center; justify-content: center; z-index: 100; }
         .modal-content { background: #ffffff; color: #4c1d95; padding: 30px; border-radius: 24px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 15px 40px rgba(0,0,0,0.15); border: 3px solid #fbcfe8; animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.2); }
         .modal h2 { color: #e11d48; margin-top: 0; font-size: 24px; }
@@ -266,37 +254,40 @@
         </select>
     </div>
 
-    <!-- 🌸 經典日系櫥窗：馬卡龍無序扭蛋堆疊 -->
+    <!-- 🌸 經典重力櫥窗：馬卡龍無序堆疊 -->
     <div class="gachapon-machine">
         <div class="gacha-ball-container" id="gachaGlass">
-            <!-- 亂序交錯堆疊擺放 -->
-            <div class="gacha-egg egg-pink egg-group-a" style="bottom: 6px; left: 12px; transform: rotate(12deg);"></div>
-            <div class="gacha-egg egg-blue egg-group-b" style="bottom: 4px; left: 45px; transform: rotate(-20deg);"></div>
-            <div class="gacha-egg egg-yellow egg-group-a" style="bottom: 10px; left: 78px; transform: rotate(35deg);"></div>
-            <div class="gacha-egg egg-cyan egg-group-b" style="bottom: 5px; left: 112px; transform: rotate(-15deg);"></div>
-            <div class="gacha-egg egg-orange egg-group-a" style="bottom: 8px; left: 146px; transform: rotate(25deg);"></div>
-            <div class="gacha-egg egg-purple egg-group-b" style="bottom: 4px; left: 176px; transform: rotate(-40deg);"></div>
+            <!-- 底層扭蛋 (Layer A) -->
+            <div class="gacha-egg egg-pink egg-layer-a" style="bottom: 6px; left: 12px; --init-rot: 12deg; transform: rotate(12deg);"></div>
+            <div class="gacha-egg egg-blue egg-layer-a" style="bottom: 4px; left: 45px; --init-rot: -20deg; transform: rotate(-20deg);"></div>
+            <div class="gacha-egg egg-yellow egg-layer-a" style="bottom: 10px; left: 78px; --init-rot: 35deg; transform: rotate(35deg);"></div>
+            <div class="gacha-egg egg-cyan egg-layer-a" style="bottom: 5px; left: 112px; --init-rot: -15deg; transform: rotate(-15deg);"></div>
+            <div class="gacha-egg egg-orange egg-layer-a" style="bottom: 8px; left: 146px; --init-rot: 25deg; transform: rotate(25deg);"></div>
+            <div class="gacha-egg egg-purple egg-layer-a" style="bottom: 4px; left: 176px; --init-rot: -40deg; transform: rotate(-40deg);"></div>
             
-            <div class="gacha-egg egg-yellow egg-group-b" style="bottom: 34px; left: 22px; transform: rotate(-30deg);"></div>
-            <div class="gacha-egg egg-pink egg-group-a" style="bottom: 38px; left: 56px; transform: rotate(18deg);"></div>
-            <div class="gacha-egg egg-cyan egg-group-b" style="bottom: 32px; left: 90px; transform: rotate(-10deg);"></div>
-            <div class="gacha-egg egg-orange egg-group-a" style="bottom: 36px; left: 126px; transform: rotate(45deg);"></div>
-            <div class="gacha-egg egg-blue egg-group-b" style="bottom: 31px; left: 160px; transform: rotate(-25deg);"></div>
+            <!-- 中層扭蛋 (Layer B) -->
+            <div class="gacha-egg egg-yellow egg-layer-b" style="bottom: 34px; left: 22px; --init-rot: -30deg; transform: rotate(-30deg);"></div>
+            <div class="gacha-egg egg-pink egg-layer-b" style="bottom: 38px; left: 56px; --init-rot: 18deg; transform: rotate(18deg);"></div>
+            <div class="gacha-egg egg-cyan egg-layer-b" style="bottom: 32px; left: 90px; --init-rot: -10deg; transform: rotate(-10deg);"></div>
+            <div class="gacha-egg egg-orange egg-layer-b" style="bottom: 36px; left: 126px; --init-rot: 45deg; transform: rotate(45deg);"></div>
+            <div class="gacha-egg egg-blue egg-layer-b" style="bottom: 31px; left: 160px; --init-rot: -25deg; transform: rotate(-25deg);"></div>
 
-            <div class="gacha-egg egg-cyan egg-group-a" style="bottom: 64px; left: 38px; transform: rotate(40deg);"></div>
-            <div class="gacha-egg egg-purple egg-group-b" style="bottom: 62px; left: 72px; transform: rotate(-50deg);"></div>
-            <div class="gacha-egg egg-yellow egg-group-a" style="bottom: 66px; left: 108px; transform: rotate(10deg);"></div>
-            <div class="gacha-egg egg-pink egg-group-b" style="bottom: 60px; left: 142px; transform: rotate(-28deg);"></div>
+            <!-- 上層扭蛋 (Layer C) -->
+            <div class="gacha-egg egg-cyan egg-layer-c" style="bottom: 64px; left: 38px; --init-rot: 40deg; transform: rotate(40deg);"></div>
+            <div class="gacha-egg egg-purple egg-layer-c" style="bottom: 62px; left: 72px; --init-rot: -50deg; transform: rotate(-50deg);"></div>
+            <div class="gacha-egg egg-yellow egg-layer-c" style="bottom: 66px; left: 108px; --init-rot: 10deg; transform: rotate(10deg);"></div>
+            <div class="gacha-egg egg-pink egg-layer-c" style="bottom: 60px; left: 142px; --init-rot: -28deg; transform: rotate(-28deg);"></div>
             
-            <div class="gacha-egg egg-orange egg-group-a" style="bottom: 92px; left: 60px; transform: rotate(20deg);"></div>
-            <div class="gacha-egg egg-blue egg-group-b" style="bottom: 90px; left: 96px; transform: rotate(-15deg);"></div>
-            <div class="gacha-egg egg-purple egg-group-a" style="bottom: 88px; left: 130px; transform: rotate(55deg);"></div>
+            <!-- 頂層零星 -->
+            <div class="gacha-egg egg-orange egg-layer-c" style="bottom: 92px; left: 60px; --init-rot: 20deg; transform: rotate(20deg);"></div>
+            <div class="gacha-egg egg-blue egg-layer-c" style="bottom: 90px; left: 96px; --init-rot: -15deg; transform: rotate(-15deg);"></div>
+            <div class="gacha-egg egg-purple egg-layer-c" style="bottom: 88px; left: 130px; --init-rot: 55deg; transform: rotate(55deg);"></div>
         </div>
         
         <div class="gacha-body">
             <div class="gacha-crank" id="gachaCrank"></div>
             <div class="gacha-outlet">
-                <!-- 掉落出來的馬卡龍幸運蛋 -->
+                <!-- 一致外觀的馬卡龍幸運蛋 -->
                 <div class="gacha-lucky-egg" id="luckyEgg"></div>
             </div>
         </div>
@@ -333,7 +324,7 @@
 
     let isDrawing = false;
 
-    // 即時同步看板庫存
+    // 即時看板監聽
     onValue(ref(db, 'prizes'), (snapshot) => {
         const prizes = snapshot.val();
         if (!prizes) {
@@ -375,7 +366,6 @@
         document.getElementById("statusBoard").innerHTML = html;
     });
 
-    // 抽獎核心邏輯（防刷安全鎖）
     function startDraw() {
         const nameInput = document.getElementById("playerName").value;
         if (!nameInput) {
@@ -386,7 +376,7 @@
         
         isDrawing = true;
         document.getElementById("spinBtn").disabled = true;
-        document.getElementById("spinBtn").innerText = "好運翻滾中...";
+        document.getElementById("spinBtn").innerText = "轉動中...";
         document.getElementById("playerName").disabled = true;
 
         document.getElementById("luckyEgg").classList.remove("dropped-egg");
@@ -454,6 +444,7 @@
             }
 
             if (result.committed && finalWonPrize) {
+                // 執行重力物理感擬真動畫
                 runGachaponAnimation(() => {
                     if (finalWonPrize.name.includes("銘謝惠顧")) {
                         showWinModal("😭 哎呀可惜！", finalWonPrize.name, "請再接再厲！", true);
@@ -474,24 +465,31 @@
         });
     }
 
-    // 🌸 夢幻大無序翻滾控制
+    // 🎬 擬真重力微幅沉降動畫
     function runGachaponAnimation(callback) {
         const glass = document.getElementById("gachaGlass");
         const crank = document.getElementById("gachaCrank");
         const luckyEgg = document.getElementById("luckyEgg");
 
+        // 1. 轉動把手
         crank.classList.add("rotating-crank");
-        glass.classList.add("shaking");
 
+        // 2. 轉動一陣子後，裡面的扭蛋堆因為少了一顆，開始產生向下沉降、微幅滾動推擠的效果
         setTimeout(() => {
-            glass.classList.remove("shaking");
-            crank.classList.remove("rotating-crank");
-            
-            // 掉落幸運雙色蛋
-            luckyEgg.classList.add("dropped-egg");
+            glass.classList.add("settling");
+        }, 200);
 
-            setTimeout(callback, 900);
-        }, 1500); 
+        // 3. 沉降的同時，幸運扭蛋順暢滾落出洞
+        setTimeout(() => {
+            luckyEgg.classList.add("dropped-egg");
+        }, 400);
+
+        // 結束動畫並呈現結果彈窗
+        setTimeout(() => {
+            crank.classList.remove("rotating-crank");
+            // 彈窗出現後不急著重設內殼位置，保持沉降後的靜止狀態
+            callback();
+        }, 1200); 
     }
 
     function resetButtonState() {
@@ -499,6 +497,9 @@
         document.getElementById("spinBtn").disabled = false;
         document.getElementById("spinBtn").innerText = "啟動幸運扭蛋";
         document.getElementById("playerName").disabled = false;
+        
+        // 下一位玩家準備玩之前，重置回初始堆疊位置
+        document.getElementById("gachaGlass").classList.remove("settling");
     }
 
     function showWinModal(title, prizeName, code, isLose) {
