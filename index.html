@@ -478,7 +478,6 @@
         window.clickTicket = clickTicket;
         window.verifyGroupPass = verifyGroupPass;
         window.handleNameChange = handleNameChange;
-        window.verifyHonorPass = verifyHonorPass;
 
         // 🔀 選好名字後：隱藏「密語解鎖/名字選擇」面板，顯示「扭蛋機」
         function handleNameChange() {
@@ -493,21 +492,6 @@
         function showControlPanel() {
             document.getElementById("machineSection").classList.add("hidden");
             document.getElementById("controlPanel").classList.remove("hidden");
-        }
-
-        // 🔑 驗證「幸運中獎者」欄位的解鎖密語，成功後只顯示同群組的中獎紀錄
-        function verifyHonorPass() {
-            const inputEl = document.getElementById("honorPass");
-            if (!inputEl) return;
-            const inputPass = inputEl.value.trim();
-
-            if (groupLists[inputPass]) {
-                honorUnlockedGroup = inputPass;
-                renderHonorBoard(lastPlayedList);
-                updateMarquee(buildMarqueeText(lastPlayedList));
-            } else {
-                alert("❌ 密語錯誤，無法解鎖中獎名單！");
-            }
         }
 
         // 📣 依目前解鎖的群組，組出跑馬燈文字（未解鎖時不透露任何姓名）
@@ -532,12 +516,9 @@
 
             if (!honorUnlockedGroup) {
                 html += `
-                <div class="flex-grow flex flex-col items-center justify-center text-center gap-3 px-2">
-                    <p class="text-xs text-gray-400 leading-relaxed">🔒 為保護個資<br>請輸入密語才能查看中獎名單</p>
-                    <div class="flex gap-2 w-full max-w-[220px]">
-                        <input type="text" id="honorPass" placeholder="請輸入密語..." class="flex-grow bg-gray-50 border border-gray-200 rounded-xl px-3 py-1.5 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-pink-400 transition-all text-center">
-                        <button onclick="verifyHonorPass()" class="bg-gray-800 text-white text-xs font-bold px-3 py-1.5 rounded-xl hover:bg-gray-700 active:scale-95 transition-all flex-shrink-0">解鎖</button>
-                    </div>
+                <div class="flex-grow flex flex-col items-center justify-center text-center gap-2 px-4">
+                    <span class="text-2xl">🔒</span>
+                    <p class="text-xs text-gray-400 leading-relaxed">為保護個資，請先在左方輸入群組密語解鎖，即可查看同群組的中獎名單</p>
                 </div>`;
                 board.innerHTML = html;
                 return;
@@ -669,6 +650,12 @@
                 });
 
                 selectEl.appendChild(optGroup);
+
+                // 🔓 同一組密語也一併解鎖「幸運中獎者」欄位與跑馬燈的同群組播報
+                honorUnlockedGroup = inputPass;
+                renderHonorBoard(lastPlayedList);
+                updateMarquee(buildMarqueeText(lastPlayedList));
+
                 alert(`🔓 【${inputPass}】名單已成功解鎖！`);
             } else {
                 const lockOpt = document.createElement("option");
