@@ -153,9 +153,6 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
-        /* 👑 控制組件隱藏樣式 */
-        .hidden-group { display: none !important; }
-
         /* 🌀 手把旋轉動畫 */
         .rotating-crank {
             animation: rotateCrank 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
@@ -385,23 +382,8 @@
                 <div>
                     <label class="block text-xs font-bold text-gray-500 mb-1.5 ml-1">👤 選擇你的名字 (每個名字限抽一次)</label>
                     <select id="playerName" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm font-semibold text-center focus:outline-none focus:ring-2 focus:ring-rose-400 transition-all">
+                        <!-- 🚀 初始狀態空空如也，絕不留給手機瀏覽器任何洩漏名字的機會 -->
                         <option value="" disabled selected>🔒 請先解鎖群組名單 🔒</option>
-                        
-                        <!-- 🌸 皮皮群組名單 -->
-                        <optgroup label="✨ 皮皮群" id="group-pipi" class="hidden-group">
-                            <option value="貝果">貝果</option>
-                            <option value="怡蒨">怡蒨</option>
-                            <option value="７７">７７</option>
-                            <option value="安鴻">安鴻</option>
-                            <option value="當家">當家</option>
-                        </optgroup>
-
-                        <!-- 🎓 龜蜜 -->
-                        <optgroup label="✨ 龜蜜群" id="group-college" class="hidden-group">
-                            <option value="彥伶">彥伶</option>
-                            <option value="亮昀">亮昀</option>
-                            <option value="芳瑜">芳瑜</option>
-                        </optgroup>
                     </select>
                 </div>
 
@@ -460,10 +442,18 @@
         let isDrawing = false;
         let isMuted = true;
         let currentPrizeUrl = ""; 
+        let globalPlayedUsers = {}; // 暫存已抽過名單
 
-        const groupPasswords = {
-            "皮皮": "group-pipi",
-            "GM": "group-college"
+        // 🛠️ 將名單改為完整的 JS 物件字典，完全脫離原 HTML DOM
+        const groupLists = {
+            "皮皮": {
+                label: "✨ 皮皮群",
+                names: ["貝果", "怡蒨", "７７", "安鴻", "當家"]
+            },
+            "GM": {
+                label: "✨ 龜蜜群",
+                names: ["彥伶", "亮昀", "芳瑜"]
+            }
         };
 
         function toggleMusic() {
@@ -484,23 +474,54 @@
             }
         }
 
+        // 🛠️ 動態生成下拉選單內容，徹底根除手機端 CSS 無法隱藏 option 的 bug
         function verifyGroupPass() {
             const inputPass = document.getElementById("secretPass").value.trim();
             const selectEl = document.getElementById("playerName");
             
-            // 🛡️ 核心修復點：先強制將所有群組 DOM 隱藏，並將下拉選單拉回最上面預設選項
-            document.getElementById("group-pipi").classList.add("hidden-group");
-            document.getElementById("group-college").classList.add("hidden-group");
-            selectEl.selectedIndex = 0; 
+            // 先清空選單
+            selectEl.innerHTML = "";
             
-            // 根據正確密語，僅將該目標群組的展示類別移除
-            if (groupPasswords[inputPass]) {
-                const targetGroupId = groupPasswords[inputPass];
-                document.getElementById(targetGroupId).classList.remove("hidden-group");
-                selectEl.options[0].innerText = "▼ 請選擇你的名字 ▼";
+            if (groupLists[inputPass]) {
+                const group = groupLists[inputPass];
+                
+                // 建立提示選項
+                const defaultOpt = document.createElement("option");
+                defaultOpt.value = "";
+                defaultOpt.disabled = true;
+                defaultOpt.selected = true;
+                defaultOpt.innerText = "▼ 請選擇你的名字 ▼";
+                selectEl.appendChild(defaultOpt);
+
+                // 建立動態 optgroup
+                const optGroup = document.createElement("optgroup");
+                optGroup.label = group.label;
+
+                // 塞入該群組專屬名字
+                group.names.forEach(name => {
+                    const opt = document.createElement("option");
+                    opt.value = name;
+                    
+                    // 根據即時 Firebase 狀態判斷是否已抽過
+                    if (globalPlayedUsers[name]) {
+                        opt.disabled = true;
+                        opt.innerText = `${name} (已抽過)`;
+                    } else {
+                        opt.innerText = name;
+                    }
+                    optGroup.appendChild(opt);
+                });
+
+                selectEl.appendChild(optGroup);
                 alert(`🔓 【${inputPass}】名單已成功解鎖！`);
             } else {
-                selectEl.options[0].innerText = "🔒 請先解鎖群組名單 🔒";
+                // 密碼錯誤或未輸入，回復為全鎖定空狀態
+                const lockOpt = document.createElement("option");
+                lockOpt.value = "";
+                lockOpt.disabled = true;
+                lockOpt.selected = true;
+                lockOpt.innerText = "🔒 請先解鎖群組名單 🔒";
+                selectEl.appendChild(lockOpt);
                 alert("❌ 密語錯誤，無法解鎖群組名單！");
             }
         }
@@ -511,7 +532,7 @@
             if (!rootData) return;
 
             const prizes = rootData.prizes;
-            const playedUsers = rootData.playedUsers || {};
+            globalPlayedUsers = rootData.playedUsers || {}; // 儲存至全域變數供解鎖判斷
 
             // 1. 渲染剩餘好禮庫存
             if (prizes) {
@@ -549,21 +570,16 @@
                 document.getElementById("statusBoard").innerHTML = html;
             }
 
-            // 2. 名單選擇器更新
+            // 2. 如果當前選單已經解鎖，配合 Firebase 更新「已抽過」狀態
             const nameSelect = document.getElementById("playerName");
             const options = nameSelect.getElementsByTagName("option");
-            
             for (let option of options) {
                 if (option.value === "") continue; 
-                
-                if (playedUsers[option.value]) {
+                if (globalPlayedUsers[option.value]) {
                     option.disabled = true;
                     if (!option.innerText.includes(" (已抽過)")) {
                         option.innerText = option.value + " (已抽過)";
                     }
-                } else {
-                    option.disabled = false;
-                    option.innerText = option.value;
                 }
             }
 
@@ -572,15 +588,15 @@
             let marqueeText = "🎉 歡迎來到呆呆扭蛋機！快來試試手氣！ 🎟️ ";
             let playedList = [];
 
-            for (let user in playedUsers) {
-                if (playedUsers[user].won && playedUsers[user].won.includes("銘謝惠顧")) {
+            for (let user in globalPlayedUsers) {
+                if (globalPlayedUsers[user].won && globalPlayedUsers[user].won.includes("銘謝惠顧")) {
                     continue;
                 }
                 
                 playedList.push({
                     user: user,
-                    won: playedUsers[user].won,
-                    time: playedUsers[user].time || 0
+                    won: globalPlayedUsers[user].won,
+                    time: globalPlayedUsers[user].time || 0
                 });
             }
 
@@ -719,7 +735,11 @@
             const luckyEgg = document.getElementById("luckyEgg");
             luckyEgg.className = "gacha-lucky-egg";
             luckyEgg.style.opacity = "0";
-            document.getElementById("playerName").value = "";
+            
+            // 抽完後重設選單為鎖定狀態
+            const selectEl = document.getElementById("playerName");
+            selectEl.innerHTML = '<option value="" disabled selected>🔒 請先解鎖群組名單 🔒</option>';
+            document.getElementById("secretPass").value = "";
         }
     </script>
 </body>
