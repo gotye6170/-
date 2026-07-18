@@ -52,19 +52,19 @@
 
     <!-- 暱稱輸入區 -->
     <div class="login-box" id="loginBox">
-        <input type="text" id="playerName" placeholder="請先輸入你的名字/暱稱" maxlength="10">
+        <input type="text" id="playerName" placeholder="請先輸入你的名字" maxlength="10">
     </div>
 
     <!-- 拉霸機 -->
     <div class="slot-machine">
         <div class="slot-window">
             <div class="slot-track" id="slotTrack">
-                <div class="slot-item" style="height:76px;">💎 祝你中大獎 💎</div>
+                <div class="slot-item" style="height:76px;">💎 祝你中獎 💎</div>
             </div>
         </div>
     </div>
 
-    <button id="spinBtn" onclick="startDraw()">啟動拉霸，試試手氣！</button>
+    <button id="spinBtn" onclick="startDraw()">點我啟動拉霸機</button>
 </div>
 
 <!-- 獎券發放彈窗 -->
@@ -73,7 +73,7 @@
         <h2 id="modalTitle">🎉 恭喜中獎！</h2>
         <p style="font-weight: bold; font-size: 18px;" id="modalPrizeName">獲得獎項</p>
         <div class="ticket-box" id="modalTicketCode" onclick="copyTicket()">TICKET-CODE</div>
-        <p style="font-size: 12px; color: #666;" id="copyHint">↑ 點擊即可操作，請截圖保存！</p>
+        <p style="font-size: 12px; color: #666;" id="copyHint">↑ 點擊後輸入密碼「3064」，請截圖保存！</p>
         <button class="close-btn" onclick="closeModal()">關閉視窗</button>
     </div>
 </div>
@@ -106,7 +106,7 @@
         }
         localPrizesData = prizes;
 
-        let html = '<span class="prize-title-text">📋 目前好禮剩餘庫存：</span>';
+        let html = '<span class="prize-title-text">📋 目前的禮物：</span>';
         for (let id in prizes) {
             const p = prizes[id];
             
@@ -140,7 +140,7 @@
     function startDraw() {
         const nameInput = document.getElementById("playerName").value.trim();
         if (!nameInput) {
-            alert("請先輸入你的暱稱再抽獎喔！");
+            alert("請先輸入你的名字喔！");
             return;
         }
         if (isDrawing) return;
