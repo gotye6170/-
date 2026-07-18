@@ -341,7 +341,7 @@
     <!-- 🌌 主舞台佈局 -->
     <div class="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
-        <!-- 左翼：目前剩餘好禮 -->
+        <!-- 左翼：禮物列表 -->
         <div class="lg:col-span-3 order-2 lg:order-1">
             <div class="dashboard-panel" id="statusBoard">
                 <span class="board-title-text prize-title-text">📋 禮物列表</span>
@@ -405,7 +405,7 @@
             </div>
         </div>
 
-        <!-- 右翼：中獎者榮譽榜 -->
+        <!-- 右翼：幸運中獎者 -->
         <div class="lg:col-span-3 order-3">
             <div class="dashboard-panel" id="honorBoard">
                 <span class="board-title-text honor-title-text">👑 幸運中獎者</span>
@@ -544,7 +544,7 @@
             globalPlayedDevices = rootData.playedDevices || {}; 
 
             if (prizes) {
-                let html = '<span class="prize-title-text">📋 目前剩餘好禮：</span>';
+                let html = '<span class="prize-title-text">📋 禮物列表</span>';
                 let hasVisiblePrize = false;
 
                 for (let id in prizes) {
@@ -590,7 +590,7 @@
                 }
             }
 
-            let honorHtml = '<span class="board-title-text honor-title-text">👑 中獎者榮譽榜：</span>';
+            let honorHtml = '<span class="board-title-text honor-title-text">👑 幸運中獎者</span>';
             let marqueeText = "🎉 歡迎來到呆呆扭蛋機！快來試試手氣！ 🎟️ ";
             let playedList = [];
 
