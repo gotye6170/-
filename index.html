@@ -6,48 +6,166 @@
     <title>🎰 呆呆抽獎 🎟️</title>
     <style>
         * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background: radial-gradient(circle, #0f2027, #203a43, #2c5364); color: white; min-height: 100vh; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
-        .container { background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(12px); padding: 30px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); width: 100%; max-width: 520px; text-align: center; border: 1px solid rgba(255, 255, 255, 0.15); }
-        h1 { margin-top: 0; color: #ff007f; text-shadow: 0 0 12px rgba(255,0,127,0.5); font-size: 28px; }
         
-        /* 獎品即時看板（已移除任何機率字眼） */
-        .status-board { background: rgba(0,0,0,0.5); padding: 15px; border-radius: 12px; margin-bottom: 20px; border-left: 5px solid #ff007f; text-align: left; font-size: 14px; line-height: 1.6; }
-        .prize-title-text { font-weight: bold; margin-bottom: 8px; color: #ff007f; display: block; font-size: 15px; }
-        .prize-item-row { display: flex; align-items: center; margin: 8px 0; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); }
-        .prize-thumb { width: 55px; height: 55px; object-fit: cover; border-radius: 8px; margin-right: 15px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); display: block; }
+        /* 高級感深色流光背景 */
+        body { 
+            background: radial-gradient(circle at 20% 20%, #1a0b2e, #0b0f19 60%, #05161e); 
+            color: white; 
+            min-height: 100vh; 
+            margin: 0; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        /* 奢華毛玻璃霓虹容器 */
+        .container { 
+            background: rgba(18, 11, 32, 0.65); 
+            backdrop-filter: blur(20px); 
+            -webkit-backdrop-filter: blur(20px);
+            padding: 35px 30px; 
+            border-radius: 24px; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 30px rgba(255, 0, 127, 0.15), inset 0 0 15px rgba(255,255,255,0.05); 
+            width: 100%; 
+            max-width: 520px; 
+            text-align: center; 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+        }
+        
+        h1 { 
+            margin-top: 0; 
+            background: linear-gradient(135deg, #ff007f, #ff7700, #00f2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 8px rgba(255,0,127,0.6));
+            font-size: 32px; 
+            font-weight: 800;
+            letter-spacing: 2px;
+        }
+        
+        /* 獎品即時看板高級化 */
+        .status-board { 
+            background: rgba(5, 5, 10, 0.7); 
+            padding: 18px; 
+            border-radius: 16px; 
+            margin-bottom: 20px; 
+            border: 1px solid rgba(255, 0, 127, 0.3);
+            box-shadow: inset 0 0 10px rgba(255, 0, 127, 0.1);
+            text-align: left; 
+            font-size: 14px; 
+            line-height: 1.6; 
+        }
+        .prize-title-text { font-weight: bold; margin-bottom: 10px; color: #ff007f; display: block; font-size: 15px; text-shadow: 0 0 5px rgba(255,0,127,0.3); }
+        .prize-item-row { display: flex; align-items: center; margin: 10px 0; background: rgba(255,255,255,0.03); padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; }
+        .prize-item-row:hover { background: rgba(255,255,255,0.06); border-color: rgba(0, 242, 254, 0.3); }
+        .prize-thumb { width: 55px; height: 55px; object-fit: cover; border-radius: 10px; margin-right: 15px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); display: block; }
         .prize-info { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; }
         .prize-name-label { font-size: 16px; font-weight: bold; color: #ffffff; margin-bottom: 2px; }
 
-        .login-box { margin-bottom: 15px; }
-        input { width: 85%; padding: 12px; border-radius: 8px; border: none; font-size: 16px; text-align: center; background: rgba(255,255,255,0.9); color: #222; font-weight: bold; }
+        .login-box { margin-bottom: 20px; }
+        input { 
+            width: 85%; 
+            padding: 14px; 
+            border-radius: 12px; 
+            border: 1px solid rgba(255,255,255,0.1); 
+            font-size: 16px; 
+            text-align: center; 
+            background: rgba(255,255,255,0.08); 
+            color: #fff; 
+            font-weight: bold; 
+            transition: 0.3s;
+        }
+        input:focus {
+            outline: none;
+            background: rgba(255,255,255,0.15);
+            border-color: #00f2fe;
+            box-shadow: 0 0 15px rgba(0,242,254,0.4);
+        }
+        input::placeholder { color: rgba(255,255,255,0.4); font-weight: normal; }
         
-        /* 拉霸滾動區 */
-        .slot-machine { background: #111; border: 6px solid #ff007f; border-radius: 15px; padding: 15px; margin: 20px 0; box-shadow: 0 0 25px rgba(255,0,127,0.4); display: flex; justify-content: center; overflow: hidden; height: 110px; }
-        .slot-window { background: #fff; color: #222; width: 90%; height: 100%; border-radius: 6px; font-size: 22px; font-weight: bold; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; border: 2px solid #333; }
+        /* 高級拉霸滾動區 (改為黑金奢華風格) */
+        .slot-machine { 
+            background: #0d0614; 
+            border: 4px solid #ff007f; 
+            border-radius: 20px; 
+            padding: 15px; 
+            margin: 25px 0; 
+            box-shadow: 0 0 35px rgba(255,0,127,0.5), inset 0 0 20px rgba(0,0,0,0.9); 
+            display: flex; 
+            justify-content: center; 
+            overflow: hidden; 
+            height: 114px; 
+        }
+        .slot-window { 
+            background: linear-gradient(180deg, #1a1a2e 0%, #0f0f1a 100%); 
+            color: #ffd700; /* 金黃色文字更有高級感 */
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
+            width: 95%; 
+            height: 100%; 
+            border-radius: 10px; 
+            font-size: 24px; 
+            font-weight: 800; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            position: relative; 
+            overflow: hidden; 
+            border: 1px solid rgba(255, 215, 0, 0.3); 
+        }
         .slot-track { display: flex; flex-direction: column; position: absolute; top: 0; }
         .slot-item { height: 76px; display: flex; align-items: center; justify-content: center; width: 100%; text-align: center; white-space: nowrap; padding: 0 10px; }
 
-        button { background: linear-gradient(135deg, #00f2fe, #4facfe); color: white; border: none; padding: 15px 35px; font-size: 18px; font-weight: bold; border-radius: 50px; cursor: pointer; box-shadow: 0 5px 20px rgba(79,172,254,0.4); transition: 0.2s; width: 85%; }
-        button:hover { transform: scale(1.03); filter: brightness(1.1); }
-        button:disabled { background: #444; color: #888; cursor: not-allowed; box-shadow: none; transform: none; }
+        /* 炫彩流光強烈發光按鍵 */
+        button { 
+            background: linear-gradient(135deg, #ff007f, #7928ca, #00f2fe); 
+            background-size: 200% auto;
+            color: white; 
+            border: none; 
+            padding: 16px 35px; 
+            font-size: 18px; 
+            font-weight: bold; 
+            border-radius: 50px; 
+            cursor: pointer; 
+            box-shadow: 0 5px 25px rgba(255,0,127,0.4), 0 0 15px rgba(0,242,254,0.2); 
+            transition: 0.3s; 
+            width: 85%; 
+            letter-spacing: 1px;
+            animation: pulseGlow 2s infinite;
+        }
+        button:hover { 
+            transform: scale(1.03); 
+            background-position: right center;
+            box-shadow: 0 8px 30px rgba(255,0,127,0.6), 0 0 25px rgba(0,242,254,0.4); 
+        }
+        button:disabled { background: #222; color: #555; cursor: not-allowed; box-shadow: none; transform: none; animation: none; border: 1px solid #333; }
 
-        /* 中獎彈窗 */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); align-items: center; justify-content: center; z-index: 100; }
-        .modal-content { background: #fff; color: #222; padding: 30px; border-radius: 20px; width: 90%; max-width: 420px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3); animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .modal h2 { color: #ff007f; margin-top: 0; font-size: 24px; }
-        .ticket-box { background: #f9f9f9; border: 2px dashed #00f2fe; padding: 15px; font-size: 22px; font-weight: bold; letter-spacing: 1px; color: #008b9b; margin: 15px 0; border-radius: 8px; cursor: pointer; word-break: break-all; transition: 0.2s; }
-        .ticket-box:hover { background: #f0fbfd; filter: brightness(0.98); }
-        .close-btn { background: #333; font-size: 14px; padding: 10px 20px; width: auto; margin-top: 10px; }
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 5px 20px rgba(255,0,127,0.4), 0 0 10px rgba(0,242,254,0.2); }
+            50% { box-shadow: 0 5px 30px rgba(255,0,127,0.7), 0 0 25px rgba(0,242,254,0.5); }
+            100% { box-shadow: 0 5px 20px rgba(255,0,127,0.4), 0 0 10px rgba(0,242,254,0.2); }
+        }
+
+        /* 中獎彈窗高級感 */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5,3,10,0.9); backdrop-filter: blur(8px); align-items: center; justify-content: center; z-index: 100; }
+        .modal-content { background: #161124; color: #fff; padding: 35px; border-radius: 24px; width: 90%; max-width: 420px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 30px rgba(0,242,254,0.2); border: 1px solid rgba(255,255,255,0.1); animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .modal h2 { color: #ff007f; margin-top: 0; font-size: 26px; text-shadow: 0 0 10px rgba(255,0,127,0.5); }
+        .ticket-box { background: rgba(0,0,0,0.4); border: 2px dashed #00f2fe; padding: 18px; font-size: 22px; font-weight: bold; letter-spacing: 1px; color: #00f2fe; margin: 20px 0; border-radius: 12px; cursor: pointer; word-break: break-all; transition: 0.2s; box-shadow: 0 0 15px rgba(0,242,254,0.1); }
+        .ticket-box:hover { background: rgba(0,242,254,0.05); box-shadow: 0 0 20px rgba(0,242,254,0.3); }
+        .close-btn { background: #2a1f42; font-size: 14px; padding: 12px 25px; width: auto; margin-top: 15px; border: 1px solid rgba(255,255,255,0.05); }
+        .close-btn:hover { background: #3d2d5e; }
         @keyframes pop { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <!-- 1. 頂部名稱已確實更改為：呆呆抽獎 -->
+    <!-- 1. 頂部名稱 -->
     <h1>🎰 呆呆抽獎 🎟️</h1>
     
-    <!-- 2. 獎品清單看板（絕不顯示任何中獎率與 % 數） -->
+    <!-- 2. 獎品清單看板 -->
     <div class="status-board" id="statusBoard">正在載入雲端禮品庫存...</div>
 
     <!-- 暱稱輸入區 -->
@@ -71,9 +189,9 @@
 <div class="modal" id="winModal">
     <div class="modal-content">
         <h2 id="modalTitle">🎉 恭喜中獎！</h2>
-        <p style="font-weight: bold; font-size: 18px;" id="modalPrizeName">獲得獎項</p>
+        <p style="font-weight: bold; font-size: 18px; color: #ffd700;" id="modalPrizeName">獲得獎項</p>
         <div class="ticket-box" id="modalTicketCode" onclick="copyTicket()">TICKET-CODE</div>
-        <p style="font-size: 12px; color: #666;" id="copyHint">↑ 點擊後輸入密碼「3064」，請截圖保存！</p>
+        <p style="font-size: 12px; color: #aaa;" id="copyHint">↑ 點擊後輸入密碼「3064」，請截圖保存！</p>
         <button class="close-btn" onclick="closeModal()">關閉視窗</button>
     </div>
 </div>
@@ -133,10 +251,10 @@
                 </div>`;
             } else {
                 html += `
-                <div class="prize-item-row" style="opacity: 0.4;">
+                <div class="prize-item-row" style="opacity: 0.3;">
                     ${imgHtml}
                     <div class="prize-info">
-                        <span class="prize-name-label" style="text-decoration: line-through; color:#aaa;">${p.name}</span>
+                        <span class="prize-name-label" style="text-decoration: line-through; color:#888;">${p.name}</span>
                         <span style="color:#ff007f; font-size:13px;">🔴 已全數送完</span>
                     </div>
                 </div>`;
@@ -267,7 +385,7 @@
             if(count > 60) speed = 3;
 
             if (count > 68) {
-                // 🎯 修正關鍵：微調精準位移量，使最終文字達到上下完美絕對置中
+                // 🎯 精準位移量修正，文字絕對置中
                 track.style.top = `-${(track.children.length - 1) * 76 - 2}px`;
                 setTimeout(callback, 400);
             } else {
@@ -303,12 +421,12 @@
             ticketBox.innerText = code;
             ticketBox.removeAttribute("data-url");
             if(isLose) {
-                ticketBox.style.border = "2px dashed #999";
-                ticketBox.style.color = "#666";
+                ticketBox.style.border = "2px dashed #555";
+                ticketBox.style.color = "#888";
                 hintBox.style.display = "none";
             } else {
                 ticketBox.style.border = "2px dashed #00f2fe";
-                ticketBox.style.color = "#008b9b";
+                ticketBox.style.color = "#00f2fe";
                 hintBox.innerText = "↑ 點擊後輸入密碼「3064」，請截圖保存！";
                 hintBox.style.display = "block";
             }
