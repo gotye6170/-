@@ -328,23 +328,6 @@
         }
         .honor-info { font-size: 13px; color: #4b5563; }
 
-        /* 🎵 音樂控制按鈕固定在右下角 */
-        .music-control-btn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: linear-gradient(135deg, #4f46e5, #06b6d4);
-            color: white;
-            padding: 10px 18px;
-            border-radius: 30px;
-            font-weight: bold;
-            font-size: 14px;
-            box-shadow: 0 8px 15px rgba(79,70,229,0.3);
-            cursor: pointer;
-            z-index: 100;
-            border: 2px solid white;
-            transition: all 0.3s ease;
-        }
     </style>
 </head>
 <body class="p-4 md:p-8 min-h-screen flex flex-col items-center justify-center">
@@ -448,9 +431,6 @@
         </div>
     </div>
 
-    <!-- 🎵 YouTube 隱藏背景音樂區 -->
-    <iframe id="bgMusic" width="0" height="0" src="https://www.youtube.com/embed/yVtbujcb0KA?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=yVtbujcb0KA" frameborder="0" allow="autoplay"></iframe>
-    <button class="music-control-btn" id="musicBtn" onclick="toggleMusic()">🎵 點擊開啟音樂</button>
 
     <!-- 🌐 Firebase 模組與核心邏輯 -->
     <script type="module">
@@ -468,10 +448,8 @@
         window.closeModal = closeModal;
         window.clickTicket = clickTicket;
         window.verifyGroupPass = verifyGroupPass;
-        window.toggleMusic = toggleMusic;
 
         let isDrawing = false;
-        let isMuted = true;
         let currentPrizeUrl = ""; 
         let globalPlayedUsers = {}; 
         let globalPlayedDevices = {};
@@ -502,23 +480,6 @@
 
         const eggColors = ["egg-pink", "egg-blue", "egg-yellow", "egg-green", "egg-purple", "egg-orange"];
 
-        function toggleMusic() {
-            const iframe = document.getElementById("bgMusic");
-            const btn = document.getElementById("musicBtn");
-            
-            if (isMuted) {
-                iframe.contentWindow.postMessage(JSON.stringify({"event":"command","func":"unMute","args":""}), '*');
-                iframe.contentWindow.postMessage(JSON.stringify({"event":"command","func":"playVideo","args":""}), '*');
-                btn.innerText = "⏸️ 暫停背景音樂";
-                btn.style.background = "linear-gradient(135deg, #ec4899, #f43f5e)";
-                isMuted = false;
-            } else {
-                iframe.contentWindow.postMessage(JSON.stringify({"event":"command","func":"mute","args":""}), '*');
-                btn.innerText = "🎵 點擊開啟音樂";
-                btn.style.background = "linear-gradient(135deg, #4f46e5, #06b6d4)";
-                isMuted = true;
-            }
-        }
 
         function verifyGroupPass() {
             if(globalPlayedDevices[deviceId]){
