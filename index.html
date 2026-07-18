@@ -292,11 +292,11 @@
         const hintBox = document.getElementById("copyHint");
         
         if (code.startsWith("http")) {
-            ticketBox.innerText = "👉 點我查看/下載票券截圖 👈";
+            ticketBox.innerText = "👉 點我並輸入密碼「3064」，即可查看獎品 👈";
             ticketBox.style.color = "#ff007f";
             ticketBox.style.border = "2px solid #ff007f";
             ticketBox.setAttribute("data-url", code);
-            hintBox.innerText = "↑ 點擊上方按鈕將開啟圖片，長按即可儲存截圖！";
+            hintBox.innerText = "長按即可儲存截圖！";
             hintBox.style.display = "block";
         } else {
             ticketBox.innerText = code;
