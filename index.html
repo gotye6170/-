@@ -489,7 +489,7 @@
             </div>
             
             <div id="modalTicketCode" onclick="clickTicket()" class="bg-slate-900 text-cyan-400 font-mono text-base font-bold py-3 px-4 rounded-xl cursor-pointer hover:bg-slate-800 active:scale-98 transition-all border border-cyan-500/30 break-all select-none">點我打開獎品連結</div>
-            <p id="copyHint" class="text-[11px] text-gray-400 mt-1.5 font-medium">💡 點擊上方即可查看獎品，如果需要密碼，請輸入「3064」</p>
+            <p id="copyHint" class="text-[11px] text-gray-400 mt-1.5 font-medium">💡 點擊上方並輸入密碼「3064」即可查看獎品</p>
 
             <button onclick="closeModal()" class="w-full bg-gray-800 hover:bg-gray-700 text-white font-bold py-2.5 rounded-xl text-sm transition-all mt-5">收下好禮</button>
         </div>
@@ -756,7 +756,7 @@
             return true;
         }
 
-        // 📋 畫出「禮物列表」欄位，已送完且非本組抽中的獎品會加註提示
+        // 📋 畫出「禮物列表」欄位，只顯示目前解鎖群組看得到的獎品；已送完且非本組抽中的獎品會加註提示
         function renderStatusBoard(prizes) {
             const board = document.getElementById("statusBoard");
             if (!board || !prizes) return;
@@ -764,9 +764,17 @@
             let html = '<span class="prize-title-text">📋 禮物列表</span>';
             let hasVisiblePrize = false;
 
+            if (!honorUnlockedGroup) {
+                board.innerHTML = html + '<div style="color: #9ca3af; font-size: 13px; padding: 10px;">🔒 請先輸入通關密語解鎖你的群組，才能看到禮物清單。</div>';
+                return;
+            }
+
             for (let id in prizes) {
                 const p = prizes[id];
                 if (p.name && p.name.includes("銘謝惠顧")) continue;
+
+                const prizeGroups = Array.isArray(p.groups) ? p.groups : [];
+                if (!prizeGroups.includes(honorUnlockedGroup)) continue; // 這個獎品沒有開放給目前解鎖的群組，不顯示
 
                 hasVisiblePrize = true;
                 const imgHtml = p.image ? `<img class="prize-thumb" src="${p.image}" alt="${p.name}">` : `<div class="prize-thumb" style="background:#f3f4f6;"></div>`;
@@ -953,8 +961,9 @@
             isDrawing = true;
 
             try {
-                // 1. 依「目前畫面上看到的」獎品資料，篩選出「數量大於0」且「權重大於0」的有效獎品
+                // 1. 依「目前畫面上看到的」獎品資料，篩選出「這個玩家的群組能抽」+「數量大於0」+「權重大於0」的有效獎品
                 //    (真正的庫存扣減仍會在下一步由資料庫做原子性檢查，這裡只是先選出候選)
+                const myGroup = getGroupKeyForName(nameInput);
                 let pool = [];
                 let totalWeight = 0;
 
@@ -962,6 +971,8 @@
                     let p = lastPrizes[id];
                     let q = Number(p.quantity || 0);
                     let w = Number(p.weight || 0);
+                    let prizeGroups = Array.isArray(p.groups) ? p.groups : [];
+                    if (!myGroup || !prizeGroups.includes(myGroup)) continue; // 這個獎品沒有開放給玩家所屬的群組
                     if (q > 0 && w > 0) {
                         pool.push({ id, prizeData: p, weight: w });
                         totalWeight += w;
@@ -971,6 +982,8 @@
                 if (pool.length === 0) {
                     for (let id in lastPrizes) {
                         let p = lastPrizes[id];
+                        let prizeGroups = Array.isArray(p.groups) ? p.groups : [];
+                        if (!myGroup || !prizeGroups.includes(myGroup)) continue;
                         if (Number(p.quantity || 0) > 0) {
                             pool.push({ id, prizeData: p, weight: 1 });
                             totalWeight += 1;
