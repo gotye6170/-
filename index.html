@@ -1015,18 +1015,26 @@
 
                 const newQuantity = Number(txResult.snapshot.val());
 
-                // 3. 讀取「剛好輪到」的那一組序號。資料庫規則規定：只有序號的索引值等於目前累計已發出的數量時才准許讀取，
-                //    所以一般人沒辦法把整包序號一次讀光，只能讀到自己剛抽中的這一組
+                // 3. 讀取這個獎品完整的序號清單，並排除掉已經發放給別人的序號，挑一組還沒發出去的。
+                //    （這個獎品的序號清單本來就只有登入過網站的人讀得到，陌生人還是看不到；
+                //     不再需要管理後台的「原始總數」欄位來換算，減少人工填寫出錯的機會）
                 let wonCode = "";
-                const totalQuantity = Number(chosenPrize.totalQuantity || 0);
-                if (totalQuantity > 0) {
-                    const claimedIndex = totalQuantity - newQuantity - 1;
-                    try {
-                        const codeSnap = await get(ref(db, `prizeCodes/${chosenPrizeId}/${claimedIndex}`));
-                        wonCode = codeSnap.exists() ? codeSnap.val() : "";
-                    } catch (e) {
-                        console.error("讀取序號失敗：", e);
+                try {
+                    const codesSnap = await get(ref(db, `prizeCodes/${chosenPrizeId}`));
+                    if (codesSnap.exists()) {
+                        const codesObj = codesSnap.val();
+                        const usedCodes = new Set(
+                            Object.values(globalPlayedUsers)
+                                .map(u => u && u.code)
+                                .filter(c => c)
+                        );
+                        const availableCodes = Object.values(codesObj).filter(c => c && !usedCodes.has(c));
+                        if (availableCodes.length > 0) {
+                            wonCode = availableCodes[0];
+                        }
                     }
+                } catch (e) {
+                    console.error("讀取序號失敗：", e);
                 }
 
                 // 4. 寫入得獎紀錄。資料庫規則規定這兩個節點「只能建立、不能覆蓋」，
