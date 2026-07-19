@@ -979,17 +979,10 @@
                     }
                 }
 
-                if (pool.length === 0) {
-                    for (let id in lastPrizes) {
-                        let p = lastPrizes[id];
-                        let prizeGroups = Array.isArray(p.groups) ? p.groups : [];
-                        if (!myGroup || !prizeGroups.includes(myGroup)) continue;
-                        if (Number(p.quantity || 0) > 0) {
-                            pool.push({ id, prizeData: p, weight: 1 });
-                            totalWeight += 1;
-                        }
-                    }
-                }
+                // 注意：不再有「權重全部為0時自動改成人人權重1平分」的備援機制。
+                // 這代表：如果你想要有「銘謝惠顧／不中獎」的結果，請務必在後台
+                // 額外新增一張名稱含「銘謝惠顧」的獎品卡，並給它一個 >0 的權重與
+                // 足夠大的庫存數量，否則權重全設 0 時抽獎會直接顯示「庫存已被抽光」。
 
                 if (pool.length === 0) {
                     alert("庫存已被抽光囉！");
