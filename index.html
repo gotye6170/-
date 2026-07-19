@@ -489,7 +489,7 @@
             </div>
             
             <div id="modalTicketCode" onclick="clickTicket()" class="bg-slate-900 text-cyan-400 font-mono text-base font-bold py-3 px-4 rounded-xl cursor-pointer hover:bg-slate-800 active:scale-98 transition-all border border-cyan-500/30 break-all select-none">點我打開獎品連結</div>
-            <p id="copyHint" class="text-[11px] text-gray-400 mt-1.5 font-medium">💡 點擊上方並輸入密碼「3064」即可查看獎品</p>
+            <p id="copyHint" class="text-[11px] text-gray-400 mt-1.5 font-medium">💡 點擊上方即可查看獎品，密碼「3064」(非必須)</p>
 
             <button onclick="closeModal()" class="w-full bg-gray-800 hover:bg-gray-700 text-white font-bold py-2.5 rounded-xl text-sm transition-all mt-5">收下好禮</button>
         </div>
@@ -503,14 +503,20 @@
     <!-- 🌐 Firebase 模組與核心邏輯 -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
-        import { getDatabase, ref, runTransaction, onValue } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
+        import { getDatabase, ref, runTransaction, onValue, get, update } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
 
+        // ⚠️ 請把下面換成你自己 Firebase 專案的完整設定（在 Firebase 主控台 > 專案設定 > 一般 > 你的應用程式 SDK 設定 可以複製到）
+        // apiKey / authDomain 是啟用「身份驗證(Auth)」必要的欄位，缺少會導致玩家無法登入、抽獎功能整個失效
         const firebaseConfig = {
+            apiKey: "AIzaSyDMG8bM8VO_al-k40JxfRu4bgph78e2PDs",
+            authDomain: "daidaikunbao.firebaseapp.com",
             databaseURL: "https://daidaikunbao-default-rtdb.firebaseio.com/"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
+        const auth = getAuth(app);
 
         window.startDraw = startDraw;
         window.closeModal = closeModal;
@@ -541,7 +547,7 @@
         function openConfirmModal() {
             if (isDrawing) return;
 
-            if (globalPlayedDevices[deviceId]) {
+            if (myDeviceRecord) {
                 alert("此裝置已經抽過獎囉！");
                 return;
             }
@@ -688,23 +694,32 @@
         let isDrawing = false;
         let currentPrizeUrl = ""; 
         let globalPlayedUsers = {}; 
-        let globalPlayedDevices = {};
+        let myDeviceRecord = null;   // 這個裝置(以登入的uid為準)是否已經抽過的紀錄，取代舊版可被竄改的localStorage字串
         let honorUnlockedGroup = null; // 幸運中獎者欄位目前解鎖的群組（null = 尚未解鎖）
         let lastPlayedList = [];       // 最近一次從 Firebase 算出的完整得獎名單（未過濾群組）
         let lastPrizes = null;         // 最近一次從 Firebase 拿到的獎品資料（用來重繪禮物列表）
+        let deviceId = null;           // 登入成功後會被設為 Firebase 匿名登入的 uid
 
-        let deviceId =
-            localStorage.getItem("gachaDeviceId");
-
-        if(!deviceId){
-
-            deviceId = crypto.randomUUID();
-
-            localStorage.setItem(
-                "gachaDeviceId",
-                deviceId
-            );
-        }
+        // 🔐 先用 Firebase 匿名登入驗證身份，通過後才開始監聽資料庫、才能抽獎
+        // (資料庫規則現在要求 auth != null 才能讀寫，避免任何人不透過這個網站就能直接戳資料庫)
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                deviceId = user.uid;
+                get(ref(db, "playedDevices/" + deviceId))
+                    .then((snap) => {
+                        myDeviceRecord = snap.exists() ? snap.val() : null;
+                        initApp();
+                    })
+                    .catch((err) => {
+                        console.error("讀取裝置狀態失敗：", err);
+                        initApp();
+                    });
+            }
+        });
+        signInAnonymously(auth).catch((err) => {
+            console.error("匿名登入失敗：", err);
+            alert("連線驗證失敗，請重新整理頁面再試一次！");
+        });
 
         const groupLists = {
             "皮皮": {
@@ -804,10 +819,9 @@
 
 
         function verifyGroupPass() {
-            if(globalPlayedDevices[deviceId]){
+            if(myDeviceRecord){
 
-            const user =
-                globalPlayedDevices[deviceId].user;
+            const user = myDeviceRecord.user;
 
             alert(`此裝置已由【${user}】抽過獎囉！`);
 
@@ -864,23 +878,12 @@
             }
         }
 
-        onValue(ref(db), (snapshot) => {
-            const rootData = snapshot.val();
-            if (!rootData) return;
-
-            const prizes = rootData.prizes;
-            globalPlayedUsers = rootData.playedUsers || {};
-            globalPlayedDevices = rootData.playedDevices || {}; 
-
-            if (prizes) {
-                lastPrizes = prizes;
-                renderStatusBoard(prizes);
-            }
-
+        // 🔎 playedUsers 更新時共用的畫面刷新邏輯（名單下拉選單 / 跑馬燈 / 幸運中獎者榜）
+        function refreshPlayedUsersUI() {
             const nameSelect = document.getElementById("playerName");
             const options = nameSelect.getElementsByTagName("option");
             for (let option of options) {
-                if (option.value === "") continue; 
+                if (option.value === "") continue;
                 if (globalPlayedUsers[option.value]) {
                     option.disabled = true;
                     if (!option.innerText.includes(" (已抽過)")) {
@@ -895,7 +898,7 @@
                 if (globalPlayedUsers[user].won && globalPlayedUsers[user].won.includes("銘謝惠顧")) {
                     continue;
                 }
-                
+
                 playedList.push({
                     user: user,
                     won: globalPlayedUsers[user].won,
@@ -909,62 +912,67 @@
             lastPlayedList = playedList;
             updateMarquee(buildMarqueeText(playedList));
             renderHonorBoard(playedList);
-        });
+        }
+
+        // 🔐 登入成功後才開始監聽資料庫（未登入時規則會拒絕讀取，所以必須等 initApp 被呼叫）
+        // 注意：這裡只監聽 /prizes 與 /playedUsers 這兩個「公開安全」節點；
+        // 真正的中獎序號(/prizeCodes)與裝置清單(/playedDevices)現在受保護，不會整包被監聽下來
+        function initApp() {
+            onValue(ref(db, "prizes"), (snapshot) => {
+                const prizes = snapshot.val();
+                if (!prizes) return;
+                lastPrizes = prizes;
+                renderStatusBoard(prizes);
+            });
+
+            onValue(ref(db, "playedUsers"), (snapshot) => {
+                globalPlayedUsers = snapshot.val() || {};
+                refreshPlayedUsersUI();
+            });
+        }
 
         // ⚖️ 修正版：依權重(weight)計算機率的抽獎核心
-        function startDraw() {
+        async function startDraw() {
             const nameInput = document.getElementById("playerName").value;
             if (!nameInput) {
                 alert("請先輸入通關密語並選擇你的名字喔！");
                 return;
             }
-            
-            if(globalPlayedDevices[deviceId]){
+
+            if (myDeviceRecord) {
                 alert("此裝置已經抽過獎囉！");
                 return;
             }
-            
+
+            if (globalPlayedUsers[nameInput]) {
+                alert("這個名字已經抽過獎囉！");
+                return;
+            }
+
             if (isDrawing) return;
             isDrawing = true;
 
-            const dbRef = ref(db);
-            
-            runTransaction(dbRef, (currentData) => {
-                if (!currentData) return currentData;
-                if (!currentData.playedUsers) currentData.playedUsers = {};
-                if (!currentData.playedDevices) currentData.playedDevices = {};
-                
-                // 檢查是否抽過
-                if(currentData.playedUsers[nameInput]){
-                    return;
-                }
-
-                if(currentData.playedDevices[deviceId]){
-                    return;
-                }
-
-                // 1. 篩選出「數量大於0」且「權重大於0」的有效獎品
+            try {
+                // 1. 依「目前畫面上看到的」獎品資料，篩選出「數量大於0」且「權重大於0」的有效獎品
+                //    (真正的庫存扣減仍會在下一步由資料庫做原子性檢查，這裡只是先選出候選)
                 let pool = [];
                 let totalWeight = 0;
 
-                for (let id in currentData.prizes) {
-                    let p = currentData.prizes[id];
+                for (let id in lastPrizes) {
+                    let p = lastPrizes[id];
                     let q = Number(p.quantity || 0);
                     let w = Number(p.weight || 0);
-
-                    // 即使設了權重，如果庫存發完了 (quantity=0) 就不參與抽獎
                     if (q > 0 && w > 0) {
-                        pool.push({ id: id, prizeData: p, weight: w });
+                        pool.push({ id, prizeData: p, weight: w });
                         totalWeight += w;
                     }
                 }
 
-                // 如果完全沒有設定權重的獎品，或獎品被抽光了，退回改抽「剩餘數量大於0」的任意獎品（當作防呆備用方案）
                 if (pool.length === 0) {
-                    for (let id in currentData.prizes) {
-                        let p = currentData.prizes[id];
+                    for (let id in lastPrizes) {
+                        let p = lastPrizes[id];
                         if (Number(p.quantity || 0) > 0) {
-                            pool.push({ id: id, prizeData: p, weight: 1 });
+                            pool.push({ id, prizeData: p, weight: 1 });
                             totalWeight += 1;
                         }
                     }
@@ -972,14 +980,13 @@
 
                 if (pool.length === 0) {
                     alert("庫存已被抽光囉！");
+                    isDrawing = false;
                     return;
                 }
 
-                // 2. 依權重比例隨機抽取
                 let randomRoll = Math.floor(Math.random() * totalWeight);
                 let chosenPrizeId = null;
                 let currentSum = 0;
-
                 for (let i = 0; i < pool.length; i++) {
                     currentSum += pool[i].weight;
                     if (randomRoll < currentSum) {
@@ -987,55 +994,65 @@
                         break;
                     }
                 }
+                if (!chosenPrizeId) chosenPrizeId = pool[0].id;
 
-                if (!chosenPrizeId) chosenPrizeId = pool[0].id; // 絕對防呆
+                const chosenPrize = pool.find(p => p.id === chosenPrizeId).prizeData;
 
-                let targetPrize = currentData.prizes[chosenPrizeId];
-                
-                // 3. 處理中獎網址 (由 ticketCodes 中抽取)
-                let wonCode = "";
-                if (targetPrize.ticketCodes && Array.isArray(targetPrize.ticketCodes) && targetPrize.ticketCodes.length > 0) {
-                    // 取出第一個網址，並從陣列中移除 (shift)
-                    wonCode = targetPrize.ticketCodes.shift();
-                } else if (targetPrize.code) {
-                    // 備用傳統欄位
-                    wonCode = targetPrize.code;
-                }
+                // 2. 用交易(transaction)安全地扣減這個獎品的庫存，資料庫規則只允許「剛好減1、且不能小於0」的寫入，
+                //    就算兩個人同時抽到同一個獎品，Firebase也會用這個機制保證不會被搶成負數
+                const quantityRef = ref(db, `prizes/${chosenPrizeId}/quantity`);
+                const txResult = await runTransaction(quantityRef, (current) => {
+                    if (current === null || current === undefined) return current;
+                    if (Number(current) <= 0) return; // 中止交易：剛好被搶完了
+                    return Number(current) - 1;
+                });
 
-                // 4. 扣除總數量
-                targetPrize.quantity = Number(targetPrize.quantity) - 1;
-                
-                // 寫入得獎紀錄
-                currentData.playedUsers[nameInput] = {
-                    won: targetPrize.name,
-                    code: wonCode, 
-                    time: Date.now(),
-                    group: getGroupKeyForName(nameInput)
-                };
-                    currentData.playedDevices[deviceId] = {
-                    user:nameInput,
-                    time:Date.now()
-                };
-
-                return currentData;
-            })
-            .then((result) => {
-                if (!result.committed) {
-                    alert("糟糕，這個名字已經抽過或是發生同步錯誤囉！");
+                if (!txResult.committed) {
+                    alert("啊，這個獎品剛好在這一瞬間被別人抽走了，請重新點一次再試一次！");
                     isDrawing = false;
                     return;
                 }
 
-                const snapshot = result.snapshot.val();
-                const myResult = snapshot.playedUsers[nameInput];
+                const newQuantity = Number(txResult.snapshot.val());
 
+                // 3. 讀取「剛好輪到」的那一組序號。資料庫規則規定：只有序號的索引值等於目前累計已發出的數量時才准許讀取，
+                //    所以一般人沒辦法把整包序號一次讀光，只能讀到自己剛抽中的這一組
+                let wonCode = "";
+                const totalQuantity = Number(chosenPrize.totalQuantity || 0);
+                if (totalQuantity > 0) {
+                    const claimedIndex = totalQuantity - newQuantity - 1;
+                    try {
+                        const codeSnap = await get(ref(db, `prizeCodes/${chosenPrizeId}/${claimedIndex}`));
+                        wonCode = codeSnap.exists() ? codeSnap.val() : "";
+                    } catch (e) {
+                        console.error("讀取序號失敗：", e);
+                    }
+                }
+
+                // 4. 寫入得獎紀錄。資料庫規則規定這兩個節點「只能建立、不能覆蓋」，
+                //    且 playedDevices 只能寫進自己(auth.uid)的那一筆，防止冒用別人身份
+                const myResult = {
+                    won: chosenPrize.name,
+                    code: wonCode,
+                    time: Date.now(),
+                    group: getGroupKeyForName(nameInput)
+                };
+
+                await update(ref(db), {
+                    [`playedUsers/${nameInput}`]: myResult,
+                    [`playedDevices/${deviceId}`]: { user: nameInput, time: Date.now() }
+                });
+
+                myDeviceRecord = { user: nameInput, time: Date.now() };
+
+                // 5. 播放動畫、顯示中獎結果
                 const container = document.getElementById("gachaGlass");
                 const luckyEgg = document.getElementById("luckyEgg");
                 const crank = document.getElementById("gachaCrank");
 
                 const chosenColor = eggColors[Math.floor(Math.random() * eggColors.length)];
                 const matchingEggsInGlass = container.querySelectorAll(`.gacha-egg.${chosenColor}:not(.egg-falling-out)`);
-                
+
                 crank.classList.add("rotating-crank");
                 playCrankSound();
 
@@ -1046,7 +1063,7 @@
 
                 container.classList.add("eggs-drop-down");
 
-                luckyEgg.className = "gacha-lucky-egg"; 
+                luckyEgg.className = "gacha-lucky-egg";
                 luckyEgg.style.opacity = "0";
                 luckyEgg.classList.add(chosenColor);
 
@@ -1060,14 +1077,14 @@
                     const modalTicketCode = document.getElementById("modalTicketCode");
                     const copyHint = document.getElementById("copyHint");
                     const closeBtn = document.querySelector("#winModal button:last-child");
-                    const labelPrize = modalPrizeName.previousElementSibling; 
+                    const labelPrize = modalPrizeName.previousElementSibling;
 
                     modalPrizeName.innerText = myResult.won;
-                    currentPrizeUrl = myResult.code; 
+                    currentPrizeUrl = myResult.code;
 
                     if (myResult.won && myResult.won.includes("銘謝惠顧")) {
                         modalTitle.innerText = "😢 差一點點！";
-                        modalTitle.className = "text-2xl font-black text-gray-500 mb-2"; 
+                        modalTitle.className = "text-2xl font-black text-gray-500 mb-2";
                         if (labelPrize) labelPrize.innerText = "💨 本次結果";
                         modalTicketCode.style.display = "none";
                         copyHint.style.display = "none";
@@ -1081,7 +1098,7 @@
                         copyHint.style.display = "block";
                         closeBtn.innerText = "收下好禮";
                     }
-                    
+
                     document.getElementById("winModal").style.display = "flex";
                     playWinSound();
                     crank.classList.remove("rotating-crank");
@@ -1089,12 +1106,11 @@
                     isDrawing = false;
                 }, 2100);
 
-            })
-            .catch((error) => {
-                console.error("交易失敗: ", error);
-                alert("伺服器擁擠，請稍後再試！");
+            } catch (error) {
+                console.error("抽獎失敗: ", error);
+                alert("伺服器擁擠，或這個名字/裝置剛好已經抽過了，請重新整理頁面後再試一次！");
                 isDrawing = false;
-            });
+            }
         }
         
         function clickTicket() {
