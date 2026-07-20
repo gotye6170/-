@@ -377,6 +377,15 @@
 </head>
 <body class="p-4 md:p-8 min-h-screen flex flex-col items-center justify-center">
 
+    <!-- 🔒 打烊模式遮罩：預設隱藏，管理員在後台開啟後，這裡會蓋住整個畫面 -->
+    <div id="closedOverlay" style="display:none; position:fixed; inset:0; z-index:9999; backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); background:rgba(15,23,42,0.72); align-items:center; justify-content:center; padding:20px;">
+        <div style="background:rgba(255,255,255,0.95); border-radius:28px; padding:40px 32px; max-width:360px; width:100%; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+            <div style="font-size:56px; margin-bottom:12px;">🚧</div>
+            <div style="font-size:22px; font-weight:900; color:#1e293b; margin-bottom:8px;">打烊中</div>
+            <div style="font-size:14px; color:#64748b; font-weight:600;">目前暫停抽獎，請稍後再回來試試手氣唷！</div>
+        </div>
+    </div>
+
     <!-- 🏷️ 頂部霓虹跑馬燈 -->
     <div class="w-full max-w-5xl bg-slate-900 text-cyan-400 font-bold px-4 py-2.5 rounded-full shadow-lg overflow-hidden border-2 border-cyan-500/30 mb-8 flex items-center gap-3">
         <span class="bg-cyan-500 text-slate-950 text-xs px-2.5 py-1 rounded-full flex-shrink-0 animate-pulse">📢 最新動態</span>
@@ -705,6 +714,12 @@
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 deviceId = user.uid;
+
+                // 🔒 即時監聽打烊模式：管理員在後台一按開關，這裡會立刻顯示/隱藏模糊遮罩
+                onValue(ref(db, "settings/closed"), (snap) => {
+                    document.getElementById("closedOverlay").style.display = (snap.val() === true) ? "flex" : "none";
+                });
+
                 get(ref(db, "playedDevices/" + deviceId))
                     .then((snap) => {
                         myDeviceRecord = snap.exists() ? snap.val() : null;
