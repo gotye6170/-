@@ -400,6 +400,7 @@
         .shop-btn:active { transform: scale(0.95); }
     </style>
 </head>
+
 <body class="p-4 md:p-8 min-h-screen flex flex-col items-center justify-center">
 
     <!-- 🔒 打烊模式遮罩 -->
@@ -795,51 +796,53 @@
             board.innerHTML = html;
         }
 
-        // ---------- 點數錢包相關 ----------
+        // ---------- 點數錢包相關 (已修正) ----------
         function listenToWallet(playerName) {
-    if (!playerName) return;
-    const walletRef = ref(db, `pointUsers/${playerName}`);
-    onValue(walletRef, (snap) => {
-        currentWalletData = snap.val();
-        // 無論如何，錢包區域都保持顯示
-        document.getElementById("walletSection").classList.remove("hidden");
-        
-        if (currentWalletData) {
-            personalPassHash = currentWalletData.personalPassHash || null;
-            if (currentWalletData.boundUid === deviceId) {
-                walletUnlocked = true;
-                updateWalletDisplay();
-            } else if (!currentWalletData.boundUid) {
-                walletUnlocked = false;
-                document.getElementById("walletDisplay").innerText = "🔒 請驗證錢包";
-            } else {
-                walletUnlocked = false;
-                document.getElementById("walletDisplay").innerText = "🔒 錢包已綁定其他裝置";
-            }
-        } else {
-            // 錢包尚未建立
-            walletUnlocked = false;
-            document.getElementById("walletDisplay").innerText = "🪙 尚未開通";
-            document.getElementById("walletExpiry").innerText = "請聯繫管理員開通點數錢包";
+            if (!playerName) return;
+            const walletRef = ref(db, `pointUsers/${playerName}`);
+            onValue(walletRef, (snap) => {
+                currentWalletData = snap.val();
+                // 錢包區域永遠顯示
+                document.getElementById("walletSection").classList.remove("hidden");
+                
+                if (currentWalletData) {
+                    personalPassHash = currentWalletData.personalPassHash || null;
+                    if (currentWalletData.boundUid === deviceId) {
+                        walletUnlocked = true;
+                        updateWalletDisplay();
+                    } else if (!currentWalletData.boundUid || currentWalletData.boundUid === "") {
+                        walletUnlocked = false;
+                        document.getElementById("walletDisplay").innerText = "🔒 請驗證錢包";
+                        document.getElementById("walletExpiry").innerText = "點擊商品專區以驗證";
+                    } else {
+                        walletUnlocked = false;
+                        document.getElementById("walletDisplay").innerText = "🔒 錢包已綁定其他裝置";
+                        document.getElementById("walletExpiry").innerText = "";
+                    }
+                } else {
+                    walletUnlocked = false;
+                    document.getElementById("walletDisplay").innerText = "🪙 錢包未開通";
+                    document.getElementById("walletExpiry").innerText = "請聯繫管理員";
+                }
+            });
         }
-    });
-}
 
         function updateWalletDisplay() {
             if (!currentWalletData || !walletUnlocked) return;
             const points = currentWalletData.points || 0;
-            const expiry = currentWalletData.expiry || null;
+            const expiry = currentWalletData.expiry || 0;
             const now = Date.now();
             let expiryText = "";
-            if (expiry && expiry < now) {
+            if (expiry && expiry !== 0 && expiry < now) {
                 expiryText = "（已過期）";
                 document.getElementById("walletDisplay").innerText = `🪙 ${points} 點 (已過期)`;
-            } else if (expiry) {
+            } else if (expiry && expiry !== 0) {
                 const d = new Date(expiry);
                 expiryText = `有效至 ${d.toLocaleDateString("zh-TW")}`;
                 document.getElementById("walletDisplay").innerText = `🪙 ${points} 點`;
             } else {
                 document.getElementById("walletDisplay").innerText = `🪙 ${points} 點`;
+                expiryText = "無期限";
             }
             document.getElementById("walletExpiry").innerText = expiryText;
         }
@@ -910,7 +913,7 @@
             }
             const points = currentWalletData ? currentWalletData.points || 0 : 0;
             const now = Date.now();
-            const expired = (currentWalletData && currentWalletData.expiry && currentWalletData.expiry < now);
+            const expired = (currentWalletData && currentWalletData.expiry && currentWalletData.expiry !== 0 && currentWalletData.expiry < now);
             let html = "";
             for (const id in shopItems) {
                 const item = shopItems[id];
@@ -929,7 +932,7 @@
             container.innerHTML = html;
         }
 
-        // 🔥 重點修改：直接扣點 + 扣庫存，不再寫 redeemRequests
+        // 直接扣點 + 扣庫存
         window.redeemItem = async function(itemId) {
             if (!currentPlayerName || !walletUnlocked) return;
             const item = shopItems[itemId];
@@ -940,7 +943,6 @@
                 const stockRef = ref(db, `shopItems/${itemId}/stock`);
                 const pointsRef = ref(db, `pointUsers/${currentPlayerName}/points`);
 
-                // 先扣庫存
                 const stockResult = await runTransaction(stockRef, (currentStock) => {
                     if (currentStock === null || currentStock === undefined) return;
                     if (Number(currentStock) <= 0) return;
@@ -952,7 +954,6 @@
                     return;
                 }
 
-                // 再扣點數
                 const pointsResult = await runTransaction(pointsRef, (currentPoints) => {
                     if (currentPoints === null || currentPoints === undefined) return;
                     if (Number(currentPoints) < item.cost) return;
@@ -960,7 +961,6 @@
                 });
 
                 if (!pointsResult.committed) {
-                    // 點數不足，補回庫存
                     await runTransaction(stockRef, (currentStock) => {
                         return (currentStock || 0) + 1;
                     });
@@ -969,15 +969,13 @@
                 }
 
                 alert(`✅ 兌換成功！獲得「${item.name}」`);
-                // 監聽器會自動刷新錢包與商品庫存顯示
-
             } catch (e) {
                 console.error("兌換失敗：", e);
                 alert("兌換過程發生錯誤，請稍後再試。");
             }
         };
 
-        // ---------- 選擇名字後的行為 ----------
+        // ---------- 選擇名字後的行為 (已修正) ----------
         function handleNameChange() {
             const val = document.getElementById("playerName").value;
             if (val) {
@@ -985,12 +983,10 @@
                 document.getElementById("controlPanel").classList.add("hidden");
                 document.getElementById("machineSection").classList.remove("hidden");
                 listenToWallet(val);
+                // 預先顯示讀取中狀態
                 document.getElementById("walletSection").classList.remove("hidden");
-                if (walletUnlocked) {
-                    updateWalletDisplay();
-                } else {
-                    document.getElementById("walletDisplay").innerText = "🔒 請驗證錢包";
-                }
+                document.getElementById("walletDisplay").innerText = "🪙 讀取中...";
+                document.getElementById("walletExpiry").innerText = "";
             }
         }
 
@@ -1107,7 +1103,7 @@
             });
         }
 
-        // 🔥 重點修改：抽獎後直接加點數，不再寫 pendingPoints
+        // ---------- 抽獎核心（點數自動發放）----------
         async function startDraw() {
             const nameInput = document.getElementById("playerName").value;
             if (!nameInput) {
@@ -1214,7 +1210,7 @@
 
                 myDeviceRecord = { user: nameInput, time: Date.now() };
 
-                // ---------- 🎯 自動發放點數（直接增加）----------
+                // 自動發放點數
                 const minP = Number(chosenPrize.minPoints);
                 const maxP = Number(chosenPrize.maxPoints);
                 if (!isNaN(minP) && !isNaN(maxP) && maxP >= minP && maxP > 0) {
@@ -1224,7 +1220,6 @@
                         await runTransaction(userPointsRef, (current) => {
                             return (current || 0) + awardedPoints;
                         });
-                        console.log(`✅ 已自動發放 ${awardedPoints} 點給 ${nameInput}`);
                     } catch (e) {
                         console.error("點數發放失敗：", e);
                     }
@@ -1373,3 +1368,5 @@
             alert("連線驗證失敗，請重新整理頁面再試一次！");
         });
     </script>
+</body>
+</html>
