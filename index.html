@@ -4,41 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>呆呆扭蛋機 🌟</title>
-    <!-- Tailwind CSS (用於快速美化外觀) -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <!-- 引入支援繁體中文的 Noto Sans TC -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@900&display=swap" rel="stylesheet">
     
     <style>
-        /* 手機版 */
-    @media (max-width: 640px){
+        /* === 手機版 === */
+        @media (max-width: 640px) {
+            .gacha-title { font-size: 2rem !important; -webkit-text-stroke: 6px #fff; }
+            .gacha-machine { transform: scale(.72); transform-origin: top center; margin-bottom: 0px; height: 350px; }
+            .dashboard-panel { height: auto; min-height: 250px; }
+            .music-control-btn { bottom: 15px; right: 15px; font-size: 12px; padding: 8px 14px; }
+        }
 
-    .gacha-title{
-        font-size:2rem !important;
-        -webkit-text-stroke:6px #fff;
-    }
-
-    .gacha-machine{
-        transform:scale(.72);
-        transform-origin:top center;
-        margin-bottom:0px;
-        height:350px;
-    }
-
-    .dashboard-panel{
-        height:auto;
-        min-height:250px;
-    }
-
-    .music-control-btn{
-        bottom:15px;
-        right:15px;
-        font-size:12px;
-        padding:8px 14px;
-    }
-}
         body {
             background: linear-gradient(135deg, #fbcfe8, #e0e7ff, #ccfbf1);
             background-size: 400% 400%;
@@ -53,19 +33,16 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* 🎪 統一且富有設計感的大標題 (完美描邊不咬字) */
         .gacha-title {
             font-family: 'Noto Sans TC', sans-serif;
             font-weight: 900;
             color: #ff3366;
             letter-spacing: 2px;
-            /* 運用 paint-order 讓白色描邊粗而不吃字 */
             -webkit-text-stroke: 10px #ffffff;
             paint-order: stroke fill;
-            filter: drop-shadow(4px 4px 0px rgba(0, 0, 0, 0.08)) drop-shadow(0px 8px 15px rgba(244, 63, 94, 0.2));
+            filter: drop-shadow(4px 4px 0px rgba(0,0,0,0.08)) drop-shadow(0px 8px 15px rgba(244,63,94,0.2));
         }
 
-        /* 🎪 扭蛋機核心造型 */
         .gacha-machine {
             position: relative;
             width: 320px;
@@ -77,7 +54,6 @@
             border: 6px solid #fee2e2;
         }
 
-        /* 🔮 透明玻璃罩 */
         .gacha-glass {
             position: relative;
             height: 240px;
@@ -89,11 +65,9 @@
             margin-bottom: 25px;
         }
 
-        /* 🥚 扭蛋基本顆粒 */
         .gacha-egg {
             position: absolute;
-            width: 38px;
-            height: 38px;
+            width: 38px; height: 38px;
             border-radius: 50%;
             box-shadow: inset -4px -4px 8px rgba(0,0,0,0.2), 2px 4px 6px rgba(0,0,0,0.1);
             transition: transform 0.3s ease, opacity 0.5s ease;
@@ -106,7 +80,6 @@
             border-radius: 19px 19px 0 0;
         }
 
-        /* 🎨 扭蛋繽紛色彩 */
         .egg-pink { background: #ec4899; }
         .egg-blue { background: #3b82f6; }
         .egg-yellow { background: #eab308; }
@@ -114,12 +87,10 @@
         .egg-purple { background: #a855f7; }
         .egg-orange { background: #f97316; }
 
-        /* 🥚 隨機分佈扭蛋群 (基礎圖層) */
         .egg-layer-a { bottom: 8px; }
         .egg-layer-b { bottom: 25px; }
         .egg-layer-c { bottom: 42px; }
 
-        /* 🎬 被抽中的那顆蛋：往下掉並淡出消失 */
         .egg-falling-out {
             animation: eggFallOut 0.8s cubic-bezier(0.55, 0.055, 0.675, 0.19) forwards !important;
         }
@@ -129,7 +100,6 @@
             100% { transform: translateY(120px) scale(0.7); opacity: 0; }
         }
 
-        /* 🎬 剩餘的所有扭蛋：集體輕微往下沉（重力合理化補位） */
         .eggs-drop-down .gacha-egg:not(.egg-falling-out) {
             animation: gravitySettle 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.3s forwards;
         }
@@ -140,7 +110,6 @@
             100% { transform: translateY(4px); }
         }
 
-        /* ⚙️ 控制面板區 */
         .gacha-panel {
             background: #991b1b;
             border-radius: 20px;
@@ -152,10 +121,8 @@
             box-shadow: inset 0 4px 8px rgba(0,0,0,0.3);
         }
 
-        /* 🕹️ 旋轉手把 */
         .gacha-crank {
-            width: 70px;
-            height: 70px;
+            width: 70px; height: 70px;
             background: radial-gradient(circle, #f3f4f6 30%, #9ca3af 70%);
             border-radius: 50%;
             border: 6px solid #4b5563;
@@ -166,8 +133,7 @@
         .gacha-crank::before {
             content: '';
             position: absolute;
-            width: 14px;
-            height: 45px;
+            width: 14px; height: 45px;
             background: #4b5563;
             top: 50%; left: 50%;
             transform: translate(-50%, -50%);
@@ -176,8 +142,7 @@
         .gacha-crank::after {
             content: '';
             position: absolute;
-            width: 24px;
-            height: 24px;
+            width: 24px; height: 24px;
             background: #dc2626;
             border-radius: 50%;
             top: -5px; left: 50%;
@@ -185,7 +150,6 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
-        /* 🌀 手把旋轉動畫 */
         .rotating-crank {
             animation: rotateCrank 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
@@ -194,10 +158,8 @@
             100% { transform: rotate(720deg); }
         }
 
-        /* 🕳️ 出蛋口外部結構 */
         .gacha-gate {
-            width: 75px;
-            height: 75px;
+            width: 75px; height: 75px;
             background: #1f2937;
             border-radius: 20px 20px 5px 5px;
             border: 4px solid #4b5563;
@@ -206,14 +168,11 @@
             overflow: hidden;
         }
 
-        /* 🥚 出蛋口內部隱藏的獲獎蛋 */
         .gacha-lucky-egg {
             position: absolute;
-            width: 46px;
-            height: 46px;
+            width: 46px; height: 46px;
             border-radius: 50%;
-            top: -60px;
-            left: 11px;
+            top: -60px; left: 11px;
             opacity: 0;
             z-index: 10;
             box-shadow: inset -5px -5px 10px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.4);
@@ -226,11 +185,9 @@
             border-radius: 23px 23px 0 0;
         }
 
-        /* 🌠 出蛋重力動畫 */
         .dropped-egg {
             animation: realGravityDrop 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.3s forwards;
         }
-        
         @keyframes realGravityDrop {
             0% { top: -60px; opacity: 0; transform: scaleY(1.1) scaleX(0.9) rotate(0deg); }
             30% { top: 12px; opacity: 1; transform: scaleY(0.8) scaleX(1.15) rotate(120deg); }
@@ -241,12 +198,11 @@
             100% { top: 12px; opacity: 1; transform: scaleY(1) scaleX(1) rotate(360deg); }
         }
 
-        /* 📋 數據看板通用外觀 */
         .dashboard-panel {
-            background: rgba(255, 255, 255, 0.85);
+            background: rgba(255,255,255,0.85);
             backdrop-filter: blur(10px);
             border-radius: 24px;
-            border: 2px solid rgba(255, 255, 255, 0.5);
+            border: 2px solid rgba(255,255,255,0.5);
             box-shadow: 0 10px 30px rgba(0,0,0,0.05);
             padding: 20px;
             height: auto;
@@ -276,7 +232,6 @@
         .scroller-content::-webkit-scrollbar-track { background: transparent; }
         .scroller-content::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
 
-        /* 🎁 剩餘好禮列 */
         .prize-item-row {
             display: flex;
             align-items: center;
@@ -289,8 +244,7 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
         .prize-thumb {
-            width: 40px;
-            height: 40px;
+            width: 40px; height: 40px;
             border-radius: 8px;
             object-fit: cover;
             flex-shrink: 0;
@@ -308,7 +262,6 @@
             color: #1f2937;
         }
 
-        /* 👑 榮譽榜列 */
         .honor-item-row {
             display: flex;
             align-items: center;
@@ -331,7 +284,6 @@
         }
         .honor-info { font-size: 13px; color: #4b5563; }
 
-        /* 📊 禮物庫存進度條 */
         .prize-progress-track {
             width: 100%;
             height: 6px;
@@ -345,14 +297,9 @@
             border-radius: 999px;
             transition: width 0.3s ease;
         }
-        .prize-progress-fill.is-available {
-            background: linear-gradient(to right, #6ee7b7, #059669);
-        }
-        .prize-progress-fill.is-empty {
-            background: linear-gradient(to right, #fca5a5, #dc2626);
-        }
+        .prize-progress-fill.is-available { background: linear-gradient(to right, #6ee7b7, #059669); }
+        .prize-progress-fill.is-empty { background: linear-gradient(to right, #fca5a5, #dc2626); }
 
-        /* 📣 跑馬燈 (改用 CSS transform 動畫，手機上比 <marquee> 順很多) */
         .marquee-viewport {
             flex: 1 1 auto;
             min-width: 0;
@@ -365,15 +312,12 @@
             will-change: transform;
             animation: marqueeScroll 20s linear infinite;
         }
-        .marquee-item {
-            padding-right: 60px;
-        }
+        .marquee-item { padding-right: 60px; }
         @keyframes marqueeScroll {
             from { transform: translateX(0); }
             to { transform: translateX(-50%); }
         }
 
-        /* 新增：點數錢包顯示區 */
         .wallet-badge {
             background: linear-gradient(135deg, #fbbf24, #f59e0b);
             color: #78350f;
@@ -434,11 +378,11 @@
             </div>
         </div>
 
-        <!-- 中央：幸運扭蛋機核心 -->
+        <!-- 中央：主要互動區 -->
         <div class="lg:col-span-6 order-1 lg:order-2 flex flex-col items-center">
             <h1 class="gacha-title text-4xl md:text-5xl mb-6">呆呆幸運扭蛋機</h1>
 
-            <!-- 🎮 輸入控制面板（只留密語與名字選擇，錢包已移出） -->
+            <!-- 🎮 控制面板 (密語 + 名字選擇) -->
             <div id="controlPanel" class="w-full max-w-sm bg-white/80 backdrop-blur-md rounded-3xl p-6 shadow-xl border border-white mt-4 md:mt-6 space-y-4">
                 <div>
                     <label class="block text-xs font-bold text-gray-500 mb-1.5 ml-1">🔑 請輸入群組密語解鎖名單</label>
@@ -449,19 +393,18 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-gray-500 mb-1.5 ml-1">👤 選擇你的名字 (每個名字限抽一次)</label>
+                    <label class="block text-xs font-bold text-gray-500 mb-1.5 ml-1">👤 選擇你的名字 (可查看錢包，未抽獎者可抽獎)</label>
                     <select id="playerName" onchange="handleNameChange()" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm font-semibold text-center focus:outline-none focus:ring-2 focus:ring-rose-400 transition-all">
                         <option value="" disabled selected>🔒 請先解鎖群組名單 🔒</option>
                     </select>
                 </div>
-                <!-- ❌ 錢包區域已移出，不再放在這裡 -->
             </div>
 
-            <!-- 🎪 扭蛋機區塊（包含獨立的錢包顯示） -->
-            <div id="machineSection" class="hidden w-full max-w-sm flex flex-col items-center mt-4 md:mt-6">
+            <!-- 🎪 內容區（選擇名字後出現） -->
+            <div id="contentArea" class="hidden w-full max-w-sm flex flex-col items-center mt-4 md:mt-6">
                 
-                <!-- 🪙 點數錢包與商品專區（獨立顯示，不受控制面板影響） -->
-                <div id="walletSection" class="hidden w-full bg-white/80 backdrop-blur-md rounded-2xl p-4 shadow-md border border-white mb-4">
+                <!-- 🪙 點數錢包與商品專區（永遠顯示，獨立於抽獎） -->
+                <div id="walletSection" class="w-full bg-white/80 backdrop-blur-md rounded-2xl p-4 shadow-md border border-white mb-4">
                     <div class="flex items-center justify-between gap-3 flex-wrap">
                         <span class="wallet-badge" id="walletDisplay">🪙 讀取中...</span>
                         <button onclick="openShop()" class="shop-btn">🎁 商品專區</button>
@@ -469,8 +412,17 @@
                     <p class="text-xs text-gray-400 mt-2" id="walletExpiry"></p>
                 </div>
 
-                <button id="spinBtn" onclick="openConfirmModal()" class="w-full bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white font-black py-3 rounded-2xl shadow-lg shadow-rose-500/20 active:scale-98 transition-all tracking-wider text-sm cursor-pointer">啟動幸運扭蛋</button>
+                <!-- 🎰 抽獎按鈕（未抽獎者可見） -->
+                <div id="drawActionArea" class="w-full">
+                    <button id="spinBtn" onclick="openConfirmModal()" class="w-full bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white font-black py-3 rounded-2xl shadow-lg shadow-rose-500/20 active:scale-98 transition-all tracking-wider text-sm cursor-pointer">啟動幸運扭蛋</button>
+                </div>
 
+                <!-- ⚠️ 已抽獎提示（已抽獎者可見） -->
+                <div id="alreadyPlayedMsg" class="hidden w-full text-center py-3 text-gray-500 font-bold text-sm bg-white/50 rounded-xl">
+                    ⚠️ 你已抽過獎，無法再次抽獎<br>但你仍可查看點數與兌換商品唷！
+                </div>
+
+                <!-- 扭蛋機本體（保留視覺） -->
                 <div class="gacha-machine mt-6">
                     <div class="gacha-glass" id="gachaGlass">
                         <div class="gacha-egg egg-pink egg-layer-a" style="left: 15px;"></div>
@@ -489,7 +441,6 @@
                         <div class="gacha-egg egg-pink egg-layer-c" style="left: 150px;"></div>
                         <div class="gacha-egg egg-yellow egg-layer-c" style="left: 195px;"></div>
                     </div>
-
                     <div class="gacha-panel">
                         <div class="gacha-crank" id="gachaCrank" onclick="openConfirmModal()"></div>
                         <div class="gacha-gate">
@@ -507,7 +458,6 @@
                 <div class="scroller-content text-gray-400 text-sm italic p-2 text-center">連線中，正在載入...</div>
             </div>
         </div>
-
     </div>
 
     <!-- ❓ 抽獎前確認彈窗 -->
@@ -522,9 +472,9 @@
         </div>
     </div>
 
-    <!-- 🏆 獲獎與狀態彈出視窗 -->
+    <!-- 🏆 獲獎彈窗 -->
     <div id="winModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" style="display: none;">
-        <div class="bg-white rounded-3xl w-full max-w-sm p-6 text-center shadow-2xl border-4 border-amber-400 transform scale-100 transition-all">
+        <div class="bg-white rounded-3xl w-full max-w-sm p-6 text-center shadow-2xl border-4 border-amber-400">
             <h2 id="modalTitle" class="text-2xl font-black text-rose-500 mb-2">🎉 恭喜中獎！</h2>
             <div class="bg-amber-50 rounded-2xl p-4 my-4 border border-amber-200">
                 <p class="text-xs text-amber-600 font-bold tracking-wider mb-1">🎁 抽中獎品</p>
@@ -536,7 +486,7 @@
         </div>
     </div>
 
-    <!-- 🔐 個人錢包密語彈窗（初始隱藏） -->
+    <!-- 🔐 個人錢包密語彈窗 -->
     <div id="walletPassModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" style="display: none;">
         <div class="bg-white rounded-3xl w-full max-w-sm p-6 text-center shadow-2xl border-4 border-yellow-400">
             <h2 class="text-xl font-black text-slate-800 mb-2">🔐 解鎖點數錢包</h2>
@@ -798,13 +748,12 @@
             board.innerHTML = html;
         }
 
-        // ---------- 點數錢包相關 (已修正，並配合新位置) ----------
+        // ---------- 點數錢包相關 ----------
         function listenToWallet(playerName) {
             if (!playerName) return;
             const walletRef = ref(db, `pointUsers/${playerName}`);
             onValue(walletRef, (snap) => {
                 currentWalletData = snap.val();
-                // 錢包區域現在在 machineSection 內，確保它顯示
                 const walletSection = document.getElementById("walletSection");
                 if (walletSection) walletSection.classList.remove("hidden");
                 
@@ -978,37 +927,49 @@
             }
         };
 
-        // ---------- 選擇名字後的行為 (已修正) ----------
+        // ---------- 選擇名字後的行為 ----------
         function handleNameChange() {
             const val = document.getElementById("playerName").value;
-            if (val) {
-                currentPlayerName = val;
-                document.getElementById("controlPanel").classList.add("hidden");
-                document.getElementById("machineSection").classList.remove("hidden");
-                // 立刻顯示錢包區域（在 machineSection 內）
-                const walletSection = document.getElementById("walletSection");
-                if (walletSection) {
-                    walletSection.classList.remove("hidden");
-                    document.getElementById("walletDisplay").innerText = "🪙 讀取中...";
-                    document.getElementById("walletExpiry").innerText = "";
-                }
-                listenToWallet(val);
+            if (!val) return;
+
+            currentPlayerName = val;
+            // 隱藏控制面板，顯示內容區
+            document.getElementById("controlPanel").classList.add("hidden");
+            const contentArea = document.getElementById("contentArea");
+            contentArea.classList.remove("hidden");
+
+            // 錢包區域必定顯示
+            document.getElementById("walletSection").classList.remove("hidden");
+            document.getElementById("walletDisplay").innerText = "🪙 讀取中...";
+            document.getElementById("walletExpiry").innerText = "";
+            listenToWallet(val);
+
+            // 判斷是否已抽過獎（名字或裝置）
+            const alreadyPlayed = !!(myDeviceRecord || globalPlayedUsers[val]);
+            const drawArea = document.getElementById("drawActionArea");
+            const alreadyMsg = document.getElementById("alreadyPlayedMsg");
+
+            if (alreadyPlayed) {
+                drawArea.classList.add("hidden");
+                alreadyMsg.classList.remove("hidden");
+            } else {
+                drawArea.classList.remove("hidden");
+                alreadyMsg.classList.add("hidden");
             }
         }
 
         function showControlPanel() {
-            document.getElementById("machineSection").classList.add("hidden");
+            document.getElementById("contentArea").classList.add("hidden");
             document.getElementById("controlPanel").classList.remove("hidden");
-            // 隱藏錢包區域（回到控制面板時）
-            const walletSection = document.getElementById("walletSection");
-            if (walletSection) walletSection.classList.add("hidden");
+            document.getElementById("walletSection").classList.add("hidden");
         }
 
         // ---------- 解鎖群組名單 ----------
         function verifyGroupPass() {
+            // 不再因為裝置抽過就擋住，而是允許繼續查看錢包
             if (myDeviceRecord) {
-                alert(`此裝置已由【${myDeviceRecord.user}】抽過獎囉！`);
-                return;
+                // 輕微提示，不阻擋
+                console.log("此裝置已抽過獎，但仍可查看錢包。");
             }
             const inputPass = document.getElementById("secretPass").value.trim();
             const selectEl = document.getElementById("playerName");
@@ -1033,7 +994,7 @@
                     opt.value = name;
                     
                     if (globalPlayedUsers[name]) {
-                        opt.disabled = true;
+                        // 已抽過仍可選，但加上標記
                         opt.innerText = `${name} (已抽過)`;
                     } else {
                         opt.innerText = name;
@@ -1067,7 +1028,6 @@
             for (let option of options) {
                 if (option.value === "") continue;
                 if (globalPlayedUsers[option.value]) {
-                    option.disabled = true;
                     if (!option.innerText.includes(" (已抽過)")) {
                         option.innerText = option.value + " (已抽過)";
                     }
@@ -1320,11 +1280,12 @@
             document.getElementById("modalTicketCode").style.display = "block";
             document.getElementById("copyHint").style.display = "block";
             
+            // 抽獎後回到控制面板，讓玩家可再次選擇（查看錢包）
+            showControlPanel();
+            // 保留密語與名單解鎖狀態？可選：重置選單
             const selectEl = document.getElementById("playerName");
             selectEl.innerHTML = '<option value="" disabled selected>🔒 請先解鎖群組名單 🔒</option>';
             document.getElementById("secretPass").value = "";
-
-            showControlPanel();
         }
 
         // ---------- 確認彈窗 ----------
@@ -1337,6 +1298,10 @@
             const nameInput = document.getElementById("playerName").value;
             if (!nameInput) {
                 alert("請先輸入通關密語並選擇你的名字喔！");
+                return;
+            }
+            if (globalPlayedUsers[nameInput]) {
+                alert("這個名字已經抽過獎囉！");
                 return;
             }
             document.getElementById("confirmModal").style.display = "flex";
@@ -1376,5 +1341,3 @@
             alert("連線驗證失敗，請重新整理頁面再試一次！");
         });
     </script>
-</body>
-</html>
