@@ -438,7 +438,7 @@
         <div class="lg:col-span-6 order-1 lg:order-2 flex flex-col items-center">
             <h1 class="gacha-title text-4xl md:text-5xl mb-6">呆呆幸運扭蛋機</h1>
 
-            <!-- 🎮 輸入控制面板 -->
+            <!-- 🎮 輸入控制面板（只留密語與名字選擇，錢包已移出） -->
             <div id="controlPanel" class="w-full max-w-sm bg-white/80 backdrop-blur-md rounded-3xl p-6 shadow-xl border border-white mt-4 md:mt-6 space-y-4">
                 <div>
                     <label class="block text-xs font-bold text-gray-500 mb-1.5 ml-1">🔑 請輸入群組密語解鎖名單</label>
@@ -454,19 +454,21 @@
                         <option value="" disabled selected>🔒 請先解鎖群組名單 🔒</option>
                     </select>
                 </div>
+                <!-- ❌ 錢包區域已移出，不再放在這裡 -->
+            </div>
 
-                <!-- 點數錢包與商品專區按鈕（初始隱藏） -->
-                <div id="walletSection" class="hidden pt-2 border-t border-gray-200">
+            <!-- 🎪 扭蛋機區塊（包含獨立的錢包顯示） -->
+            <div id="machineSection" class="hidden w-full max-w-sm flex flex-col items-center mt-4 md:mt-6">
+                
+                <!-- 🪙 點數錢包與商品專區（獨立顯示，不受控制面板影響） -->
+                <div id="walletSection" class="hidden w-full bg-white/80 backdrop-blur-md rounded-2xl p-4 shadow-md border border-white mb-4">
                     <div class="flex items-center justify-between gap-3 flex-wrap">
-                        <span class="wallet-badge" id="walletDisplay">🪙 0 點</span>
+                        <span class="wallet-badge" id="walletDisplay">🪙 讀取中...</span>
                         <button onclick="openShop()" class="shop-btn">🎁 商品專區</button>
                     </div>
                     <p class="text-xs text-gray-400 mt-2" id="walletExpiry"></p>
                 </div>
-            </div>
 
-            <!-- 🎪 扭蛋機區塊 -->
-            <div id="machineSection" class="hidden w-full max-w-sm flex flex-col items-center mt-4 md:mt-6">
                 <button id="spinBtn" onclick="openConfirmModal()" class="w-full bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white font-black py-3 rounded-2xl shadow-lg shadow-rose-500/20 active:scale-98 transition-all tracking-wider text-sm cursor-pointer">啟動幸運扭蛋</button>
 
                 <div class="gacha-machine mt-6">
@@ -796,14 +798,15 @@
             board.innerHTML = html;
         }
 
-        // ---------- 點數錢包相關 (已修正) ----------
+        // ---------- 點數錢包相關 (已修正，並配合新位置) ----------
         function listenToWallet(playerName) {
             if (!playerName) return;
             const walletRef = ref(db, `pointUsers/${playerName}`);
             onValue(walletRef, (snap) => {
                 currentWalletData = snap.val();
-                // 錢包區域永遠顯示
-                document.getElementById("walletSection").classList.remove("hidden");
+                // 錢包區域現在在 machineSection 內，確保它顯示
+                const walletSection = document.getElementById("walletSection");
+                if (walletSection) walletSection.classList.remove("hidden");
                 
                 if (currentWalletData) {
                     personalPassHash = currentWalletData.personalPassHash || null;
@@ -982,18 +985,23 @@
                 currentPlayerName = val;
                 document.getElementById("controlPanel").classList.add("hidden");
                 document.getElementById("machineSection").classList.remove("hidden");
+                // 立刻顯示錢包區域（在 machineSection 內）
+                const walletSection = document.getElementById("walletSection");
+                if (walletSection) {
+                    walletSection.classList.remove("hidden");
+                    document.getElementById("walletDisplay").innerText = "🪙 讀取中...";
+                    document.getElementById("walletExpiry").innerText = "";
+                }
                 listenToWallet(val);
-                // 預先顯示讀取中狀態
-                document.getElementById("walletSection").classList.remove("hidden");
-                document.getElementById("walletDisplay").innerText = "🪙 讀取中...";
-                document.getElementById("walletExpiry").innerText = "";
             }
         }
 
         function showControlPanel() {
             document.getElementById("machineSection").classList.add("hidden");
             document.getElementById("controlPanel").classList.remove("hidden");
-            document.getElementById("walletSection").classList.add("hidden");
+            // 隱藏錢包區域（回到控制面板時）
+            const walletSection = document.getElementById("walletSection");
+            if (walletSection) walletSection.classList.add("hidden");
         }
 
         // ---------- 解鎖群組名單 ----------
