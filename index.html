@@ -4,21 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>呆呆扭蛋機 🌟</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@900&display=swap" rel="stylesheet">
     
     <style>
-        /* === 手機版 === */
+        /* 手機版 */
         @media (max-width: 640px) {
             .gacha-title { font-size: 2rem !important; -webkit-text-stroke: 6px #fff; }
             .gacha-machine { transform: scale(.72); transform-origin: top center; margin-bottom: 0px; height: 350px; }
             .dashboard-panel { height: auto; min-height: 250px; }
             .music-control-btn { bottom: 15px; right: 15px; font-size: 12px; padding: 8px 14px; }
         }
-
         body {
             background: linear-gradient(135deg, #fbcfe8, #e0e7ff, #ccfbf1);
             background-size: 400% 400%;
@@ -26,168 +24,101 @@
             font-family: 'Noto Sans TC', sans-serif;
             overflow-x: hidden;
         }
-
         @keyframes gradientBG {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
-
         .gacha-title {
             font-family: 'Noto Sans TC', sans-serif;
-            font-weight: 900;
-            color: #ff3366;
-            letter-spacing: 2px;
-            -webkit-text-stroke: 10px #ffffff;
-            paint-order: stroke fill;
+            font-weight: 900; color: #ff3366; letter-spacing: 2px;
+            -webkit-text-stroke: 10px #ffffff; paint-order: stroke fill;
             filter: drop-shadow(4px 4px 0px rgba(0,0,0,0.08)) drop-shadow(0px 8px 15px rgba(244,63,94,0.2));
         }
-
         .gacha-machine {
-            position: relative;
-            width: 320px;
+            position: relative; width: 320px;
             background: linear-gradient(to bottom, #ef4444, #dc2626);
             border-radius: 40px 40px 20px 20px;
             box-shadow: 0 20px 0 #b91c1c, 0 30px 40px rgba(0,0,0,0.3);
-            padding: 25px;
-            margin: 40px auto 0 auto;
+            padding: 25px; margin: 40px auto 0 auto;
             border: 6px solid #fee2e2;
         }
-
         .gacha-glass {
-            position: relative;
-            height: 240px;
+            position: relative; height: 240px;
             background: radial-gradient(circle at 50% 30%, rgba(255,255,255,0.4) 0%, rgba(243,244,246,0.8) 70%);
-            border-radius: 30px;
-            border: 6px solid #b91c1c;
-            overflow: hidden;
-            box-shadow: inset 0 10px 20px rgba(0,0,0,0.15);
+            border-radius: 30px; border: 6px solid #b91c1c;
+            overflow: hidden; box-shadow: inset 0 10px 20px rgba(0,0,0,0.15);
             margin-bottom: 25px;
         }
-
         .gacha-egg {
-            position: absolute;
-            width: 38px; height: 38px;
-            border-radius: 50%;
+            position: absolute; width: 38px; height: 38px; border-radius: 50%;
             box-shadow: inset -4px -4px 8px rgba(0,0,0,0.2), 2px 4px 6px rgba(0,0,0,0.1);
             transition: transform 0.3s ease, opacity 0.5s ease;
         }
         .gacha-egg::after {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 50%;
-            background: rgba(255,255,255,0.35);
-            border-radius: 19px 19px 0 0;
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 50%;
+            background: rgba(255,255,255,0.35); border-radius: 19px 19px 0 0;
         }
-
-        .egg-pink { background: #ec4899; }
-        .egg-blue { background: #3b82f6; }
-        .egg-yellow { background: #eab308; }
-        .egg-green { background: #22c55e; }
-        .egg-purple { background: #a855f7; }
-        .egg-orange { background: #f97316; }
-
-        .egg-layer-a { bottom: 8px; }
-        .egg-layer-b { bottom: 25px; }
-        .egg-layer-c { bottom: 42px; }
-
-        .egg-falling-out {
-            animation: eggFallOut 0.8s cubic-bezier(0.55, 0.055, 0.675, 0.19) forwards !important;
-        }
+        .egg-pink { background: #ec4899; } .egg-blue { background: #3b82f6; }
+        .egg-yellow { background: #eab308; } .egg-green { background: #22c55e; }
+        .egg-purple { background: #a855f7; } .egg-orange { background: #f97316; }
+        .egg-layer-a { bottom: 8px; } .egg-layer-b { bottom: 25px; } .egg-layer-c { bottom: 42px; }
+        .egg-falling-out { animation: eggFallOut 0.8s cubic-bezier(0.55, 0.055, 0.675, 0.19) forwards !important; }
         @keyframes eggFallOut {
             0% { transform: translateY(0) scale(1); opacity: 1; }
             50% { transform: translateY(60px) scale(0.9); opacity: 0.6; }
             100% { transform: translateY(120px) scale(0.7); opacity: 0; }
         }
-
         .eggs-drop-down .gacha-egg:not(.egg-falling-out) {
             animation: gravitySettle 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.3s forwards;
         }
         @keyframes gravitySettle {
-            0% { transform: translateY(0); }
-            50% { transform: translateY(6px); }
-            75% { transform: translateY(3px); }
-            100% { transform: translateY(4px); }
+            0% { transform: translateY(0); } 50% { transform: translateY(6px); }
+            75% { transform: translateY(3px); } 100% { transform: translateY(4px); }
         }
-
         .gacha-panel {
-            background: #991b1b;
-            border-radius: 20px;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
+            background: #991b1b; border-radius: 20px; padding: 20px;
+            display: flex; flex-direction: column; align-items: center; gap: 15px;
             box-shadow: inset 0 4px 8px rgba(0,0,0,0.3);
         }
-
         .gacha-crank {
             width: 70px; height: 70px;
             background: radial-gradient(circle, #f3f4f6 30%, #9ca3af 70%);
-            border-radius: 50%;
-            border: 6px solid #4b5563;
-            position: relative;
-            cursor: pointer;
+            border-radius: 50%; border: 6px solid #4b5563;
+            position: relative; cursor: pointer;
             box-shadow: 0 4px 0 #374151, 0 6px 10px rgba(0,0,0,0.3);
         }
         .gacha-crank::before {
-            content: '';
-            position: absolute;
-            width: 14px; height: 45px;
-            background: #4b5563;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            border-radius: 7px;
+            content: ''; position: absolute; width: 14px; height: 45px;
+            background: #4b5563; top: 50%; left: 50%;
+            transform: translate(-50%, -50%); border-radius: 7px;
         }
         .gacha-crank::after {
-            content: '';
-            position: absolute;
-            width: 24px; height: 24px;
-            background: #dc2626;
-            border-radius: 50%;
-            top: -5px; left: 50%;
-            transform: translateX(-50%);
+            content: ''; position: absolute; width: 24px; height: 24px;
+            background: #dc2626; border-radius: 50%;
+            top: -5px; left: 50%; transform: translateX(-50%);
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
-
-        .rotating-crank {
-            animation: rotateCrank 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-        }
+        .rotating-crank { animation: rotateCrank 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
         @keyframes rotateCrank {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(720deg); }
+            0% { transform: rotate(0deg); } 100% { transform: rotate(720deg); }
         }
-
         .gacha-gate {
-            width: 75px; height: 75px;
-            background: #1f2937;
-            border-radius: 20px 20px 5px 5px;
-            border: 4px solid #4b5563;
-            position: relative;
-            box-shadow: inset 0 5px 10px rgba(0,0,0,0.5);
+            width: 75px; height: 75px; background: #1f2937;
+            border-radius: 20px 20px 5px 5px; border: 4px solid #4b5563;
+            position: relative; box-shadow: inset 0 5px 10px rgba(0,0,0,0.5);
             overflow: hidden;
         }
-
         .gacha-lucky-egg {
-            position: absolute;
-            width: 46px; height: 46px;
-            border-radius: 50%;
-            top: -60px; left: 11px;
-            opacity: 0;
-            z-index: 10;
+            position: absolute; width: 46px; height: 46px; border-radius: 50%;
+            top: -60px; left: 11px; opacity: 0; z-index: 10;
             box-shadow: inset -5px -5px 10px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.4);
         }
         .gacha-lucky-egg::after {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 50%;
-            background: rgba(255,255,255,0.35);
-            border-radius: 23px 23px 0 0;
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 50%;
+            background: rgba(255,255,255,0.35); border-radius: 23px 23px 0 0;
         }
-
-        .dropped-egg {
-            animation: realGravityDrop 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.3s forwards;
-        }
+        .dropped-egg { animation: realGravityDrop 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.3s forwards; }
         @keyframes realGravityDrop {
             0% { top: -60px; opacity: 0; transform: scaleY(1.1) scaleX(0.9) rotate(0deg); }
             30% { top: 12px; opacity: 1; transform: scaleY(0.8) scaleX(1.15) rotate(120deg); }
@@ -197,149 +128,71 @@
             90% { top: 12px; transform: scaleY(1) scaleX(1) rotate(350deg); }
             100% { top: 12px; opacity: 1; transform: scaleY(1) scaleX(1) rotate(360deg); }
         }
-
         .dashboard-panel {
-            background: rgba(255,255,255,0.85);
-            backdrop-filter: blur(10px);
-            border-radius: 24px;
-            border: 2px solid rgba(255,255,255,0.5);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-            padding: 20px;
-            height: auto;
-            max-height: 380px;
-            display: flex;
-            flex-direction: column;
+            background: rgba(255,255,255,0.85); backdrop-filter: blur(10px);
+            border-radius: 24px; border: 2px solid rgba(255,255,255,0.5);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05); padding: 20px;
+            height: auto; max-height: 380px; display: flex; flex-direction: column;
         }
         .board-title-text {
-            font-size: 18px;
-            font-weight: 900;
-            display: flex;
-            align-items: center;
-            padding-bottom: 10px;
-            border-bottom: 2px dashed rgba(0,0,0,0.1);
-            margin-bottom: 12px;
-            flex-shrink: 0;
+            font-size: 18px; font-weight: 900; display: flex; align-items: center;
+            padding-bottom: 10px; border-bottom: 2px dashed rgba(0,0,0,0.1);
+            margin-bottom: 12px; flex-shrink: 0;
         }
-        .prize-title-text { color: #06b6d4; }
-        .honor-title-text { color: #ec4899; }
-
-        .scroller-content {
-            overflow-y: auto;
-            flex-grow: 1;
-            padding-right: 4px;
-        }
+        .prize-title-text { color: #06b6d4; } .honor-title-text { color: #ec4899; }
+        .scroller-content { overflow-y: auto; flex-grow: 1; padding-right: 4px; }
         .scroller-content::-webkit-scrollbar { width: 6px; }
         .scroller-content::-webkit-scrollbar-track { background: transparent; }
         .scroller-content::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
-
         .prize-item-row {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            background: white;
-            padding: 8px 12px;
-            border-radius: 14px;
-            margin-bottom: 8px;
-            border: 1px solid #f3f4f6;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            display: flex; align-items: center; gap: 12px; background: white;
+            padding: 8px 12px; border-radius: 14px; margin-bottom: 8px;
+            border: 1px solid #f3f4f6; box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
-        .prize-thumb {
-            width: 40px; height: 40px;
-            border-radius: 8px;
-            object-fit: cover;
-            flex-shrink: 0;
-        }
-        .prize-info {
-            display: flex;
-            flex-direction: column;
-            gap: 1px;
-            flex: 1;
-            min-width: 0;
-        }
-        .prize-name-label {
-            font-size: 14px;
-            font-weight: bold;
-            color: #1f2937;
-        }
-
+        .prize-thumb { width: 40px; height: 40px; border-radius: 8px; object-fit: cover; flex-shrink: 0; }
+        .prize-info { display: flex; flex-direction: column; gap: 1px; flex: 1; min-width: 0; }
+        .prize-name-label { font-size: 14px; font-weight: bold; color: #1f2937; }
         .honor-item-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            display: flex; align-items: center; gap: 10px;
             background: linear-gradient(to right, #fffdfa, #fff);
-            padding: 10px 12px;
-            border-radius: 14px;
-            margin-bottom: 8px;
-            border: 1px solid #fdf2e9;
-            box-shadow: 0 2px 4px rgba(236,72,153,0.05);
+            padding: 10px 12px; border-radius: 14px; margin-bottom: 8px;
+            border: 1px solid #fdf2e9; box-shadow: 0 2px 4px rgba(236,72,153,0.05);
         }
         .honor-badge {
             background: linear-gradient(135deg, #fbcfe8, #f472b6);
-            color: #9d174d;
-            font-size: 11px;
-            font-weight: bold;
-            padding: 2px 6px;
-            border-radius: 6px;
-            flex-shrink: 0;
+            color: #9d174d; font-size: 11px; font-weight: bold;
+            padding: 2px 6px; border-radius: 6px; flex-shrink: 0;
         }
         .honor-info { font-size: 13px; color: #4b5563; }
-
         .prize-progress-track {
-            width: 100%;
-            height: 6px;
-            background: #f3f4f6;
-            border-radius: 999px;
-            overflow: hidden;
-            margin-top: 4px;
+            width: 100%; height: 6px; background: #f3f4f6;
+            border-radius: 999px; overflow: hidden; margin-top: 4px;
         }
-        .prize-progress-fill {
-            height: 100%;
-            border-radius: 999px;
-            transition: width 0.3s ease;
-        }
+        .prize-progress-fill { height: 100%; border-radius: 999px; transition: width 0.3s ease; }
         .prize-progress-fill.is-available { background: linear-gradient(to right, #6ee7b7, #059669); }
         .prize-progress-fill.is-empty { background: linear-gradient(to right, #fca5a5, #dc2626); }
-
-        .marquee-viewport {
-            flex: 1 1 auto;
-            min-width: 0;
-            overflow: hidden;
-            position: relative;
-        }
+        .marquee-viewport { flex: 1 1 auto; min-width: 0; overflow: hidden; position: relative; }
         .marquee-track {
-            display: inline-flex;
-            white-space: nowrap;
-            will-change: transform;
+            display: inline-flex; white-space: nowrap; will-change: transform;
             animation: marqueeScroll 20s linear infinite;
         }
         .marquee-item { padding-right: 60px; }
         @keyframes marqueeScroll {
-            from { transform: translateX(0); }
-            to { transform: translateX(-50%); }
+            from { transform: translateX(0); } to { transform: translateX(-50%); }
         }
-
         .wallet-badge {
             background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            color: #78350f;
-            border-radius: 999px;
-            padding: 6px 18px;
-            font-weight: 900;
-            font-size: 14px;
+            color: #78350f; border-radius: 999px; padding: 6px 18px;
+            font-weight: 900; font-size: 14px;
             box-shadow: 0 4px 10px rgba(245,158,11,0.3);
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
+            display: inline-flex; align-items: center; gap: 6px;
         }
         .shop-btn {
             background: linear-gradient(135deg, #10b981, #059669);
-            color: white;
-            border-radius: 999px;
-            padding: 8px 20px;
-            font-weight: 900;
-            font-size: 14px;
+            color: white; border-radius: 999px; padding: 8px 20px;
+            font-weight: 900; font-size: 14px;
             box-shadow: 0 4px 10px rgba(16,185,129,0.3);
-            cursor: pointer;
-            transition: transform 0.1s;
+            cursor: pointer; transition: transform 0.1s;
         }
         .shop-btn:active { transform: scale(0.95); }
     </style>
@@ -393,7 +246,7 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-gray-500 mb-1.5 ml-1">👤 選擇你的名字 (可查看錢包，未抽獎者可抽獎)</label>
+                    <label class="block text-xs font-bold text-gray-500 mb-1.5 ml-1">👤 選擇你的名字 (未抽獎者可抽獎，已抽獎者可查看錢包)</label>
                     <select id="playerName" onchange="handleNameChange()" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm font-semibold text-center focus:outline-none focus:ring-2 focus:ring-rose-400 transition-all">
                         <option value="" disabled selected>🔒 請先解鎖群組名單 🔒</option>
                     </select>
@@ -403,7 +256,7 @@
             <!-- 🎪 內容區（選擇名字後出現） -->
             <div id="contentArea" class="hidden w-full max-w-sm flex flex-col items-center mt-4 md:mt-6">
                 
-                <!-- 🪙 點數錢包與商品專區（永遠顯示，獨立於抽獎） -->
+                <!-- 🪙 點數錢包卡片（永遠獨立顯示） -->
                 <div id="walletSection" class="w-full bg-white/80 backdrop-blur-md rounded-2xl p-4 shadow-md border border-white mb-4">
                     <div class="flex items-center justify-between gap-3 flex-wrap">
                         <span class="wallet-badge" id="walletDisplay">🪙 讀取中...</span>
@@ -520,7 +373,6 @@
     <!-- 🔊 音效開關 -->
     <button id="soundToggleBtn" onclick="toggleSound()" class="music-control-btn fixed bottom-5 right-5 bg-slate-900 text-cyan-400 text-sm font-bold px-4 py-2 rounded-full shadow-lg border border-cyan-500/30 z-40 transition-all active:scale-95">🔊 音效</button>
 
-    <!-- 🌐 Firebase 模組與核心邏輯 -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
         import { getDatabase, ref, runTransaction, onValue, get, update } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
@@ -536,7 +388,6 @@
         const db = getDatabase(app);
         const auth = getAuth(app);
 
-        // 暴露給 HTML onclick 使用的函式
         window.startDraw = startDraw;
         window.closeModal = closeModal;
         window.clickTicket = clickTicket;
@@ -551,7 +402,6 @@
         window.verifyPersonalPass = verifyPersonalPass;
         window.closeWalletPassModal = closeWalletPassModal;
 
-        // ---------- 全域狀態 ----------
         let isDrawing = false;
         let currentPrizeUrl = ""; 
         let globalPlayedUsers = {}; 
@@ -561,244 +411,97 @@
         let lastPrizes = null;
         let deviceId = null;
 
-        // 錢包相關
         let currentPlayerName = null;
         let currentWalletData = null;
         let walletUnlocked = false;
         let personalPassHash = null;
-
-        // 商品列表
         let shopItems = {};
 
         // ---------- 音效 ----------
         let audioCtx = null;
         let soundEnabled = true;
+        function getAudioCtx() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); if (audioCtx.state === "suspended") audioCtx.resume(); return audioCtx; }
+        function playTone(f, d, t, s, g) { try { const ctx = getAudioCtx(); const o = ctx.createOscillator(); const gn = ctx.createGain(); o.type = t; o.frequency.value = f; o.connect(gn); gn.connect(ctx.destination); const st = ctx.currentTime + s; gn.gain.setValueAtTime(g, st); gn.gain.exponentialRampToValueAtTime(0.001, st + d); o.start(st); o.stop(st + d + 0.02); } catch (e) {} }
+        function playCrankSound() { if (!soundEnabled) return; for (let i = 0; i < 6; i++) playTone(300 + Math.random() * 150, 0.08, "square", i * 0.15, 0.06); }
+        function playWinSound() { if (!soundEnabled) return; playTone(523.25, 0.15, "triangle", 0, 0.18); playTone(659.25, 0.15, "triangle", 0.15, 0.18); playTone(783.99, 0.28, "triangle", 0.3, 0.2); }
+        function toggleSound() { soundEnabled = !soundEnabled; document.getElementById("soundToggleBtn").textContent = soundEnabled ? "🔊 音效" : "🔇 靜音"; }
 
-        function getAudioCtx() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            if (audioCtx.state === "suspended") audioCtx.resume();
-            return audioCtx;
-        }
-
-        function playTone(freq, duration, type, startDelay, gainValue) {
-            try {
-                const ctx = getAudioCtx();
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                osc.type = type;
-                osc.frequency.value = freq;
-                osc.connect(gain);
-                gain.connect(ctx.destination);
-                const t = ctx.currentTime + startDelay;
-                gain.gain.setValueAtTime(gainValue, t);
-                gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
-                osc.start(t);
-                osc.stop(t + duration + 0.02);
-            } catch (e) {}
-        }
-
-        function playCrankSound() {
-            if (!soundEnabled) return;
-            for (let i = 0; i < 6; i++) {
-                playTone(300 + Math.random() * 150, 0.08, "square", i * 0.15, 0.06);
-            }
-        }
-
-        function playWinSound() {
-            if (!soundEnabled) return;
-            playTone(523.25, 0.15, "triangle", 0, 0.18);
-            playTone(659.25, 0.15, "triangle", 0.15, 0.18);
-            playTone(783.99, 0.28, "triangle", 0.3, 0.2);
-        }
-
-        function toggleSound() {
-            soundEnabled = !soundEnabled;
-            const btn = document.getElementById("soundToggleBtn");
-            if (btn) btn.textContent = soundEnabled ? "🔊 音效" : "🔇 靜音";
-        }
-
-        // ---------- 群組名單 ----------
         const groupLists = {
-            "皮皮": {
-                label: "✨ 皮皮群",
-                names: ["貝果", "怡蒨", "７７", "安鴻", "當家", "立涵", "皮夾", "睏寶"]
-            },
-            "GM": {
-                label: "✨ 龜蜜群",
-                names: ["伶", "昀", "瑜"]
-            }
+            "皮皮": { label: "✨ 皮皮群", names: ["貝果", "怡蒨", "７７", "安鴻", "當家", "立涵", "皮夾", "睏寶"] },
+            "GM": { label: "✨ 龜蜜群", names: ["伶", "昀", "瑜"] }
         };
-
         const eggColors = ["egg-pink", "egg-blue", "egg-yellow", "egg-green", "egg-purple", "egg-orange"];
 
-        // ---------- 輔助函式 ----------
-        function getGroupKeyForName(name) {
-            for (const key in groupLists) {
-                if (groupLists[key].names.includes(name)) return key;
-            }
-            return null;
-        }
+        function getGroupKeyForName(name) { for (const k in groupLists) if (groupLists[k].names.includes(name)) return k; return null; }
+        function isPrizeTakenByOtherGroup(pn) { if (!honorUnlockedGroup) return false; for (const u in globalPlayedUsers) { if (globalPlayedUsers[u].won === pn && globalPlayedUsers[u].group === honorUnlockedGroup) return false; } return true; }
+        async function sha256(m) { const b = new TextEncoder().encode(m); const h = await crypto.subtle.digest("SHA-256", b); return Array.from(new Uint8Array(h)).map(x => x.toString(16).padStart(2, "0")).join(""); }
 
-        function isPrizeTakenByOtherGroup(prizeName) {
-            if (!honorUnlockedGroup) return false;
-            for (const user in globalPlayedUsers) {
-                const rec = globalPlayedUsers[user];
-                if (rec.won === prizeName && rec.group === honorUnlockedGroup) return false;
-            }
-            return true;
+        // ---------- 跑馬燈、榮譽榜、禮物列表 ----------
+        function buildMarqueeText(list) { const def = "🎉 歡迎來到呆呆扭蛋機！快來試試手氣！ 🎟️ "; if (!honorUnlockedGroup) return def; const f = list.filter(i => i.group === honorUnlockedGroup); if (!f.length) return def; return "🔥 中獎快報 🔥 " + f.map(i => `【${i.user}】喜獲大獎：${i.won}！`).join(" 🌟 ") + " 歡慶連連，好運不斷！"; }
+        function renderHonorBoard(list) {
+            const b = document.getElementById("honorBoard"); if (!b) return;
+            let h = '<span class="board-title-text honor-title-text">👑 幸運中獎者</span>';
+            if (!honorUnlockedGroup) { b.innerHTML = h + '<div class="flex-grow flex flex-col items-center justify-center text-center gap-2 px-4"><span class="text-2xl">🔒</span><p class="text-xs text-gray-400">請先解鎖群組</p></div>'; return; }
+            const f = list.filter(i => i.group === honorUnlockedGroup);
+            h += '<div class="scroller-content">';
+            if (f.length) f.forEach(i => h += `<div class="honor-item-row"><span class="honor-badge">已得獎</span><div class="honor-info"><span>恭喜 <b style="color:#ec4899;">${i.user}</b> 抽中 🎁 <b style="color:#7c3aed;">${i.won}</b></span></div></div>`);
+            else h += '<div style="color:#9ca3af;font-size:13px;text-align:center;padding:20px;">目前還沒有人中獎哦！</div>';
+            h += '</div>'; b.innerHTML = h;
         }
-
-        async function sha256(message) {
-            const msgBuffer = new TextEncoder().encode(message);
-            const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+        function updateMarquee(t) {
+            const i1 = document.getElementById("marqueeItem1"), i2 = document.getElementById("marqueeItem2"), tr = document.getElementById("marqueeTrack");
+            i1.textContent = t; i2.textContent = t;
+            requestAnimationFrame(() => { const w = i1.offsetWidth; const d = Math.max(w / 70, 8); tr.style.animation = "none"; void tr.offsetWidth; tr.style.animation = `marqueeScroll ${d}s linear infinite`; });
         }
-
-        // ---------- 跑馬燈與榮譽榜 ----------
-        function buildMarqueeText(playedList) {
-            const defaultText = "🎉 歡迎來到呆呆扭蛋機！快來試試手氣！ 🎟️ ";
-            if (!honorUnlockedGroup) return defaultText;
-            const filtered = playedList.filter(item => item.group === honorUnlockedGroup);
-            if (filtered.length === 0) return defaultText;
-            let marqueeItems = filtered.map(item => `【${item.user}】喜獲大獎：${item.won}！`);
-            return "🔥 中獎快報 🔥 " + marqueeItems.join(" 🌟 ") + " 歡慶連連，好運不斷！";
-        }
-
-        function renderHonorBoard(playedList) {
-            const board = document.getElementById("honorBoard");
-            if (!board) return;
-            let html = '<span class="board-title-text honor-title-text">👑 幸運中獎者</span>';
-            if (!honorUnlockedGroup) {
-                html += `<div class="flex-grow flex flex-col items-center justify-center text-center gap-2 px-4">
-                    <span class="text-2xl">🔒</span>
-                    <p class="text-xs text-gray-400 leading-relaxed">為保護個資，請先在左方輸入群組密語解鎖，即可查看同群組的中獎名單</p>
-                </div>`;
-                board.innerHTML = html;
-                return;
-            }
-            const filtered = playedList.filter(item => item.group === honorUnlockedGroup);
-            html += '<div class="scroller-content">';
-            if (filtered.length > 0) {
-                filtered.forEach(item => {
-                    html += `<div class="honor-item-row">
-                        <span class="honor-badge">已得獎</span>
-                        <div class="honor-info">
-                            <span class="honor-name-label">恭喜 <b style="color:#ec4899;">${item.user}</b> 抽中了 🎁 <b style="color:#7c3aed;">${item.won}</b></span>
-                        </div>
-                    </div>`;
-                });
-            } else {
-                html += '<div style="color: #9ca3af; font-size: 13px; text-align: center; padding: 20px; width: 100%;">目前還沒有人中獎哦！快來成為首位幸運兒</div>';
-            }
-            html += '</div>';
-            board.innerHTML = html;
-        }
-
-        function updateMarquee(text) {
-            const item1 = document.getElementById("marqueeItem1");
-            const item2 = document.getElementById("marqueeItem2");
-            const track = document.getElementById("marqueeTrack");
-            item1.textContent = text;
-            item2.textContent = text;
-            requestAnimationFrame(() => {
-                const singleWidth = item1.offsetWidth;
-                const pxPerSecond = 70;
-                const duration = Math.max(singleWidth / pxPerSecond, 8);
-                track.style.animation = "none";
-                void track.offsetWidth;
-                track.style.animation = `marqueeScroll ${duration}s linear infinite`;
-            });
-        }
-
-        // ---------- 禮物列表 ----------
-        function renderStatusBoard(prizes) {
-            const board = document.getElementById("statusBoard");
-            if (!board || !prizes) return;
-            let html = '<span class="prize-title-text">📋 禮物列表</span>';
-            if (!honorUnlockedGroup) {
-                board.innerHTML = html + '<div style="color: #9ca3af; font-size: 13px; padding: 10px;">🔒 請先輸入通關密語解鎖你的群組，才能看到禮物清單。</div>';
-                return;
-            }
-            let hasVisiblePrize = false;
-            for (let id in prizes) {
-                const p = prizes[id];
-                if (p.name && p.name.includes("銘謝惠顧")) continue;
-                const prizeGroups = Array.isArray(p.groups) ? p.groups : [];
-                if (!prizeGroups.includes(honorUnlockedGroup)) continue;
-                hasVisiblePrize = true;
-                const imgHtml = p.image ? `<img class="prize-thumb" src="${p.image}" alt="${p.name}">` : `<div class="prize-thumb" style="background:#f3f4f6;"></div>`;
-                const remain = Number(p.quantity || 0);
-                const total = Number(p.totalQuantity || 0);
-                const showTotal = total > 1;
-                if (remain > 0) {
-                    const qtyLabel = showTotal ? `🟢 剩餘 <b>${remain}</b> 份 / 共 <b>${total}</b> 份` : `🟢 剩餘 <b>${remain}</b> 份`;
-                    const progressBar = showTotal ? `<div class="prize-progress-track"><div class="prize-progress-fill is-available" style="width:${Math.round(remain / total * 100)}%;"></div></div>` : '';
-                    html += `<div class="prize-item-row">${imgHtml}<div class="prize-info"><span class="prize-name-label">${p.name}</span><span style="color:#059669; font-size:13px; font-weight:bold;">${qtyLabel}</span>${progressBar}</div></div>`;
+        function renderStatusBoard(pz) {
+            const b = document.getElementById("statusBoard"); if (!b || !pz) return;
+            let h = '<span class="prize-title-text">📋 禮物列表</span>';
+            if (!honorUnlockedGroup) { b.innerHTML = h + '<div style="color:#9ca3af;font-size:13px;padding:10px;">🔒 請先解鎖群組</div>'; return; }
+            let has = false;
+            for (let id in pz) {
+                const p = pz[id]; if (p.name && p.name.includes("銘謝惠顧")) continue;
+                const g = Array.isArray(p.groups) ? p.groups : [];
+                if (!g.includes(honorUnlockedGroup)) continue;
+                has = true;
+                const img = p.image ? `<img class="prize-thumb" src="${p.image}" alt="${p.name}">` : '<div class="prize-thumb" style="background:#f3f4f6;"></div>';
+                const rem = Number(p.quantity||0), total = Number(p.totalQuantity||0), st = total > 1;
+                if (rem > 0) {
+                    const ql = st ? `🟢 剩餘 <b>${rem}</b> 份 / 共 <b>${total}</b> 份` : `🟢 剩餘 <b>${rem}</b> 份`;
+                    const pb = st ? `<div class="prize-progress-track"><div class="prize-progress-fill is-available" style="width:${Math.round(rem/total*100)}%;"></div></div>` : '';
+                    h += `<div class="prize-item-row">${img}<div class="prize-info"><span class="prize-name-label">${p.name}</span><span style="color:#059669;font-size:13px;font-weight:bold;">${ql}</span>${pb}</div></div>`;
                 } else {
-                    const otherGroupNote = isPrizeTakenByOtherGroup(p.name) ? '<div style="color:#f97316; font-size:11px; font-weight:bold; margin-top:1px;">🔸 已被其他組抽走</div>' : '';
-                    const soldOutLabel = showTotal ? `🔴 已全數送完（共 <b>${total}</b> 份）` : `🔴 已全數送完`;
-                    const progressBar = showTotal ? `<div class="prize-progress-track"><div class="prize-progress-fill is-empty" style="width:100%;"></div></div>` : '';
-                    html += `<div class="prize-item-row" style="opacity: 0.4;">${imgHtml}<div class="prize-info"><span class="prize-name-label" style="text-decoration: line-through; color:#9ca3af;">${p.name}</span><span style="color:#dc2626; font-size:13px; font-weight:bold;">${soldOutLabel}</span>${progressBar}${otherGroupNote}</div></div>`;
+                    const on = isPrizeTakenByOtherGroup(p.name) ? '<div style="color:#f97316;font-size:11px;font-weight:bold;margin-top:1px;">🔸 已被其他組抽走</div>' : '';
+                    const sl = st ? `🔴 已全數送完（共 <b>${total}</b> 份）` : `🔴 已全數送完`;
+                    h += `<div class="prize-item-row" style="opacity:0.4;">${img}<div class="prize-info"><span class="prize-name-label" style="text-decoration:line-through;color:#9ca3af;">${p.name}</span><span style="color:#dc2626;font-size:13px;font-weight:bold;">${sl}</span><div class="prize-progress-track"><div class="prize-progress-fill is-empty" style="width:100%;"></div></div>${on}</div></div>`;
                 }
             }
-            if (!hasVisiblePrize) html += '<div style="color: #9ca3af; font-size: 13px; padding: 10px;">目前無公開好禮。</div>';
-            board.innerHTML = html;
+            if (!has) h += '<div style="color:#9ca3af;font-size:13px;padding:10px;">目前無公開好禮。</div>';
+            b.innerHTML = h;
         }
 
-        // ---------- 點數錢包相關 ----------
-        function listenToWallet(playerName) {
-            if (!playerName) return;
-            const walletRef = ref(db, `pointUsers/${playerName}`);
-            onValue(walletRef, (snap) => {
+        // ---------- 點數錢包 ----------
+        function listenToWallet(name) {
+            if (!name) return;
+            onValue(ref(db, `pointUsers/${name}`), snap => {
                 currentWalletData = snap.val();
-                const walletSection = document.getElementById("walletSection");
-                if (walletSection) walletSection.classList.remove("hidden");
-                
+                document.getElementById("walletSection").classList.remove("hidden");
                 if (currentWalletData) {
                     personalPassHash = currentWalletData.personalPassHash || null;
-                    if (currentWalletData.boundUid === deviceId) {
-                        walletUnlocked = true;
-                        updateWalletDisplay();
-                    } else if (!currentWalletData.boundUid || currentWalletData.boundUid === "") {
-                        walletUnlocked = false;
-                        document.getElementById("walletDisplay").innerText = "🔒 請驗證錢包";
-                        document.getElementById("walletExpiry").innerText = "點擊商品專區以驗證";
-                    } else {
-                        walletUnlocked = false;
-                        document.getElementById("walletDisplay").innerText = "🔒 錢包已綁定其他裝置";
-                        document.getElementById("walletExpiry").innerText = "";
-                    }
-                } else {
-                    walletUnlocked = false;
-                    document.getElementById("walletDisplay").innerText = "🪙 錢包未開通";
-                    document.getElementById("walletExpiry").innerText = "請聯繫管理員";
-                }
+                    if (currentWalletData.boundUid === deviceId) { walletUnlocked = true; updateWalletDisplay(); }
+                    else if (!currentWalletData.boundUid) { walletUnlocked = false; document.getElementById("walletDisplay").innerText = "🔒 請驗證錢包"; document.getElementById("walletExpiry").innerText = "點擊商品專區以驗證"; }
+                    else { walletUnlocked = false; document.getElementById("walletDisplay").innerText = "🔒 錢包已綁定其他裝置"; document.getElementById("walletExpiry").innerText = ""; }
+                } else { walletUnlocked = false; document.getElementById("walletDisplay").innerText = "🪙 錢包未開通"; document.getElementById("walletExpiry").innerText = "請聯繫管理員"; }
             });
         }
-
         function updateWalletDisplay() {
             if (!currentWalletData || !walletUnlocked) return;
-            const points = currentWalletData.points || 0;
-            const expiry = currentWalletData.expiry || 0;
-            const now = Date.now();
-            let expiryText = "";
-            if (expiry && expiry !== 0 && expiry < now) {
-                expiryText = "（已過期）";
-                document.getElementById("walletDisplay").innerText = `🪙 ${points} 點 (已過期)`;
-            } else if (expiry && expiry !== 0) {
-                const d = new Date(expiry);
-                expiryText = `有效至 ${d.toLocaleDateString("zh-TW")}`;
-                document.getElementById("walletDisplay").innerText = `🪙 ${points} 點`;
-            } else {
-                document.getElementById("walletDisplay").innerText = `🪙 ${points} 點`;
-                expiryText = "無期限";
-            }
-            document.getElementById("walletExpiry").innerText = expiryText;
+            const pts = currentWalletData.points||0, exp = currentWalletData.expiry||0, now = Date.now();
+            let txt = "";
+            if (exp && exp !== 0 && exp < now) { txt = "（已過期）"; document.getElementById("walletDisplay").innerText = `🪙 ${pts} 點 (已過期)`; }
+            else if (exp && exp !== 0) { const d = new Date(exp); txt = `有效至 ${d.toLocaleDateString("zh-TW")}`; document.getElementById("walletDisplay").innerText = `🪙 ${pts} 點`; }
+            else { document.getElementById("walletDisplay").innerText = `🪙 ${pts} 點`; txt = "無期限"; }
+            document.getElementById("walletExpiry").innerText = txt;
         }
-
         function promptWalletPass() {
             if (!currentPlayerName) return;
             document.getElementById("walletPassName").innerText = currentPlayerName;
@@ -806,156 +509,70 @@
             document.getElementById("walletPassError").innerText = "";
             document.getElementById("walletPassModal").style.display = "flex";
         }
-
-        function closeWalletPassModal() {
-            document.getElementById("walletPassModal").style.display = "none";
-        }
-
+        function closeWalletPassModal() { document.getElementById("walletPassModal").style.display = "none"; }
         async function verifyPersonalPass() {
-            const input = document.getElementById("personalPassInput").value.trim();
-            if (!input) {
-                document.getElementById("walletPassError").innerText = "請輸入密語";
-                return;
-            }
-            if (!personalPassHash) {
-                document.getElementById("walletPassError").innerText = "尚未設定個人密語，請聯繫管理員";
-                return;
-            }
-            const inputHash = await sha256(input);
-            if (inputHash === personalPassHash) {
+            const inp = document.getElementById("personalPassInput").value.trim();
+            if (!inp) { document.getElementById("walletPassError").innerText = "請輸入密語"; return; }
+            if (!personalPassHash) { document.getElementById("walletPassError").innerText = "尚未設定個人密語"; return; }
+            if (await sha256(inp) === personalPassHash) {
                 walletUnlocked = true;
-                if (!currentWalletData || currentWalletData.boundUid !== deviceId) {
-                    try {
-                        await update(ref(db, `pointUsers/${currentPlayerName}`), { boundUid: deviceId });
-                    } catch (e) {
-                        console.error("綁定裝置失敗", e);
-                    }
-                }
-                closeWalletPassModal();
-                updateWalletDisplay();
-                if (document.getElementById("shopModal").style.display === "flex") {
-                    renderShopItems();
-                }
-            } else {
-                document.getElementById("walletPassError").innerText = "密語錯誤";
-            }
+                if (!currentWalletData || currentWalletData.boundUid !== deviceId) try { await update(ref(db, `pointUsers/${currentPlayerName}`), { boundUid: deviceId }); } catch(e){}
+                closeWalletPassModal(); updateWalletDisplay();
+                if (document.getElementById("shopModal").style.display === "flex") renderShopItems();
+            } else document.getElementById("walletPassError").innerText = "密語錯誤";
         }
 
         // ---------- 商品專區 ----------
-        function openShop() {
-            if (!currentPlayerName) return;
-            if (!walletUnlocked) {
-                promptWalletPass();
-                return;
-            }
-            document.getElementById("shopModal").style.display = "flex";
-            document.getElementById("shopWalletDisplay").innerText = `🪙 ${currentWalletData ? currentWalletData.points || 0 : 0} 點`;
-            renderShopItems();
-        }
-
-        function closeShop() {
-            document.getElementById("shopModal").style.display = "none";
-        }
-
+        function openShop() { if (!currentPlayerName) return; if (!walletUnlocked) { promptWalletPass(); return; } document.getElementById("shopModal").style.display = "flex"; document.getElementById("shopWalletDisplay").innerText = `🪙 ${currentWalletData?currentWalletData.points||0:0} 點`; renderShopItems(); }
+        function closeShop() { document.getElementById("shopModal").style.display = "none"; }
         function renderShopItems() {
-            const container = document.getElementById("shopItemList");
-            if (!shopItems || Object.keys(shopItems).length === 0) {
-                container.innerHTML = '<p class="text-gray-400 text-sm text-center">目前沒有可兌換的商品</p>';
-                return;
-            }
-            const points = currentWalletData ? currentWalletData.points || 0 : 0;
-            const now = Date.now();
-            const expired = (currentWalletData && currentWalletData.expiry && currentWalletData.expiry !== 0 && currentWalletData.expiry < now);
-            let html = "";
+            const c = document.getElementById("shopItemList");
+            if (!shopItems || !Object.keys(shopItems).length) { c.innerHTML = '<p class="text-gray-400 text-sm text-center">目前沒有可兌換的商品</p>'; return; }
+            const pts = currentWalletData?currentWalletData.points||0:0, now = Date.now(), expired = (currentWalletData&&currentWalletData.expiry&&currentWalletData.expiry!==0&&currentWalletData.expiry<now);
+            let h = "";
             for (const id in shopItems) {
-                const item = shopItems[id];
-                const canRedeem = !expired && points >= item.cost && item.stock > 0;
-                const btnClass = canRedeem ? "bg-emerald-500 hover:bg-emerald-600" : "bg-gray-300 cursor-not-allowed";
-                const disabledAttr = canRedeem ? "" : "disabled";
-                html += `<div class="flex items-center gap-4 bg-gray-50 rounded-xl p-3">
-                    <img src="${item.image || ''}" class="w-16 h-16 rounded-lg object-cover bg-white" onerror="this.style.display='none'">
-                    <div class="flex-grow">
-                        <div class="font-bold text-slate-700">${item.name}</div>
-                        <div class="text-sm text-gray-500">需要 🪙 ${item.cost} 點 | 庫存 ${item.stock}</div>
-                    </div>
-                    <button onclick="redeemItem('${id}')" class="text-xs font-bold px-4 py-2 rounded-xl text-white transition-all ${btnClass}" ${disabledAttr}>兌換</button>
+                const it = shopItems[id], ok = !expired && pts >= it.cost && it.stock > 0;
+                h += `<div class="flex items-center gap-4 bg-gray-50 rounded-xl p-3">
+                    <img src="${it.image||''}" class="w-16 h-16 rounded-lg object-cover bg-white" onerror="this.style.display='none'">
+                    <div class="flex-grow"><div class="font-bold text-slate-700">${it.name}</div><div class="text-sm text-gray-500">需要 🪙 ${it.cost} 點 | 庫存 ${it.stock}</div></div>
+                    <button onclick="redeemItem('${id}')" class="text-xs font-bold px-4 py-2 rounded-xl text-white transition-all ${ok?'bg-emerald-500 hover:bg-emerald-600':'bg-gray-300 cursor-not-allowed'}" ${ok?'':'disabled'}>兌換</button>
                 </div>`;
             }
-            container.innerHTML = html;
+            c.innerHTML = h;
         }
-
-        // 直接扣點 + 扣庫存
         window.redeemItem = async function(itemId) {
             if (!currentPlayerName || !walletUnlocked) return;
-            const item = shopItems[itemId];
-            if (!item) return;
-            if (!confirm(`確定要用 ${item.cost} 點兌換「${item.name}」嗎？`)) return;
-
+            const it = shopItems[itemId]; if (!it) return;
+            if (!confirm(`確定要用 ${it.cost} 點兌換「${it.name}」嗎？`)) return;
             try {
-                const stockRef = ref(db, `shopItems/${itemId}/stock`);
-                const pointsRef = ref(db, `pointUsers/${currentPlayerName}/points`);
-
-                const stockResult = await runTransaction(stockRef, (currentStock) => {
-                    if (currentStock === null || currentStock === undefined) return;
-                    if (Number(currentStock) <= 0) return;
-                    return Number(currentStock) - 1;
-                });
-
-                if (!stockResult.committed) {
-                    alert("❌ 商品庫存不足，可能已被換完。");
-                    return;
-                }
-
-                const pointsResult = await runTransaction(pointsRef, (currentPoints) => {
-                    if (currentPoints === null || currentPoints === undefined) return;
-                    if (Number(currentPoints) < item.cost) return;
-                    return Number(currentPoints) - item.cost;
-                });
-
-                if (!pointsResult.committed) {
-                    await runTransaction(stockRef, (currentStock) => {
-                        return (currentStock || 0) + 1;
-                    });
-                    alert("❌ 點數不足，無法兌換。");
-                    return;
-                }
-
-                alert(`✅ 兌換成功！獲得「${item.name}」`);
-            } catch (e) {
-                console.error("兌換失敗：", e);
-                alert("兌換過程發生錯誤，請稍後再試。");
-            }
+                const sr = ref(db, `shopItems/${itemId}/stock`), pr = ref(db, `pointUsers/${currentPlayerName}/points`);
+                const srRes = await runTransaction(sr, cur => (cur===null||cur<=0)?undefined:cur-1);
+                if (!srRes.committed) { alert("❌ 庫存不足"); return; }
+                const prRes = await runTransaction(pr, cur => (cur===null||cur<it.cost)?undefined:cur-it.cost);
+                if (!prRes.committed) { await runTransaction(sr, cur => (cur||0)+1); alert("❌ 點數不足"); return; }
+                alert(`✅ 兌換成功！獲得「${it.name}」`);
+            } catch(e) { console.error(e); alert("兌換失敗"); }
         };
 
-        // ---------- 選擇名字後的行為 ----------
+        // ---------- 選擇名字 ----------
         function handleNameChange() {
             const val = document.getElementById("playerName").value;
             if (!val) return;
-
             currentPlayerName = val;
-            // 隱藏控制面板，顯示內容區
             document.getElementById("controlPanel").classList.add("hidden");
-            const contentArea = document.getElementById("contentArea");
-            contentArea.classList.remove("hidden");
+            const content = document.getElementById("contentArea");
+            content.classList.remove("hidden");
 
-            // 錢包區域必定顯示
+            // 錢包永遠顯示
             document.getElementById("walletSection").classList.remove("hidden");
             document.getElementById("walletDisplay").innerText = "🪙 讀取中...";
             document.getElementById("walletExpiry").innerText = "";
             listenToWallet(val);
 
-            // 判斷是否已抽過獎（名字或裝置）
-            const alreadyPlayed = !!(myDeviceRecord || globalPlayedUsers[val]);
-            const drawArea = document.getElementById("drawActionArea");
-            const alreadyMsg = document.getElementById("alreadyPlayedMsg");
-
-            if (alreadyPlayed) {
-                drawArea.classList.add("hidden");
-                alreadyMsg.classList.remove("hidden");
-            } else {
-                drawArea.classList.remove("hidden");
-                alreadyMsg.classList.add("hidden");
-            }
+            // 根據是否已抽獎決定顯示抽獎按鈕或提示
+            const already = !!(myDeviceRecord || globalPlayedUsers[val]);
+            document.getElementById("drawActionArea").classList.toggle("hidden", already);
+            document.getElementById("alreadyPlayedMsg").classList.toggle("hidden", !already);
         }
 
         function showControlPanel() {
@@ -964,380 +581,175 @@
             document.getElementById("walletSection").classList.add("hidden");
         }
 
-        // ---------- 解鎖群組名單 ----------
+        // ---------- 解鎖群組（關鍵修改：不再阻擋已抽獎者）----------
         function verifyGroupPass() {
-            // 不再因為裝置抽過就擋住，而是允許繼續查看錢包
-            if (myDeviceRecord) {
-                // 輕微提示，不阻擋
-                console.log("此裝置已抽過獎，但仍可查看錢包。");
-            }
+            // 已抽獎的裝置不再跳出阻擋，僅在選名字時隱藏抽獎按鈕
             const inputPass = document.getElementById("secretPass").value.trim();
             const selectEl = document.getElementById("playerName");
-            
             selectEl.innerHTML = "";
-            
+
             if (groupLists[inputPass]) {
                 const group = groupLists[inputPass];
-                
-                const defaultOpt = document.createElement("option");
-                defaultOpt.value = "";
-                defaultOpt.disabled = true;
-                defaultOpt.selected = true;
-                defaultOpt.innerText = "▼ 請選擇你的名字 ▼";
-                selectEl.appendChild(defaultOpt);
+                const defOpt = document.createElement("option");
+                defOpt.value = ""; defOpt.disabled = true; defOpt.selected = true;
+                defOpt.innerText = "▼ 請選擇你的名字 ▼";
+                selectEl.appendChild(defOpt);
 
                 const optGroup = document.createElement("optgroup");
                 optGroup.label = group.label;
-
                 group.names.forEach(name => {
                     const opt = document.createElement("option");
                     opt.value = name;
-                    
-                    if (globalPlayedUsers[name]) {
-                        // 已抽過仍可選，但加上標記
-                        opt.innerText = `${name} (已抽過)`;
-                    } else {
-                        opt.innerText = name;
-                    }
+                    opt.innerText = globalPlayedUsers[name] ? `${name} (已抽過)` : name;
                     optGroup.appendChild(opt);
                 });
-
                 selectEl.appendChild(optGroup);
 
                 honorUnlockedGroup = inputPass;
                 renderHonorBoard(lastPlayedList);
                 updateMarquee(buildMarqueeText(lastPlayedList));
                 if (lastPrizes) renderStatusBoard(lastPrizes);
-
                 alert(`🔓 【${inputPass}】名單已成功解鎖！`);
             } else {
                 const lockOpt = document.createElement("option");
-                lockOpt.value = "";
-                lockOpt.disabled = true;
-                lockOpt.selected = true;
+                lockOpt.value = ""; lockOpt.disabled = true; lockOpt.selected = true;
                 lockOpt.innerText = "🔒 請先解鎖群組名單 🔒";
                 selectEl.appendChild(lockOpt);
                 alert("❌ 密語錯誤，無法解鎖群組名單！");
             }
         }
 
-        // ---------- 更新 UI ----------
+        // ---------- UI更新 ----------
         function refreshPlayedUsersUI() {
-            const nameSelect = document.getElementById("playerName");
-            const options = nameSelect.getElementsByTagName("option");
-            for (let option of options) {
-                if (option.value === "") continue;
-                if (globalPlayedUsers[option.value]) {
-                    if (!option.innerText.includes(" (已抽過)")) {
-                        option.innerText = option.value + " (已抽過)";
-                    }
-                }
+            const sel = document.getElementById("playerName");
+            for (let opt of sel.options) {
+                if (!opt.value) continue;
+                if (globalPlayedUsers[opt.value] && !opt.innerText.includes("(已抽過)")) opt.innerText = opt.value + " (已抽過)";
             }
-
-            let playedList = [];
-            for (let user in globalPlayedUsers) {
-                if (globalPlayedUsers[user].won && globalPlayedUsers[user].won.includes("銘謝惠顧")) continue;
-                playedList.push({
-                    user: user,
-                    won: globalPlayedUsers[user].won,
-                    time: globalPlayedUsers[user].time || 0,
-                    group: globalPlayedUsers[user].group || null
-                });
+            let list = [];
+            for (let u in globalPlayedUsers) {
+                if (globalPlayedUsers[u].won && globalPlayedUsers[u].won.includes("銘謝惠顧")) continue;
+                list.push({ user: u, won: globalPlayedUsers[u].won, time: globalPlayedUsers[u].time||0, group: globalPlayedUsers[u].group||null });
             }
-            playedList.sort((a, b) => b.time - a.time);
-            lastPlayedList = playedList;
-            updateMarquee(buildMarqueeText(playedList));
-            renderHonorBoard(playedList);
+            list.sort((a,b) => b.time - a.time);
+            lastPlayedList = list;
+            updateMarquee(buildMarqueeText(list));
+            renderHonorBoard(list);
         }
 
         function initApp() {
-            onValue(ref(db, "prizes"), (snapshot) => {
-                const prizes = snapshot.val();
-                if (!prizes) return;
-                lastPrizes = prizes;
-                renderStatusBoard(prizes);
-            });
-
-            onValue(ref(db, "playedUsers"), (snapshot) => {
-                globalPlayedUsers = snapshot.val() || {};
-                refreshPlayedUsersUI();
-            });
-
-            onValue(ref(db, "shopItems"), (snapshot) => {
-                shopItems = snapshot.val() || {};
-                if (document.getElementById("shopModal").style.display === "flex") {
-                    renderShopItems();
-                }
-            });
+            onValue(ref(db, "prizes"), snap => { lastPrizes = snap.val()||{}; renderStatusBoard(lastPrizes); });
+            onValue(ref(db, "playedUsers"), snap => { globalPlayedUsers = snap.val()||{}; refreshPlayedUsersUI(); });
+            onValue(ref(db, "shopItems"), snap => { shopItems = snap.val()||{}; if (document.getElementById("shopModal").style.display === "flex") renderShopItems(); });
         }
 
-        // ---------- 抽獎核心（點數自動發放）----------
+        // ---------- 抽獎核心 ----------
         async function startDraw() {
-            const nameInput = document.getElementById("playerName").value;
-            if (!nameInput) {
-                alert("請先輸入通關密語並選擇你的名字喔！");
-                return;
-            }
-
-            if (myDeviceRecord) {
-                alert("此裝置已經抽過獎囉！");
-                return;
-            }
-
-            if (globalPlayedUsers[nameInput]) {
-                alert("這個名字已經抽過獎囉！");
-                return;
-            }
-
+            const name = document.getElementById("playerName").value;
+            if (!name) { alert("請先選擇名字"); return; }
+            if (myDeviceRecord) { alert("此裝置已抽過"); return; }
+            if (globalPlayedUsers[name]) { alert("這個名字已抽過"); return; }
             if (isDrawing) return;
             isDrawing = true;
-
             try {
-                const myGroup = getGroupKeyForName(nameInput);
-                let pool = [];
-                let totalWeight = 0;
-
+                const myGroup = getGroupKeyForName(name);
+                let pool = [], totalW = 0;
                 for (let id in lastPrizes) {
-                    let p = lastPrizes[id];
-                    let q = Number(p.quantity || 0);
-                    let w = Number(p.weight || 0);
-                    let prizeGroups = Array.isArray(p.groups) ? p.groups : [];
-                    if (!myGroup || !prizeGroups.includes(myGroup)) continue;
-                    if (q > 0 && w > 0) {
-                        pool.push({ id, prizeData: p, weight: w });
-                        totalWeight += w;
-                    }
+                    const p = lastPrizes[id];
+                    if (!Array.isArray(p.groups) || !p.groups.includes(myGroup)) continue;
+                    const q = Number(p.quantity||0), w = Number(p.weight||0);
+                    if (q>0 && w>0) { pool.push({id, prizeData:p, weight:w}); totalW += w; }
                 }
+                if (!pool.length) { alert("庫存已空"); isDrawing = false; return; }
+                let roll = Math.floor(Math.random()*totalW), sum = 0, chosenId = pool[0].id;
+                for (let i=0;i<pool.length;i++) { sum += pool[i].weight; if (roll < sum) { chosenId = pool[i].id; break; } }
+                const chosen = pool.find(p=>p.id===chosenId).prizeData;
 
-                if (pool.length === 0) {
-                    alert("庫存已被抽光囉！");
-                    isDrawing = false;
-                    return;
-                }
+                const qRef = ref(db, `prizes/${chosenId}/quantity`);
+                const tx = await runTransaction(qRef, cur => (cur===null||cur<=0)?undefined:cur-1);
+                if (!tx.committed) { alert("獎品被秒殺"); isDrawing = false; return; }
 
-                let randomRoll = Math.floor(Math.random() * totalWeight);
-                let chosenPrizeId = null;
-                let currentSum = 0;
-                for (let i = 0; i < pool.length; i++) {
-                    currentSum += pool[i].weight;
-                    if (randomRoll < currentSum) {
-                        chosenPrizeId = pool[i].id;
-                        break;
-                    }
-                }
-                if (!chosenPrizeId) chosenPrizeId = pool[0].id;
-
-                const chosenPrize = pool.find(p => p.id === chosenPrizeId).prizeData;
-
-                // 扣減庫存
-                const quantityRef = ref(db, `prizes/${chosenPrizeId}/quantity`);
-                const txResult = await runTransaction(quantityRef, (current) => {
-                    if (current === null || current === undefined) return current;
-                    if (Number(current) <= 0) return;
-                    return Number(current) - 1;
-                });
-
-                if (!txResult.committed) {
-                    alert("啊，這個獎品剛好在這一瞬間被別人抽走了，請重新點一次再試一次！");
-                    isDrawing = false;
-                    return;
-                }
-
-                // 讀取獎品序號
-                let wonCode = "";
+                let code = "";
                 try {
-                    const codesSnap = await get(ref(db, `prizeCodes/${chosenPrizeId}`));
-                    if (codesSnap.exists()) {
-                        const codesObj = codesSnap.val();
-                        const usedCodes = new Set(
-                            Object.values(globalPlayedUsers)
-                                .map(u => u && u.code)
-                                .filter(c => c)
-                        );
-                        const availableCodes = Object.values(codesObj).filter(c => c && !usedCodes.has(c));
-                        if (availableCodes.length > 0) {
-                            wonCode = availableCodes[0];
-                        }
+                    const cs = await get(ref(db, `prizeCodes/${chosenId}`));
+                    if (cs.exists()) {
+                        const cObj = cs.val();
+                        const used = new Set(Object.values(globalPlayedUsers).map(u=>u&&u.code).filter(c=>c));
+                        const av = Object.values(cObj).filter(c=>c&&!used.has(c));
+                        if (av.length) code = av[0];
                     }
-                } catch (e) {
-                    console.error("讀取序號失敗：", e);
+                } catch(e){}
+
+                const result = { won: chosen.name, code, time: Date.now(), group: myGroup };
+                await update(ref(db), { [`playedUsers/${name}`]: result, [`playedDevices/${deviceId}`]: { user: name, time: Date.now() } });
+                myDeviceRecord = { user: name, time: Date.now() };
+
+                // 點數發放
+                const minP = Number(chosen.minPoints), maxP = Number(chosen.maxPoints);
+                if (!isNaN(minP) && !isNaN(maxP) && maxP>=minP && maxP>0) {
+                    const pts = Math.floor(Math.random()*(maxP-minP+1))+minP;
+                    try { await runTransaction(ref(db, `pointUsers/${name}/points`), cur => (cur||0)+pts); } catch(e){}
                 }
 
-                // 寫入得獎紀錄
-                const myResult = {
-                    won: chosenPrize.name,
-                    code: wonCode,
-                    time: Date.now(),
-                    group: myGroup
-                };
-
-                await update(ref(db), {
-                    [`playedUsers/${nameInput}`]: myResult,
-                    [`playedDevices/${deviceId}`]: { user: nameInput, time: Date.now() }
-                });
-
-                myDeviceRecord = { user: nameInput, time: Date.now() };
-
-                // 自動發放點數
-                const minP = Number(chosenPrize.minPoints);
-                const maxP = Number(chosenPrize.maxPoints);
-                if (!isNaN(minP) && !isNaN(maxP) && maxP >= minP && maxP > 0) {
-                    const awardedPoints = Math.floor(Math.random() * (maxP - minP + 1)) + minP;
-                    const userPointsRef = ref(db, `pointUsers/${nameInput}/points`);
-                    try {
-                        await runTransaction(userPointsRef, (current) => {
-                            return (current || 0) + awardedPoints;
-                        });
-                    } catch (e) {
-                        console.error("點數發放失敗：", e);
-                    }
-                }
-
-                // 播放動畫
-                const container = document.getElementById("gachaGlass");
-                const luckyEgg = document.getElementById("luckyEgg");
-                const crank = document.getElementById("gachaCrank");
-
-                const chosenColor = eggColors[Math.floor(Math.random() * eggColors.length)];
-                const matchingEggsInGlass = container.querySelectorAll(`.gacha-egg.${chosenColor}:not(.egg-falling-out)`);
-
-                crank.classList.add("rotating-crank");
-                playCrankSound();
-
-                if (matchingEggsInGlass.length > 0) {
-                    const targetEgg = matchingEggsInGlass[Math.floor(Math.random() * matchingEggsInGlass.length)];
-                    targetEgg.classList.add("egg-falling-out");
-                }
-
+                // 動畫...
+                const container = document.getElementById("gachaGlass"), lucky = document.getElementById("luckyEgg"), crank = document.getElementById("gachaCrank");
+                const color = eggColors[Math.floor(Math.random()*eggColors.length)];
+                const matches = container.querySelectorAll(`.gacha-egg.${color}:not(.egg-falling-out)`);
+                crank.classList.add("rotating-crank"); playCrankSound();
+                if (matches.length) matches[Math.floor(Math.random()*matches.length)].classList.add("egg-falling-out");
                 container.classList.add("eggs-drop-down");
-
-                luckyEgg.className = "gacha-lucky-egg";
-                luckyEgg.style.opacity = "0";
-                luckyEgg.classList.add(chosenColor);
-
+                lucky.className = "gacha-lucky-egg"; lucky.style.opacity = "0"; lucky.classList.add(color);
+                setTimeout(() => lucky.classList.add("dropped-egg"), 1000);
                 setTimeout(() => {
-                    luckyEgg.classList.add("dropped-egg");
-                }, 1000);
-
-                setTimeout(() => {
-                    const modalTitle = document.getElementById("modalTitle");
-                    const modalPrizeName = document.getElementById("modalPrizeName");
-                    const modalTicketCode = document.getElementById("modalTicketCode");
-                    const copyHint = document.getElementById("copyHint");
-                    const closeBtn = document.querySelector("#winModal button:last-child");
-                    const labelPrize = modalPrizeName.previousElementSibling;
-
-                    modalPrizeName.innerText = myResult.won;
-                    currentPrizeUrl = myResult.code;
-
-                    if (myResult.won && myResult.won.includes("銘謝惠顧")) {
-                        modalTitle.innerText = "😢 差一點點！";
-                        modalTitle.className = "text-2xl font-black text-gray-500 mb-2";
-                        if (labelPrize) labelPrize.innerText = "💨 本次結果";
-                        modalTicketCode.style.display = "none";
-                        copyHint.style.display = "none";
-                        closeBtn.innerText = "再接再厲";
-                    } else {
-                        modalTitle.innerText = "🎉 恭喜中獎！";
-                        modalTitle.className = "text-2xl font-black text-rose-500 mb-2";
-                        if (labelPrize) labelPrize.innerText = "🎁 抽中獎品";
-                        modalTicketCode.style.display = "block";
-                        modalTicketCode.innerText = "點我打開獎品連結";
-                        copyHint.style.display = "block";
-                        closeBtn.innerText = "收下好禮";
-                    }
-
+                    document.getElementById("modalPrizeName").innerText = result.won;
+                    currentPrizeUrl = result.code;
+                    const isThanks = result.won && result.won.includes("銘謝惠顧");
+                    document.getElementById("modalTitle").innerText = isThanks ? "😢 差一點點！" : "🎉 恭喜中獎！";
+                    document.getElementById("modalTitle").className = `text-2xl font-black mb-2 ${isThanks?'text-gray-500':'text-rose-500'}`;
+                    document.getElementById("modalTicketCode").style.display = isThanks ? "none" : "block";
+                    document.getElementById("copyHint").style.display = isThanks ? "none" : "block";
+                    document.querySelector("#winModal button:last-child").innerText = isThanks ? "再接再厲" : "收下好禮";
                     document.getElementById("winModal").style.display = "flex";
                     playWinSound();
-                    crank.classList.remove("rotating-crank");
-                    container.classList.remove("eggs-drop-down");
+                    crank.classList.remove("rotating-crank"); container.classList.remove("eggs-drop-down");
                     isDrawing = false;
                 }, 2100);
-
-            } catch (error) {
-                console.error("抽獎失敗: ", error);
-                alert("伺服器擁擠，或這個名字/裝置剛好已經抽過了，請重新整理頁面後再試一次！");
-                isDrawing = false;
-            }
-        }
-        
-        function clickTicket() {
-            if (currentPrizeUrl && currentPrizeUrl.startsWith("http")) {
-                window.open(currentPrizeUrl, "_blank");
-            } else if (currentPrizeUrl) {
-                alert(`獎品內容為：${currentPrizeUrl}`);
-            } else {
-                alert("未偵測到有效的連結！");
-            }
+            } catch(e) { console.error(e); alert("伺服器擁擠，請稍後再試"); isDrawing = false; }
         }
 
+        function clickTicket() { if (currentPrizeUrl&&currentPrizeUrl.startsWith("http")) window.open(currentPrizeUrl,"_blank"); else if (currentPrizeUrl) alert(currentPrizeUrl); else alert("無連結"); }
         function closeModal() {
             document.getElementById("winModal").style.display = "none";
-            const luckyEgg = document.getElementById("luckyEgg");
-            luckyEgg.className = "gacha-lucky-egg";
-            luckyEgg.style.opacity = "0";
-            
+            document.getElementById("luckyEgg").className = "gacha-lucky-egg";
             document.getElementById("modalTicketCode").style.display = "block";
             document.getElementById("copyHint").style.display = "block";
-            
-            // 抽獎後回到控制面板，讓玩家可再次選擇（查看錢包）
             showControlPanel();
-            // 保留密語與名單解鎖狀態？可選：重置選單
-            const selectEl = document.getElementById("playerName");
-            selectEl.innerHTML = '<option value="" disabled selected>🔒 請先解鎖群組名單 🔒</option>';
+            document.getElementById("playerName").innerHTML = '<option value="" disabled selected>🔒 請先解鎖群組名單 🔒</option>';
             document.getElementById("secretPass").value = "";
         }
 
-        // ---------- 確認彈窗 ----------
         function openConfirmModal() {
             if (isDrawing) return;
-            if (myDeviceRecord) {
-                alert("此裝置已經抽過獎囉！");
-                return;
-            }
-            const nameInput = document.getElementById("playerName").value;
-            if (!nameInput) {
-                alert("請先輸入通關密語並選擇你的名字喔！");
-                return;
-            }
-            if (globalPlayedUsers[nameInput]) {
-                alert("這個名字已經抽過獎囉！");
-                return;
-            }
+            if (myDeviceRecord) { alert("此裝置已抽過獎"); return; }
+            const name = document.getElementById("playerName").value;
+            if (!name) { alert("請先選擇名字"); return; }
+            if (globalPlayedUsers[name]) { alert("這個名字已抽過"); return; }
             document.getElementById("confirmModal").style.display = "flex";
         }
+        function closeConfirmModal() { document.getElementById("confirmModal").style.display = "none"; }
+        function confirmAndDraw() { closeConfirmModal(); startDraw(); }
 
-        function closeConfirmModal() {
-            document.getElementById("confirmModal").style.display = "none";
-        }
-
-        function confirmAndDraw() {
-            closeConfirmModal();
-            startDraw();
-        }
-
-        // ---------- 監聽打烊模式 ----------
-        onAuthStateChanged(auth, (user) => {
+        // 初始化
+        onAuthStateChanged(auth, user => {
             if (user) {
                 deviceId = user.uid;
-
-                onValue(ref(db, "settings/closed"), (snap) => {
-                    document.getElementById("closedOverlay").style.display = (snap.val() === true) ? "flex" : "none";
+                onValue(ref(db, "settings/closed"), snap => {
+                    document.getElementById("closedOverlay").style.display = snap.val()===true ? "flex" : "none";
                 });
-
-                get(ref(db, "playedDevices/" + deviceId))
-                    .then((snap) => {
-                        myDeviceRecord = snap.exists() ? snap.val() : null;
-                        initApp();
-                    })
-                    .catch((err) => {
-                        console.error("讀取裝置狀態失敗：", err);
-                        initApp();
-                    });
+                get(ref(db, "playedDevices/"+deviceId)).then(snap => { myDeviceRecord = snap.exists()?snap.val():null; initApp(); }).catch(() => initApp());
             }
         });
-        signInAnonymously(auth).catch((err) => {
-            console.error("匿名登入失敗：", err);
-            alert("連線驗證失敗，請重新整理頁面再試一次！");
-        });
+        signInAnonymously(auth).catch(e => alert("連線失敗"));
     </script>
+</body>
+</html>
