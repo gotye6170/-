@@ -797,29 +797,33 @@
 
         // ---------- 點數錢包相關 ----------
         function listenToWallet(playerName) {
-            if (!playerName) return;
-            const walletRef = ref(db, `pointUsers/${playerName}`);
-            onValue(walletRef, (snap) => {
-                currentWalletData = snap.val();
-                if (currentWalletData) {
-                    personalPassHash = currentWalletData.personalPassHash || null;
-                    if (currentWalletData.boundUid === deviceId) {
-                        walletUnlocked = true;
-                        updateWalletDisplay();
-                    } else if (!currentWalletData.boundUid) {
-                        walletUnlocked = false;
-                        document.getElementById("walletSection").classList.remove("hidden");
-                    } else {
-                        walletUnlocked = false;
-                        document.getElementById("walletSection").classList.remove("hidden");
-                        document.getElementById("walletDisplay").innerText = "🔒 錢包已綁定其他裝置";
-                    }
-                } else {
-                    walletUnlocked = false;
-                    document.getElementById("walletSection").classList.add("hidden");
-                }
-            });
+    if (!playerName) return;
+    const walletRef = ref(db, `pointUsers/${playerName}`);
+    onValue(walletRef, (snap) => {
+        currentWalletData = snap.val();
+        // 無論如何，錢包區域都保持顯示
+        document.getElementById("walletSection").classList.remove("hidden");
+        
+        if (currentWalletData) {
+            personalPassHash = currentWalletData.personalPassHash || null;
+            if (currentWalletData.boundUid === deviceId) {
+                walletUnlocked = true;
+                updateWalletDisplay();
+            } else if (!currentWalletData.boundUid) {
+                walletUnlocked = false;
+                document.getElementById("walletDisplay").innerText = "🔒 請驗證錢包";
+            } else {
+                walletUnlocked = false;
+                document.getElementById("walletDisplay").innerText = "🔒 錢包已綁定其他裝置";
+            }
+        } else {
+            // 錢包尚未建立
+            walletUnlocked = false;
+            document.getElementById("walletDisplay").innerText = "🪙 尚未開通";
+            document.getElementById("walletExpiry").innerText = "請聯繫管理員開通點數錢包";
         }
+    });
+}
 
         function updateWalletDisplay() {
             if (!currentWalletData || !walletUnlocked) return;
