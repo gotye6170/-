@@ -1046,6 +1046,7 @@
             }
         }
 
+        // ---------- 更新 UI ----------
         function refreshPlayedUsersUI() {
             const nameSelect = document.getElementById("playerName");
             const options = nameSelect.getElementsByTagName("option");
@@ -1097,7 +1098,7 @@
             });
         }
 
-        // ---------- 抽獎核心（整合點數發放） ----------
+        // ---------- 抽獎核心（點數寫入 pendingPoints） ----------
         async function startDraw() {
             const nameInput = document.getElementById("playerName").value;
             if (!nameInput) {
@@ -1204,18 +1205,23 @@
 
                 myDeviceRecord = { user: nameInput, time: Date.now() };
 
-                // ---------- 點數發放邏輯 ----------
-                // 檢查獎品是否有設定 minPoints / maxPoints，若有則隨機產生點數，並透過 Cloud Function 寫入錢包
+                // ---------- 點數發放（改為寫入 pendingPoints）----------
                 const minP = Number(chosenPrize.minPoints);
                 const maxP = Number(chosenPrize.maxPoints);
                 if (!isNaN(minP) && !isNaN(maxP) && maxP >= minP && maxP > 0) {
                     const awardedPoints = Math.floor(Math.random() * (maxP - minP + 1)) + minP;
-                    // 呼叫 Cloud Function 發點（非同步，不影響抽獎結果顯示）
-                    fetch("https://us-central1-daidaikunbao.cloudfunctions.net/awardPoints", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ playerName: nameInput, points: awardedPoints, uid: deviceId })
-                    }).catch(e => console.error("發點請求失敗", e));
+                    // 寫入待處理清單，管理員後台確認後才會真正發放
+                    try {
+                        await push(ref(db, "pendingPoints"), {
+                            playerName: nameInput,
+                            points: awardedPoints,
+                            prizeName: chosenPrize.name,
+                            timestamp: Date.now(),
+                            status: "pending"
+                        });
+                    } catch (e) {
+                        console.error("寫入 pendingPoints 失敗：", e);
+                    }
                 }
 
                 // 播放動畫
@@ -1311,6 +1317,29 @@
 
             showControlPanel();
         }
+
+        // ---------- 商品兌換（改為寫入 redeemRequests）----------
+        window.redeemItem = async function(itemId) {
+            if (!currentPlayerName || !walletUnlocked) return;
+            const item = shopItems[itemId];
+            if (!item) return;
+            if (!confirm(`確定要申請用 ${item.cost} 點兌換「${item.name}」嗎？\n管理員確認後點數才會扣除。`)) return;
+
+            try {
+                await push(ref(db, "redeemRequests"), {
+                    playerName: currentPlayerName,
+                    itemId: itemId,
+                    itemName: item.name,
+                    cost: item.cost,
+                    timestamp: Date.now(),
+                    status: "pending"
+                });
+                alert("✅ 兌換請求已送出，請等待管理員確認！");
+            } catch (e) {
+                alert("請求失敗，請稍後再試");
+                console.error(e);
+            }
+        };
 
         // ---------- 確認彈窗 ----------
         function openConfirmModal() {
