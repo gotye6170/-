@@ -4,41 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>呆呆扭蛋機 🌟</title>
-    <!-- Tailwind CSS (用於快速美化外觀) -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <!-- 引入支援繁體中文的 Noto Sans TC -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght=900&display=swap" rel="stylesheet">
     
     <style>
-        /* 手機版 */
-    @media (max-width: 640px){
-
-    .gacha-title{
-        font-size:2rem !important;
-        -webkit-text-stroke:6px #fff;
-    }
-
-    .gacha-machine{
-        transform:scale(.72);
-        transform-origin:top center;
-        margin-bottom:0px;
-        height:350px;
-    }
-
-    .dashboard-panel{
-        height:auto;
-        min-height:250px;
-    }
-
-    .music-control-btn{
-        bottom:15px;
-        right:15px;
-        font-size:12px;
-        padding:8px 14px;
-    }
-}
+        @media (max-width: 640px){
+            .gacha-title{ font-size:2rem !important; -webkit-text-stroke:6px #fff; }
+            .gacha-machine{ transform:scale(.72); transform-origin:top center; margin-bottom:0px; height:350px; }
+            .dashboard-panel{ height:auto; min-height:250px; }
+            .music-control-btn{ bottom:15px; right:15px; font-size:12px; padding:8px 14px; }
+        }
         body {
             background: linear-gradient(135deg, #fbcfe8, #e0e7ff, #ccfbf1);
             background-size: 400% 400%;
@@ -53,19 +31,16 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* 🎪 統一且富有設計感的大標題 (完美描邊不咬字) */
         .gacha-title {
             font-family: 'Noto Sans TC', sans-serif;
             font-weight: 900;
             color: #ff3366;
             letter-spacing: 2px;
-            /* 運用 paint-order 讓白色描邊粗而不吃字 */
             -webkit-text-stroke: 10px #ffffff;
             paint-order: stroke fill;
             filter: drop-shadow(4px 4px 0px rgba(0, 0, 0, 0.08)) drop-shadow(0px 8px 15px rgba(244, 63, 94, 0.2));
         }
 
-        /* 🎪 扭蛋機核心造型 */
         .gacha-machine {
             position: relative;
             width: 320px;
@@ -77,7 +52,6 @@
             border: 6px solid #fee2e2;
         }
 
-        /* 🔮 透明玻璃罩 */
         .gacha-glass {
             position: relative;
             height: 240px;
@@ -89,7 +63,6 @@
             margin-bottom: 25px;
         }
 
-        /* 🥚 扭蛋基本顆粒 */
         .gacha-egg {
             position: absolute;
             width: 38px;
@@ -106,7 +79,6 @@
             border-radius: 19px 19px 0 0;
         }
 
-        /* 🎨 扭蛋繽紛色彩 */
         .egg-pink { background: #ec4899; }
         .egg-blue { background: #3b82f6; }
         .egg-yellow { background: #eab308; }
@@ -114,12 +86,10 @@
         .egg-purple { background: #a855f7; }
         .egg-orange { background: #f97316; }
 
-        /* 🥚 隨機分佈扭蛋群 (基礎圖層) */
         .egg-layer-a { bottom: 8px; }
         .egg-layer-b { bottom: 25px; }
         .egg-layer-c { bottom: 42px; }
 
-        /* 🎬 被抽中的那顆蛋：往下掉並淡出消失 */
         .egg-falling-out {
             animation: eggFallOut 0.8s cubic-bezier(0.55, 0.055, 0.675, 0.19) forwards !important;
         }
@@ -129,7 +99,6 @@
             100% { transform: translateY(120px) scale(0.7); opacity: 0; }
         }
 
-        /* 🎬 剩餘的所有扭蛋：集體輕微往下沉（重力合理化補位） */
         .eggs-drop-down .gacha-egg:not(.egg-falling-out) {
             animation: gravitySettle 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.3s forwards;
         }
@@ -140,7 +109,6 @@
             100% { transform: translateY(4px); }
         }
 
-        /* ⚙️ 控制面板區 */
         .gacha-panel {
             background: #991b1b;
             border-radius: 20px;
@@ -152,7 +120,6 @@
             box-shadow: inset 0 4px 8px rgba(0,0,0,0.3);
         }
 
-        /* 🕹️ 旋轉手把 */
         .gacha-crank {
             width: 70px;
             height: 70px;
@@ -185,16 +152,9 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
-        /* 🌀 手把旋轉動畫 */
-        .rotating-crank {
-            animation: rotateCrank 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-        }
-        @keyframes rotateCrank {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(720deg); }
-        }
+        .rotating-crank { animation: rotateCrank 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+        @keyframes rotateCrank { 0% { transform: rotate(0deg); } 100% { transform: rotate(720deg); } }
 
-        /* 🕳️ 出蛋口外部結構 */
         .gacha-gate {
             width: 75px;
             height: 75px;
@@ -206,7 +166,6 @@
             overflow: hidden;
         }
 
-        /* 🥚 出蛋口內部隱藏的獲獎蛋 */
         .gacha-lucky-egg {
             position: absolute;
             width: 46px;
@@ -226,10 +185,7 @@
             border-radius: 23px 23px 0 0;
         }
 
-        /* 🌠 出蛋重力動畫 */
-        .dropped-egg {
-            animation: realGravityDrop 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.3s forwards;
-        }
+        .dropped-egg { animation: realGravityDrop 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.3s forwards; }
         
         @keyframes realGravityDrop {
             0% { top: -60px; opacity: 0; transform: scaleY(1.1) scaleX(0.9) rotate(0deg); }
@@ -241,7 +197,6 @@
             100% { top: 12px; opacity: 1; transform: scaleY(1) scaleX(1) rotate(360deg); }
         }
 
-        /* 📋 數據看板通用外觀 */
         .dashboard-panel {
             background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(10px);
@@ -255,129 +210,44 @@
             flex-direction: column;
         }
         .board-title-text {
-            font-size: 18px;
-            font-weight: 900;
-            display: flex;
-            align-items: center;
-            padding-bottom: 10px;
-            border-bottom: 2px dashed rgba(0,0,0,0.1);
-            margin-bottom: 12px;
-            flex-shrink: 0;
+            font-size: 18px; font-weight: 900; display: flex; align-items: center;
+            padding-bottom: 10px; border-bottom: 2px dashed rgba(0,0,0,0.1); margin-bottom: 12px; flex-shrink: 0;
         }
         .prize-title-text { color: #06b6d4; }
         .honor-title-text { color: #ec4899; }
 
-        .scroller-content {
-            overflow-y: auto;
-            flex-grow: 1;
-            padding-right: 4px;
-        }
+        .scroller-content { overflow-y: auto; flex-grow: 1; padding-right: 4px; }
         .scroller-content::-webkit-scrollbar { width: 6px; }
-        .scroller-content::-webkit-scrollbar-track { background: transparent; }
         .scroller-content::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
 
-        /* 🎁 剩餘好禮列 */
         .prize-item-row {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            background: white;
-            padding: 8px 12px;
-            border-radius: 14px;
-            margin-bottom: 8px;
-            border: 1px solid #f3f4f6;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            display: flex; align-items: center; gap: 12px; background: white;
+            padding: 8px 12px; border-radius: 14px; margin-bottom: 8px;
+            border: 1px solid #f3f4f6; box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
-        .prize-thumb {
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
-            object-fit: cover;
-            flex-shrink: 0;
-        }
-        .prize-info {
-            display: flex;
-            flex-direction: column;
-            gap: 1px;
-            flex: 1;
-            min-width: 0;
-        }
-        .prize-name-label {
-            font-size: 14px;
-            font-weight: bold;
-            color: #1f2937;
-        }
+        .prize-thumb { width: 40px; height: 40px; border-radius: 8px; object-fit: cover; flex-shrink: 0; }
+        .prize-info { display: flex; flex-direction: column; gap: 1px; flex: 1; min-width: 0; }
+        .prize-name-label { font-size: 14px; font-weight: bold; color: #1f2937; }
 
-        /* 👑 榮譽榜列 */
         .honor-item-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: linear-gradient(to right, #fffdfa, #fff);
-            padding: 10px 12px;
-            border-radius: 14px;
-            margin-bottom: 8px;
-            border: 1px solid #fdf2e9;
-            box-shadow: 0 2px 4px rgba(236,72,153,0.05);
+            display: flex; align-items: center; gap: 10px; background: linear-gradient(to right, #fffdfa, #fff);
+            padding: 10px 12px; border-radius: 14px; margin-bottom: 8px; border: 1px solid #fdf2e9;
         }
         .honor-badge {
-            background: linear-gradient(135deg, #fbcfe8, #f472b6);
-            color: #9d174d;
-            font-size: 11px;
-            font-weight: bold;
-            padding: 2px 6px;
-            border-radius: 6px;
-            flex-shrink: 0;
+            background: linear-gradient(135deg, #fbcfe8, #f472b6); color: #9d174d;
+            font-size: 11px; font-weight: bold; padding: 2px 6px; border-radius: 6px; flex-shrink: 0;
         }
         .honor-info { font-size: 13px; color: #4b5563; }
 
-        /* 📊 禮物庫存進度條 */
-        .prize-progress-track {
-            width: 100%;
-            height: 6px;
-            background: #f3f4f6;
-            border-radius: 999px;
-            overflow: hidden;
-            margin-top: 4px;
-        }
-        .prize-progress-fill {
-            height: 100%;
-            border-radius: 999px;
-            transition: width 0.3s ease;
-        }
-        .prize-progress-fill.is-available {
-            background: linear-gradient(to right, #6ee7b7, #059669);
-        }
-        .prize-progress-fill.is-empty {
-            background: linear-gradient(to right, #fca5a5, #dc2626);
-        }
-
-        /* 📣 跑馬燈 (改用 CSS transform 動畫，手機上比 <marquee> 順很多) */
-        .marquee-viewport {
-            flex: 1 1 auto;
-            min-width: 0;
-            overflow: hidden;
-            position: relative;
-        }
-        .marquee-track {
-            display: inline-flex;
-            white-space: nowrap;
-            will-change: transform;
-            animation: marqueeScroll 20s linear infinite;
-        }
-        .marquee-item {
-            padding-right: 60px;
-        }
-        @keyframes marqueeScroll {
-            from { transform: translateX(0); }
-            to { transform: translateX(-50%); }
-        }
-
+        .marquee-viewport { flex: 1 1 auto; min-width: 0; overflow: hidden; position: relative; }
+        .marquee-track { display: inline-flex; white-space: nowrap; will-change: transform; animation: marqueeScroll 20s linear infinite; }
+        .marquee-item { padding-right: 60px; }
+        @keyframes marqueeScroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
     </style>
 </head>
 <body class="p-4 md:p-8 min-h-screen flex flex-col items-center justify-center">
 
-    <!-- 🔒 打烊模式遮罩：預設隱藏，管理員在後台開啟後，這裡會蓋住整個畫面 -->
+    <!-- 打烊模式遮罩 -->
     <div id="closedOverlay" style="display:none; position:fixed; inset:0; z-index:9999; backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); background:rgba(15,23,42,0.72); align-items:center; justify-content:center; padding:20px;">
         <div style="background:rgba(255,255,255,0.95); border-radius:28px; padding:40px 32px; max-width:360px; width:100%; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
             <div style="font-size:56px; margin-bottom:12px;">🚧</div>
@@ -386,7 +256,7 @@
         </div>
     </div>
 
-    <!-- 🏷️ 頂部霓虹跑馬燈 -->
+    <!-- 頂部跑馬燈 -->
     <div class="w-full max-w-5xl bg-slate-900 text-cyan-400 font-bold px-4 py-2.5 rounded-full shadow-lg overflow-hidden border-2 border-cyan-500/30 mb-8 flex items-center gap-3">
         <span class="bg-cyan-500 text-slate-950 text-xs px-2.5 py-1 rounded-full flex-shrink-0 animate-pulse">📢 最新動態</span>
         <div class="marquee-viewport">
@@ -397,7 +267,7 @@
         </div>
     </div>
 
-    <!-- 🌌 主舞台佈局 -->
+    <!-- 主舞台 -->
     <div class="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
         <!-- 左翼：禮物列表 -->
@@ -412,7 +282,7 @@
         <div class="lg:col-span-6 order-1 lg:order-2 flex flex-col items-center">
             <h1 class="gacha-title text-4xl md:text-5xl mb-6">呆呆幸運扭蛋機</h1>
 
-            <!-- 🎮 輸入控制面板 (一開始只顯示這個) -->
+            <!-- 輸入控制面板 -->
             <div id="controlPanel" class="w-full max-w-sm bg-white/80 backdrop-blur-md rounded-3xl p-6 shadow-xl border border-white mt-4 md:mt-6 space-y-4">
                 <div>
                     <label class="block text-xs font-bold text-gray-500 mb-1.5 ml-1">🔑 請輸入群組密語解鎖名單</label>
@@ -428,28 +298,33 @@
                         <option value="" disabled selected>🔒 請先解鎖群組名單 🔒</option>
                     </select>
                 </div>
+
+                <!-- 💰 玩家點數資訊卡片 (選擇名字後會更新) -->
+                <div id="pointsCard" class="hidden bg-amber-50 p-4 rounded-2xl border border-amber-200 text-center shadow-sm">
+                    <span class="text-xs font-bold text-amber-800 block mb-1">💰 目前累積點數</span>
+                    <div class="text-2xl font-black text-amber-600 mb-0.5"><span id="userPointsText">0</span> <span class="text-xs font-bold">點</span></div>
+                    <p id="pointsExpireText" class="text-[11px] text-amber-700/80 mb-3 font-semibold">到期日：無</p>
+                    <button onclick="openShopModal()" class="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold text-xs py-2 rounded-xl shadow transition-all active:scale-95 cursor-pointer">🎁 前往點數兌換專區</button>
+                </div>
             </div>
 
-            <!-- 🎪 扭蛋機區塊：選好名字後才會出現 -->
+            <!-- 扭蛋機區塊 -->
             <div id="machineSection" class="hidden w-full max-w-sm flex flex-col items-center mt-4 md:mt-6">
                 <button id="spinBtn" onclick="openConfirmModal()" class="w-full bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white font-black py-3 rounded-2xl shadow-lg shadow-rose-500/20 active:scale-98 transition-all tracking-wider text-sm cursor-pointer">啟動幸運扭蛋</button>
 
                 <div class="gacha-machine mt-6">
                     <div class="gacha-glass" id="gachaGlass">
-                        <!-- 底層蛋 -->
                         <div class="gacha-egg egg-pink egg-layer-a" style="left: 15px;"></div>
                         <div class="gacha-egg egg-blue egg-layer-a" style="left: 60px;"></div>
                         <div class="gacha-egg egg-yellow egg-layer-a" style="left: 110px;"></div>
                         <div class="gacha-egg egg-green egg-layer-a" style="left: 155px;"></div>
                         <div class="gacha-egg egg-purple egg-layer-a" style="left: 200px;"></div>
                         <div class="gacha-egg egg-orange egg-layer-a" style="left: 245px;"></div>
-                        <!-- 中層蛋 -->
                         <div class="gacha-egg egg-yellow egg-layer-b" style="left: 35px;"></div>
                         <div class="gacha-egg egg-pink egg-layer-b" style="left: 85px;"></div>
                         <div class="gacha-egg egg-green egg-layer-b" style="left: 130px;"></div>
                         <div class="gacha-egg egg-blue egg-layer-b" style="left: 175px;"></div>
                         <div class="gacha-egg egg-orange egg-layer-b" style="left: 220px;"></div>
-                        <!-- 頂層蛋 -->
                         <div class="gacha-egg egg-purple egg-layer-c" style="left: 55px;"></div>
                         <div class="gacha-egg egg-blue egg-layer-c" style="left: 105px;"></div>
                         <div class="gacha-egg egg-pink egg-layer-c" style="left: 150px;"></div>
@@ -488,7 +363,7 @@
         </div>
     </div>
 
-    <!-- 🏆 獲獎與狀態彈出視窗 (Modal) -->
+    <!-- 🏆 獲獎彈窗 -->
     <div id="winModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" style="display: none;">
         <div class="bg-white rounded-3xl w-full max-w-sm p-6 text-center shadow-2xl border-4 border-amber-400 transform scale-100 transition-all">
             <h2 id="modalTitle" class="text-2xl font-black text-rose-500 mb-2">🎉 恭喜中獎！</h2>
@@ -498,25 +373,42 @@
             </div>
             
             <div id="modalTicketCode" onclick="clickTicket()" class="bg-slate-900 text-cyan-400 font-mono text-base font-bold py-3 px-4 rounded-xl cursor-pointer hover:bg-slate-800 active:scale-98 transition-all border border-cyan-500/30 break-all select-none">點我打開獎品連結</div>
-            <p id="copyHint" class="text-[11px] text-gray-400 mt-1.5 font-medium">💡 點擊上方即可查看獎品，若需要密碼，請輸入「3064」</p>
+            <p id="copyHint" class="text-[11px] text-gray-400 mt-1.5 font-medium">💡 點擊上方即可查看獎品內容，若需要密碼，請輸入「3064」</p>
 
             <button onclick="closeModal()" class="w-full bg-gray-800 hover:bg-gray-700 text-white font-bold py-2.5 rounded-xl text-sm transition-all mt-5">收下好禮</button>
+        </div>
+    </div>
+
+    <!-- 🛍️ 點數兌換專區彈窗 -->
+    <div id="shopModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" style="display: none;">
+        <div class="bg-white rounded-3xl w-full max-w-lg p-6 shadow-2xl border-4 border-amber-300 max-h-[85vh] flex flex-col">
+            <div class="flex items-center justify-between pb-3 border-b border-gray-100 mb-4">
+                <div>
+                    <h2 class="text-xl font-black text-amber-600 flex items-center gap-1.5">🛍️ 點數兌換專區</h2>
+                    <p class="text-xs text-gray-400 font-bold">目前擁有：<span id="shopUserPoints" class="text-amber-600 font-black">0</span> 點</p>
+                </div>
+                <button onclick="closeShopModal()" class="text-gray-400 hover:text-gray-600 font-bold text-xl px-2">✕</button>
+            </div>
+            
+            <div id="shopItemList" class="scroller-content space-y-3 flex-grow pr-1">
+                <div class="text-center text-gray-400 text-sm py-8">載入商品中...</div>
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-gray-100 text-center">
+                <button onclick="closeShopModal()" class="w-full bg-gray-800 hover:bg-gray-700 text-white font-bold py-2.5 rounded-xl text-sm transition-all">關閉兌換專區</button>
+            </div>
         </div>
     </div>
 
     <!-- 🔊 音效開關 -->
     <button id="soundToggleBtn" onclick="toggleSound()" class="music-control-btn fixed bottom-5 right-5 bg-slate-900 text-cyan-400 text-sm font-bold px-4 py-2 rounded-full shadow-lg border border-cyan-500/30 z-40 transition-all active:scale-95">🔊 音效</button>
 
-
-
     <!-- 🌐 Firebase 模組與核心邏輯 -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
-        import { getDatabase, ref, runTransaction, onValue, get, update } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
+        import { getDatabase, ref, runTransaction, onValue, get, update, push } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
 
-        // ⚠️ 請把下面換成你自己 Firebase 專案的完整設定（在 Firebase 主控台 > 專案設定 > 一般 > 你的應用程式 SDK 設定 可以複製到）
-        // apiKey / authDomain 是啟用「身份驗證(Auth)」必要的欄位，缺少會導致玩家無法登入、抽獎功能整個失效
         const firebaseConfig = {
             apiKey: "AIzaSyDMG8bM8VO_al-k40JxfRu4bgph78e2PDs",
             authDomain: "daidaikunbao.firebaseapp.com",
@@ -536,55 +428,66 @@
         window.closeConfirmModal = closeConfirmModal;
         window.confirmAndDraw = confirmAndDraw;
         window.toggleSound = toggleSound;
+        window.openShopModal = openShopModal;
+        window.closeShopModal = closeShopModal;
+        window.redeemShopItem = redeemShopItem;
 
-        // 🔀 選好名字後：隱藏「密語解鎖/名字選擇」面板，顯示「扭蛋機」
+        let currentUserPointsData = { points: 0, expireAt: null };
+        let currentShopItems = {};
+
+        function fetchUserPoints(username) {
+            if (!username) return;
+            onValue(ref(db, `userPoints/${username}`), (snap) => {
+                const data = snap.val() || { points: 0, expireAt: null };
+                const now = Date.now();
+                
+                // 檢查點數是否過期
+                if (data.expireAt && now > data.expireAt) {
+                    currentUserPointsData = { points: 0, expireAt: data.expireAt, isExpired: true };
+                    document.getElementById("userPointsText").innerText = "0 (已過期)";
+                    document.getElementById("pointsExpireText").innerText = `到期日：${new Date(data.expireAt).toLocaleDateString("zh-TW")} (已失效)`;
+                } else {
+                    currentUserPointsData = data;
+                    document.getElementById("userPointsText").innerText = data.points || 0;
+                    document.getElementById("pointsExpireText").innerText = data.expireAt 
+                        ? `到期日：${new Date(data.expireAt).toLocaleDateString("zh-TW")}` 
+                        : "到期日：無期限";
+                }
+                document.getElementById("shopUserPoints").innerText = currentUserPointsData.points || 0;
+            });
+        }
+
         function handleNameChange() {
             const val = document.getElementById("playerName").value;
             if (val) {
                 document.getElementById("controlPanel").classList.add("hidden");
                 document.getElementById("machineSection").classList.remove("hidden");
+                document.getElementById("pointsCard").classList.remove("hidden");
+                fetchUserPoints(val);
             }
         }
 
-        // 🔙 切回「密語解鎖/名字選擇」畫面 (讓下一位玩家可以繼續使用)
         function showControlPanel() {
             document.getElementById("machineSection").classList.add("hidden");
             document.getElementById("controlPanel").classList.remove("hidden");
         }
 
-        // ❓ 抽獎前的確認彈窗
         function openConfirmModal() {
             if (isDrawing) return;
-
-            if (myDeviceRecord) {
-                alert("此裝置已經抽過獎囉！");
-                return;
-            }
+            if (myDeviceRecord) { alert("此裝置已經抽過獎囉！"); return; }
             const nameInput = document.getElementById("playerName").value;
-            if (!nameInput) {
-                alert("請先輸入通關密語並選擇你的名字喔！");
-                return;
-            }
+            if (!nameInput) { alert("請先輸入通關密語並選擇你的名字喔！"); return; }
             document.getElementById("confirmModal").style.display = "flex";
         }
 
-        function closeConfirmModal() {
-            document.getElementById("confirmModal").style.display = "none";
-        }
+        function closeConfirmModal() { document.getElementById("confirmModal").style.display = "none"; }
+        function confirmAndDraw() { closeConfirmModal(); startDraw(); }
 
-        function confirmAndDraw() {
-            closeConfirmModal();
-            startDraw();
-        }
-
-        // 🔊 音效：用 Web Audio API 即時合成，不依賴外部音檔，手機/離線都能正常運作
         let audioCtx = null;
         let soundEnabled = true;
 
         function getAudioCtx() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             if (audioCtx.state === "suspended") audioCtx.resume();
             return audioCtx;
         }
@@ -594,25 +497,18 @@
                 const ctx = getAudioCtx();
                 const osc = ctx.createOscillator();
                 const gain = ctx.createGain();
-                osc.type = type;
-                osc.frequency.value = freq;
-                osc.connect(gain);
-                gain.connect(ctx.destination);
+                osc.type = type; osc.frequency.value = freq;
+                osc.connect(gain); gain.connect(ctx.destination);
                 const t = ctx.currentTime + startDelay;
                 gain.gain.setValueAtTime(gainValue, t);
                 gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
-                osc.start(t);
-                osc.stop(t + duration + 0.02);
-            } catch (e) {
-                // 部分瀏覽器/情境下 Web Audio 可能無法使用，靜默失敗即可，不影響抽獎功能
-            }
+                osc.start(t); osc.stop(t + duration + 0.02);
+            } catch (e) {}
         }
 
         function playCrankSound() {
             if (!soundEnabled) return;
-            for (let i = 0; i < 6; i++) {
-                playTone(300 + Math.random() * 150, 0.08, "square", i * 0.15, 0.06);
-            }
+            for (let i = 0; i < 6; i++) playTone(300 + Math.random() * 150, 0.08, "square", i * 0.15, 0.06);
         }
 
         function playWinSound() {
@@ -628,74 +524,45 @@
             if (btn) btn.textContent = soundEnabled ? "🔊 音效" : "🔇 靜音";
         }
 
-        // 📣 依目前解鎖的群組，組出跑馬燈文字（未解鎖時不透露任何姓名）
         function buildMarqueeText(playedList) {
             const defaultText = "🎉 歡迎來到呆呆扭蛋機！快來試試手氣！ 🎟️ ";
-
             if (!honorUnlockedGroup) return defaultText;
-
             const filtered = playedList.filter(item => item.group === honorUnlockedGroup);
             if (filtered.length === 0) return defaultText;
-
             let marqueeItems = filtered.map(item => `【${item.user}】喜獲大獎：${item.won}！`);
             return "🔥 中獎快報 🔥 " + marqueeItems.join(" 🌟 ") + " 歡慶連連，好運不斷！";
         }
 
-        // 👑 依目前解鎖狀態，畫出「幸運中獎者」欄位內容
         function renderHonorBoard(playedList) {
             const board = document.getElementById("honorBoard");
             if (!board) return;
-
             let html = '<span class="board-title-text honor-title-text">👑 幸運中獎者</span>';
-
             if (!honorUnlockedGroup) {
-                html += `
-                <div class="flex-grow flex flex-col items-center justify-center text-center gap-2 px-4">
-                    <span class="text-2xl">🔒</span>
-                    <p class="text-xs text-gray-400 leading-relaxed">為保護個資，請先在左方輸入群組密語解鎖，即可查看同群組的中獎名單</p>
-                </div>`;
-                board.innerHTML = html;
-                return;
+                html += `<div class="flex-grow flex flex-col items-center justify-center text-center gap-2 px-4"><span class="text-2xl">🔒</span><p class="text-xs text-gray-400 leading-relaxed">為保護個資，請先在左方輸入群組密語解鎖，即可查看同群組的中獎名單</p></div>`;
+                board.innerHTML = html; return;
             }
-
             const filtered = playedList.filter(item => item.group === honorUnlockedGroup);
-
             html += '<div class="scroller-content">';
             if (filtered.length > 0) {
                 filtered.forEach(item => {
-                    html += `
-                    <div class="honor-item-row">
-                        <span class="honor-badge">已得獎</span>
-                        <div class="honor-info">
-                            <span class="honor-name-label">恭喜 <b style="color:#ec4899;">${item.user}</b> 抽中了 🎁 <b style="color:#7c3aed;">${item.won}</b></span>
-                        </div>
-                    </div>`;
+                    html += `<div class="honor-item-row"><span class="honor-badge">已得獎</span><div class="honor-info"><span class="honor-name-label">恭喜 <b style="color:#ec4899;">${item.user}</b> 抽中了 🎁 <b style="color:#7c3aed;">${item.won}</b></span></div></div>`;
                 });
             } else {
                 html += '<div style="color: #9ca3af; font-size: 13px; text-align: center; padding: 20px; width: 100%;">目前還沒有人中獎哦！快來成為首位幸運兒</div>';
             }
             html += '</div>';
-
             board.innerHTML = html;
         }
 
-        // 📣 更新跑馬燈內容，並依文字長度重新計算捲動速度，確保順暢無跳動
         function updateMarquee(text) {
             const item1 = document.getElementById("marqueeItem1");
             const item2 = document.getElementById("marqueeItem2");
             const track = document.getElementById("marqueeTrack");
-
-            item1.textContent = text;
-            item2.textContent = text;
-
+            item1.textContent = text; item2.textContent = text;
             requestAnimationFrame(() => {
                 const singleWidth = item1.offsetWidth;
-                const pxPerSecond = 70; // 捲動速度，數字越大跑越快
-                const duration = Math.max(singleWidth / pxPerSecond, 8); // 最短 8 秒，避免短文字轉太快
-
-                // 重新套用動畫，避免文字換內容時位移對不齊
-                track.style.animation = "none";
-                void track.offsetWidth; // 強制 reflow 以重置動畫
+                const duration = Math.max(singleWidth / 70, 8);
+                track.style.animation = "none"; void track.offsetWidth;
                 track.style.animation = `marqueeScroll ${duration}s linear infinite`;
             });
         }
@@ -703,53 +570,33 @@
         let isDrawing = false;
         let currentPrizeUrl = ""; 
         let globalPlayedUsers = {}; 
-        let myDeviceRecord = null;   // 這個裝置(以登入的uid為準)是否已經抽過的紀錄，取代舊版可被竄改的localStorage字串
-        let honorUnlockedGroup = null; // 幸運中獎者欄位目前解鎖的群組（null = 尚未解鎖）
-        let lastPlayedList = [];       // 最近一次從 Firebase 算出的完整得獎名單（未過濾群組）
-        let lastPrizes = null;         // 最近一次從 Firebase 拿到的獎品資料（用來重繪禮物列表）
-        let deviceId = null;           // 登入成功後會被設為 Firebase 匿名登入的 uid
+        let myDeviceRecord = null;   
+        let honorUnlockedGroup = null; 
+        let lastPlayedList = [];       
+        let lastPrizes = null;         
+        let deviceId = null;           
 
-        // 🔐 先用 Firebase 匿名登入驗證身份，通過後才開始監聽資料庫、才能抽獎
-        // (資料庫規則現在要求 auth != null 才能讀寫，避免任何人不透過這個網站就能直接戳資料庫)
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 deviceId = user.uid;
-
-                // 🔒 即時監聽打烊模式：管理員在後台一按開關，這裡會立刻顯示/隱藏模糊遮罩
                 onValue(ref(db, "settings/closed"), (snap) => {
                     document.getElementById("closedOverlay").style.display = (snap.val() === true) ? "flex" : "none";
                 });
-
-                get(ref(db, "playedDevices/" + deviceId))
-                    .then((snap) => {
-                        myDeviceRecord = snap.exists() ? snap.val() : null;
-                        initApp();
-                    })
-                    .catch((err) => {
-                        console.error("讀取裝置狀態失敗：", err);
-                        initApp();
-                    });
+                get(ref(db, "playedDevices/" + deviceId)).then((snap) => {
+                    myDeviceRecord = snap.exists() ? snap.val() : null;
+                    initApp();
+                }).catch((err) => { console.error("讀取裝置狀態失敗：", err); initApp(); });
             }
         });
-        signInAnonymously(auth).catch((err) => {
-            console.error("匿名登入失敗：", err);
-            alert("連線驗證失敗，請重新整理頁面再試一次！");
-        });
+        signInAnonymously(auth).catch((err) => { alert("連線驗證失敗，請重新整理頁面再試一次！"); });
 
         const groupLists = {
-            "皮皮": {
-                label: "✨ 皮皮群",
-                names: ["貝果", "怡蒨", "７７", "安鴻", "當家", "立涵", "皮夾", "睏寶"]
-            },
-            "GM": {
-                label: "✨ 龜蜜群",
-                names: ["伶", "昀", "瑜"]
-            }
+            "皮皮": { label: "✨ 皮皮群", names: ["貝果", "怡蒨", "７７", "安鴻", "當家", "立涵", "皮夾", "睏寶"] },
+            "GM": { label: "✨ 龜蜜群", names: ["伶", "昀", "瑜"] }
         };
 
         const eggColors = ["egg-pink", "egg-blue", "egg-yellow", "egg-green", "egg-purple", "egg-orange"];
 
-        // 🔎 依名字反查該名字屬於哪個群組（用來把中獎紀錄標記群組）
         function getGroupKeyForName(name) {
             for (const key in groupLists) {
                 if (groupLists[key].names.includes(name)) return key;
@@ -757,111 +604,55 @@
             return null;
         }
 
-        // 🔎 判斷某個已送完的獎品，是否完全沒被「目前解鎖的群組」抽中過
-        // （用來在禮物列表加註「已被其他組抽走」，說明庫存跟中獎名單看起來不一致的原因）
         function isPrizeTakenByOtherGroup(prizeName) {
-            if (!honorUnlockedGroup) return false; // 尚未解鎖任何群組時，不做這個判斷
-
+            if (!honorUnlockedGroup) return false;
             for (const user in globalPlayedUsers) {
                 const rec = globalPlayedUsers[user];
-                if (rec.won === prizeName && rec.group === honorUnlockedGroup) {
-                    return false; // 自己這組也有人抽中過，不算「被其他組拿走」
-                }
+                if (rec.won === prizeName && rec.group === honorUnlockedGroup) return false;
             }
             return true;
         }
 
-        // 📋 畫出「禮物列表」欄位，只顯示目前解鎖群組看得到的獎品；已送完且非本組抽中的獎品會加註提示
         function renderStatusBoard(prizes) {
             const board = document.getElementById("statusBoard");
             if (!board || !prizes) return;
-
             let html = '<span class="prize-title-text">📋 禮物列表</span>';
-            let hasVisiblePrize = false;
-
             if (!honorUnlockedGroup) {
                 board.innerHTML = html + '<div style="color: #9ca3af; font-size: 13px; padding: 10px;">🔒 請先輸入通關密語解鎖你的群組，才能看到禮物清單。</div>';
                 return;
             }
-
             for (let id in prizes) {
                 const p = prizes[id];
                 if (p.name && p.name.includes("銘謝惠顧")) continue;
-
                 const prizeGroups = Array.isArray(p.groups) ? p.groups : [];
-                if (!prizeGroups.includes(honorUnlockedGroup)) continue; // 這個獎品沒有開放給目前解鎖的群組，不顯示
+                if (!prizeGroups.includes(honorUnlockedGroup)) continue;
 
-                hasVisiblePrize = true;
                 const imgHtml = p.image ? `<img class="prize-thumb" src="${p.image}" alt="${p.name}">` : `<div class="prize-thumb" style="background:#f3f4f6;"></div>`;
-
                 const remain = Number(p.quantity || 0);
                 const total = Number(p.totalQuantity || 0);
-                const showTotal = total > 1; // 只有原始總數大於 1 份時，才顯示「共 X 份」
 
                 if (remain > 0) {
-                    const qtyLabel = showTotal
-                        ? `🟢 剩餘 <b>${remain}</b> 份 / 共 <b>${total}</b> 份`
-                        : `🟢 剩餘 <b>${remain}</b> 份`;
-                    const progressBar = showTotal
-                        ? `<div class="prize-progress-track"><div class="prize-progress-fill is-available" style="width:${Math.round(remain / total * 100)}%;"></div></div>`
-                        : '';
-                    html += `
-                    <div class="prize-item-row">
-                        ${imgHtml}
-                        <div class="prize-info">
-                            <span class="prize-name-label">${p.name}</span>
-                            <span style="color:#059669; font-size:13px; font-weight:bold;">${qtyLabel}</span>
-                            ${progressBar}
-                        </div>
-                    </div>`;
+                    html += `<div class="prize-item-row">${imgHtml}<div class="prize-info"><span class="prize-name-label">${p.name}</span><span style="color:#059669; font-size:13px; font-weight:bold;">🟢 剩餘 <b>${remain}</b> 份</span></div></div>`;
                 } else {
-                    const otherGroupNote = isPrizeTakenByOtherGroup(p.name)
-                        ? '<div style="color:#f97316; font-size:11px; font-weight:bold; margin-top:1px;">🔸 已被其他組抽走</div>'
-                        : '';
-                    const soldOutLabel = showTotal
-                        ? `🔴 已全數送完（共 <b>${total}</b> 份）`
-                        : `🔴 已全數送完`;
-                    const progressBar = showTotal
-                        ? `<div class="prize-progress-track"><div class="prize-progress-fill is-empty" style="width:100%;"></div></div>`
-                        : '';
-                    html += `
-                    <div class="prize-item-row" style="opacity: 0.4;">
-                        ${imgHtml}
-                        <div class="prize-info">
-                            <span class="prize-name-label" style="text-decoration: line-through; color:#9ca3af;">${p.name}</span>
-                            <span style="color:#dc2626; font-size:13px; font-weight:bold;">${soldOutLabel}</span>
-                            ${progressBar}
-                            ${otherGroupNote}
-                        </div>
-                    </div>`;
+                    html += `<div class="prize-item-row" style="opacity: 0.4;">${imgHtml}<div class="prize-info"><span class="prize-name-label" style="text-decoration: line-through; color:#9ca3af;">${p.name}</span><span style="color:#dc2626; font-size:13px; font-weight:bold;">🔴 已全數送完</span></div></div>`;
                 }
             }
-            if (!hasVisiblePrize) html += '<div style="color: #9ca3af; font-size: 13px; padding: 10px;">目前無公開好禮。</div>';
             board.innerHTML = html;
         }
 
-
         function verifyGroupPass() {
             if(myDeviceRecord){
-
-            const user = myDeviceRecord.user;
-
-            alert(`此裝置已由【${user}】抽過獎囉！`);
-
-            return;
-        }
+                alert(`此裝置已由【${myDeviceRecord.user}】抽過獎囉！`);
+                return;
+            }
             const inputPass = document.getElementById("secretPass").value.trim();
             const selectEl = document.getElementById("playerName");
-            
             selectEl.innerHTML = "";
             
             if (groupLists[inputPass]) {
                 const group = groupLists[inputPass];
-                
                 const defaultOpt = document.createElement("option");
-                defaultOpt.value = "";
-                defaultOpt.disabled = true;
-                defaultOpt.selected = true;
+                defaultOpt.value = ""; defaultOpt.disabled = true; defaultOpt.selected = true;
                 defaultOpt.innerText = "▼ 請選擇你的名字 ▼";
                 selectEl.appendChild(defaultOpt);
 
@@ -871,37 +662,25 @@
                 group.names.forEach(name => {
                     const opt = document.createElement("option");
                     opt.value = name;
-                    
                     if (globalPlayedUsers[name]) {
-                        opt.disabled = true;
-                        opt.innerText = `${name} (已抽過)`;
+                        opt.disabled = true; opt.innerText = `${name} (已抽過)`;
                     } else {
                         opt.innerText = name;
                     }
                     optGroup.appendChild(opt);
                 });
-
                 selectEl.appendChild(optGroup);
 
-                // 🔓 同一組密語也一併解鎖「幸運中獎者」欄位與跑馬燈的同群組播報
                 honorUnlockedGroup = inputPass;
                 renderHonorBoard(lastPlayedList);
                 updateMarquee(buildMarqueeText(lastPlayedList));
                 if (lastPrizes) renderStatusBoard(lastPrizes);
-
                 alert(`🔓 【${inputPass}】名單已成功解鎖！`);
             } else {
-                const lockOpt = document.createElement("option");
-                lockOpt.value = "";
-                lockOpt.disabled = true;
-                lockOpt.selected = true;
-                lockOpt.innerText = "🔒 請先解鎖群組名單 🔒";
-                selectEl.appendChild(lockOpt);
                 alert("❌ 密語錯誤，無法解鎖群組名單！");
             }
         }
 
-        // 🔎 playedUsers 更新時共用的畫面刷新邏輯（名單下拉選單 / 跑馬燈 / 幸運中獎者榜）
         function refreshPlayedUsersUI() {
             const nameSelect = document.getElementById("playerName");
             const options = nameSelect.getElementsByTagName("option");
@@ -909,37 +688,23 @@
                 if (option.value === "") continue;
                 if (globalPlayedUsers[option.value]) {
                     option.disabled = true;
-                    if (!option.innerText.includes(" (已抽過)")) {
-                        option.innerText = option.value + " (已抽過)";
-                    }
+                    if (!option.innerText.includes(" (已抽過)")) option.innerText = option.value + " (已抽過)";
                 }
             }
 
             let playedList = [];
-
             for (let user in globalPlayedUsers) {
-                if (globalPlayedUsers[user].won && globalPlayedUsers[user].won.includes("銘謝惠顧")) {
-                    continue;
-                }
-
+                if (globalPlayedUsers[user].won && globalPlayedUsers[user].won.includes("銘謝惠顧")) continue;
                 playedList.push({
-                    user: user,
-                    won: globalPlayedUsers[user].won,
-                    time: globalPlayedUsers[user].time || 0,
-                    group: globalPlayedUsers[user].group || null
+                    user: user, won: globalPlayedUsers[user].won, time: globalPlayedUsers[user].time || 0, group: globalPlayedUsers[user].group || null
                 });
             }
-
             playedList.sort((a, b) => b.time - a.time);
-
             lastPlayedList = playedList;
             updateMarquee(buildMarqueeText(playedList));
             renderHonorBoard(playedList);
         }
 
-        // 🔐 登入成功後才開始監聽資料庫（未登入時規則會拒絕讀取，所以必須等 initApp 被呼叫）
-        // 注意：這裡只監聽 /prizes 與 /playedUsers 這兩個「公開安全」節點；
-        // 真正的中獎序號(/prizeCodes)與裝置清單(/playedDevices)現在受保護，不會整包被監聽下來
         function initApp() {
             onValue(ref(db, "prizes"), (snapshot) => {
                 const prizes = snapshot.val();
@@ -952,32 +717,133 @@
                 globalPlayedUsers = snapshot.val() || {};
                 refreshPlayedUsersUI();
             });
+
+            onValue(ref(db, "shopItems"), (snapshot) => {
+                currentShopItems = snapshot.val() || {};
+                renderShopItems();
+            });
         }
 
-        // ⚖️ 修正版：依權重(weight)計算機率的抽獎核心
-        async function startDraw() {
+        // 🛍️ 點數兌換專區視窗邏輯
+        function openShopModal() {
             const nameInput = document.getElementById("playerName").value;
             if (!nameInput) {
-                alert("請先輸入通關密語並選擇你的名字喔！");
+                alert("請先選擇你的名字才能進入點數兌換專區喔！");
+                return;
+            }
+            renderShopItems();
+            document.getElementById("shopModal").style.display = "flex";
+        }
+
+        function closeShopModal() {
+            document.getElementById("shopModal").style.display = "none";
+        }
+
+        function renderShopItems() {
+            const container = document.getElementById("shopItemList");
+            if (!container) return;
+
+            const keys = Object.keys(currentShopItems);
+            if (keys.length === 0) {
+                container.innerHTML = '<div class="text-center text-gray-400 text-sm py-8">目前暫無上架商品</div>';
                 return;
             }
 
-            if (myDeviceRecord) {
-                alert("此裝置已經抽過獎囉！");
+            let html = "";
+            keys.forEach(id => {
+                const item = currentShopItems[id];
+                const cost = Number(item.cost || 0);
+                const qty = Number(item.quantity || 0);
+                const userPts = Number(currentUserPointsData.points || 0);
+                const canAfford = userPts >= cost && qty > 0;
+
+                const imgHtml = item.image 
+                    ? `<img src="${item.image}" class="w-16 h-16 rounded-xl object-cover border flex-shrink-0">` 
+                    : `<div class="w-16 h-16 rounded-xl bg-amber-100 text-amber-500 font-bold flex items-center justify-center text-xl flex-shrink-0">🎁</div>`;
+
+                html += `
+                <div class="bg-amber-50/50 rounded-2xl p-3 border border-amber-200/60 flex items-center gap-3">
+                    ${imgHtml}
+                    <div class="flex-grow min-w-0">
+                        <div class="font-black text-slate-800 text-sm truncate">${item.name}</div>
+                        <div class="text-xs text-amber-600 font-bold mt-0.5">💰 所需點數：${cost} 點</div>
+                        <div class="text-[11px] text-gray-400 font-medium">庫存：${qty > 0 ? qty + ' 份' : '<span class="text-rose-500 font-bold">已售完</span>'}</div>
+                    </div>
+                    <button onclick="redeemShopItem('${id}')" ${!canAfford ? 'disabled' : ''} class="px-3.5 py-2 rounded-xl font-bold text-xs flex-shrink-0 transition-all ${canAfford ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md active:scale-95 cursor-pointer hover:from-amber-600 hover:to-orange-600' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}">
+                        ${qty <= 0 ? '已售完' : (userPts < cost ? '點數不足' : '兌換')}
+                    </button>
+                </div>`;
+            });
+
+            container.innerHTML = html;
+        }
+
+        async function redeemShopItem(itemId) {
+            const username = document.getElementById("playerName").value;
+            const item = currentShopItems[itemId];
+            if (!username || !item) return;
+
+            const cost = Number(item.cost || 0);
+            const now = Date.now();
+
+            if (currentUserPointsData.expireAt && now > currentUserPointsData.expireAt) {
+                alert("❌ 你的點數已過期，無法進行兌換！");
                 return;
             }
 
-            if (globalPlayedUsers[nameInput]) {
-                alert("這個名字已經抽過獎囉！");
+            if ((currentUserPointsData.points || 0) < cost) {
+                alert("❌ 點數不足，無法兌換此商品！");
                 return;
             }
 
+            if (!confirm(`確定要消耗 ${cost} 點兌換「${item.name}」嗎？`)) return;
+
+            try {
+                // 1. 扣減庫存
+                const qtyRef = ref(db, `shopItems/${itemId}/quantity`);
+                const txRes = await runTransaction(qtyRef, (cur) => {
+                    if (cur === null || cur === undefined) return cur;
+                    if (Number(cur) <= 0) return;
+                    return Number(cur) - 1;
+                });
+
+                if (!txRes.committed) {
+                    alert("啊！商品剛好被搶光了！");
+                    return;
+                }
+
+                // 2. 扣除玩家點數
+                const newPts = (currentUserPointsData.points || 0) - cost;
+                await update(ref(db, `userPoints/${username}`), {
+                    points: newPts
+                });
+
+                // 3. 紀錄訂單
+                await push(ref(db, "shopOrders"), {
+                    user: username,
+                    itemName: item.name,
+                    cost: cost,
+                    time: Date.now()
+                });
+
+                alert("🎉 經睏寶確認後，獎品會以私訊方式發送");
+                closeShopModal();
+
+            } catch (e) {
+                console.error("兌換失敗：", e);
+                alert("兌換失敗，請稍後再試！");
+            }
+        }
+
+        async function startDraw() {
+            const nameInput = document.getElementById("playerName").value;
+            if (!nameInput) { alert("請先輸入通關密語並選擇你的名字喔！"); return; }
+            if (myDeviceRecord) { alert("此裝置已經抽過獎囉！"); return; }
+            if (globalPlayedUsers[nameInput]) { alert("這個名字已經抽過獎囉！"); return; }
             if (isDrawing) return;
             isDrawing = true;
 
             try {
-                // 1. 依「目前畫面上看到的」獎品資料，篩選出「這個玩家的群組能抽」+「數量大於0」+「權重大於0」的有效獎品
-                //    (真正的庫存扣減仍會在下一步由資料庫做原子性檢查，這裡只是先選出候選)
                 const myGroup = getGroupKeyForName(nameInput);
                 let pool = [];
                 let totalWeight = 0;
@@ -987,17 +853,12 @@
                     let q = Number(p.quantity || 0);
                     let w = Number(p.weight || 0);
                     let prizeGroups = Array.isArray(p.groups) ? p.groups : [];
-                    if (!myGroup || !prizeGroups.includes(myGroup)) continue; // 這個獎品沒有開放給玩家所屬的群組
+                    if (!myGroup || !prizeGroups.includes(myGroup)) continue;
                     if (q > 0 && w > 0) {
                         pool.push({ id, prizeData: p, weight: w });
                         totalWeight += w;
                     }
                 }
-
-                // 注意：不再有「權重全部為0時自動改成人人權重1平分」的備援機制。
-                // 這代表：如果你想要有「銘謝惠顧／不中獎」的結果，請務必在後台
-                // 額外新增一張名稱含「銘謝惠顧」的獎品卡，並給它一個 >0 的權重與
-                // 足夠大的庫存數量，否則權重全設 0 時抽獎會直接顯示「庫存已被抽光」。
 
                 if (pool.length === 0) {
                     alert("庫存已被抽光囉！");
@@ -1019,12 +880,10 @@
 
                 const chosenPrize = pool.find(p => p.id === chosenPrizeId).prizeData;
 
-                // 2. 用交易(transaction)安全地扣減這個獎品的庫存，資料庫規則只允許「剛好減1、且不能小於0」的寫入，
-                //    就算兩個人同時抽到同一個獎品，Firebase也會用這個機制保證不會被搶成負數
                 const quantityRef = ref(db, `prizes/${chosenPrizeId}/quantity`);
                 const txResult = await runTransaction(quantityRef, (current) => {
                     if (current === null || current === undefined) return current;
-                    if (Number(current) <= 0) return; // 中止交易：剛好被搶完了
+                    if (Number(current) <= 0) return;
                     return Number(current) - 1;
                 });
 
@@ -1034,34 +893,49 @@
                     return;
                 }
 
-                const newQuantity = Number(txResult.snapshot.val());
-
-                // 3. 讀取這個獎品完整的序號清單，並排除掉已經發放給別人的序號，挑一組還沒發出去的。
-                //    （這個獎品的序號清單本來就只有登入過網站的人讀得到，陌生人還是看不到；
-                //     不再需要管理後台的「原始總數」欄位來換算，減少人工填寫出錯的機會）
                 let wonCode = "";
-                try {
-                    const codesSnap = await get(ref(db, `prizeCodes/${chosenPrizeId}`));
-                    if (codesSnap.exists()) {
-                        const codesObj = codesSnap.val();
-                        const usedCodes = new Set(
-                            Object.values(globalPlayedUsers)
-                                .map(u => u && u.code)
-                                .filter(c => c)
-                        );
-                        const availableCodes = Object.values(codesObj).filter(c => c && !usedCodes.has(c));
-                        if (availableCodes.length > 0) {
-                            wonCode = availableCodes[0];
+                let awardedPoints = 0;
+
+                // 🎁 如果抽中的是「點數獎品」
+                if (chosenPrize.isPointPrize) {
+                    const minP = Number(chosenPrize.minPoints || 1);
+                    const maxP = Number(chosenPrize.maxPoints || 5);
+                    awardedPoints = Math.floor(Math.random() * (maxP - minP + 1)) + minP;
+
+                    const days = Number(chosenPrize.pointExpireDays || 30);
+                    const expireAt = Date.now() + (days * 24 * 60 * 60 * 1000);
+
+                    const userPtsRef = ref(db, `userPoints/${nameInput}`);
+                    const ptsSnap = await get(userPtsRef);
+                    let basePts = 0;
+                    if (ptsSnap.exists()) {
+                        const curData = ptsSnap.val();
+                        if (!curData.expireAt || Date.now() < curData.expireAt) {
+                            basePts = Number(curData.points || 0);
                         }
                     }
-                } catch (e) {
-                    console.error("讀取序號失敗：", e);
+                    await update(userPtsRef, {
+                        points: basePts + awardedPoints,
+                        expireAt: expireAt
+                    });
+                } else {
+                    try {
+                        const codesSnap = await get(ref(db, `prizeCodes/${chosenPrizeId}`));
+                        if (codesSnap.exists()) {
+                            const codesObj = codesSnap.val();
+                            const usedCodes = new Set(Object.values(globalPlayedUsers).map(u => u && u.code).filter(c => c));
+                            const availableCodes = Object.values(codesObj).filter(c => c && !usedCodes.has(c));
+                            if (availableCodes.length > 0) wonCode = availableCodes[0];
+                        }
+                    } catch (e) { console.error("讀取序號失敗：", e); }
                 }
 
-                // 4. 寫入得獎紀錄。資料庫規則規定這兩個節點「只能建立、不能覆蓋」，
-                //    且 playedDevices 只能寫進自己(auth.uid)的那一筆，防止冒用別人身份
+                const wonText = chosenPrize.isPointPrize 
+                    ? `🎁 獲得點數 ${awardedPoints} 點！` 
+                    : chosenPrize.name;
+
                 const myResult = {
-                    won: chosenPrize.name,
+                    won: wonText,
                     code: wonCode,
                     time: Date.now(),
                     group: getGroupKeyForName(nameInput)
@@ -1074,7 +948,6 @@
 
                 myDeviceRecord = { user: nameInput, time: Date.now() };
 
-                // 5. 播放動畫、顯示中獎結果
                 const container = document.getElementById("gachaGlass");
                 const luckyEgg = document.getElementById("luckyEgg");
                 const crank = document.getElementById("gachaCrank");
@@ -1091,14 +964,11 @@
                 }
 
                 container.classList.add("eggs-drop-down");
-
                 luckyEgg.className = "gacha-lucky-egg";
                 luckyEgg.style.opacity = "0";
                 luckyEgg.classList.add(chosenColor);
 
-                setTimeout(() => {
-                    luckyEgg.classList.add("dropped-egg");
-                }, 1000);
+                setTimeout(() => { luckyEgg.classList.add("dropped-egg"); }, 1000);
 
                 setTimeout(() => {
                     const modalTitle = document.getElementById("modalTitle");
@@ -1106,22 +976,25 @@
                     const modalTicketCode = document.getElementById("modalTicketCode");
                     const copyHint = document.getElementById("copyHint");
                     const closeBtn = document.querySelector("#winModal button:last-child");
-                    const labelPrize = modalPrizeName.previousElementSibling;
 
                     modalPrizeName.innerText = myResult.won;
                     currentPrizeUrl = myResult.code;
 
-                    if (myResult.won && myResult.won.includes("銘謝惠顧")) {
+                    if (chosenPrize.isPointPrize) {
+                        modalTitle.innerText = "🎉 獲得點數！";
+                        modalTitle.className = "text-2xl font-black text-amber-500 mb-2";
+                        modalTicketCode.style.display = "none";
+                        copyHint.innerText = "💡 點數已自動匯入你的帳戶，可至兌換專區換好禮！";
+                        closeBtn.innerText = "收下點數";
+                    } else if (myResult.won && myResult.won.includes("銘謝惠顧")) {
                         modalTitle.innerText = "😢 差一點點！";
                         modalTitle.className = "text-2xl font-black text-gray-500 mb-2";
-                        if (labelPrize) labelPrize.innerText = "💨 本次結果";
                         modalTicketCode.style.display = "none";
                         copyHint.style.display = "none";
                         closeBtn.innerText = "再接再厲";
                     } else {
                         modalTitle.innerText = "🎉 恭喜中獎！";
                         modalTitle.className = "text-2xl font-black text-rose-500 mb-2";
-                        if (labelPrize) labelPrize.innerText = "🎁 抽中獎品";
                         modalTicketCode.style.display = "block";
                         modalTicketCode.innerText = "點我打開獎品連結";
                         copyHint.style.display = "block";
@@ -1137,7 +1010,7 @@
 
             } catch (error) {
                 console.error("抽獎失敗: ", error);
-                alert("伺服器擁擠，或這個名字/裝置剛好已經抽過了，請重新整理頁面後再試一次！");
+                alert("抽獎失敗，請重新整理頁面後再試一次！");
                 isDrawing = false;
             }
         }
@@ -1158,15 +1031,14 @@
             luckyEgg.className = "gacha-lucky-egg";
             luckyEgg.style.opacity = "0";
             
-            // 🔄 重置 Modal 元素的預設顯示狀態，確保下次中獎能正常運作
             document.getElementById("modalTicketCode").style.display = "block";
             document.getElementById("copyHint").style.display = "block";
             
             const selectEl = document.getElementById("playerName");
             selectEl.innerHTML = '<option value="" disabled selected>🔒 請先解鎖群組名單 🔒</option>';
             document.getElementById("secretPass").value = "";
+            document.getElementById("pointsCard").classList.add("hidden");
 
-            // 🔄 切回選單畫面，準備給下一位玩家使用
             showControlPanel();
         }
     </script>
