@@ -185,6 +185,13 @@
             cursor: pointer; transition: transform 0.1s;
         }
         .shop-btn:active { transform: scale(0.95); }
+        .back-btn {
+            background: rgba(255,255,255,0.7); border: 1px solid #e5e7eb;
+            color: #6b7280; border-radius: 999px; padding: 6px 16px;
+            font-size: 12px; font-weight: bold; cursor: pointer;
+            transition: background 0.2s;
+        }
+        .back-btn:hover { background: rgba(255,255,255,0.9); }
     </style>
 </head>
 
@@ -246,11 +253,13 @@
             <!-- 🎪 內容區（選擇名字後出現） -->
             <div id="contentArea" class="hidden w-full max-w-sm flex flex-col items-center mt-4 md:mt-6">
                 
-                <!-- 🔥 新增：顯示目前玩家名字 -->
-                <div id="playerNameDisplay" class="w-full text-center mb-3 hidden">
-                    <span class="inline-block bg-white/70 backdrop-blur-sm rounded-full px-5 py-2 text-sm font-bold text-slate-700 shadow-sm border border-white">
+                <!-- 🔥 上一步按鈕 + 玩家名稱 -->
+                <div class="w-full flex items-center justify-between mb-3">
+                    <button onclick="goBack()" class="back-btn">← 上一步</button>
+                    <span id="playerNameDisplay" class="inline-block bg-white/70 backdrop-blur-sm rounded-full px-5 py-2 text-sm font-bold text-slate-700 shadow-sm border border-white">
                         👤 目前玩家：<span id="currentPlayerNameLabel" class="text-rose-500"></span>
                     </span>
+                    <div style="width:60px;"></div> <!-- 佔位以平衡 -->
                 </div>
 
                 <!-- 🪙 點數錢包卡片 -->
@@ -272,7 +281,7 @@
                     ⚠️ 你已抽過獎，無法再次抽獎<br>但你仍可查看點數與兌換商品唷！
                 </div>
 
-                <!-- 扭蛋機本體（完全保留） -->
+                <!-- 扭蛋機本體 -->
                 <div class="gacha-machine mt-6">
                     <div class="gacha-glass" id="gachaGlass">
                         <div class="gacha-egg egg-pink egg-layer-a" style="left: 15px;"></div>
@@ -388,7 +397,7 @@
     <!-- 🔊 音效開關 -->
     <button id="soundToggleBtn" onclick="toggleSound()" class="music-control-btn fixed bottom-5 right-5 bg-slate-900 text-cyan-400 text-sm font-bold px-4 py-2 rounded-full shadow-lg border border-cyan-500/30 z-40 transition-all active:scale-95">🔊 音效</button>
 
-    <script type="module">
+        <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
         import { getDatabase, ref, runTransaction, onValue, get, update, push } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
@@ -416,6 +425,7 @@
         window.closeShop = closeShop;
         window.verifyPersonalPass = verifyPersonalPass;
         window.closeWalletPassModal = closeWalletPassModal;
+        window.goBack = goBack;  // 暴露上一步
 
         // ---------- 全域狀態 ----------
         let isDrawing = false;
@@ -666,10 +676,20 @@
                     processedAt: Date.now(),
                     prizeDelivered: false
                 });
-                // 刷新記錄
                 loadPlayerRedeemHistory();
             } catch(e) { console.error(e); alert("兌換失敗"); }
         };
+
+        // ---------- 上一步 ----------
+        function goBack() {
+            // 隱藏內容區，顯示控制面板，但不清空密語和下拉選單
+            document.getElementById("contentArea").classList.add("hidden");
+            document.getElementById("controlPanel").classList.remove("hidden");
+            // 錢包區塊隱藏（返回控制面板時一併）
+            document.getElementById("walletSection").classList.add("hidden");
+            // 不清除 secretPass 的值與下拉選單，讓玩家可以直接重新選名字
+            // 但我們必須確保下拉選單的 onchange 仍然有效
+        }
 
         // ---------- 選擇名字 ----------
         function handleNameChange() {
@@ -755,6 +775,12 @@
             onValue(ref(db, "shopItems"), snap => { shopItems = snap.val()||{}; if (document.getElementById("shopModal").style.display === "flex") renderShopItems(); });
         }
 
+        // 輔助：取得當年年底 timestamp
+        function getYearEndTimestamp() {
+            const now = new Date();
+            return new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999).getTime();
+        }
+
         // ---------- 抽獎核心 ----------
         async function startDraw() {
             const name = document.getElementById("playerName").value;
@@ -796,14 +822,31 @@
                 const minP = Number(chosen.minPoints), maxP = Number(chosen.maxPoints);
                 if (!isNaN(minP) && !isNaN(maxP) && maxP>=minP && maxP>0) {
                     awardedPoints = Math.floor(Math.random()*(maxP-minP+1))+minP;
+                    const yearEnd = getYearEndTimestamp();
                     try {
-                        await runTransaction(ref(db, `pointUsers/${name}/points`), cur => (cur||0)+awardedPoints);
+                        // 使用 transaction 增加點數，並一併設定 expiry 為當年年底
+                        await runTransaction(ref(db, `pointUsers/${name}`), cur => {
+                            if (!cur) {
+                                // 新建錢包
+                                return {
+                                    points: awardedPoints,
+                                    expiry: yearEnd,
+                                    personalPassHash: "",
+                                    boundUid: ""
+                                };
+                            } else {
+                                cur.points = (cur.points || 0) + awardedPoints;
+                                cur.expiry = yearEnd; // 每次獲得點數都延長到今年底
+                                return cur;
+                            }
+                        });
                         await push(ref(db, "pendingPoints"), {
                             playerName: name, points: awardedPoints, prizeName: chosen.name,
                             timestamp: Date.now(), status: "approved", processedAt: Date.now()
                         });
                     } catch(e) { console.error("點數發放失敗", e); }
                 }
+                // ... 動畫與彈窗 (保持不變)
                 const container = document.getElementById("gachaGlass"), lucky = document.getElementById("luckyEgg"), crank = document.getElementById("gachaCrank");
                 const color = eggColors[Math.floor(Math.random()*eggColors.length)];
                 const matches = container.querySelectorAll(`.gacha-egg.${color}:not(.egg-falling-out)`);
