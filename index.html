@@ -10,14 +10,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@900&display=swap" rel="stylesheet">
     
     <style>
-        /* === 手機版 === */
         @media (max-width: 640px) {
-            .gacha-title { font-size: 2rem !important; -webkit-text-stroke: 6px #fff; }
-            .gacha-machine { transform: scale(.72); transform-origin: top center; margin-bottom: 0px; height: 350px; }
-            .dashboard-panel { height: auto; min-height: 250px; }
-            .music-control-btn { bottom: 15px; right: 15px; font-size: 12px; padding: 8px 14px; }
+            .gacha-title { font-size:2rem !important; -webkit-text-stroke:6px #fff; }
+            .gacha-machine { transform:scale(.72); transform-origin:top center; margin-bottom:0px; height:350px; }
+            .dashboard-panel { height:auto; min-height:250px; }
+            .music-control-btn { bottom:15px; right:15px; font-size:12px; padding:8px 14px; }
         }
-
         body {
             background: linear-gradient(135deg, #fbcfe8, #e0e7ff, #ccfbf1);
             background-size: 400% 400%;
@@ -25,168 +23,94 @@
             font-family: 'Noto Sans TC', sans-serif;
             overflow-x: hidden;
         }
-
         @keyframes gradientBG {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
-
         .gacha-title {
             font-family: 'Noto Sans TC', sans-serif;
-            font-weight: 900;
-            color: #ff3366;
-            letter-spacing: 2px;
-            -webkit-text-stroke: 10px #ffffff;
-            paint-order: stroke fill;
+            font-weight: 900; color: #ff3366; letter-spacing: 2px;
+            -webkit-text-stroke: 10px #ffffff; paint-order: stroke fill;
             filter: drop-shadow(4px 4px 0px rgba(0,0,0,0.08)) drop-shadow(0px 8px 15px rgba(244,63,94,0.2));
         }
-
         .gacha-machine {
-            position: relative;
-            width: 320px;
+            position: relative; width: 320px;
             background: linear-gradient(to bottom, #ef4444, #dc2626);
             border-radius: 40px 40px 20px 20px;
             box-shadow: 0 20px 0 #b91c1c, 0 30px 40px rgba(0,0,0,0.3);
-            padding: 25px;
-            margin: 20px auto 0 auto;
-            border: 6px solid #fee2e2;
+            padding: 25px; margin: 20px auto 0 auto; border: 6px solid #fee2e2;
         }
-
         .gacha-glass {
-            position: relative;
-            height: 240px;
+            position: relative; height: 240px;
             background: radial-gradient(circle at 50% 30%, rgba(255,255,255,0.4) 0%, rgba(243,244,246,0.8) 70%);
-            border-radius: 30px;
-            border: 6px solid #b91c1c;
-            overflow: hidden;
-            box-shadow: inset 0 10px 20px rgba(0,0,0,0.15);
-            margin-bottom: 25px;
+            border-radius: 30px; border: 6px solid #b91c1c; overflow: hidden;
+            box-shadow: inset 0 10px 20px rgba(0,0,0,0.15); margin-bottom: 25px;
         }
-
         .gacha-egg {
-            position: absolute;
-            width: 38px; height: 38px;
-            border-radius: 50%;
+            position: absolute; width: 38px; height: 38px; border-radius: 50%;
             box-shadow: inset -4px -4px 8px rgba(0,0,0,0.2), 2px 4px 6px rgba(0,0,0,0.1);
             transition: transform 0.3s ease, opacity 0.5s ease;
         }
         .gacha-egg::after {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 50%;
-            background: rgba(255,255,255,0.35);
-            border-radius: 19px 19px 0 0;
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 50%;
+            background: rgba(255,255,255,0.35); border-radius: 19px 19px 0 0;
         }
-
-        .egg-pink { background: #ec4899; }
-        .egg-blue { background: #3b82f6; }
-        .egg-yellow { background: #eab308; }
-        .egg-green { background: #22c55e; }
-        .egg-purple { background: #a855f7; }
-        .egg-orange { background: #f97316; }
-
-        .egg-layer-a { bottom: 8px; }
-        .egg-layer-b { bottom: 25px; }
-        .egg-layer-c { bottom: 42px; }
-
-        .egg-falling-out {
-            animation: eggFallOut 0.8s cubic-bezier(0.55, 0.055, 0.675, 0.19) forwards !important;
-        }
+        .egg-pink { background: #ec4899; } .egg-blue { background: #3b82f6; }
+        .egg-yellow { background: #eab308; } .egg-green { background: #22c55e; }
+        .egg-purple { background: #a855f7; } .egg-orange { background: #f97316; }
+        .egg-layer-a { bottom: 8px; } .egg-layer-b { bottom: 25px; } .egg-layer-c { bottom: 42px; }
+        .egg-falling-out { animation: eggFallOut 0.8s cubic-bezier(0.55, 0.055, 0.675, 0.19) forwards !important; }
         @keyframes eggFallOut {
             0% { transform: translateY(0) scale(1); opacity: 1; }
             50% { transform: translateY(60px) scale(0.9); opacity: 0.6; }
             100% { transform: translateY(120px) scale(0.7); opacity: 0; }
         }
-
         .eggs-drop-down .gacha-egg:not(.egg-falling-out) {
             animation: gravitySettle 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.3s forwards;
         }
         @keyframes gravitySettle {
-            0% { transform: translateY(0); }
-            50% { transform: translateY(6px); }
-            75% { transform: translateY(3px); }
-            100% { transform: translateY(4px); }
+            0% { transform: translateY(0); } 50% { transform: translateY(6px); }
+            75% { transform: translateY(3px); } 100% { transform: translateY(4px); }
         }
-
         .gacha-panel {
-            background: #991b1b;
-            border-radius: 20px;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
+            background: #991b1b; border-radius: 20px; padding: 20px;
+            display: flex; flex-direction: column; align-items: center; gap: 15px;
             box-shadow: inset 0 4px 8px rgba(0,0,0,0.3);
         }
-
         .gacha-crank {
             width: 70px; height: 70px;
             background: radial-gradient(circle, #f3f4f6 30%, #9ca3af 70%);
-            border-radius: 50%;
-            border: 6px solid #4b5563;
-            position: relative;
-            cursor: pointer;
+            border-radius: 50%; border: 6px solid #4b5563;
+            position: relative; cursor: pointer;
             box-shadow: 0 4px 0 #374151, 0 6px 10px rgba(0,0,0,0.3);
         }
         .gacha-crank::before {
-            content: '';
-            position: absolute;
-            width: 14px; height: 45px;
-            background: #4b5563;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            border-radius: 7px;
+            content: ''; position: absolute; width: 14px; height: 45px;
+            background: #4b5563; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 7px;
         }
         .gacha-crank::after {
-            content: '';
-            position: absolute;
-            width: 24px; height: 24px;
-            background: #dc2626;
-            border-radius: 50%;
-            top: -5px; left: 50%;
-            transform: translateX(-50%);
+            content: ''; position: absolute; width: 24px; height: 24px;
+            background: #dc2626; border-radius: 50%; top: -5px; left: 50%; transform: translateX(-50%);
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
-
-        .rotating-crank {
-            animation: rotateCrank 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-        }
-        @keyframes rotateCrank {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(720deg); }
-        }
-
+        .rotating-crank { animation: rotateCrank 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+        @keyframes rotateCrank { 0% { transform: rotate(0deg); } 100% { transform: rotate(720deg); } }
         .gacha-gate {
-            width: 75px; height: 75px;
-            background: #1f2937;
-            border-radius: 20px 20px 5px 5px;
-            border: 4px solid #4b5563;
-            position: relative;
-            box-shadow: inset 0 5px 10px rgba(0,0,0,0.5);
-            overflow: hidden;
+            width: 75px; height: 75px; background: #1f2937;
+            border-radius: 20px 20px 5px 5px; border: 4px solid #4b5563;
+            position: relative; box-shadow: inset 0 5px 10px rgba(0,0,0,0.5); overflow: hidden;
         }
-
         .gacha-lucky-egg {
-            position: absolute;
-            width: 46px; height: 46px;
-            border-radius: 50%;
-            top: -60px; left: 11px;
-            opacity: 0;
-            z-index: 10;
+            position: absolute; width: 46px; height: 46px; border-radius: 50%;
+            top: -60px; left: 11px; opacity: 0; z-index: 10;
             box-shadow: inset -5px -5px 10px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.4);
         }
         .gacha-lucky-egg::after {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 50%;
-            background: rgba(255,255,255,0.35);
-            border-radius: 23px 23px 0 0;
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 50%;
+            background: rgba(255,255,255,0.35); border-radius: 23px 23px 0 0;
         }
-
-        .dropped-egg {
-            animation: realGravityDrop 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.3s forwards;
-        }
+        .dropped-egg { animation: realGravityDrop 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.3s forwards; }
         @keyframes realGravityDrop {
             0% { top: -60px; opacity: 0; transform: scaleY(1.1) scaleX(0.9) rotate(0deg); }
             30% { top: 12px; opacity: 1; transform: scaleY(0.8) scaleX(1.15) rotate(120deg); }
@@ -196,51 +120,30 @@
             90% { top: 12px; transform: scaleY(1) scaleX(1) rotate(350deg); }
             100% { top: 12px; opacity: 1; transform: scaleY(1) scaleX(1) rotate(360deg); }
         }
-
         .dashboard-panel {
-            background: rgba(255,255,255,0.85);
-            backdrop-filter: blur(10px);
-            border-radius: 24px;
-            border: 2px solid rgba(255,255,255,0.5);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-            padding: 20px;
-            height: auto;
-            max-height: 380px;
-            display: flex;
-            flex-direction: column;
+            background: rgba(255,255,255,0.85); backdrop-filter: blur(10px);
+            border-radius: 24px; border: 2px solid rgba(255,255,255,0.5);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05); padding: 20px;
+            height: auto; max-height: 380px; display: flex; flex-direction: column;
         }
         .board-title-text {
-            font-size: 18px;
-            font-weight: 900;
-            display: flex;
-            align-items: center;
-            padding-bottom: 10px;
-            border-bottom: 2px dashed rgba(0,0,0,0.1);
-            margin-bottom: 12px;
-            flex-shrink: 0;
+            font-size: 18px; font-weight: 900; display: flex; align-items: center;
+            padding-bottom: 10px; border-bottom: 2px dashed rgba(0,0,0,0.1);
+            margin-bottom: 12px; flex-shrink: 0;
         }
-        .prize-title-text { color: #06b6d4; }
-        .honor-title-text { color: #ec4899; }
-
-        .scroller-content {
-            overflow-y: auto;
-            flex-grow: 1;
-            padding-right: 4px;
-        }
+        .prize-title-text { color: #06b6d4; } .honor-title-text { color: #ec4899; }
+        .scroller-content { overflow-y: auto; flex-grow: 1; padding-right: 4px; }
         .scroller-content::-webkit-scrollbar { width: 6px; }
         .scroller-content::-webkit-scrollbar-track { background: transparent; }
         .scroller-content::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
-
         .prize-item-row {
-            display: flex; align-items: center; gap: 12px;
-            background: white; padding: 8px 12px; border-radius: 14px;
-            margin-bottom: 8px; border: 1px solid #f3f4f6;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            display: flex; align-items: center; gap: 12px; background: white;
+            padding: 8px 12px; border-radius: 14px; margin-bottom: 8px;
+            border: 1px solid #f3f4f6; box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
         .prize-thumb { width: 40px; height: 40px; border-radius: 8px; object-fit: cover; flex-shrink: 0; }
         .prize-info { display: flex; flex-direction: column; gap: 1px; flex: 1; min-width: 0; }
         .prize-name-label { font-size: 14px; font-weight: bold; color: #1f2937; }
-
         .honor-item-row {
             display: flex; align-items: center; gap: 10px;
             background: linear-gradient(to right, #fffdfa, #fff);
@@ -253,7 +156,6 @@
             padding: 2px 6px; border-radius: 6px; flex-shrink: 0;
         }
         .honor-info { font-size: 13px; color: #4b5563; }
-
         .prize-progress-track {
             width: 100%; height: 6px; background: #f3f4f6;
             border-radius: 999px; overflow: hidden; margin-top: 4px;
@@ -261,27 +163,25 @@
         .prize-progress-fill { height: 100%; border-radius: 999px; transition: width 0.3s ease; }
         .prize-progress-fill.is-available { background: linear-gradient(to right, #6ee7b7, #059669); }
         .prize-progress-fill.is-empty { background: linear-gradient(to right, #fca5a5, #dc2626); }
-
         .marquee-viewport { flex: 1 1 auto; min-width: 0; overflow: hidden; position: relative; }
-        .marquee-track { display: inline-flex; white-space: nowrap; will-change: transform; animation: marqueeScroll 20s linear infinite; }
+        .marquee-track {
+            display: inline-flex; white-space: nowrap; will-change: transform;
+            animation: marqueeScroll 20s linear infinite;
+        }
         .marquee-item { padding-right: 60px; }
         @keyframes marqueeScroll {
-            from { transform: translateX(0); }
-            to { transform: translateX(-50%); }
+            from { transform: translateX(0); } to { transform: translateX(-50%); }
         }
-
         .wallet-badge {
             background: linear-gradient(135deg, #fbbf24, #f59e0b);
             color: #78350f; border-radius: 999px; padding: 6px 18px;
-            font-weight: 900; font-size: 14px;
-            box-shadow: 0 4px 10px rgba(245,158,11,0.3);
+            font-weight: 900; font-size: 14px; box-shadow: 0 4px 10px rgba(245,158,11,0.3);
             display: inline-flex; align-items: center; gap: 6px;
         }
         .shop-btn {
             background: linear-gradient(135deg, #10b981, #059669);
             color: white; border-radius: 999px; padding: 8px 20px;
-            font-weight: 900; font-size: 14px;
-            box-shadow: 0 4px 10px rgba(16,185,129,0.3);
+            font-weight: 900; font-size: 14px; box-shadow: 0 4px 10px rgba(16,185,129,0.3);
             cursor: pointer; transition: transform 0.1s;
         }
         .shop-btn:active { transform: scale(0.95); }
@@ -346,7 +246,14 @@
             <!-- 🎪 內容區（選擇名字後出現） -->
             <div id="contentArea" class="hidden w-full max-w-sm flex flex-col items-center mt-4 md:mt-6">
                 
-                <!-- 🪙 點數錢包卡片（永遠獨立顯示） -->
+                <!-- 🔥 新增：顯示目前玩家名字 -->
+                <div id="playerNameDisplay" class="w-full text-center mb-3 hidden">
+                    <span class="inline-block bg-white/70 backdrop-blur-sm rounded-full px-5 py-2 text-sm font-bold text-slate-700 shadow-sm border border-white">
+                        👤 目前玩家：<span id="currentPlayerNameLabel" class="text-rose-500"></span>
+                    </span>
+                </div>
+
+                <!-- 🪙 點數錢包卡片 -->
                 <div id="walletSection" class="w-full bg-white/80 backdrop-blur-md rounded-2xl p-4 shadow-md border border-white mb-4">
                     <div class="flex items-center justify-between gap-3 flex-wrap">
                         <span class="wallet-badge" id="walletDisplay">🪙 讀取中...</span>
@@ -360,12 +267,12 @@
                     <button id="spinBtn" onclick="openConfirmModal()" class="w-full bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white font-black py-3 rounded-2xl shadow-lg shadow-rose-500/20 active:scale-98 transition-all tracking-wider text-sm cursor-pointer">啟動幸運扭蛋</button>
                 </div>
 
-                <!-- ⚠️ 已抽獎提示（已抽獎者可見） -->
+                <!-- ⚠️ 已抽獎提示 -->
                 <div id="alreadyPlayedMsg" class="hidden w-full text-center py-3 text-gray-500 font-bold text-sm bg-white/50 rounded-xl">
                     ⚠️ 你已抽過獎，無法再次抽獎<br>但你仍可查看點數與兌換商品唷！
                 </div>
 
-                <!-- 扭蛋機本體（保留視覺） -->
+                <!-- 扭蛋機本體（完全保留） -->
                 <div class="gacha-machine mt-6">
                     <div class="gacha-glass" id="gachaGlass">
                         <div class="gacha-egg egg-pink egg-layer-a" style="left: 15px;"></div>
@@ -415,14 +322,13 @@
         </div>
     </div>
 
-    <!-- 🏆 獲獎彈窗（已新增點數顯示） -->
+    <!-- 🏆 獲獎彈窗（含點數顯示） -->
     <div id="winModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" style="display: none;">
         <div class="bg-white rounded-3xl w-full max-w-sm p-6 text-center shadow-2xl border-4 border-amber-400">
             <h2 id="modalTitle" class="text-2xl font-black text-rose-500 mb-2">🎉 恭喜中獎！</h2>
             <div class="bg-amber-50 rounded-2xl p-4 my-4 border border-amber-200">
                 <p class="text-xs text-amber-600 font-bold tracking-wider mb-1">🎁 抽中獎品</p>
                 <p id="modalPrizeName" class="text-xl font-extrabold text-slate-800">載入中...</p>
-                <!-- 🔥 新增：顯示獲得點數 -->
                 <p id="modalPointsInfo" class="text-sm font-bold text-amber-600 mt-1 hidden"></p>
             </div>
             <div id="modalTicketCode" onclick="clickTicket()" class="bg-slate-900 text-cyan-400 font-mono text-base font-bold py-3 px-4 rounded-xl cursor-pointer hover:bg-slate-800 active:scale-98 transition-all border border-cyan-500/30 break-all select-none">點我打開獎品連結</div>
@@ -445,9 +351,9 @@
         </div>
     </div>
 
-    <!-- 🛍️ 商品專區彈窗 -->
+    <!-- 🛍️ 商品專區彈窗（分頁） -->
     <div id="shopModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" style="display: none;">
-        <div class="bg-white rounded-3xl w-full max-w-lg p-6 shadow-2xl border-4 border-emerald-400 max-h-[80vh] flex flex-col">
+        <div class="bg-white rounded-3xl w-full max-w-lg p-6 shadow-2xl border-4 border-emerald-400 max-h-[85vh] flex flex-col">
             <div class="flex items-center justify-between mb-4">
                 <h2 class="text-xl font-black text-slate-800">🛍️ 商品專區</h2>
                 <button onclick="closeShop()" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
@@ -456,8 +362,25 @@
                 <span class="wallet-badge text-sm" id="shopWalletDisplay">🪙 0 點</span>
                 <span class="text-xs text-gray-400">可用點數</span>
             </div>
+            
+            <!-- 分頁按鈕 -->
+            <div class="flex gap-2 mb-3">
+                <button id="tabShopItems" class="tab-btn text-xs font-bold px-3 py-1.5 rounded-lg bg-emerald-100 text-emerald-700">商品列表</button>
+                <button id="tabPointsHistory" class="tab-btn text-xs font-bold px-3 py-1.5 rounded-lg bg-gray-100 text-gray-500">點數記錄</button>
+                <button id="tabRedeemHistory" class="tab-btn text-xs font-bold px-3 py-1.5 rounded-lg bg-gray-100 text-gray-500">兌換記錄</button>
+            </div>
+
+            <!-- 商品列表區 -->
             <div id="shopItemList" class="overflow-y-auto flex-grow space-y-3 pr-1">
                 <p class="text-gray-400 text-sm text-center">載入商品中...</p>
+            </div>
+            <!-- 點數記錄區 -->
+            <div id="pointsHistoryList" class="hidden overflow-y-auto flex-grow space-y-2 pr-1">
+                <p class="text-gray-400 text-sm text-center">尚無點數記錄</p>
+            </div>
+            <!-- 兌換記錄區 -->
+            <div id="redeemHistoryList" class="hidden overflow-y-auto flex-grow space-y-2 pr-1">
+                <p class="text-gray-400 text-sm text-center">尚無兌換記錄</p>
             </div>
         </div>
     </div>
@@ -609,13 +532,55 @@
             } else document.getElementById("walletPassError").innerText = "密語錯誤";
         }
 
-        // ---------- 商品專區 ----------
-        function openShop() { if (!currentPlayerName) return; if (!walletUnlocked) { promptWalletPass(); return; } document.getElementById("shopModal").style.display = "flex"; document.getElementById("shopWalletDisplay").innerText = `🪙 ${currentWalletData?currentWalletData.points||0:0} 點`; renderShopItems(); }
+        // ---------- 商品專區（含分頁）----------
+        function openShop() {
+            if (!currentPlayerName) return;
+            if (!walletUnlocked) { promptWalletPass(); return; }
+            document.getElementById("shopModal").style.display = "flex";
+            document.getElementById("shopWalletDisplay").innerText = `🪙 ${currentWalletData ? currentWalletData.points || 0 : 0} 點`;
+            switchShopTab('shop');
+            renderShopItems();
+            loadPlayerPointsHistory();
+            loadPlayerRedeemHistory();
+        }
         function closeShop() { document.getElementById("shopModal").style.display = "none"; }
+
+        function switchShopTab(tab) {
+            const tabs = {
+                shop: document.getElementById('tabShopItems'),
+                points: document.getElementById('tabPointsHistory'),
+                redeem: document.getElementById('tabRedeemHistory')
+            };
+            Object.values(tabs).forEach(b => { b.classList.remove('bg-emerald-100','text-emerald-700'); b.classList.add('bg-gray-100','text-gray-500'); });
+            if (tab === 'shop') {
+                tabs.shop.classList.add('bg-emerald-100','text-emerald-700');
+                document.getElementById('shopItemList').classList.remove('hidden');
+                document.getElementById('pointsHistoryList').classList.add('hidden');
+                document.getElementById('redeemHistoryList').classList.add('hidden');
+            } else if (tab === 'points') {
+                tabs.points.classList.add('bg-emerald-100','text-emerald-700');
+                document.getElementById('shopItemList').classList.add('hidden');
+                document.getElementById('pointsHistoryList').classList.remove('hidden');
+                document.getElementById('redeemHistoryList').classList.add('hidden');
+            } else if (tab === 'redeem') {
+                tabs.redeem.classList.add('bg-emerald-100','text-emerald-700');
+                document.getElementById('shopItemList').classList.add('hidden');
+                document.getElementById('pointsHistoryList').classList.add('hidden');
+                document.getElementById('redeemHistoryList').classList.remove('hidden');
+            }
+        }
+
+        function bindShopTabs() {
+            document.getElementById('tabShopItems').addEventListener('click', () => switchShopTab('shop'));
+            document.getElementById('tabPointsHistory').addEventListener('click', () => switchShopTab('points'));
+            document.getElementById('tabRedeemHistory').addEventListener('click', () => switchShopTab('redeem'));
+        }
+
         function renderShopItems() {
             const c = document.getElementById("shopItemList");
             if (!shopItems || !Object.keys(shopItems).length) { c.innerHTML = '<p class="text-gray-400 text-sm text-center">目前沒有可兌換的商品</p>'; return; }
-            const pts = currentWalletData?currentWalletData.points||0:0, now = Date.now(), expired = (currentWalletData&&currentWalletData.expiry&&currentWalletData.expiry!==0&&currentWalletData.expiry<now);
+            const pts = currentWalletData ? currentWalletData.points || 0 : 0;
+            const now = Date.now(), expired = (currentWalletData && currentWalletData.expiry && currentWalletData.expiry !== 0 && currentWalletData.expiry < now);
             let h = "";
             for (const id in shopItems) {
                 const it = shopItems[id], ok = !expired && pts >= it.cost && it.stock > 0;
@@ -627,6 +592,59 @@
             }
             c.innerHTML = h;
         }
+
+        async function loadPlayerPointsHistory() {
+            const container = document.getElementById("pointsHistoryList");
+            if (!currentPlayerName) { container.innerHTML = '<p class="text-gray-400 text-sm text-center">請先選擇玩家</p>'; return; }
+            try {
+                const snap = await get(ref(db, "pendingPoints"));
+                const all = snap.val() || {};
+                const playerRecords = Object.entries(all)
+                    .filter(([id, rec]) => rec.playerName === currentPlayerName)
+                    .sort((a, b) => (b[1].timestamp || 0) - (a[1].timestamp || 0));
+                if (!playerRecords.length) {
+                    container.innerHTML = '<p class="text-gray-400 text-sm text-center">尚無點數記錄</p>';
+                    return;
+                }
+                container.innerHTML = playerRecords.map(([id, rec]) => {
+                    const time = rec.timestamp ? new Date(rec.timestamp).toLocaleString("zh-TW") : "未知時間";
+                    const status = rec.status === "approved" ? "✅" : rec.status === "rejected" ? "🗑️" : "🕒";
+                    return `<div class="flex justify-between items-center bg-gray-50 rounded-lg p-2 text-xs">
+                        <div>🪙 +${rec.points} ${status} <span class="text-gray-500 ml-1">${time}</span></div>
+                        <div class="text-gray-400">${rec.prizeName || ''}</div>
+                    </div>`;
+                }).join("");
+            } catch(e) { container.innerHTML = '<p class="text-gray-400 text-sm text-center">讀取失敗</p>'; }
+        }
+
+        async function loadPlayerRedeemHistory() {
+            const container = document.getElementById("redeemHistoryList");
+            if (!currentPlayerName) { container.innerHTML = '<p class="text-gray-400 text-sm text-center">請先選擇玩家</p>'; return; }
+            try {
+                const snap = await get(ref(db, "redeemRequests"));
+                const all = snap.val() || {};
+                const playerRecords = Object.entries(all)
+                    .filter(([id, rec]) => rec.playerName === currentPlayerName)
+                    .sort((a, b) => (b[1].timestamp || 0) - (a[1].timestamp || 0));
+                if (!playerRecords.length) {
+                    container.innerHTML = '<p class="text-gray-400 text-sm text-center">尚無兌換記錄</p>';
+                    return;
+                }
+                container.innerHTML = playerRecords.map(([id, rec]) => {
+                    const time = rec.timestamp ? new Date(rec.timestamp).toLocaleString("zh-TW") : "未知時間";
+                    const delivered = rec.prizeDelivered ? "🎁 已發放" : "⏳ 未發放";
+                    const status = rec.status === "approved" ? "✅" : rec.status === "rejected" ? "🗑️" : "🕒";
+                    return `<div class="flex flex-col bg-gray-50 rounded-lg p-2 text-xs gap-1">
+                        <div class="flex justify-between">
+                            <span>🛍️ ${rec.itemName} (🪙 ${rec.cost}) ${status}</span>
+                            <span class="text-gray-400">${time}</span>
+                        </div>
+                        <div class="text-gray-500">${delivered}</div>
+                    </div>`;
+                }).join("");
+            } catch(e) { container.innerHTML = '<p class="text-gray-400 text-sm text-center">讀取失敗</p>'; }
+        }
+
         window.redeemItem = async function(itemId) {
             if (!currentPlayerName || !walletUnlocked) return;
             const it = shopItems[itemId]; if (!it) return;
@@ -638,7 +656,6 @@
                 const prRes = await runTransaction(pr, cur => (cur===null||cur<it.cost)?undefined:cur-it.cost);
                 if (!prRes.committed) { await runTransaction(sr, cur => (cur||0)+1); alert("❌ 點數不足"); return; }
                 alert(`✅ 兌換成功！獲得「${it.name}」`);
-                // 🔥 寫入兌換記錄（含 prizeDelivered 欄位）
                 await push(ref(db, "redeemRequests"), {
                     playerName: currentPlayerName,
                     itemId: itemId,
@@ -649,6 +666,8 @@
                     processedAt: Date.now(),
                     prizeDelivered: false
                 });
+                // 刷新記錄
+                loadPlayerRedeemHistory();
             } catch(e) { console.error(e); alert("兌換失敗"); }
         };
 
@@ -657,6 +676,9 @@
             const val = document.getElementById("playerName").value;
             if (!val) return;
             currentPlayerName = val;
+            // 顯示玩家名字
+            document.getElementById("currentPlayerNameLabel").innerText = val;
+            document.getElementById("playerNameDisplay").classList.remove("hidden");
             document.getElementById("controlPanel").classList.add("hidden");
             const content = document.getElementById("contentArea");
             content.classList.remove("hidden");
@@ -668,10 +690,12 @@
             document.getElementById("drawActionArea").classList.toggle("hidden", already);
             document.getElementById("alreadyPlayedMsg").classList.toggle("hidden", !already);
         }
+
         function showControlPanel() {
             document.getElementById("contentArea").classList.add("hidden");
             document.getElementById("controlPanel").classList.remove("hidden");
             document.getElementById("walletSection").classList.add("hidden");
+            document.getElementById("playerNameDisplay").classList.add("hidden");
         }
 
         // ---------- 解鎖群組 ----------
@@ -731,7 +755,7 @@
             onValue(ref(db, "shopItems"), snap => { shopItems = snap.val()||{}; if (document.getElementById("shopModal").style.display === "flex") renderShopItems(); });
         }
 
-        // ---------- 抽獎核心（含點數顯示與記錄）----------
+        // ---------- 抽獎核心 ----------
         async function startDraw() {
             const name = document.getElementById("playerName").value;
             if (!name) { alert("請先選擇名字"); return; }
@@ -740,7 +764,6 @@
             if (isDrawing) return;
             isDrawing = true;
             let awardedPoints = 0;
-
             try {
                 const myGroup = getGroupKeyForName(name);
                 let pool = [], totalW = 0;
@@ -754,11 +777,9 @@
                 let roll = Math.floor(Math.random()*totalW), sum = 0, chosenId = pool[0].id;
                 for (let i=0;i<pool.length;i++) { sum += pool[i].weight; if (roll < sum) { chosenId = pool[i].id; break; } }
                 const chosen = pool.find(p=>p.id===chosenId).prizeData;
-
                 const qRef = ref(db, `prizes/${chosenId}/quantity`);
                 const tx = await runTransaction(qRef, cur => (cur===null||cur<=0)?undefined:cur-1);
                 if (!tx.committed) { alert("獎品被秒殺"); isDrawing = false; return; }
-
                 let code = "";
                 try {
                     const cs = await get(ref(db, `prizeCodes/${chosenId}`));
@@ -769,30 +790,20 @@
                         if (av.length) code = av[0];
                     }
                 } catch(e){}
-
                 const result = { won: chosen.name, code, time: Date.now(), group: myGroup };
                 await update(ref(db), { [`playedUsers/${name}`]: result, [`playedDevices/${deviceId}`]: { user: name, time: Date.now() } });
                 myDeviceRecord = { user: name, time: Date.now() };
-
-                // 點數發放
                 const minP = Number(chosen.minPoints), maxP = Number(chosen.maxPoints);
                 if (!isNaN(minP) && !isNaN(maxP) && maxP>=minP && maxP>0) {
                     awardedPoints = Math.floor(Math.random()*(maxP-minP+1))+minP;
                     try {
                         await runTransaction(ref(db, `pointUsers/${name}/points`), cur => (cur||0)+awardedPoints);
-                        // 寫入點數記錄
                         await push(ref(db, "pendingPoints"), {
-                            playerName: name,
-                            points: awardedPoints,
-                            prizeName: chosen.name,
-                            timestamp: Date.now(),
-                            status: "approved",
-                            processedAt: Date.now()
+                            playerName: name, points: awardedPoints, prizeName: chosen.name,
+                            timestamp: Date.now(), status: "approved", processedAt: Date.now()
                         });
                     } catch(e) { console.error("點數發放失敗", e); }
                 }
-
-                // 動畫...
                 const container = document.getElementById("gachaGlass"), lucky = document.getElementById("luckyEgg"), crank = document.getElementById("gachaCrank");
                 const color = eggColors[Math.floor(Math.random()*eggColors.length)];
                 const matches = container.querySelectorAll(`.gacha-egg.${color}:not(.egg-falling-out)`);
@@ -804,15 +815,12 @@
                 setTimeout(() => {
                     document.getElementById("modalPrizeName").innerText = result.won;
                     currentPrizeUrl = result.code;
-                    // 顯示點數
                     const pointsInfo = document.getElementById("modalPointsInfo");
                     if (pointsInfo) {
                         if (awardedPoints > 0) {
                             pointsInfo.innerText = `🪙 獲得 ${awardedPoints} 點`;
                             pointsInfo.classList.remove("hidden");
-                        } else {
-                            pointsInfo.classList.add("hidden");
-                        }
+                        } else pointsInfo.classList.add("hidden");
                     }
                     const isThanks = result.won && result.won.includes("銘謝惠顧");
                     document.getElementById("modalTitle").innerText = isThanks ? "😢 差一點點！" : "🎉 恭喜中獎！";
@@ -850,6 +858,10 @@
         function closeConfirmModal() { document.getElementById("confirmModal").style.display = "none"; }
         function confirmAndDraw() { closeConfirmModal(); startDraw(); }
 
+        // 初始化
+        document.addEventListener("DOMContentLoaded", () => {
+            bindShopTabs();
+        });
         onAuthStateChanged(auth, user => {
             if (user) {
                 deviceId = user.uid;
