@@ -262,7 +262,7 @@
                     <div style="width:60px;"></div>
                 </div>
 
-                <!-- 🪙 點數兌換系統區塊（重新設計標題與說明） -->
+                <!-- 🪙 點數兌換系統區塊（重新設計） -->
                 <div class="w-full bg-white/80 backdrop-blur-md rounded-2xl p-5 shadow-md border border-white mb-4">
                     <!-- 大標題 -->
                     <h3 class="text-center text-base font-black text-amber-600 mb-3">🎁 點數兌換系統</h3>
@@ -414,7 +414,6 @@
     <!-- 🔊 音效開關 -->
     <button id="soundToggleBtn" onclick="toggleSound()" class="music-control-btn fixed bottom-5 right-5 bg-slate-900 text-cyan-400 text-sm font-bold px-4 py-2 rounded-full shadow-lg border border-cyan-500/30 z-40 transition-all active:scale-95">🔊 音效</button>
 
-    
         <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
         import { getDatabase, ref, runTransaction, onValue, get, update, push } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
@@ -443,7 +442,7 @@
         window.closeShop = closeShop;
         window.verifyPersonalPass = verifyPersonalPass;
         window.closeWalletPassModal = closeWalletPassModal;
-        window.goBack = goBack;  // 暴露上一步
+        window.goBack = goBack;
 
         // ---------- 全域狀態 ----------
         let isDrawing = false;
@@ -528,7 +527,6 @@
             if (!playerName) return;
             onValue(ref(db, `pointUsers/${playerName}`), snap => {
                 currentWalletData = snap.val();
-                document.getElementById("walletSection").classList.remove("hidden");
                 if (currentWalletData) {
                     personalPassHash = currentWalletData.personalPassHash || null;
                     if (currentWalletData.boundUid === deviceId) { walletUnlocked = true; updateWalletDisplay(); }
@@ -630,15 +628,13 @@
                 const playerRecords = Object.entries(all)
                     .filter(([id, rec]) => rec.playerName === currentPlayerName)
                     .sort((a, b) => (b[1].timestamp || 0) - (a[1].timestamp || 0));
-                if (!playerRecords.length) {
-                    container.innerHTML = '<p class="text-gray-400 text-sm text-center">尚無點數記錄</p>';
-                    return;
-                }
+                if (!playerRecords.length) { container.innerHTML = '<p class="text-gray-400 text-sm text-center">尚無點數記錄</p>'; return; }
                 container.innerHTML = playerRecords.map(([id, rec]) => {
                     const time = rec.timestamp ? new Date(rec.timestamp).toLocaleString("zh-TW") : "未知時間";
                     const status = rec.status === "approved" ? "✅" : rec.status === "rejected" ? "🗑️" : "🕒";
+                    const pointStr = rec.points >= 0 ? `+${rec.points}` : `${rec.points}`;
                     return `<div class="flex justify-between items-center bg-gray-50 rounded-lg p-2 text-xs">
-                        <div>🪙 +${rec.points} ${status} <span class="text-gray-500 ml-1">${time}</span></div>
+                        <div>🪙 ${pointStr} ${status} <span class="text-gray-500 ml-1">${time}</span></div>
                         <div class="text-gray-400">${rec.prizeName || ''}</div>
                     </div>`;
                 }).join("");
@@ -654,10 +650,7 @@
                 const playerRecords = Object.entries(all)
                     .filter(([id, rec]) => rec.playerName === currentPlayerName)
                     .sort((a, b) => (b[1].timestamp || 0) - (a[1].timestamp || 0));
-                if (!playerRecords.length) {
-                    container.innerHTML = '<p class="text-gray-400 text-sm text-center">尚無兌換記錄</p>';
-                    return;
-                }
+                if (!playerRecords.length) { container.innerHTML = '<p class="text-gray-400 text-sm text-center">尚無兌換記錄</p>'; return; }
                 container.innerHTML = playerRecords.map(([id, rec]) => {
                     const time = rec.timestamp ? new Date(rec.timestamp).toLocaleString("zh-TW") : "未知時間";
                     const delivered = rec.prizeDelivered ? "🎁 已發放" : "⏳ 未發放";
@@ -700,13 +693,8 @@
 
         // ---------- 上一步 ----------
         function goBack() {
-            // 隱藏內容區，顯示控制面板，但不清空密語和下拉選單
             document.getElementById("contentArea").classList.add("hidden");
             document.getElementById("controlPanel").classList.remove("hidden");
-            // 錢包區塊隱藏（返回控制面板時一併）
-            document.getElementById("walletSection").classList.add("hidden");
-            // 不清除 secretPass 的值與下拉選單，讓玩家可以直接重新選名字
-            // 但我們必須確保下拉選單的 onchange 仍然有效
         }
 
         // ---------- 選擇名字 ----------
@@ -714,15 +702,12 @@
             const val = document.getElementById("playerName").value;
             if (!val) return;
             currentPlayerName = val;
-            // 顯示玩家名字
             document.getElementById("currentPlayerNameLabel").innerText = val;
             document.getElementById("playerNameDisplay").classList.remove("hidden");
             document.getElementById("controlPanel").classList.add("hidden");
             const content = document.getElementById("contentArea");
             content.classList.remove("hidden");
-            document.getElementById("walletSection").classList.remove("hidden");
-            document.getElementById("walletDisplay").innerText = "🪙 讀取中...";
-            document.getElementById("walletExpiry").innerText = "";
+            // 錢包顯示由 listenToWallet 控制
             listenToWallet(val);
             const already = !!(myDeviceRecord || globalPlayedUsers[val]);
             document.getElementById("drawActionArea").classList.toggle("hidden", already);
@@ -732,8 +717,6 @@
         function showControlPanel() {
             document.getElementById("contentArea").classList.add("hidden");
             document.getElementById("controlPanel").classList.remove("hidden");
-            document.getElementById("walletSection").classList.add("hidden");
-            document.getElementById("playerNameDisplay").classList.add("hidden");
         }
 
         // ---------- 解鎖群組 ----------
@@ -793,7 +776,6 @@
             onValue(ref(db, "shopItems"), snap => { shopItems = snap.val()||{}; if (document.getElementById("shopModal").style.display === "flex") renderShopItems(); });
         }
 
-        // 輔助：取得當年年底 timestamp
         function getYearEndTimestamp() {
             const now = new Date();
             return new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999).getTime();
@@ -842,19 +824,12 @@
                     awardedPoints = Math.floor(Math.random()*(maxP-minP+1))+minP;
                     const yearEnd = getYearEndTimestamp();
                     try {
-                        // 使用 transaction 增加點數，並一併設定 expiry 為當年年底
                         await runTransaction(ref(db, `pointUsers/${name}`), cur => {
                             if (!cur) {
-                                // 新建錢包
-                                return {
-                                    points: awardedPoints,
-                                    expiry: yearEnd,
-                                    personalPassHash: "",
-                                    boundUid: ""
-                                };
+                                return { points: awardedPoints, expiry: yearEnd, personalPassHash: "", boundUid: "" };
                             } else {
                                 cur.points = (cur.points || 0) + awardedPoints;
-                                cur.expiry = yearEnd; // 每次獲得點數都延長到今年底
+                                cur.expiry = yearEnd;
                                 return cur;
                             }
                         });
@@ -864,7 +839,6 @@
                         });
                     } catch(e) { console.error("點數發放失敗", e); }
                 }
-                // ... 動畫與彈窗 (保持不變)
                 const container = document.getElementById("gachaGlass"), lucky = document.getElementById("luckyEgg"), crank = document.getElementById("gachaCrank");
                 const color = eggColors[Math.floor(Math.random()*eggColors.length)];
                 const matches = container.querySelectorAll(`.gacha-egg.${color}:not(.egg-falling-out)`);
@@ -919,10 +893,7 @@
         function closeConfirmModal() { document.getElementById("confirmModal").style.display = "none"; }
         function confirmAndDraw() { closeConfirmModal(); startDraw(); }
 
-        // 初始化
-        document.addEventListener("DOMContentLoaded", () => {
-            bindShopTabs();
-        });
+        document.addEventListener("DOMContentLoaded", () => { bindShopTabs(); });
         onAuthStateChanged(auth, user => {
             if (user) {
                 deviceId = user.uid;
