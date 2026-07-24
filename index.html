@@ -259,16 +259,33 @@
                     <span id="playerNameDisplay" class="inline-block bg-white/70 backdrop-blur-sm rounded-full px-5 py-2 text-sm font-bold text-slate-700 shadow-sm border border-white">
                         👤 目前玩家：<span id="currentPlayerNameLabel" class="text-rose-500"></span>
                     </span>
-                    <div style="width:60px;"></div> <!-- 佔位以平衡 -->
+                    <div style="width:60px;"></div>
                 </div>
 
-                <!-- 🪙 點數錢包卡片 -->
-                <div id="walletSection" class="w-full bg-white/80 backdrop-blur-md rounded-2xl p-4 shadow-md border border-white mb-4">
-                    <div class="flex items-center justify-between gap-3 flex-wrap">
-                        <span class="wallet-badge" id="walletDisplay">🪙 讀取中...</span>
-                        <button onclick="openShop()" class="shop-btn">🎁 商品專區</button>
+                <!-- 🪙 點數兌換系統區塊（重新設計標題與說明） -->
+                <div class="w-full bg-white/80 backdrop-blur-md rounded-2xl p-5 shadow-md border border-white mb-4">
+                    <!-- 大標題 -->
+                    <h3 class="text-center text-base font-black text-amber-600 mb-3">🎁 點數兌換系統</h3>
+                    
+                    <!-- 點數錢包區 -->
+                    <div class="mb-3">
+                        <p class="text-xs font-bold text-gray-500 text-center mb-1">目前可用點數</p>
+                        <div class="flex justify-center">
+                            <span class="wallet-badge text-sm" id="walletDisplay">🪙 讀取中...</span>
+                        </div>
+                        <p class="text-xs text-gray-400 text-center mt-1" id="walletExpiry"></p>
                     </div>
-                    <p class="text-xs text-gray-400 mt-2" id="walletExpiry"></p>
+
+                    <!-- 分隔線 -->
+                    <hr class="my-3 border-gray-200">
+
+                    <!-- 商品專區按鈕 -->
+                    <div>
+                        <p class="text-xs font-bold text-gray-500 text-center mb-2">請點擊下方按鈕兌換商品</p>
+                        <div class="flex justify-center">
+                            <button onclick="openShop()" class="shop-btn">🎁 商品專區</button>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- 🎰 抽獎按鈕（未抽獎者可見） -->
@@ -397,6 +414,7 @@
     <!-- 🔊 音效開關 -->
     <button id="soundToggleBtn" onclick="toggleSound()" class="music-control-btn fixed bottom-5 right-5 bg-slate-900 text-cyan-400 text-sm font-bold px-4 py-2 rounded-full shadow-lg border border-cyan-500/30 z-40 transition-all active:scale-95">🔊 音效</button>
 
+    
         <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
         import { getDatabase, ref, runTransaction, onValue, get, update, push } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
