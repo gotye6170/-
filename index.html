@@ -823,21 +823,28 @@
                 if (!isNaN(minP) && !isNaN(maxP) && maxP>=minP && maxP>0) {
                     awardedPoints = Math.floor(Math.random()*(maxP-minP+1))+minP;
                     const yearEnd = getYearEndTimestamp();
+                    let pointsWriteOk = false;
                     try {
-                        await runTransaction(ref(db, `pointUsers/${name}`), cur => {
-                            if (!cur) {
-                                return { points: awardedPoints, expiry: yearEnd, personalPassHash: "", boundUid: "" };
-                            } else {
-                                cur.points = (cur.points || 0) + awardedPoints;
-                                cur.expiry = yearEnd;
-                                return cur;
-                            }
-                        });
-                        await push(ref(db, "pendingPoints"), {
-                            playerName: name, points: awardedPoints, prizeName: chosen.name,
-                            timestamp: Date.now(), status: "approved", processedAt: Date.now()
-                        });
+                        // 注意：資料庫規則只允許一般玩家寫入 pointUsers/{name}/points 這個「子節點」，
+                        // 不允許一次寫入整個 pointUsers/{name} 物件（那個層級的 .write 只給管理員）。
+                        // 所以這裡改成分開寫：先用 transaction 對 points 子節點做原子加總。
+                        const tx = await runTransaction(ref(db, `pointUsers/${name}/points`), cur => (cur || 0) + awardedPoints);
+                        if (tx.committed) {
+                            // expiry 也是獨立子節點寫入，規則已開放一般玩家可寫入合法的到期時間戳記
+                            await update(ref(db, `pointUsers/${name}`), { expiry: yearEnd });
+                            await push(ref(db, "pendingPoints"), {
+                                playerName: name, points: awardedPoints, prizeName: chosen.name,
+                                timestamp: Date.now(), status: "approved", processedAt: Date.now()
+                            });
+                            pointsWriteOk = true;
+                        } else {
+                            console.error("點數 transaction 未提交（可能被資料庫規則拒絕）");
+                        }
                     } catch(e) { console.error("點數發放失敗", e); }
+                    if (!pointsWriteOk) {
+                        // 寫入失敗就不要讓畫面顯示「獲得點數」，避免玩家看到卻沒真的入帳
+                        awardedPoints = 0;
+                    }
                 }
                 const container = document.getElementById("gachaGlass"), lucky = document.getElementById("luckyEgg"), crank = document.getElementById("gachaCrank");
                 const color = eggColors[Math.floor(Math.random()*eggColors.length)];
