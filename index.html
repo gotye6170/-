@@ -677,6 +677,14 @@
                 const prRes = await runTransaction(pr, cur => (cur===null||cur<it.cost)?undefined:cur-it.cost);
                 if (!prRes.committed) { await runTransaction(sr, cur => (cur||0)+1); alert("❌ 點數不足"); return; }
                 alert(`✅ 兌換成功！獲得「${it.name}」`);
+                await push(ref(db, "pendingPoints"), {
+                    playerName: currentPlayerName,
+                    points: -it.cost,
+                    prizeName: `🛍️ 兌換：${it.name}`,
+                    timestamp: Date.now(),
+                    status: "approved",
+                    processedAt: Date.now()
+                });
                 await push(ref(db, "redeemRequests"), {
                     playerName: currentPlayerName,
                     itemId: itemId,
@@ -688,8 +696,10 @@
                     prizeDelivered: false
                 });
                 loadPlayerRedeemHistory();
+                loadPlayerPointsHistory();
             } catch(e) { console.error(e); alert("兌換失敗"); }
         };
+
 
         // ---------- 上一步 ----------
         function goBack() {
