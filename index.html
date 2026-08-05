@@ -192,6 +192,11 @@
             transition: background 0.2s;
         }
         .back-btn:hover { background: rgba(255,255,255,0.9); }
+        /* 管理员测试按钮样式 */
+        .admin-test-btn {
+            color: #a0aec0; font-size: 11px; text-decoration: underline; cursor: pointer; background: none; border: none;
+        }
+        .admin-test-btn:hover { color: #718096; }
     </style>
 </head>
 
@@ -232,7 +237,7 @@
         <div class="lg:col-span-6 order-1 lg:order-2 flex flex-col items-center">
             <h1 class="gacha-title text-4xl md:text-5xl mb-6">呆呆幸運扭蛋機</h1>
 
-            <!-- 🎮 控制面板 (密語 + 名字選擇) -->
+            <!-- 🎮 控制面板 (密語 + 名字選擇 + 管理员测试) -->
             <div id="controlPanel" class="w-full max-w-sm bg-white/80 backdrop-blur-md rounded-3xl p-6 shadow-xl border border-white mt-4 md:mt-6 space-y-4">
                 <div>
                     <label class="block text-xs font-bold text-gray-500 mb-1.5 ml-1">🔑 請輸入群組密語解鎖名單</label>
@@ -248,12 +253,17 @@
                         <option value="" disabled selected>🔒 請先解鎖群組名單 🔒</option>
                     </select>
                 </div>
+
+                <!-- 🔧 管理员测试模式入口 -->
+                <div class="flex justify-end">
+                    <button onclick="promptAdminMode()" class="admin-test-btn">🔧 管理员测试</button>
+                </div>
             </div>
 
             <!-- 🎪 內容區（選擇名字後出現） -->
             <div id="contentArea" class="hidden w-full max-w-sm flex flex-col items-center mt-4 md:mt-6">
                 
-                <!-- 🔥 上一步按鈕 + 玩家名稱 -->
+                <!-- 上一步 + 玩家名稱 -->
                 <div class="w-full flex items-center justify-between mb-3">
                     <button onclick="goBack()" class="back-btn">← 上一步</button>
                     <span id="playerNameDisplay" class="inline-block bg-white/70 backdrop-blur-sm rounded-full px-5 py-2 text-sm font-bold text-slate-700 shadow-sm border border-white">
@@ -262,12 +272,9 @@
                     <div style="width:60px;"></div>
                 </div>
 
-                <!-- 🪙 點數兌換系統區塊（重新設計） -->
+                <!-- 🪙 點數兌換系統區塊 -->
                 <div class="w-full bg-white/80 backdrop-blur-md rounded-2xl p-5 shadow-md border border-white mb-4">
-                    <!-- 大標題 -->
                     <h3 class="text-center text-base font-black text-amber-600 mb-3">🎁 點數兌換系統</h3>
-                    
-                    <!-- 點數錢包區 -->
                     <div class="mb-3">
                         <p class="text-xs font-bold text-gray-500 text-center mb-1">目前可用點數</p>
                         <div class="flex justify-center">
@@ -275,11 +282,7 @@
                         </div>
                         <p class="text-xs text-gray-400 text-center mt-1" id="walletExpiry"></p>
                     </div>
-
-                    <!-- 分隔線 -->
                     <hr class="my-3 border-gray-200">
-
-                    <!-- 商品專區按鈕 -->
                     <div>
                         <p class="text-xs font-bold text-gray-500 text-center mb-2">請點擊下方按鈕兌換商品</p>
                         <div class="flex justify-center">
@@ -288,7 +291,7 @@
                     </div>
                 </div>
 
-                <!-- 🎰 抽獎按鈕（未抽獎者可見） -->
+                <!-- 🎰 抽獎按鈕 -->
                 <div id="drawActionArea" class="w-full">
                     <button id="spinBtn" onclick="openConfirmModal()" class="w-full bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white font-black py-3 rounded-2xl shadow-lg shadow-rose-500/20 active:scale-98 transition-all tracking-wider text-sm cursor-pointer">啟動幸運扭蛋</button>
                 </div>
@@ -348,7 +351,7 @@
         </div>
     </div>
 
-    <!-- 🏆 獲獎彈窗（含點數顯示） -->
+    <!-- 🏆 獲獎彈窗 -->
     <div id="winModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" style="display: none;">
         <div class="bg-white rounded-3xl w-full max-w-sm p-6 text-center shadow-2xl border-4 border-amber-400">
             <h2 id="modalTitle" class="text-2xl font-black text-rose-500 mb-2">🎉 恭喜中獎！</h2>
@@ -396,18 +399,9 @@
                 <button id="tabRedeemHistory" class="tab-btn text-xs font-bold px-3 py-1.5 rounded-lg bg-gray-100 text-gray-500">兌換記錄</button>
             </div>
 
-            <!-- 商品列表區 -->
-            <div id="shopItemList" class="overflow-y-auto flex-grow space-y-3 pr-1">
-                <p class="text-gray-400 text-sm text-center">載入商品中...</p>
-            </div>
-            <!-- 點數記錄區 -->
-            <div id="pointsHistoryList" class="hidden overflow-y-auto flex-grow space-y-2 pr-1">
-                <p class="text-gray-400 text-sm text-center">尚無點數記錄</p>
-            </div>
-            <!-- 兌換記錄區 -->
-            <div id="redeemHistoryList" class="hidden overflow-y-auto flex-grow space-y-2 pr-1">
-                <p class="text-gray-400 text-sm text-center">尚無兌換記錄</p>
-            </div>
+            <div id="shopItemList" class="overflow-y-auto flex-grow space-y-3 pr-1"><p class="text-gray-400 text-sm text-center">載入商品中...</p></div>
+            <div id="pointsHistoryList" class="hidden overflow-y-auto flex-grow space-y-2 pr-1"><p class="text-gray-400 text-sm text-center">尚無點數記錄</p></div>
+            <div id="redeemHistoryList" class="hidden overflow-y-auto flex-grow space-y-2 pr-1"><p class="text-gray-400 text-sm text-center">尚無兌換記錄</p></div>
         </div>
     </div>
 
@@ -443,6 +437,7 @@
         window.verifyPersonalPass = verifyPersonalPass;
         window.closeWalletPassModal = closeWalletPassModal;
         window.goBack = goBack;
+        window.promptAdminMode = promptAdminMode;
 
         // ---------- 全域狀態 ----------
         let isDrawing = false;
@@ -459,6 +454,9 @@
         let walletUnlocked = false;
         let personalPassHash = null;
         let shopItems = {};
+        let disabledPlayers = {};
+        let isAdminMode = false;
+        const ADMIN_TEST_PASSWORD = "test123";  // 管理员测试密码，可自行修改
 
         // ---------- 音效 ----------
         let audioCtx = null;
@@ -677,14 +675,6 @@
                 const prRes = await runTransaction(pr, cur => (cur===null||cur<it.cost)?undefined:cur-it.cost);
                 if (!prRes.committed) { await runTransaction(sr, cur => (cur||0)+1); alert("❌ 點數不足"); return; }
                 alert(`✅ 兌換成功！獲得「${it.name}」`);
-                await push(ref(db, "pendingPoints"), {
-                    playerName: currentPlayerName,
-                    points: -it.cost,
-                    prizeName: `🛍️ 兌換：${it.name}`,
-                    timestamp: Date.now(),
-                    status: "approved",
-                    processedAt: Date.now()
-                });
                 await push(ref(db, "redeemRequests"), {
                     playerName: currentPlayerName,
                     itemId: itemId,
@@ -696,10 +686,20 @@
                     prizeDelivered: false
                 });
                 loadPlayerRedeemHistory();
-                loadPlayerPointsHistory();
             } catch(e) { console.error(e); alert("兌換失敗"); }
         };
 
+        // ---------- 管理员测试模式 ----------
+        function promptAdminMode() {
+            const pwd = prompt("請輸入管理員測試密碼：");
+            if (pwd === ADMIN_TEST_PASSWORD) {
+                isAdminMode = true;
+                alert("✅ 管理員模式已開啟，抽獎無限制。");
+                // 若已解鎖群組，可能需要重新渲染選單 (不用)
+            } else if (pwd !== null) {
+                alert("❌ 密碼錯誤");
+            }
+        }
 
         // ---------- 上一步 ----------
         function goBack() {
@@ -711,15 +711,20 @@
         function handleNameChange() {
             const val = document.getElementById("playerName").value;
             if (!val) return;
+            // 检查是否被禁用
+            if (disabledPlayers[val]) {
+                alert("此玩家已被管理員禁止抽獎。");
+                document.getElementById("playerName").value = "";
+                return;
+            }
             currentPlayerName = val;
             document.getElementById("currentPlayerNameLabel").innerText = val;
             document.getElementById("playerNameDisplay").classList.remove("hidden");
             document.getElementById("controlPanel").classList.add("hidden");
             const content = document.getElementById("contentArea");
             content.classList.remove("hidden");
-            // 錢包顯示由 listenToWallet 控制
             listenToWallet(val);
-            const already = !!(myDeviceRecord || globalPlayedUsers[val]);
+            const already = !isAdminMode && (myDeviceRecord || globalPlayedUsers[val]);
             document.getElementById("drawActionArea").classList.toggle("hidden", already);
             document.getElementById("alreadyPlayedMsg").classList.toggle("hidden", !already);
         }
@@ -729,7 +734,7 @@
             document.getElementById("controlPanel").classList.remove("hidden");
         }
 
-        // ---------- 解鎖群組 ----------
+        // ---------- 解鎖群組 (考虑禁用玩家) ----------
         function verifyGroupPass() {
             const inputPass = document.getElementById("secretPass").value.trim();
             const selectEl = document.getElementById("playerName");
@@ -745,7 +750,17 @@
                 group.names.forEach(name => {
                     const opt = document.createElement("option");
                     opt.value = name;
-                    opt.innerText = globalPlayedUsers[name] ? `${name} (已抽過)` : name;
+                    // 已抽过 或 被禁用 都不可选
+                    if (globalPlayedUsers[name] || disabledPlayers[name]) {
+                        opt.disabled = true;
+                        if (disabledPlayers[name]) {
+                            opt.innerText = `${name} (已禁用)`;
+                        } else {
+                            opt.innerText = `${name} (已抽過)`;
+                        }
+                    } else {
+                        opt.innerText = name;
+                    }
                     optGroup.appendChild(opt);
                 });
                 selectEl.appendChild(optGroup);
@@ -768,7 +783,14 @@
             const sel = document.getElementById("playerName");
             for (let opt of sel.options) {
                 if (!opt.value) continue;
-                if (globalPlayedUsers[opt.value] && !opt.innerText.includes("(已抽過)")) opt.innerText = opt.value + " (已抽過)";
+                // 同时考虑禁用状态
+                if (disabledPlayers[opt.value]) {
+                    opt.disabled = true;
+                    opt.innerText = opt.value + " (已禁用)";
+                } else if (globalPlayedUsers[opt.value] && !opt.innerText.includes("(已抽過)")) {
+                    opt.disabled = true;
+                    opt.innerText = opt.value + " (已抽過)";
+                }
             }
             let list = [];
             for (let u in globalPlayedUsers) {
@@ -780,10 +802,20 @@
             updateMarquee(buildMarqueeText(list));
             renderHonorBoard(list);
         }
+
         function initApp() {
             onValue(ref(db, "prizes"), snap => { lastPrizes = snap.val()||{}; renderStatusBoard(lastPrizes); });
             onValue(ref(db, "playedUsers"), snap => { globalPlayedUsers = snap.val()||{}; refreshPlayedUsersUI(); });
             onValue(ref(db, "shopItems"), snap => { shopItems = snap.val()||{}; if (document.getElementById("shopModal").style.display === "flex") renderShopItems(); });
+            // 监听禁用玩家列表
+            onValue(ref(db, "disabledPlayers"), snap => {
+                disabledPlayers = snap.val() || {};
+                // 如果已经解锁群组，重建下拉菜单
+                if (honorUnlockedGroup) {
+                    // 调用 refreshPlayedUsersUI 也更新了选项，但 verifyGroupPass 已经做过，这里可保留
+                    refreshPlayedUsersUI();
+                }
+            });
         }
 
         function getYearEndTimestamp() {
@@ -791,12 +823,13 @@
             return new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999).getTime();
         }
 
-        // ---------- 抽獎核心 ----------
+        // ---------- 抽獎核心（管理员模式免限制）----------
         async function startDraw() {
             const name = document.getElementById("playerName").value;
             if (!name) { alert("請先選擇名字"); return; }
-            if (myDeviceRecord) { alert("此裝置已抽過"); return; }
-            if (globalPlayedUsers[name]) { alert("這個名字已抽過"); return; }
+            if (!isAdminMode && myDeviceRecord) { alert("此裝置已抽過"); return; }
+            if (!isAdminMode && globalPlayedUsers[name]) { alert("這個名字已抽過"); return; }
+            if (disabledPlayers[name]) { alert("此玩家已被禁止抽獎"); return; }
             if (isDrawing) return;
             isDrawing = true;
             let awardedPoints = 0;
@@ -833,29 +866,20 @@
                 if (!isNaN(minP) && !isNaN(maxP) && maxP>=minP && maxP>0) {
                     awardedPoints = Math.floor(Math.random()*(maxP-minP+1))+minP;
                     const yearEnd = getYearEndTimestamp();
-                    let pointsWriteOk = false;
                     try {
-                        // 注意：資料庫規則只允許一般玩家寫入 pointUsers/{name}/points 這個「子節點」，
-                        // 不允許一次寫入整個 pointUsers/{name} 物件（那個層級的 .write 只給管理員）。
-                        // 所以這裡改成分開寫：先用 transaction 對 points 子節點做原子加總。
-                        const tx = await runTransaction(ref(db, `pointUsers/${name}/points`), cur => (cur || 0) + awardedPoints);
-                        if (tx.committed) {
-                            // expiry 也是獨立子節點寫入，規則已開放一般玩家可寫入合法的到期時間戳記
-                            await update(ref(db, `pointUsers/${name}`), { expiry: yearEnd });
-                            await push(ref(db, "pendingPoints"), {
-                                playerName: name, points: awardedPoints, prizeName: chosen.name,
-                                timestamp: Date.now(), status: "approved", processedAt: Date.now()
-                            });
-                            pointsWriteOk = true;
-                        } else {
-                            console.error("點數 transaction 未提交（可能被資料庫規則拒絕）");
-                        }
+                        await runTransaction(ref(db, `pointUsers/${name}`), cur => {
+                            if (!cur) return { points: awardedPoints, expiry: yearEnd, personalPassHash: "", boundUid: "" };
+                            cur.points = (cur.points || 0) + awardedPoints;
+                            cur.expiry = yearEnd;
+                            return cur;
+                        });
+                        await push(ref(db, "pendingPoints"), {
+                            playerName: name, points: awardedPoints, prizeName: chosen.name,
+                            timestamp: Date.now(), status: "approved", processedAt: Date.now()
+                        });
                     } catch(e) { console.error("點數發放失敗", e); }
-                    if (!pointsWriteOk) {
-                        // 寫入失敗就不要讓畫面顯示「獲得點數」，避免玩家看到卻沒真的入帳
-                        awardedPoints = 0;
-                    }
                 }
+                // 動畫...
                 const container = document.getElementById("gachaGlass"), lucky = document.getElementById("luckyEgg"), crank = document.getElementById("gachaCrank");
                 const color = eggColors[Math.floor(Math.random()*eggColors.length)];
                 const matches = container.querySelectorAll(`.gacha-egg.${color}:not(.egg-falling-out)`);
@@ -897,14 +921,16 @@
             showControlPanel();
             document.getElementById("playerName").innerHTML = '<option value="" disabled selected>🔒 請先解鎖群組名單 🔒</option>';
             document.getElementById("secretPass").value = "";
+            isAdminMode = false;  // 关闭管理员模式，恢复安全
         }
 
         function openConfirmModal() {
             if (isDrawing) return;
-            if (myDeviceRecord) { alert("此裝置已抽過"); return; }
+            if (!isAdminMode && myDeviceRecord) { alert("此裝置已抽過"); return; }
             const name = document.getElementById("playerName").value;
             if (!name) { alert("請先選擇名字"); return; }
-            if (globalPlayedUsers[name]) { alert("這個名字已抽過"); return; }
+            if (!isAdminMode && globalPlayedUsers[name]) { alert("這個名字已抽過"); return; }
+            if (disabledPlayers[name]) { alert("此玩家已被禁止抽獎"); return; }
             document.getElementById("confirmModal").style.display = "flex";
         }
         function closeConfirmModal() { document.getElementById("confirmModal").style.display = "none"; }
