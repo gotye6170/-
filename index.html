@@ -701,7 +701,7 @@
             </div>
         </div>
 
-        <!-- 左翼：禮物列表（🔥 加入 ID） -->
+        <!-- 左翼：禮物列表（加入 ID，初始顯示） -->
         <div class="lg:col-span-3 order-2 lg:order-1 mobile-side-panels" id="prizeListPanel">
             <div class="dashboard-panel" id="statusBoard">
                 <span class="board-title-text prize-title-text">📋 禮物列表</span>
@@ -709,7 +709,7 @@
             </div>
         </div>
 
-        <!-- 右翼：幸運中獎者（🔥 加入 ID） -->
+        <!-- 右翼：幸運中獎者（加入 ID，初始顯示） -->
         <div class="lg:col-span-3 order-3 mobile-side-panels" id="honorBoardPanel">
             <div class="dashboard-panel" id="honorBoard">
                 <span class="board-title-text honor-title-text">👑 幸運中獎者</span>
@@ -1100,22 +1100,25 @@
         function goBack() {
             document.getElementById("contentArea").classList.add("hidden");
             document.getElementById("controlPanel").classList.remove("hidden");
+            // 🔥 恢復側邊欄顯示（直接設定 display）
+            document.getElementById("prizeListPanel").style.display = "";
+            document.getElementById("honorBoardPanel").style.display = "";
         }
 
         // 🔥 顯示抽獎系統（顯示側邊欄）
         function showDrawSystem() {
-            document.getElementById("drawSystemArea").classList.remove("hidden");
-            document.getElementById("pointsSystemArea").classList.add("hidden");
-            document.getElementById("prizeListPanel").classList.remove("hidden");
-            document.getElementById("honorBoardPanel").classList.remove("hidden");
+            document.getElementById("drawSystemArea").style.display = "block";
+            document.getElementById("pointsSystemArea").style.display = "none";
+            document.getElementById("prizeListPanel").style.display = "";
+            document.getElementById("honorBoardPanel").style.display = "";
         }
 
         // 🔥 顯示點數兌換系統（隱藏側邊欄）
         function showPointsSystem() {
-            document.getElementById("drawSystemArea").classList.add("hidden");
-            document.getElementById("pointsSystemArea").classList.remove("hidden");
-            document.getElementById("prizeListPanel").classList.add("hidden");
-            document.getElementById("honorBoardPanel").classList.add("hidden");
+            document.getElementById("drawSystemArea").style.display = "none";
+            document.getElementById("pointsSystemArea").style.display = "block";
+            document.getElementById("prizeListPanel").style.display = "none";
+            document.getElementById("honorBoardPanel").style.display = "none";
         }
 
         // ---------- 選擇模式 ----------
@@ -1170,6 +1173,9 @@
         function showControlPanel() {
             document.getElementById("contentArea").classList.add("hidden");
             document.getElementById("controlPanel").classList.remove("hidden");
+            // 🔥 恢復側邊欄顯示
+            document.getElementById("prizeListPanel").style.display = "";
+            document.getElementById("honorBoardPanel").style.display = "";
         }
 
         // ---------- 解鎖群組 ----------
