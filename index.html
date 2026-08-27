@@ -746,7 +746,7 @@
     <div id="confirmModal" class="modal-overlay" style="display: none;">
         <div class="modal-card p-6 text-center border-4 border-rose-300">
             <h2 class="text-xl font-black text-slate-800 mb-2">🎯 確定要抽獎嗎？</h2>
-            <p class="text-sm text-gray-500 mb-6">每個名字只能抽一次，送出後無法反悔喔！</p>
+            <p class="text-sm text-gray-500 mb-6">送出後無法反悔喔！</p>
             <div class="flex gap-3">
                 <button onclick="closeConfirmModal()" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold py-3 rounded-xl text-base transition-all">再想一下</button>
                 <button onclick="confirmAndDraw()" class="flex-1 bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white font-bold py-3 rounded-xl text-base transition-all">確定抽獎</button>
@@ -764,7 +764,7 @@
                 <p id="modalPointsInfo" class="text-sm font-bold text-amber-600 mt-1 hidden"></p>
             </div>
             <div id="modalTicketCode" onclick="clickTicket()" class="bg-slate-900 text-cyan-400 font-mono text-base font-bold py-3 px-4 rounded-xl cursor-pointer hover:bg-slate-800 active:scale-98 transition-all border border-cyan-500/30 break-all select-none">點我打開獎品連結</div>
-            <p id="copyHint" class="text-[11px] text-gray-400 mt-1.5 font-medium">💡 點擊上方並輸入密碼「3064」即可查看獎品</p>
+            <p id="copyHint" class="text-[11px] text-gray-400 mt-1.5 font-medium">💡 點擊上方即可查看獎品，若需要密碼，請輸入「3064」</p>
             <button onclick="closeModal()" class="w-full bg-gray-800 hover:bg-gray-700 text-white font-bold py-3 rounded-xl text-base transition-all mt-4">收下好禮</button>
         </div>
     </div>
