@@ -645,13 +645,19 @@
 
                 <!-- 🎰 抽獎專屬區塊 -->
                 <div id="drawSystemArea" class="w-full">
+                    <!-- 剩餘抽獎次數提示（新增） -->
+                    <div id="drawCountDisplay" class="w-full text-center mb-2 text-sm font-bold text-gray-600"></div>
+                    
                     <div id="drawActionArea" class="w-full">
                         <button id="spinBtn" onclick="openConfirmModal()" class="w-full bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white font-black py-4 rounded-2xl shadow-lg shadow-rose-500/20 active:scale-98 transition-all tracking-wider text-base cursor-pointer">🎰 啟動幸運扭蛋</button>
                     </div>
+
                     <div id="alreadyPlayedMsg" class="hidden w-full text-center py-3 text-gray-500 font-bold text-sm bg-white/50 rounded-xl mt-4">
-                        ⚠️ 你已抽過獎，無法再次抽獎
+                        ⚠️ 你已達抽獎次數上限，無法繼續抽獎
                     </div>
-                    <div class="gacha-machine">
+
+                    <!-- 扭蛋機本體 -->
+                    <div class="gacha-machine mt-4 md:mt-6">
                         <div class="gacha-glass" id="gachaGlass">
                             <div class="gacha-egg egg-pink egg-layer-a" style="left: 15px;"></div>
                             <div class="gacha-egg egg-blue egg-layer-a" style="left: 60px;"></div>
@@ -701,7 +707,7 @@
             </div>
         </div>
 
-        <!-- 左翼：禮物列表（加入 ID，初始顯示） -->
+        <!-- 左翼：禮物列表 -->
         <div class="lg:col-span-3 order-2 lg:order-1 mobile-side-panels" id="prizeListPanel">
             <div class="dashboard-panel" id="statusBoard">
                 <span class="board-title-text prize-title-text">📋 禮物列表</span>
@@ -709,7 +715,7 @@
             </div>
         </div>
 
-        <!-- 右翼：幸運中獎者（加入 ID，初始顯示） -->
+        <!-- 右翼：幸運中獎者 -->
         <div class="lg:col-span-3 order-3 mobile-side-panels" id="honorBoardPanel">
             <div class="dashboard-panel" id="honorBoard">
                 <span class="board-title-text honor-title-text">👑 幸運中獎者</span>
@@ -838,12 +844,11 @@
         // ---------- 全域狀態 ----------
         let isDrawing = false;
         let currentPrizeUrl = ""; 
-        let globalPlayedUsers = {}; 
-        let myDeviceRecord = null;
+        let globalPlayedUsers = {};   // { name: { won, code, time, group, drawCount } }
         let honorUnlockedGroup = null;
         let lastPlayedList = [];
         let lastPrizes = null;
-        let deviceId = null;
+        let deviceId = null;          // 僅用於錢包綁定，不再用於抽獎限制
 
         let currentPlayerName = null;
         let currentWalletData = null;
@@ -853,6 +858,9 @@
         let disabledPlayers = {};
         let isAdminMode = false;
         const ADMIN_TEST_PASSWORD = "test123";
+        
+        // 每位玩家可抽次數（由後台設定，預設 1）
+        let maxDrawsPerPlayer = 1;
 
         // ---------- 音效 ----------
         let audioCtx = null;
@@ -863,6 +871,7 @@
         function playWinSound() { if (!soundEnabled) return; playTone(523.25, 0.15, "triangle", 0, 0.18); playTone(659.25, 0.15, "triangle", 0.15, 0.18); playTone(783.99, 0.28, "triangle", 0.3, 0.2); }
         function toggleSound() { soundEnabled = !soundEnabled; document.getElementById("soundToggleBtn").textContent = soundEnabled ? "🔊 音效" : "🔇 靜音"; }
 
+        // ---------- 群組名單 ----------
         const groupLists = {
             "皮皮": { label: "✨ 皮皮群", names: ["貝果", "怡蒨", "７７", "安鴻", "當家", "立涵", "皮夾", "睏寶"] },
             "GM": { label: "✨ 龜蜜群", names: ["伶", "昀", "瑜"] }
@@ -872,6 +881,36 @@
         function getGroupKeyForName(name) { for (const k in groupLists) if (groupLists[k].names.includes(name)) return k; return null; }
         function isPrizeTakenByOtherGroup(pn) { if (!honorUnlockedGroup) return false; for (const u in globalPlayedUsers) { if (globalPlayedUsers[u].won === pn && globalPlayedUsers[u].group === honorUnlockedGroup) return false; } return true; }
         async function sha256(m) { const b = new TextEncoder().encode(m); const h = await crypto.subtle.digest("SHA-256", b); return Array.from(new Uint8Array(h)).map(x => x.toString(16).padStart(2, "0")).join(""); }
+
+        // ---------- 讀取全域設定（每位玩家可抽次數） ----------
+        function loadGlobalSettings() {
+            onValue(ref(db, "settings/global/maxDrawsPerPlayer"), (snap) => {
+                const val = snap.val();
+                if (val && Number.isInteger(val) && val > 0) {
+                    maxDrawsPerPlayer = val;
+                } else {
+                    maxDrawsPerPlayer = 1;
+                }
+                // 如果已經解鎖群組，重新建立下拉選單
+                if (honorUnlockedGroup) {
+                    verifyGroupPass(); // 重新建立選單以更新剩餘次數
+                }
+                if (currentPlayerName) updateDrawCountDisplay();
+            });
+        }
+
+        // ---------- 更新剩餘次數顯示 ----------
+        function updateDrawCountDisplay() {
+            const display = document.getElementById("drawCountDisplay");
+            if (!display || !currentPlayerName) return;
+            const drawCount = globalPlayedUsers[currentPlayerName]?.drawCount || 0;
+            const remaining = maxDrawsPerPlayer - drawCount;
+            if (remaining > 0) {
+                display.innerText = `剩餘抽獎次數：${remaining} 次`;
+            } else {
+                display.innerText = "抽獎次數已用完";
+            }
+        }
 
         // ---------- 跑馬燈、榮譽榜、禮物列表 ----------
         function buildMarqueeText(list) { const def = "🎉 歡迎來到呆呆扭蛋機！快來試試手氣！ 🎟️ "; if (!honorUnlockedGroup) return def; const f = list.filter(i => i.group === honorUnlockedGroup); if (!f.length) return def; return "🔥 中獎快報 🔥 " + f.map(i => `【${i.user}】喜獲大獎：${i.won}！`).join(" 🌟 ") + " 歡慶連連，好運不斷！"; }
@@ -952,7 +991,7 @@
             } else document.getElementById("walletPassError").innerText = "密語錯誤";
         }
 
-        // ---------- 商品專區（含分頁）----------
+        // ---------- 商品專區（含分頁） ----------
         function openShop() {
             if (!currentPlayerName) return;
             if (!walletUnlocked) { promptWalletPass(); return; }
@@ -1100,20 +1139,20 @@
         function goBack() {
             document.getElementById("contentArea").classList.add("hidden");
             document.getElementById("controlPanel").classList.remove("hidden");
-            // 🔥 恢復側邊欄顯示（直接設定 display）
             document.getElementById("prizeListPanel").style.display = "";
             document.getElementById("honorBoardPanel").style.display = "";
         }
 
-        // 🔥 顯示抽獎系統（顯示側邊欄）
+        // ---------- 顯示抽獎系統（顯示側邊欄） ----------
         function showDrawSystem() {
             document.getElementById("drawSystemArea").style.display = "block";
             document.getElementById("pointsSystemArea").style.display = "none";
             document.getElementById("prizeListPanel").style.display = "";
             document.getElementById("honorBoardPanel").style.display = "";
+            updateDrawCountDisplay();
         }
 
-        // 🔥 顯示點數兌換系統（隱藏側邊欄）
+        // ---------- 顯示點數兌換系統（隱藏側邊欄） ----------
         function showPointsSystem() {
             document.getElementById("drawSystemArea").style.display = "none";
             document.getElementById("pointsSystemArea").style.display = "block";
@@ -1158,27 +1197,33 @@
             content.classList.remove("hidden");
             listenToWallet(val);
 
-            const already = !isAdminMode && (myDeviceRecord || globalPlayedUsers[val]);
+            // 判斷是否已達抽獎上限（不再使用裝置限制）
+            const drawCount = globalPlayedUsers[val]?.drawCount || 0;
+            const canDraw = isAdminMode || drawCount < maxDrawsPerPlayer;
 
-            if (already) {
-                // 已抽獎，直接進入點數兌換系統
-                showPointsSystem();
-            } else {
-                // 未抽獎，跳出選擇視窗
+            if (canDraw) {
+                // 可以抽獎，顯示選擇模式
                 showChoiceModal(val);
                 showDrawSystem();
+                document.getElementById("drawActionArea").classList.remove("hidden");
+                document.getElementById("alreadyPlayedMsg").classList.add("hidden");
+                updateDrawCountDisplay();
+            } else {
+                // 已達上限，直接進入點數兌換系統
+                showPointsSystem();
+                document.getElementById("drawActionArea").classList.add("hidden");
+                document.getElementById("alreadyPlayedMsg").classList.remove("hidden");
             }
         }
 
         function showControlPanel() {
             document.getElementById("contentArea").classList.add("hidden");
             document.getElementById("controlPanel").classList.remove("hidden");
-            // 🔥 恢復側邊欄顯示
             document.getElementById("prizeListPanel").style.display = "";
             document.getElementById("honorBoardPanel").style.display = "";
         }
 
-        // ---------- 解鎖群組 ----------
+        // ---------- 解鎖群組（建立下拉選單，依剩餘次數決定可用性） ----------
         function verifyGroupPass() {
             const inputPass = document.getElementById("secretPass").value.trim();
             const selectEl = document.getElementById("playerName");
@@ -1194,12 +1239,16 @@
                 group.names.forEach(name => {
                     const opt = document.createElement("option");
                     opt.value = name;
-                    if (globalPlayedUsers[name] || disabledPlayers[name]) {
+                    const drawCount = globalPlayedUsers[name]?.drawCount || 0;
+                    const remaining = maxDrawsPerPlayer - drawCount;
+                    if (disabledPlayers[name]) {
                         opt.disabled = true;
-                        if (disabledPlayers[name]) opt.innerText = `${name} (已禁用)`;
-                        else opt.innerText = `${name} (已抽過)`;
+                        opt.innerText = `${name} (已禁用)`;
+                    } else if (remaining <= 0) {
+                        opt.disabled = true;
+                        opt.innerText = `${name} (已達上限)`;
                     } else {
-                        opt.innerText = name;
+                        opt.innerText = `${name}（剩餘 ${remaining} 次）`;
                     }
                     optGroup.appendChild(opt);
                 });
@@ -1223,18 +1272,24 @@
             const sel = document.getElementById("playerName");
             for (let opt of sel.options) {
                 if (!opt.value) continue;
-                if (disabledPlayers[opt.value]) {
+                const name = opt.value;
+                const drawCount = globalPlayedUsers[name]?.drawCount || 0;
+                const remaining = maxDrawsPerPlayer - drawCount;
+                if (disabledPlayers[name]) {
                     opt.disabled = true;
-                    opt.innerText = opt.value + " (已禁用)";
-                } else if (globalPlayedUsers[opt.value] && !opt.innerText.includes("(已抽過)")) {
+                    opt.innerText = name + " (已禁用)";
+                } else if (remaining <= 0) {
                     opt.disabled = true;
-                    opt.innerText = opt.value + " (已抽過)";
+                    opt.innerText = name + " (已達上限)";
+                } else {
+                    opt.disabled = false;
+                    opt.innerText = `${name}（剩餘 ${remaining} 次）`;
                 }
             }
             let list = [];
             for (let u in globalPlayedUsers) {
                 if (globalPlayedUsers[u].won && globalPlayedUsers[u].won.includes("銘謝惠顧")) continue;
-                list.push({ user: u, won: globalPlayedUsers[u].won, time: globalPlayedUsers[u].time||0, group: globalPlayedUsers[u].group||null });
+                list.push({ user: u, won: globalPlayedUsers[u].won, time: globalPlayedUsers[u].time||0, group: globalPlayedUsers[u].group||null, drawCount: globalPlayedUsers[u].drawCount || 0 });
             }
             list.sort((a,b) => b.time - a.time);
             lastPlayedList = list;
@@ -1244,12 +1299,17 @@
 
         function initApp() {
             onValue(ref(db, "prizes"), snap => { lastPrizes = snap.val()||{}; renderStatusBoard(lastPrizes); });
-            onValue(ref(db, "playedUsers"), snap => { globalPlayedUsers = snap.val()||{}; refreshPlayedUsersUI(); });
+            onValue(ref(db, "playedUsers"), snap => {
+                globalPlayedUsers = snap.val() || {};
+                refreshPlayedUsersUI();
+                if (currentPlayerName) updateDrawCountDisplay();
+            });
             onValue(ref(db, "shopItems"), snap => { shopItems = snap.val()||{}; if (document.getElementById("shopModal").style.display === "flex") renderShopItems(); });
             onValue(ref(db, "disabledPlayers"), snap => {
                 disabledPlayers = snap.val() || {};
                 if (honorUnlockedGroup) refreshPlayedUsersUI();
             });
+            loadGlobalSettings();
         }
 
         function getYearEndTimestamp() {
@@ -1257,14 +1317,19 @@
             return new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999).getTime();
         }
 
-        // ---------- 抽獎核心 ----------
+        // ---------- 抽獎核心（移除裝置限制，改用 drawCount） ----------
         async function startDraw() {
             const name = document.getElementById("playerName").value;
             if (!name) { alert("請先選擇名字"); return; }
-            if (!isAdminMode && myDeviceRecord) { alert("此裝置已抽過"); return; }
-            if (!isAdminMode && globalPlayedUsers[name]) { alert("這個名字已抽過"); return; }
             if (disabledPlayers[name]) { alert("此玩家已被禁止抽獎"); return; }
             if (isDrawing) return;
+            
+            const drawCount = globalPlayedUsers[name]?.drawCount || 0;
+            if (!isAdminMode && drawCount >= maxDrawsPerPlayer) {
+                alert("抽獎次數已用完");
+                return;
+            }
+            
             isDrawing = true;
             let awardedPoints = 0;
             try {
@@ -1293,9 +1358,25 @@
                         if (av.length) code = av[0];
                     }
                 } catch(e){}
-                const result = { won: chosen.name, code, time: Date.now(), group: myGroup };
-                await update(ref(db), { [`playedUsers/${name}`]: result, [`playedDevices/${deviceId}`]: { user: name, time: Date.now() } });
-                myDeviceRecord = { user: name, time: Date.now() };
+                
+                // 更新玩家抽獎紀錄：最新結果 + drawCount 加一
+                const newDrawCount = (globalPlayedUsers[name]?.drawCount || 0) + 1;
+                await update(ref(db, `playedUsers/${name}`), {
+                    won: chosen.name,
+                    code: code,
+                    time: Date.now(),
+                    group: myGroup,
+                    drawCount: newDrawCount
+                });
+                globalPlayedUsers[name] = {
+                    won: chosen.name,
+                    code: code,
+                    time: Date.now(),
+                    group: myGroup,
+                    drawCount: newDrawCount
+                };
+                
+                // 點數發放
                 const minP = Number(chosen.minPoints), maxP = Number(chosen.maxPoints);
                 if (!isNaN(minP) && !isNaN(maxP) && maxP>=minP && maxP>0) {
                     awardedPoints = Math.floor(Math.random()*(maxP-minP+1))+minP;
@@ -1313,6 +1394,8 @@
                         });
                     } catch(e) { console.error("點數發放失敗", e); }
                 }
+                
+                // 動畫與彈窗
                 const container = document.getElementById("gachaGlass"), lucky = document.getElementById("luckyEgg"), crank = document.getElementById("gachaCrank");
                 const color = eggColors[Math.floor(Math.random()*eggColors.length)];
                 const matches = container.querySelectorAll(`.gacha-egg.${color}:not(.egg-falling-out)`);
@@ -1322,8 +1405,8 @@
                 lucky.className = "gacha-lucky-egg"; lucky.style.opacity = "0"; lucky.classList.add(color);
                 setTimeout(() => lucky.classList.add("dropped-egg"), 1000);
                 setTimeout(() => {
-                    document.getElementById("modalPrizeName").innerText = result.won;
-                    currentPrizeUrl = result.code;
+                    document.getElementById("modalPrizeName").innerText = chosen.name;
+                    currentPrizeUrl = code;
                     const pointsInfo = document.getElementById("modalPointsInfo");
                     if (pointsInfo) {
                         if (awardedPoints > 0) {
@@ -1331,7 +1414,7 @@
                             pointsInfo.classList.remove("hidden");
                         } else pointsInfo.classList.add("hidden");
                     }
-                    const isThanks = result.won && result.won.includes("銘謝惠顧");
+                    const isThanks = chosen.name && chosen.name.includes("銘謝惠顧");
                     document.getElementById("modalTitle").innerText = isThanks ? "😢 差一點點！" : "🎉 恭喜中獎！";
                     document.getElementById("modalTitle").className = `text-2xl font-black mb-2 ${isThanks?'text-gray-500':'text-rose-500'}`;
                     document.getElementById("modalTicketCode").style.display = isThanks ? "none" : "block";
@@ -1352,17 +1435,26 @@
             document.getElementById("luckyEgg").className = "gacha-lucky-egg";
             document.getElementById("modalTicketCode").style.display = "block";
             document.getElementById("copyHint").style.display = "block";
-            // 抽獎結束後切到點數兌換系統（側邊欄會自動隱藏）
-            showPointsSystem();
+            // 抽獎結束後，若還有剩餘次數，留在抽獎頁面並更新顯示；否則跳轉點數兌換系統
+            const drawCount = globalPlayedUsers[currentPlayerName]?.drawCount || 0;
+            const remaining = maxDrawsPerPlayer - drawCount;
+            if (remaining > 0 && !isAdminMode) {
+                showDrawSystem();
+                updateDrawCountDisplay();
+            } else {
+                showPointsSystem();
+                document.getElementById("drawActionArea").classList.add("hidden");
+                document.getElementById("alreadyPlayedMsg").classList.remove("hidden");
+            }
             isAdminMode = false;
         }
 
         function openConfirmModal() {
             if (isDrawing) return;
-            if (!isAdminMode && myDeviceRecord) { alert("此裝置已抽過"); return; }
             const name = document.getElementById("playerName").value;
             if (!name) { alert("請先選擇名字"); return; }
-            if (!isAdminMode && globalPlayedUsers[name]) { alert("這個名字已抽過"); return; }
+            const drawCount = globalPlayedUsers[name]?.drawCount || 0;
+            if (!isAdminMode && drawCount >= maxDrawsPerPlayer) { alert("抽獎次數已用完"); return; }
             if (disabledPlayers[name]) { alert("此玩家已被禁止抽獎"); return; }
             document.getElementById("confirmModal").style.display = "flex";
         }
@@ -1372,11 +1464,11 @@
         document.addEventListener("DOMContentLoaded", () => { bindShopTabs(); });
         onAuthStateChanged(auth, user => {
             if (user) {
-                deviceId = user.uid;
+                deviceId = user.uid;  // 僅用於錢包綁定，不再用於抽獎限制
                 onValue(ref(db, "settings/closed"), snap => {
                     document.getElementById("closedOverlay").style.display = snap.val()===true ? "flex" : "none";
                 });
-                get(ref(db, "playedDevices/"+deviceId)).then(snap => { myDeviceRecord = snap.exists()?snap.val():null; initApp(); }).catch(() => initApp());
+                initApp();
             }
         });
         signInAnonymously(auth).catch(e => alert("連線失敗"));
