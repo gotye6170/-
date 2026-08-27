@@ -35,100 +35,6 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* ========== 桌面版樣式（不變） ========== */
-        @media (min-width: 1024px) {
-            .gacha-title {
-                font-size: 3rem;
-                -webkit-text-stroke: 10px #ffffff;
-            }
-            .gacha-machine {
-                transform: scale(1);
-            }
-        }
-
-        /* ========== 手機版樣式（App 化） ========== */
-        @media (max-width: 640px) {
-            .gacha-title {
-                font-size: 1.8rem !important;
-                -webkit-text-stroke: 4px #fff;
-                margin-bottom: 12px;
-                letter-spacing: 1px;
-            }
-
-            .gacha-machine {
-                transform: scale(0.78);
-                transform-origin: top center;
-                margin: -20px auto -40px auto;
-                height: 300px;
-            }
-
-            .dashboard-panel {
-                height: auto;
-                min-height: 150px;
-                max-height: 250px;
-                padding: 14px;
-            }
-
-            .music-control-btn {
-                bottom: 15px;
-                right: 15px;
-                font-size: 12px;
-                padding: 10px 16px;
-            }
-
-            /* 手機版按鈕加大 */
-            .shop-btn {
-                padding: 12px 28px;
-                font-size: 16px;
-                border-radius: 999px;
-            }
-
-            .wallet-badge {
-                padding: 8px 20px;
-                font-size: 15px;
-            }
-
-            .back-btn {
-                padding: 8px 18px;
-                font-size: 13px;
-            }
-
-            /* 手機版彈窗全屏化 */
-            .modal-card {
-                width: 100%;
-                max-width: 100%;
-                margin: 0;
-                border-radius: 24px 24px 0 0;
-                position: absolute;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                max-height: 90vh;
-                overflow-y: auto;
-                padding-bottom: env(safe-area-inset-bottom);
-            }
-
-            /* 手機版輸入框防 iOS 縮放 */
-            input, select, textarea {
-                font-size: 16px !important;
-            }
-
-            /* 手機版主內容區塊 */
-            .mobile-main-area {
-                width: 100%;
-                max-width: 420px;
-                margin: 0 auto;
-            }
-
-            /* 手機版左右側板改為下方 */
-            .mobile-side-panels {
-                display: flex;
-                flex-direction: column;
-                gap: 12px;
-                margin-top: 16px;
-            }
-        }
-
         /* ========== 大標題 ========== */
         .gacha-title {
             font-family: 'Noto Sans TC', sans-serif;
@@ -522,7 +428,36 @@
 
         .admin-test-btn:hover { color: #718096; }
 
-        /* ========== 彈窗（手機版 bottom sheet） ========== */
+        /* ========== 選擇模式彈窗 ========== */
+        .choice-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 20px 16px;
+            border-radius: 20px;
+            font-weight: 900;
+            font-size: 18px;
+            cursor: pointer;
+            transition: transform 0.15s;
+            border: none;
+        }
+        .choice-btn:active { transform: scale(0.96); }
+
+        .choice-btn-draw {
+            background: linear-gradient(135deg, #f472b6, #ec4899);
+            color: white;
+            box-shadow: 0 8px 20px rgba(236,72,153,0.35);
+        }
+
+        .choice-btn-points {
+            background: linear-gradient(135deg, #34d399, #059669);
+            color: white;
+            box-shadow: 0 8px 20px rgba(16,185,129,0.35);
+        }
+
+        /* ========== 彈窗 ========== */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -535,19 +470,111 @@
             padding: 20px;
         }
 
+        .modal-card {
+            background: white;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        /* ========== 手機版樣式 ========== */
         @media (max-width: 640px) {
+            .gacha-title {
+                font-size: 1.8rem !important;
+                -webkit-text-stroke: 4px #fff;
+                margin-bottom: 12px;
+                letter-spacing: 1px;
+            }
+
+            .gacha-machine {
+                transform: scale(0.78);
+                transform-origin: top center;
+                margin: -20px auto -40px auto;
+                height: 300px;
+            }
+
+            .dashboard-panel {
+                height: auto;
+                min-height: 150px;
+                max-height: 250px;
+                padding: 14px;
+            }
+
+            .music-control-btn {
+                bottom: 15px;
+                right: 15px;
+                font-size: 12px;
+                padding: 10px 16px;
+            }
+
+            .shop-btn {
+                padding: 12px 28px;
+                font-size: 16px;
+            }
+
+            .wallet-badge {
+                padding: 8px 20px;
+                font-size: 15px;
+            }
+
+            .back-btn {
+                padding: 8px 18px;
+                font-size: 13px;
+            }
+
+            input, select, textarea {
+                font-size: 16px !important;
+            }
+
+            .mobile-main-area {
+                width: 100%;
+                max-width: 420px;
+                margin: 0 auto;
+            }
+
+            .mobile-side-panels {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                margin-top: 16px;
+            }
+
+            /* 🔥 修復解鎖按鈕超出畫面：改為上下排列 */
+            .secret-pass-row {
+                flex-direction: column !important;
+                gap: 8px !important;
+            }
+            .secret-pass-row input {
+                width: 100% !important;
+            }
+            .secret-pass-row button {
+                width: 100% !important;
+                padding: 12px !important;
+                font-size: 15px !important;
+            }
+
+            /* 手機版彈窗底部彈出 */
             .modal-overlay {
                 align-items: flex-end;
                 padding: 0;
             }
-
             .modal-card {
-                width: 100%;
                 border-radius: 24px 24px 0 0;
-                border: none;
+                max-width: 100%;
                 max-height: 90vh;
                 overflow-y: auto;
                 padding-bottom: env(safe-area-inset-bottom);
+            }
+        }
+
+        /* ========== 桌面版樣式 ========== */
+        @media (min-width: 1024px) {
+            .gacha-title {
+                font-size: 3rem;
+            }
+            .gacha-machine {
+                transform: scale(1);
             }
         }
     </style>
@@ -575,10 +602,10 @@
         </div>
     </div>
 
-    <!-- 🌌 主舞台佈局（手機版改單欄，桌面版維持三欄） -->
+    <!-- 🌌 主舞台佈局 -->
     <div class="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 items-start">
         
-        <!-- 中央：主要互動區（手機版排最前） -->
+        <!-- 中央：主要互動區 -->
         <div class="lg:col-span-6 order-1 flex flex-col items-center mobile-main-area">
             <h1 class="gacha-title text-4xl md:text-5xl mb-4 md:mb-6">呆呆幸運扭蛋機</h1>
 
@@ -586,7 +613,7 @@
             <div id="controlPanel" class="w-full max-w-sm bg-white/80 backdrop-blur-md rounded-3xl p-6 shadow-xl border border-white mt-2 md:mt-4 space-y-4">
                 <div>
                     <label class="block text-xs font-bold text-gray-500 mb-1.5 ml-1">🔑 請輸入群組密語解鎖名單</label>
-                    <div class="flex gap-2">
+                    <div class="secret-pass-row flex gap-2">
                         <input type="text" id="secretPass" placeholder="請輸入密語..." class="flex-grow bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-3 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-rose-400 transition-all text-center">
                         <button onclick="verifyGroupPass()" class="bg-gray-800 text-white text-sm font-bold px-5 py-3 rounded-xl hover:bg-gray-700 active:scale-95 transition-all flex-shrink-0">解鎖</button>
                     </div>
@@ -617,65 +644,68 @@
                     <div style="width:60px;"></div>
                 </div>
 
-                <!-- 🪙 點數兌換系統 -->
-                <div class="w-full bg-white/80 backdrop-blur-md rounded-2xl p-5 shadow-md border border-white mb-3 md:mb-4">
-                    <h3 class="text-center text-base font-black text-amber-600 mb-3">🎁 點數兌換系統</h3>
-                    <div class="mb-3">
-                        <p class="text-xs font-bold text-gray-500 text-center mb-1.5">目前可用點數</p>
-                        <div class="flex justify-center">
-                            <span class="wallet-badge text-sm" id="walletDisplay">🪙 讀取中...</span>
+                <!-- 🎰 抽獎專屬區塊（初始顯示，選擇抽獎時顯示） -->
+                <div id="drawSystemArea" class="w-full">
+                    <!-- 抽獎按鈕 -->
+                    <div id="drawActionArea" class="w-full">
+                        <button id="spinBtn" onclick="openConfirmModal()" class="w-full bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white font-black py-4 rounded-2xl shadow-lg shadow-rose-500/20 active:scale-98 transition-all tracking-wider text-base cursor-pointer">🎰 啟動幸運扭蛋</button>
+                    </div>
+                    <!-- 已抽獎提示 -->
+                    <div id="alreadyPlayedMsg" class="hidden w-full text-center py-3 text-gray-500 font-bold text-sm bg-white/50 rounded-xl">
+                        ⚠️ 你已抽過獎，無法再次抽獎
+                    </div>
+                    <!-- 扭蛋機本體 -->
+                    <div class="gacha-machine mt-4 md:mt-6">
+                        <div class="gacha-glass" id="gachaGlass">
+                            <div class="gacha-egg egg-pink egg-layer-a" style="left: 15px;"></div>
+                            <div class="gacha-egg egg-blue egg-layer-a" style="left: 60px;"></div>
+                            <div class="gacha-egg egg-yellow egg-layer-a" style="left: 110px;"></div>
+                            <div class="gacha-egg egg-green egg-layer-a" style="left: 155px;"></div>
+                            <div class="gacha-egg egg-purple egg-layer-a" style="left: 200px;"></div>
+                            <div class="gacha-egg egg-orange egg-layer-a" style="left: 245px;"></div>
+                            <div class="gacha-egg egg-yellow egg-layer-b" style="left: 35px;"></div>
+                            <div class="gacha-egg egg-pink egg-layer-b" style="left: 85px;"></div>
+                            <div class="gacha-egg egg-green egg-layer-b" style="left: 130px;"></div>
+                            <div class="gacha-egg egg-blue egg-layer-b" style="left: 175px;"></div>
+                            <div class="gacha-egg egg-orange egg-layer-b" style="left: 220px;"></div>
+                            <div class="gacha-egg egg-purple egg-layer-c" style="left: 55px;"></div>
+                            <div class="gacha-egg egg-blue egg-layer-c" style="left: 105px;"></div>
+                            <div class="gacha-egg egg-pink egg-layer-c" style="left: 150px;"></div>
+                            <div class="gacha-egg egg-yellow egg-layer-c" style="left: 195px;"></div>
                         </div>
-                        <p class="text-xs text-gray-400 text-center mt-1.5" id="walletExpiry"></p>
-                    </div>
-                    <hr class="my-3 border-gray-200">
-                    <div>
-                        <p class="text-xs font-bold text-gray-500 text-center mb-2">請點擊下方按鈕兌換商品</p>
-                        <div class="flex justify-center">
-                            <button onclick="openShop()" class="shop-btn">🎁 商品專區</button>
+                        <div class="gacha-panel">
+                            <div class="gacha-crank" id="gachaCrank" onclick="openConfirmModal()"></div>
+                            <div class="gacha-gate">
+                                <div class="gacha-lucky-egg" id="luckyEgg"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 🎰 抽獎按鈕 -->
-                <div id="drawActionArea" class="w-full">
-                    <button id="spinBtn" onclick="openConfirmModal()" class="w-full bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white font-black py-4 rounded-2xl shadow-lg shadow-rose-500/20 active:scale-98 transition-all tracking-wider text-base cursor-pointer">🎰 啟動幸運扭蛋</button>
-                </div>
-
-                <!-- ⚠️ 已抽獎提示 -->
-                <div id="alreadyPlayedMsg" class="hidden w-full text-center py-3 text-gray-500 font-bold text-sm bg-white/50 rounded-xl">
-                    ⚠️ 你已抽過獎，無法再次抽獎<br>但你仍可查看點數與兌換商品唷！
-                </div>
-
-                <!-- 扭蛋機本體 -->
-                <div class="gacha-machine mt-4 md:mt-6">
-                    <div class="gacha-glass" id="gachaGlass">
-                        <div class="gacha-egg egg-pink egg-layer-a" style="left: 15px;"></div>
-                        <div class="gacha-egg egg-blue egg-layer-a" style="left: 60px;"></div>
-                        <div class="gacha-egg egg-yellow egg-layer-a" style="left: 110px;"></div>
-                        <div class="gacha-egg egg-green egg-layer-a" style="left: 155px;"></div>
-                        <div class="gacha-egg egg-purple egg-layer-a" style="left: 200px;"></div>
-                        <div class="gacha-egg egg-orange egg-layer-a" style="left: 245px;"></div>
-                        <div class="gacha-egg egg-yellow egg-layer-b" style="left: 35px;"></div>
-                        <div class="gacha-egg egg-pink egg-layer-b" style="left: 85px;"></div>
-                        <div class="gacha-egg egg-green egg-layer-b" style="left: 130px;"></div>
-                        <div class="gacha-egg egg-blue egg-layer-b" style="left: 175px;"></div>
-                        <div class="gacha-egg egg-orange egg-layer-b" style="left: 220px;"></div>
-                        <div class="gacha-egg egg-purple egg-layer-c" style="left: 55px;"></div>
-                        <div class="gacha-egg egg-blue egg-layer-c" style="left: 105px;"></div>
-                        <div class="gacha-egg egg-pink egg-layer-c" style="left: 150px;"></div>
-                        <div class="gacha-egg egg-yellow egg-layer-c" style="left: 195px;"></div>
-                    </div>
-                    <div class="gacha-panel">
-                        <div class="gacha-crank" id="gachaCrank" onclick="openConfirmModal()"></div>
-                        <div class="gacha-gate">
-                            <div class="gacha-lucky-egg" id="luckyEgg"></div>
+                <!-- 🪙 點數兌換系統區塊（初始隱藏，選擇點數時顯示） -->
+                <div id="pointsSystemArea" class="w-full hidden">
+                    <div class="w-full bg-white/80 backdrop-blur-md rounded-2xl p-5 shadow-md border border-white">
+                        <h3 class="text-center text-base font-black text-amber-600 mb-3">🎁 點數兌換系統</h3>
+                        <div class="mb-3">
+                            <p class="text-xs font-bold text-gray-500 text-center mb-1.5">目前可用點數</p>
+                            <div class="flex justify-center">
+                                <span class="wallet-badge text-sm" id="walletDisplay">🪙 讀取中...</span>
+                            </div>
+                            <p class="text-xs text-gray-400 text-center mt-1.5" id="walletExpiry"></p>
+                        </div>
+                        <hr class="my-3 border-gray-200">
+                        <div>
+                            <p class="text-xs font-bold text-gray-500 text-center mb-2">請點擊下方按鈕兌換商品</p>
+                            <div class="flex justify-center">
+                                <button onclick="openShop()" class="shop-btn">🎁 商品專區</button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- 左翼：禮物列表（手機版排下方） -->
+        <!-- 左翼：禮物列表 -->
         <div class="lg:col-span-3 order-2 lg:order-1 mobile-side-panels">
             <div class="dashboard-panel" id="statusBoard">
                 <span class="board-title-text prize-title-text">📋 禮物列表</span>
@@ -683,7 +713,7 @@
             </div>
         </div>
 
-        <!-- 右翼：幸運中獎者（手機版排下方） -->
+        <!-- 右翼：幸運中獎者 -->
         <div class="lg:col-span-3 order-3 mobile-side-panels">
             <div class="dashboard-panel" id="honorBoard">
                 <span class="board-title-text honor-title-text">👑 幸運中獎者</span>
@@ -692,9 +722,27 @@
         </div>
     </div>
 
+    <!-- 🔀 選擇模式彈窗（新增） -->
+    <div id="choiceModal" class="modal-overlay" style="display: none;">
+        <div class="modal-card p-6 text-center">
+            <h2 class="text-xl font-black text-slate-800 mb-1">👋 你好，<span id="choicePlayerName" class="text-rose-500"></span>！</h2>
+            <p class="text-sm text-gray-500 mb-5">請選擇你要進行的項目</p>
+            <div class="space-y-3">
+                <button onclick="chooseDraw()" class="choice-btn choice-btn-draw w-full">
+                    <span class="text-2xl">🎰</span>
+                    <span>抽獎</span>
+                </button>
+                <button onclick="choosePoints()" class="choice-btn choice-btn-points w-full">
+                    <span class="text-2xl">🎁</span>
+                    <span>點數兌換系統</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- ❓ 抽獎確認彈窗 -->
     <div id="confirmModal" class="modal-overlay" style="display: none;">
-        <div class="modal-card bg-white rounded-3xl w-full max-w-sm p-6 text-center shadow-2xl border-4 border-rose-300">
+        <div class="modal-card p-6 text-center border-4 border-rose-300">
             <h2 class="text-xl font-black text-slate-800 mb-2">🎯 確定要抽獎嗎？</h2>
             <p class="text-sm text-gray-500 mb-6">每個名字只能抽一次，送出後無法反悔喔！</p>
             <div class="flex gap-3">
@@ -706,7 +754,7 @@
 
     <!-- 🏆 獲獎彈窗 -->
     <div id="winModal" class="modal-overlay" style="display: none;">
-        <div class="modal-card bg-white rounded-3xl w-full max-w-sm p-6 text-center shadow-2xl border-4 border-amber-400">
+        <div class="modal-card p-6 text-center border-4 border-amber-400">
             <h2 id="modalTitle" class="text-2xl font-black text-rose-500 mb-2">🎉 恭喜中獎！</h2>
             <div class="bg-amber-50 rounded-2xl p-4 my-4 border border-amber-200">
                 <p class="text-xs text-amber-600 font-bold tracking-wider mb-1">🎁 抽中獎品</p>
@@ -721,7 +769,7 @@
 
     <!-- 🔐 錢包密語彈窗 -->
     <div id="walletPassModal" class="modal-overlay" style="display: none;">
-        <div class="modal-card bg-white rounded-3xl w-full max-w-sm p-6 text-center shadow-2xl border-4 border-yellow-400">
+        <div class="modal-card p-6 text-center border-4 border-yellow-400">
             <h2 class="text-xl font-black text-slate-800 mb-2">🔐 解鎖點數錢包</h2>
             <p class="text-sm text-gray-500 mb-4">請輸入 <b id="walletPassName"></b> 的個人錢包密語</p>
             <input type="password" id="personalPassInput" placeholder="輸入個人密語" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-base font-semibold text-center focus:outline-none focus:ring-2 focus:ring-yellow-400 transition-all mb-4">
@@ -735,7 +783,7 @@
 
     <!-- 🛍️ 商品專區彈窗 -->
     <div id="shopModal" class="modal-overlay" style="display: none;">
-        <div class="modal-card bg-white rounded-3xl w-full max-w-lg p-6 shadow-2xl border-4 border-emerald-400 max-h-[85vh] flex flex-col">
+        <div class="modal-card p-6 max-w-lg flex flex-col max-h-[85vh]">
             <div class="flex items-center justify-between mb-4">
                 <h2 class="text-xl font-black text-slate-800">🛍️ 商品專區</h2>
                 <button onclick="closeShop()" class="text-gray-400 hover:text-gray-600 text-3xl leading-none">&times;</button>
@@ -744,13 +792,11 @@
                 <span class="wallet-badge text-sm" id="shopWalletDisplay">🪙 0 點</span>
                 <span class="text-xs text-gray-400">可用點數</span>
             </div>
-            
             <div class="flex gap-2 mb-3">
                 <button id="tabShopItems" class="tab-btn text-xs font-bold px-3 py-2 rounded-lg bg-emerald-100 text-emerald-700 flex-1">商品列表</button>
                 <button id="tabPointsHistory" class="tab-btn text-xs font-bold px-3 py-2 rounded-lg bg-gray-100 text-gray-500 flex-1">點數記錄</button>
                 <button id="tabRedeemHistory" class="tab-btn text-xs font-bold px-3 py-2 rounded-lg bg-gray-100 text-gray-500 flex-1">兌換記錄</button>
             </div>
-
             <div id="shopItemList" class="overflow-y-auto flex-grow space-y-3 pr-1"><p class="text-gray-400 text-sm text-center">載入商品中...</p></div>
             <div id="pointsHistoryList" class="hidden overflow-y-auto flex-grow space-y-2 pr-1"><p class="text-gray-400 text-sm text-center">尚無點數記錄</p></div>
             <div id="redeemHistoryList" class="hidden overflow-y-auto flex-grow space-y-2 pr-1"><p class="text-gray-400 text-sm text-center">尚無兌換記錄</p></div>
@@ -790,6 +836,8 @@
         window.closeWalletPassModal = closeWalletPassModal;
         window.goBack = goBack;
         window.promptAdminMode = promptAdminMode;
+        window.chooseDraw = chooseDraw;
+        window.choosePoints = choosePoints;
 
         // ---------- 全域狀態 ----------
         let isDrawing = false;
@@ -1058,6 +1106,38 @@
             document.getElementById("controlPanel").classList.remove("hidden");
         }
 
+        // ---------- 顯示抽獎系統 ----------
+        function showDrawSystem() {
+            document.getElementById("drawSystemArea").classList.remove("hidden");
+            document.getElementById("pointsSystemArea").classList.add("hidden");
+        }
+
+        // ---------- 顯示點數兌換系統 ----------
+        function showPointsSystem() {
+            document.getElementById("drawSystemArea").classList.add("hidden");
+            document.getElementById("pointsSystemArea").classList.remove("hidden");
+        }
+
+        // ---------- 選擇模式 ----------
+        function showChoiceModal(playerName) {
+            document.getElementById("choicePlayerName").innerText = playerName;
+            document.getElementById("choiceModal").style.display = "flex";
+        }
+
+        function closeChoiceModal() {
+            document.getElementById("choiceModal").style.display = "none";
+        }
+
+        function chooseDraw() {
+            closeChoiceModal();
+            showDrawSystem();
+        }
+
+        function choosePoints() {
+            closeChoiceModal();
+            showPointsSystem();
+        }
+
         // ---------- 選擇名字 ----------
         function handleNameChange() {
             const val = document.getElementById("playerName").value;
@@ -1074,9 +1154,18 @@
             const content = document.getElementById("contentArea");
             content.classList.remove("hidden");
             listenToWallet(val);
+
             const already = !isAdminMode && (myDeviceRecord || globalPlayedUsers[val]);
-            document.getElementById("drawActionArea").classList.toggle("hidden", already);
-            document.getElementById("alreadyPlayedMsg").classList.toggle("hidden", !already);
+
+            if (already) {
+                // 已抽獎，直接進入點數兌換系統
+                showPointsSystem();
+            } else {
+                // 未抽獎，跳出選擇視窗
+                showChoiceModal(val);
+                // 預設先顯示抽獎系統（隱藏點數系統）
+                showDrawSystem();
+            }
         }
 
         function showControlPanel() {
@@ -1120,7 +1209,7 @@
                 lockOpt.value = ""; lockOpt.disabled = true; lockOpt.selected = true;
                 lockOpt.innerText = "🔒 請先解鎖群組名單 🔒";
                 selectEl.appendChild(lockOpt);
-                alert("❌ 密語錯誤");
+                alert("❌ 密碼錯誤");
             }
         }
 
@@ -1252,14 +1341,15 @@
         }
 
         function clickTicket() { if (currentPrizeUrl&&currentPrizeUrl.startsWith("http")) window.open(currentPrizeUrl,"_blank"); else if (currentPrizeUrl) alert(currentPrizeUrl); else alert("無連結"); }
+
+        // 🔥 抽獎完成後自動跳轉到點數兌換系統
         function closeModal() {
             document.getElementById("winModal").style.display = "none";
             document.getElementById("luckyEgg").className = "gacha-lucky-egg";
             document.getElementById("modalTicketCode").style.display = "block";
             document.getElementById("copyHint").style.display = "block";
-            showControlPanel();
-            document.getElementById("playerName").innerHTML = '<option value="" disabled selected>🔒 請先解鎖群組名單 🔒</option>';
-            document.getElementById("secretPass").value = "";
+            // 抽獎結束後顯示點數兌換系統
+            showPointsSystem();
             isAdminMode = false;
         }
 
