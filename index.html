@@ -54,7 +54,6 @@
             border-radius: 40px 40px 20px 20px;
             box-shadow: 0 20px 0 #b91c1c, 0 30px 40px rgba(0,0,0,0.3);
             padding: 25px;
-            /* 🔥 修正：使用一致的間距，與左右欄位間距相同 */
             margin: 24px auto 24px auto;
             border: 6px solid #fee2e2;
         }
@@ -491,7 +490,6 @@
             .gacha-machine {
                 transform: scale(0.78);
                 transform-origin: top center;
-                /* 🔥 修正：移除負外距，使用與其他元素一致的間距 */
                 margin: 24px auto 24px auto;
                 height: 300px;
             }
@@ -542,7 +540,6 @@
                 margin-top: 24px;
             }
 
-            /* 🔥 密語輸入列改上下排列 */
             .secret-pass-row {
                 flex-direction: column !important;
                 gap: 8px !important;
@@ -556,7 +553,6 @@
                 font-size: 15px !important;
             }
 
-            /* 手機版彈窗底部彈出 */
             .modal-overlay {
                 align-items: flex-end;
                 padding: 0;
@@ -649,15 +645,12 @@
 
                 <!-- 🎰 抽獎專屬區塊 -->
                 <div id="drawSystemArea" class="w-full">
-                    <!-- 抽獎按鈕 -->
                     <div id="drawActionArea" class="w-full">
                         <button id="spinBtn" onclick="openConfirmModal()" class="w-full bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white font-black py-4 rounded-2xl shadow-lg shadow-rose-500/20 active:scale-98 transition-all tracking-wider text-base cursor-pointer">🎰 啟動幸運扭蛋</button>
                     </div>
-                    <!-- 已抽獎提示 -->
                     <div id="alreadyPlayedMsg" class="hidden w-full text-center py-3 text-gray-500 font-bold text-sm bg-white/50 rounded-xl mt-4">
                         ⚠️ 你已抽過獎，無法再次抽獎
                     </div>
-                    <!-- 扭蛋機本體（已透過 CSS margin 統一間距） -->
                     <div class="gacha-machine">
                         <div class="gacha-glass" id="gachaGlass">
                             <div class="gacha-egg egg-pink egg-layer-a" style="left: 15px;"></div>
@@ -708,16 +701,16 @@
             </div>
         </div>
 
-        <!-- 左翼：禮物列表 -->
-        <div class="lg:col-span-3 order-2 lg:order-1 mobile-side-panels">
+        <!-- 左翼：禮物列表（🔥 加入 ID） -->
+        <div class="lg:col-span-3 order-2 lg:order-1 mobile-side-panels" id="prizeListPanel">
             <div class="dashboard-panel" id="statusBoard">
                 <span class="board-title-text prize-title-text">📋 禮物列表</span>
                 <div class="scroller-content text-gray-400 text-sm italic p-2 text-center">連線中，正在加載禮品庫存...</div>
             </div>
         </div>
 
-        <!-- 右翼：幸運中獎者 -->
-        <div class="lg:col-span-3 order-3 mobile-side-panels">
+        <!-- 右翼：幸運中獎者（🔥 加入 ID） -->
+        <div class="lg:col-span-3 order-3 mobile-side-panels" id="honorBoardPanel">
             <div class="dashboard-panel" id="honorBoard">
                 <span class="board-title-text honor-title-text">👑 幸運中獎者</span>
                 <div class="scroller-content text-gray-400 text-sm italic p-2 text-center">連線中，正在載入...</div>
@@ -1109,16 +1102,20 @@
             document.getElementById("controlPanel").classList.remove("hidden");
         }
 
-        // ---------- 顯示抽獎系統 ----------
+        // 🔥 顯示抽獎系統（顯示側邊欄）
         function showDrawSystem() {
             document.getElementById("drawSystemArea").classList.remove("hidden");
             document.getElementById("pointsSystemArea").classList.add("hidden");
+            document.getElementById("prizeListPanel").classList.remove("hidden");
+            document.getElementById("honorBoardPanel").classList.remove("hidden");
         }
 
-        // ---------- 顯示點數兌換系統 ----------
+        // 🔥 顯示點數兌換系統（隱藏側邊欄）
         function showPointsSystem() {
             document.getElementById("drawSystemArea").classList.add("hidden");
             document.getElementById("pointsSystemArea").classList.remove("hidden");
+            document.getElementById("prizeListPanel").classList.add("hidden");
+            document.getElementById("honorBoardPanel").classList.add("hidden");
         }
 
         // ---------- 選擇模式 ----------
@@ -1349,6 +1346,7 @@
             document.getElementById("luckyEgg").className = "gacha-lucky-egg";
             document.getElementById("modalTicketCode").style.display = "block";
             document.getElementById("copyHint").style.display = "block";
+            // 抽獎結束後切到點數兌換系統（側邊欄會自動隱藏）
             showPointsSystem();
             isAdminMode = false;
         }
