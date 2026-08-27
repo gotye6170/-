@@ -54,7 +54,8 @@
             border-radius: 40px 40px 20px 20px;
             box-shadow: 0 20px 0 #b91c1c, 0 30px 40px rgba(0,0,0,0.3);
             padding: 25px;
-            margin: 20px auto 0 auto;
+            /* 🔥 修正：使用一致的間距，與左右欄位間距相同 */
+            margin: 24px auto 24px auto;
             border: 6px solid #fee2e2;
         }
 
@@ -490,7 +491,8 @@
             .gacha-machine {
                 transform: scale(0.78);
                 transform-origin: top center;
-                margin: -20px auto -40px auto;
+                /* 🔥 修正：移除負外距，使用與其他元素一致的間距 */
+                margin: 24px auto 24px auto;
                 height: 300px;
             }
 
@@ -536,11 +538,11 @@
             .mobile-side-panels {
                 display: flex;
                 flex-direction: column;
-                gap: 12px;
-                margin-top: 16px;
+                gap: 24px;
+                margin-top: 24px;
             }
 
-            /* 🔥 修復解鎖按鈕超出畫面：改為上下排列 */
+            /* 🔥 密語輸入列改上下排列 */
             .secret-pass-row {
                 flex-direction: column !important;
                 gap: 8px !important;
@@ -575,6 +577,7 @@
             }
             .gacha-machine {
                 transform: scale(1);
+                margin: 32px auto 32px auto;
             }
         }
     </style>
@@ -636,7 +639,7 @@
             <div id="contentArea" class="hidden w-full max-w-sm flex flex-col items-center mt-3 md:mt-4">
                 
                 <!-- 上一步 + 玩家名稱 -->
-                <div class="w-full flex items-center justify-between mb-2 md:mb-3">
+                <div class="w-full flex items-center justify-between mb-4 md:mb-6">
                     <button onclick="goBack()" class="back-btn">← 上一步</button>
                     <span id="playerNameDisplay" class="inline-block bg-white/70 backdrop-blur-sm rounded-full px-5 py-2 text-sm font-bold text-slate-700 shadow-sm border border-white">
                         👤 <span id="currentPlayerNameLabel" class="text-rose-500"></span>
@@ -644,18 +647,18 @@
                     <div style="width:60px;"></div>
                 </div>
 
-                <!-- 🎰 抽獎專屬區塊（初始顯示，選擇抽獎時顯示） -->
+                <!-- 🎰 抽獎專屬區塊 -->
                 <div id="drawSystemArea" class="w-full">
                     <!-- 抽獎按鈕 -->
                     <div id="drawActionArea" class="w-full">
                         <button id="spinBtn" onclick="openConfirmModal()" class="w-full bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white font-black py-4 rounded-2xl shadow-lg shadow-rose-500/20 active:scale-98 transition-all tracking-wider text-base cursor-pointer">🎰 啟動幸運扭蛋</button>
                     </div>
                     <!-- 已抽獎提示 -->
-                    <div id="alreadyPlayedMsg" class="hidden w-full text-center py-3 text-gray-500 font-bold text-sm bg-white/50 rounded-xl">
+                    <div id="alreadyPlayedMsg" class="hidden w-full text-center py-3 text-gray-500 font-bold text-sm bg-white/50 rounded-xl mt-4">
                         ⚠️ 你已抽過獎，無法再次抽獎
                     </div>
-                    <!-- 扭蛋機本體 -->
-                    <div class="gacha-machine mt-4 md:mt-6">
+                    <!-- 扭蛋機本體（已透過 CSS margin 統一間距） -->
+                    <div class="gacha-machine">
                         <div class="gacha-glass" id="gachaGlass">
                             <div class="gacha-egg egg-pink egg-layer-a" style="left: 15px;"></div>
                             <div class="gacha-egg egg-blue egg-layer-a" style="left: 60px;"></div>
@@ -682,7 +685,7 @@
                     </div>
                 </div>
 
-                <!-- 🪙 點數兌換系統區塊（初始隱藏，選擇點數時顯示） -->
+                <!-- 🪙 點數兌換系統區塊 -->
                 <div id="pointsSystemArea" class="w-full hidden">
                     <div class="w-full bg-white/80 backdrop-blur-md rounded-2xl p-5 shadow-md border border-white">
                         <h3 class="text-center text-base font-black text-amber-600 mb-3">🎁 點數兌換系統</h3>
@@ -722,7 +725,7 @@
         </div>
     </div>
 
-    <!-- 🔀 選擇模式彈窗（新增） -->
+    <!-- 🔀 選擇模式彈窗 -->
     <div id="choiceModal" class="modal-overlay" style="display: none;">
         <div class="modal-card p-6 text-center">
             <h2 class="text-xl font-black text-slate-800 mb-1">👋 你好，<span id="choicePlayerName" class="text-rose-500"></span>！</h2>
@@ -1163,7 +1166,6 @@
             } else {
                 // 未抽獎，跳出選擇視窗
                 showChoiceModal(val);
-                // 預設先顯示抽獎系統（隱藏點數系統）
                 showDrawSystem();
             }
         }
@@ -1342,13 +1344,11 @@
 
         function clickTicket() { if (currentPrizeUrl&&currentPrizeUrl.startsWith("http")) window.open(currentPrizeUrl,"_blank"); else if (currentPrizeUrl) alert(currentPrizeUrl); else alert("無連結"); }
 
-        // 🔥 抽獎完成後自動跳轉到點數兌換系統
         function closeModal() {
             document.getElementById("winModal").style.display = "none";
             document.getElementById("luckyEgg").className = "gacha-lucky-egg";
             document.getElementById("modalTicketCode").style.display = "block";
             document.getElementById("copyHint").style.display = "block";
-            // 抽獎結束後顯示點數兌換系統
             showPointsSystem();
             isAdminMode = false;
         }
