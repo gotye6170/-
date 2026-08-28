@@ -645,7 +645,7 @@
 
                 <!-- 🎰 抽獎專屬區塊 -->
                 <div id="drawSystemArea" class="w-full">
-                    <!-- 剩餘抽獎次數提示（新增） -->
+                    <!-- 剩餘抽獎次數提示 -->
                     <div id="drawCountDisplay" class="w-full text-center mb-2 text-sm font-bold text-gray-600"></div>
                     
                     <div id="drawActionArea" class="w-full">
@@ -746,7 +746,7 @@
     <div id="confirmModal" class="modal-overlay" style="display: none;">
         <div class="modal-card p-6 text-center border-4 border-rose-300">
             <h2 class="text-xl font-black text-slate-800 mb-2">🎯 確定要抽獎嗎？</h2>
-            <p class="text-sm text-gray-500 mb-6">送出後無法反悔喔！</p>
+            <p class="text-sm text-gray-500 mb-6">每個名字只能抽一次，送出後無法反悔喔！</p>
             <div class="flex gap-3">
                 <button onclick="closeConfirmModal()" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold py-3 rounded-xl text-base transition-all">再想一下</button>
                 <button onclick="confirmAndDraw()" class="flex-1 bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white font-bold py-3 rounded-xl text-base transition-all">確定抽獎</button>
@@ -764,7 +764,7 @@
                 <p id="modalPointsInfo" class="text-sm font-bold text-amber-600 mt-1 hidden"></p>
             </div>
             <div id="modalTicketCode" onclick="clickTicket()" class="bg-slate-900 text-cyan-400 font-mono text-base font-bold py-3 px-4 rounded-xl cursor-pointer hover:bg-slate-800 active:scale-98 transition-all border border-cyan-500/30 break-all select-none">點我打開獎品連結</div>
-            <p id="copyHint" class="text-[11px] text-gray-400 mt-1.5 font-medium">💡 點擊上方即可查看獎品，若需要密碼，請輸入「3064」</p>
+            <p id="copyHint" class="text-[11px] text-gray-400 mt-1.5 font-medium">💡 點擊上方並輸入密碼「3064」即可查看獎品</p>
             <button onclick="closeModal()" class="w-full bg-gray-800 hover:bg-gray-700 text-white font-bold py-3 rounded-xl text-base transition-all mt-4">收下好禮</button>
         </div>
     </div>
@@ -856,11 +856,12 @@
         let personalPassHash = null;
         let shopItems = {};
         let disabledPlayers = {};
+        let drawLimits = {};          // { name: limit }
         let isAdminMode = false;
         const ADMIN_TEST_PASSWORD = "test123";
         
-        // 每位玩家可抽次數（由後台設定，預設 1）
-        let maxDrawsPerPlayer = 1;
+        // 全域預設每位玩家可抽次數（若沒有個別設定）
+        let defaultMaxDraws = 1;
 
         // ---------- 音效 ----------
         let audioCtx = null;
@@ -871,7 +872,6 @@
         function playWinSound() { if (!soundEnabled) return; playTone(523.25, 0.15, "triangle", 0, 0.18); playTone(659.25, 0.15, "triangle", 0.15, 0.18); playTone(783.99, 0.28, "triangle", 0.3, 0.2); }
         function toggleSound() { soundEnabled = !soundEnabled; document.getElementById("soundToggleBtn").textContent = soundEnabled ? "🔊 音效" : "🔇 靜音"; }
 
-        // ---------- 群組名單 ----------
         const groupLists = {
             "皮皮": { label: "✨ 皮皮群", names: ["貝果", "怡蒨", "７７", "安鴻", "當家", "立涵", "皮夾", "睏寶"] },
             "GM": { label: "✨ 龜蜜群", names: ["伶", "昀", "瑜"] }
@@ -882,19 +882,27 @@
         function isPrizeTakenByOtherGroup(pn) { if (!honorUnlockedGroup) return false; for (const u in globalPlayedUsers) { if (globalPlayedUsers[u].won === pn && globalPlayedUsers[u].group === honorUnlockedGroup) return false; } return true; }
         async function sha256(m) { const b = new TextEncoder().encode(m); const h = await crypto.subtle.digest("SHA-256", b); return Array.from(new Uint8Array(h)).map(x => x.toString(16).padStart(2, "0")).join(""); }
 
-        // ---------- 讀取全域設定（每位玩家可抽次數） ----------
-        function loadGlobalSettings() {
+        // ---------- 獲取某玩家的抽獎上限 ----------
+        function getMaxDrawsForPlayer(name) {
+            if (drawLimits[name] !== undefined && Number.isInteger(drawLimits[name]) && drawLimits[name] >= 0) {
+                return drawLimits[name];
+            }
+            return defaultMaxDraws;
+        }
+
+        // ---------- 讀取全域預設與個別設定 ----------
+        function loadDrawSettings() {
+            // 全域預設
             onValue(ref(db, "settings/global/maxDrawsPerPlayer"), (snap) => {
                 const val = snap.val();
-                if (val && Number.isInteger(val) && val > 0) {
-                    maxDrawsPerPlayer = val;
-                } else {
-                    maxDrawsPerPlayer = 1;
-                }
-                // 如果已經解鎖群組，重新建立下拉選單
-                if (honorUnlockedGroup) {
-                    verifyGroupPass(); // 重新建立選單以更新剩餘次數
-                }
+                defaultMaxDraws = (val && Number.isInteger(val) && val > 0) ? val : 1;
+                if (honorUnlockedGroup) verifyGroupPass();
+                if (currentPlayerName) updateDrawCountDisplay();
+            });
+            // 個別設定
+            onValue(ref(db, "drawLimits"), (snap) => {
+                drawLimits = snap.val() || {};
+                if (honorUnlockedGroup) verifyGroupPass();
                 if (currentPlayerName) updateDrawCountDisplay();
             });
         }
@@ -904,9 +912,10 @@
             const display = document.getElementById("drawCountDisplay");
             if (!display || !currentPlayerName) return;
             const drawCount = globalPlayedUsers[currentPlayerName]?.drawCount || 0;
-            const remaining = maxDrawsPerPlayer - drawCount;
+            const limit = getMaxDrawsForPlayer(currentPlayerName);
+            const remaining = limit - drawCount;
             if (remaining > 0) {
-                display.innerText = `剩餘抽獎次數：${remaining} 次`;
+                display.innerText = `剩餘抽獎次數：${remaining} 次（上限 ${limit} 次）`;
             } else {
                 display.innerText = "抽獎次數已用完";
             }
@@ -1197,19 +1206,17 @@
             content.classList.remove("hidden");
             listenToWallet(val);
 
-            // 判斷是否已達抽獎上限（不再使用裝置限制）
             const drawCount = globalPlayedUsers[val]?.drawCount || 0;
-            const canDraw = isAdminMode || drawCount < maxDrawsPerPlayer;
+            const limit = getMaxDrawsForPlayer(val);
+            const canDraw = isAdminMode || drawCount < limit;
 
             if (canDraw) {
-                // 可以抽獎，顯示選擇模式
                 showChoiceModal(val);
                 showDrawSystem();
                 document.getElementById("drawActionArea").classList.remove("hidden");
                 document.getElementById("alreadyPlayedMsg").classList.add("hidden");
                 updateDrawCountDisplay();
             } else {
-                // 已達上限，直接進入點數兌換系統
                 showPointsSystem();
                 document.getElementById("drawActionArea").classList.add("hidden");
                 document.getElementById("alreadyPlayedMsg").classList.remove("hidden");
@@ -1240,7 +1247,8 @@
                     const opt = document.createElement("option");
                     opt.value = name;
                     const drawCount = globalPlayedUsers[name]?.drawCount || 0;
-                    const remaining = maxDrawsPerPlayer - drawCount;
+                    const limit = getMaxDrawsForPlayer(name);
+                    const remaining = limit - drawCount;
                     if (disabledPlayers[name]) {
                         opt.disabled = true;
                         opt.innerText = `${name} (已禁用)`;
@@ -1248,7 +1256,7 @@
                         opt.disabled = true;
                         opt.innerText = `${name} (已達上限)`;
                     } else {
-                        opt.innerText = `${name}（剩餘 ${remaining} 次）`;
+                        opt.innerText = `${name}（剩餘 ${remaining}/${limit} 次）`;
                     }
                     optGroup.appendChild(opt);
                 });
@@ -1274,7 +1282,8 @@
                 if (!opt.value) continue;
                 const name = opt.value;
                 const drawCount = globalPlayedUsers[name]?.drawCount || 0;
-                const remaining = maxDrawsPerPlayer - drawCount;
+                const limit = getMaxDrawsForPlayer(name);
+                const remaining = limit - drawCount;
                 if (disabledPlayers[name]) {
                     opt.disabled = true;
                     opt.innerText = name + " (已禁用)";
@@ -1283,7 +1292,7 @@
                     opt.innerText = name + " (已達上限)";
                 } else {
                     opt.disabled = false;
-                    opt.innerText = `${name}（剩餘 ${remaining} 次）`;
+                    opt.innerText = `${name}（剩餘 ${remaining}/${limit} 次）`;
                 }
             }
             let list = [];
@@ -1309,7 +1318,7 @@
                 disabledPlayers = snap.val() || {};
                 if (honorUnlockedGroup) refreshPlayedUsersUI();
             });
-            loadGlobalSettings();
+            loadDrawSettings();
         }
 
         function getYearEndTimestamp() {
@@ -1317,7 +1326,7 @@
             return new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999).getTime();
         }
 
-        // ---------- 抽獎核心（移除裝置限制，改用 drawCount） ----------
+        // ---------- 抽獎核心（使用玩家獨立限制） ----------
         async function startDraw() {
             const name = document.getElementById("playerName").value;
             if (!name) { alert("請先選擇名字"); return; }
@@ -1325,7 +1334,8 @@
             if (isDrawing) return;
             
             const drawCount = globalPlayedUsers[name]?.drawCount || 0;
-            if (!isAdminMode && drawCount >= maxDrawsPerPlayer) {
+            const limit = getMaxDrawsForPlayer(name);
+            if (!isAdminMode && drawCount >= limit) {
                 alert("抽獎次數已用完");
                 return;
             }
@@ -1359,7 +1369,6 @@
                     }
                 } catch(e){}
                 
-                // 更新玩家抽獎紀錄：最新結果 + drawCount 加一
                 const newDrawCount = (globalPlayedUsers[name]?.drawCount || 0) + 1;
                 await update(ref(db, `playedUsers/${name}`), {
                     won: chosen.name,
@@ -1376,7 +1385,6 @@
                     drawCount: newDrawCount
                 };
                 
-                // 點數發放
                 const minP = Number(chosen.minPoints), maxP = Number(chosen.maxPoints);
                 if (!isNaN(minP) && !isNaN(maxP) && maxP>=minP && maxP>0) {
                     awardedPoints = Math.floor(Math.random()*(maxP-minP+1))+minP;
@@ -1395,7 +1403,6 @@
                     } catch(e) { console.error("點數發放失敗", e); }
                 }
                 
-                // 動畫與彈窗
                 const container = document.getElementById("gachaGlass"), lucky = document.getElementById("luckyEgg"), crank = document.getElementById("gachaCrank");
                 const color = eggColors[Math.floor(Math.random()*eggColors.length)];
                 const matches = container.querySelectorAll(`.gacha-egg.${color}:not(.egg-falling-out)`);
@@ -1435,9 +1442,9 @@
             document.getElementById("luckyEgg").className = "gacha-lucky-egg";
             document.getElementById("modalTicketCode").style.display = "block";
             document.getElementById("copyHint").style.display = "block";
-            // 抽獎結束後，若還有剩餘次數，留在抽獎頁面並更新顯示；否則跳轉點數兌換系統
             const drawCount = globalPlayedUsers[currentPlayerName]?.drawCount || 0;
-            const remaining = maxDrawsPerPlayer - drawCount;
+            const limit = getMaxDrawsForPlayer(currentPlayerName);
+            const remaining = limit - drawCount;
             if (remaining > 0 && !isAdminMode) {
                 showDrawSystem();
                 updateDrawCountDisplay();
@@ -1454,7 +1461,8 @@
             const name = document.getElementById("playerName").value;
             if (!name) { alert("請先選擇名字"); return; }
             const drawCount = globalPlayedUsers[name]?.drawCount || 0;
-            if (!isAdminMode && drawCount >= maxDrawsPerPlayer) { alert("抽獎次數已用完"); return; }
+            const limit = getMaxDrawsForPlayer(name);
+            if (!isAdminMode && drawCount >= limit) { alert("抽獎次數已用完"); return; }
             if (disabledPlayers[name]) { alert("此玩家已被禁止抽獎"); return; }
             document.getElementById("confirmModal").style.display = "flex";
         }
@@ -1464,7 +1472,7 @@
         document.addEventListener("DOMContentLoaded", () => { bindShopTabs(); });
         onAuthStateChanged(auth, user => {
             if (user) {
-                deviceId = user.uid;  // 僅用於錢包綁定，不再用於抽獎限制
+                deviceId = user.uid;
                 onValue(ref(db, "settings/closed"), snap => {
                     document.getElementById("closedOverlay").style.display = snap.val()===true ? "flex" : "none";
                 });
