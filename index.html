@@ -1496,7 +1496,7 @@
             return new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999).getTime();
         }
 
-        // ---------- 抽獎核心（防重複時間戳版） ----------
+        // ---------- 抽獎核心（防重複寫入版） ----------
         async function startDraw() {
             const name = document.getElementById("playerName").value;
             if (!name) { alert("請先選擇名字"); return; }
@@ -1504,14 +1504,13 @@
             if (isDrawing) return;
             isDrawing = true;
 
-            // 🔒 立即禁用抽獎按鈕
             const spinBtn = document.getElementById("spinBtn");
             if (spinBtn) spinBtn.disabled = true;
 
             try {
-                // 檢查是否在短時間內重複抽獎（防止雙擊或跨分頁）
+                // 檢查是否在短時間內重複抽獎
                 const playerData = globalPlayedUsers[name];
-                if (playerData && playerData.lastDrawTime && (Date.now() - playerData.lastDrawTime < 5000)) {
+                if (playerData && playerData.lastDrawTime && (Date.now() - playerData.lastDrawTime < 3000)) {
                     alert("抽獎過於頻繁，請稍後再試。");
                     isDrawing = false;
                     if (spinBtn) spinBtn.disabled = false;
@@ -1582,11 +1581,11 @@
                     }
                 } catch (e) {}
 
-                // 更新玩家抽獎紀錄（加入 lastDrawTime 防止重複）
+                // 更新玩家抽獎紀錄（加入 lastDrawTime）
                 const playedRef = ref(db, `playedUsers/${name}`);
                 await runTransaction(playedRef, (current) => {
                     const now = Date.now();
-                    if (current && current.lastDrawTime && (now - current.lastDrawTime < 5000)) {
+                    if (current && current.lastDrawTime && (now - current.lastDrawTime < 3000)) {
                         return; // 中止事務
                     }
                     if (current === null) {
@@ -1600,13 +1599,29 @@
                     }
                 });
 
-                // 新增抽獎紀錄
-                await push(ref(db, `drawRecords/${name}`), {
-                    won: chosen.name,
-                    code: code,
-                    time: Date.now(),
-                    group: myGroup
-                });
+                // 防重複寫入 drawRecords：檢查最近一筆是否在 2 秒內
+                let skipRecord = false;
+                const existingRecordsSnap = await get(ref(db, `drawRecords/${name}`));
+                if (existingRecordsSnap.exists()) {
+                    const records = existingRecordsSnap.val();
+                    const keys = Object.keys(records);
+                    if (keys.length > 0) {
+                        const lastKey = keys[keys.length - 1];
+                        const lastTime = records[lastKey].time;
+                        if (Date.now() - lastTime < 2000) {
+                            skipRecord = true;
+                        }
+                    }
+                }
+
+                if (!skipRecord) {
+                    await push(ref(db, `drawRecords/${name}`), {
+                        won: chosen.name,
+                        code: code,
+                        time: Date.now(),
+                        group: myGroup
+                    });
+                }
 
                 // 更新本地快取
                 const newDrawCount = (playerData?.drawCount || 0) + 1;
