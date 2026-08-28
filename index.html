@@ -1496,178 +1496,197 @@
             return new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999).getTime();
         }
 
-// ---------- 抽獎核心（防重複強化版） ----------
-async function startDraw() {
-    const name = document.getElementById("playerName").value;
-    if (!name) { alert("請先選擇名字"); return; }
-    if (disabledPlayers[name]) { alert("此玩家已被禁止抽獎"); return; }
-    if (isDrawing) return;
-    isDrawing = true;
+        // ---------- 抽獎核心（防重複時間戳版） ----------
+        async function startDraw() {
+            const name = document.getElementById("playerName").value;
+            if (!name) { alert("請先選擇名字"); return; }
+            if (disabledPlayers[name]) { alert("此玩家已被禁止抽獎"); return; }
+            if (isDrawing) return;
+            isDrawing = true;
 
-    // 🔒 立即禁用抽獎按鈕，防止重複點擊
-    const spinBtn = document.getElementById("spinBtn");
-    if (spinBtn) spinBtn.disabled = true;
+            // 🔒 立即禁用抽獎按鈕
+            const spinBtn = document.getElementById("spinBtn");
+            if (spinBtn) spinBtn.disabled = true;
 
-    try {
-        const drawCount = globalPlayedUsers[name]?.drawCount || 0;
-        const limit = getMaxDrawsForPlayer(name);
-        if (!isAdminMode && drawCount >= limit) {
-            alert("抽獎次數已用完");
-            isDrawing = false;
-            if (spinBtn) spinBtn.disabled = false;
-            return;
-        }
-
-        let awardedPoints = 0;
-        const myGroup = getGroupKeyForName(name);
-        let pool = [];
-        let totalW = 0;
-
-        for (let id in lastPrizes) {
-            const p = lastPrizes[id];
-            if (!Array.isArray(p.groups) || !p.groups.includes(myGroup)) continue;
-            const q = Number(p.quantity || 0);
-            const w = Number(p.weight || 0);
-            if (q > 0 && w > 0) {
-                pool.push({ id, prizeData: p, weight: w });
-                totalW += w;
-            }
-        }
-
-        if (!pool.length) {
-            alert("庫存已空");
-            isDrawing = false;
-            if (spinBtn) spinBtn.disabled = false;
-            return;
-        }
-
-        let roll = Math.floor(Math.random() * totalW);
-        let sum = 0;
-        let chosenId = pool[0].id;
-        for (let i = 0; i < pool.length; i++) {
-            sum += pool[i].weight;
-            if (roll < sum) {
-                chosenId = pool[i].id;
-                break;
-            }
-        }
-        const chosen = pool.find(p => p.id === chosenId).prizeData;
-
-        const qRef = ref(db, `prizes/${chosenId}/quantity`);
-        const tx = await runTransaction(qRef, cur => (cur === null || cur <= 0) ? undefined : cur - 1);
-        if (!tx.committed) {
-            alert("獎品被秒殺");
-            isDrawing = false;
-            if (spinBtn) spinBtn.disabled = false;
-            return;
-        }
-
-        let code = "";
-        try {
-            const cs = await get(ref(db, `prizeCodes/${chosenId}`));
-            if (cs.exists()) {
-                const cObj = cs.val();
-                const used = new Set(Object.values(globalPlayedUsers).map(u => u && u.code).filter(c => c));
-                const av = Object.values(cObj).filter(c => c && !used.has(c));
-                if (av.length) code = av[0];
-            }
-        } catch (e) {}
-
-        // 更新玩家抽獎紀錄（使用 transaction 並確保健壯）
-        const playedRef = ref(db, `playedUsers/${name}`);
-        await runTransaction(playedRef, (current) => {
-            if (current === null) {
-                return { won: chosen.name, code, time: Date.now(), group: myGroup, drawCount: 1 };
-            } else {
-                return { ...current, won: chosen.name, code, time: Date.now(), group: myGroup, drawCount: (current.drawCount || 0) + 1 };
-            }
-        });
-
-        // 新增抽獎紀錄（確保只執行一次）
-        await push(ref(db, `drawRecords/${name}`), {
-            won: chosen.name,
-            code: code,
-            time: Date.now(),
-            group: myGroup
-        });
-
-        // 更新本地快取
-        globalPlayedUsers[name] = {
-            won: chosen.name,
-            code: code,
-            time: Date.now(),
-            group: myGroup,
-            drawCount: (globalPlayedUsers[name]?.drawCount || 0) + 1
-        };
-
-        // 發放點數（只更新 points 子節點）
-        const minP = Number(chosen.minPoints);
-        const maxP = Number(chosen.maxPoints);
-        if (!isNaN(minP) && !isNaN(maxP) && maxP >= minP && maxP > 0) {
-            awardedPoints = Math.floor(Math.random() * (maxP - minP + 1)) + minP;
             try {
-                await runTransaction(ref(db, `pointUsers/${name}/points`), cur => (cur || 0) + awardedPoints);
-                await push(ref(db, "pendingPoints"), {
-                    playerName: name,
-                    points: awardedPoints,
-                    prizeName: chosen.name,
-                    timestamp: Date.now(),
-                    status: "approved",
-                    processedAt: Date.now()
+                // 檢查是否在短時間內重複抽獎（防止雙擊或跨分頁）
+                const playerData = globalPlayedUsers[name];
+                if (playerData && playerData.lastDrawTime && (Date.now() - playerData.lastDrawTime < 5000)) {
+                    alert("抽獎過於頻繁，請稍後再試。");
+                    isDrawing = false;
+                    if (spinBtn) spinBtn.disabled = false;
+                    return;
+                }
+
+                const drawCount = playerData?.drawCount || 0;
+                const limit = getMaxDrawsForPlayer(name);
+                if (!isAdminMode && drawCount >= limit) {
+                    alert("抽獎次數已用完");
+                    isDrawing = false;
+                    if (spinBtn) spinBtn.disabled = false;
+                    return;
+                }
+
+                let awardedPoints = 0;
+                const myGroup = getGroupKeyForName(name);
+                let pool = [];
+                let totalW = 0;
+
+                for (let id in lastPrizes) {
+                    const p = lastPrizes[id];
+                    if (!Array.isArray(p.groups) || !p.groups.includes(myGroup)) continue;
+                    const q = Number(p.quantity || 0);
+                    const w = Number(p.weight || 0);
+                    if (q > 0 && w > 0) {
+                        pool.push({ id, prizeData: p, weight: w });
+                        totalW += w;
+                    }
+                }
+
+                if (!pool.length) {
+                    alert("庫存已空");
+                    isDrawing = false;
+                    if (spinBtn) spinBtn.disabled = false;
+                    return;
+                }
+
+                let roll = Math.floor(Math.random() * totalW);
+                let sum = 0;
+                let chosenId = pool[0].id;
+                for (let i = 0; i < pool.length; i++) {
+                    sum += pool[i].weight;
+                    if (roll < sum) {
+                        chosenId = pool[i].id;
+                        break;
+                    }
+                }
+                const chosen = pool.find(p => p.id === chosenId).prizeData;
+
+                const qRef = ref(db, `prizes/${chosenId}/quantity`);
+                const tx = await runTransaction(qRef, cur => (cur === null || cur <= 0) ? undefined : cur - 1);
+                if (!tx.committed) {
+                    alert("獎品被秒殺");
+                    isDrawing = false;
+                    if (spinBtn) spinBtn.disabled = false;
+                    return;
+                }
+
+                let code = "";
+                try {
+                    const cs = await get(ref(db, `prizeCodes/${chosenId}`));
+                    if (cs.exists()) {
+                        const cObj = cs.val();
+                        const used = new Set(Object.values(globalPlayedUsers).map(u => u && u.code).filter(c => c));
+                        const av = Object.values(cObj).filter(c => c && !used.has(c));
+                        if (av.length) code = av[0];
+                    }
+                } catch (e) {}
+
+                // 更新玩家抽獎紀錄（加入 lastDrawTime 防止重複）
+                const playedRef = ref(db, `playedUsers/${name}`);
+                await runTransaction(playedRef, (current) => {
+                    const now = Date.now();
+                    if (current && current.lastDrawTime && (now - current.lastDrawTime < 5000)) {
+                        return; // 中止事務
+                    }
+                    if (current === null) {
+                        return { won: chosen.name, code, time: now, group: myGroup, drawCount: 1, lastDrawTime: now };
+                    } else {
+                        return { ...current, won: chosen.name, code, time: now, group: myGroup, drawCount: (current.drawCount || 0) + 1, lastDrawTime: now };
+                    }
+                }).then((result) => {
+                    if (!result.committed) {
+                        throw new Error("重複抽獎");
+                    }
                 });
+
+                // 新增抽獎紀錄
+                await push(ref(db, `drawRecords/${name}`), {
+                    won: chosen.name,
+                    code: code,
+                    time: Date.now(),
+                    group: myGroup
+                });
+
+                // 更新本地快取
+                const newDrawCount = (playerData?.drawCount || 0) + 1;
+                globalPlayedUsers[name] = {
+                    won: chosen.name,
+                    code: code,
+                    time: Date.now(),
+                    group: myGroup,
+                    drawCount: newDrawCount,
+                    lastDrawTime: Date.now()
+                };
+
+                // 發放點數
+                const minP = Number(chosen.minPoints);
+                const maxP = Number(chosen.maxPoints);
+                if (!isNaN(minP) && !isNaN(maxP) && maxP >= minP && maxP > 0) {
+                    awardedPoints = Math.floor(Math.random() * (maxP - minP + 1)) + minP;
+                    try {
+                        await runTransaction(ref(db, `pointUsers/${name}/points`), cur => (cur || 0) + awardedPoints);
+                        await push(ref(db, "pendingPoints"), {
+                            playerName: name,
+                            points: awardedPoints,
+                            prizeName: chosen.name,
+                            timestamp: Date.now(),
+                            status: "approved",
+                            processedAt: Date.now()
+                        });
+                    } catch (e) {
+                        console.error("點數發放失敗（不影響抽獎）", e);
+                    }
+                }
+
+                // 動畫與彈窗
+                const container = document.getElementById("gachaGlass");
+                const lucky = document.getElementById("luckyEgg");
+                const crank = document.getElementById("gachaCrank");
+                const color = eggColors[Math.floor(Math.random() * eggColors.length)];
+                const matches = container.querySelectorAll(`.gacha-egg.${color}:not(.egg-falling-out)`);
+                crank.classList.add("rotating-crank");
+                playCrankSound();
+                if (matches.length) matches[Math.floor(Math.random() * matches.length)].classList.add("egg-falling-out");
+                container.classList.add("eggs-drop-down");
+                lucky.className = "gacha-lucky-egg";
+                lucky.style.opacity = "0";
+                lucky.classList.add(color);
+                setTimeout(() => lucky.classList.add("dropped-egg"), 1000);
+                setTimeout(() => {
+                    document.getElementById("modalPrizeName").innerText = chosen.name;
+                    currentPrizeUrl = code;
+                    const pointsInfo = document.getElementById("modalPointsInfo");
+                    if (pointsInfo) {
+                        if (awardedPoints > 0) {
+                            pointsInfo.innerText = `🪙 獲得 ${awardedPoints} 點`;
+                            pointsInfo.classList.remove("hidden");
+                        } else {
+                            pointsInfo.classList.add("hidden");
+                        }
+                    }
+                    const isThanks = chosen.name && chosen.name.includes("銘謝惠顧");
+                    document.getElementById("modalTitle").innerText = isThanks ? "😢 差一點點！" : "🎉 恭喜中獎！";
+                    document.getElementById("modalTitle").className = `text-2xl font-black mb-2 ${isThanks ? 'text-gray-500' : 'text-rose-500'}`;
+                    document.getElementById("modalTicketCode").style.display = isThanks ? "none" : "block";
+                    document.getElementById("copyHint").style.display = isThanks ? "none" : "block";
+                    document.querySelector("#winModal button:last-child").innerText = isThanks ? "再接再厲" : "收下好禮";
+                    document.getElementById("winModal").style.display = "flex";
+                    playWinSound();
+                    crank.classList.remove("rotating-crank");
+                    container.classList.remove("eggs-drop-down");
+                    isDrawing = false;
+                    if (spinBtn) spinBtn.disabled = false;
+                }, 2100);
+
             } catch (e) {
-                console.error("點數發放失敗（不影響抽獎）", e);
+                console.error("抽獎失敗: ", e);
+                alert("抽獎失敗，請稍後再試");
+                isDrawing = false;
+                const spinBtn = document.getElementById("spinBtn");
+                if (spinBtn) spinBtn.disabled = false;
             }
         }
-
-        // 動畫與彈窗
-        const container = document.getElementById("gachaGlass");
-        const lucky = document.getElementById("luckyEgg");
-        const crank = document.getElementById("gachaCrank");
-        const color = eggColors[Math.floor(Math.random() * eggColors.length)];
-        const matches = container.querySelectorAll(`.gacha-egg.${color}:not(.egg-falling-out)`);
-        crank.classList.add("rotating-crank");
-        playCrankSound();
-        if (matches.length) matches[Math.floor(Math.random() * matches.length)].classList.add("egg-falling-out");
-        container.classList.add("eggs-drop-down");
-        lucky.className = "gacha-lucky-egg";
-        lucky.style.opacity = "0";
-        lucky.classList.add(color);
-        setTimeout(() => lucky.classList.add("dropped-egg"), 1000);
-        setTimeout(() => {
-            document.getElementById("modalPrizeName").innerText = chosen.name;
-            currentPrizeUrl = code;
-            const pointsInfo = document.getElementById("modalPointsInfo");
-            if (pointsInfo) {
-                if (awardedPoints > 0) {
-                    pointsInfo.innerText = `🪙 獲得 ${awardedPoints} 點`;
-                    pointsInfo.classList.remove("hidden");
-                } else {
-                    pointsInfo.classList.add("hidden");
-                }
-            }
-            const isThanks = chosen.name && chosen.name.includes("銘謝惠顧");
-            document.getElementById("modalTitle").innerText = isThanks ? "😢 差一點點！" : "🎉 恭喜中獎！";
-            document.getElementById("modalTitle").className = `text-2xl font-black mb-2 ${isThanks ? 'text-gray-500' : 'text-rose-500'}`;
-            document.getElementById("modalTicketCode").style.display = isThanks ? "none" : "block";
-            document.getElementById("copyHint").style.display = isThanks ? "none" : "block";
-            document.querySelector("#winModal button:last-child").innerText = isThanks ? "再接再厲" : "收下好禮";
-            document.getElementById("winModal").style.display = "flex";
-            playWinSound();
-            crank.classList.remove("rotating-crank");
-            container.classList.remove("eggs-drop-down");
-            isDrawing = false;
-            if (spinBtn) spinBtn.disabled = false;
-        }, 2100);
-
-    } catch (e) {
-        console.error("抽獎失敗: ", e);
-        alert("伺服器擁擠，請稍後再試");
-        isDrawing = false;
-        const spinBtn = document.getElementById("spinBtn");
-        if (spinBtn) spinBtn.disabled = false;
-    }
-}
 
         function clickTicket() {
             if (currentPrizeUrl && currentPrizeUrl.startsWith("http")) {
