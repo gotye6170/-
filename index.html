@@ -1497,7 +1497,7 @@
         // ---------- Firebase 鎖節點 ----------
         const drawLocksRef = (name) => ref(db, `drawLocks/${name}`);
 
-// ---------- 抽獎核心（最終防重版） ----------
+// ---------- 抽獎核心（修正動畫卡住） ----------
 async function startDraw() {
     const name = document.getElementById("playerName").value;
     if (!name) { alert("請先選擇名字"); return; }
@@ -1519,10 +1519,10 @@ async function startDraw() {
             return;
         }
 
-        // 抽獎邏輯（選擇獎品、扣庫存、讀取序號）保持不變，但放在這裡
         const myGroup = getGroupKeyForName(name);
         let pool = [];
         let totalW = 0;
+
         for (let id in lastPrizes) {
             const p = lastPrizes[id];
             if (!Array.isArray(p.groups) || !p.groups.includes(myGroup)) continue;
@@ -1533,12 +1533,14 @@ async function startDraw() {
                 totalW += w;
             }
         }
+
         if (!pool.length) {
             alert("庫存已空");
             isDrawing = false;
             if (spinBtn) spinBtn.disabled = false;
             return;
         }
+
         let roll = Math.floor(Math.random() * totalW);
         let sum = 0;
         let chosenId = pool[0].id;
@@ -1573,33 +1575,17 @@ async function startDraw() {
             }
         } catch (e) {}
 
-        // 🔐 原子性地更新 playedUsers，同時檢查時間戳以防止重複
+        // 更新 playedUsers 並防止重複
         const playedRef = ref(db, `playedUsers/${name}`);
         const result = await runTransaction(playedRef, (current) => {
             const now = Date.now();
-            // 如果 5 秒內已有抽獎，放棄本次
             if (current && current.lastDrawTime && (now - current.lastDrawTime < 5000)) {
-                return; // 中止事務
+                return; // 中止
             }
             if (current === null) {
-                return {
-                    won: chosen.name,
-                    code: code,
-                    time: now,
-                    group: myGroup,
-                    drawCount: 1,
-                    lastDrawTime: now
-                };
+                return { won: chosen.name, code, time: now, group: myGroup, drawCount: 1, lastDrawTime: now };
             } else {
-                return {
-                    ...current,
-                    won: chosen.name,
-                    code: code,
-                    time: now,
-                    group: myGroup,
-                    drawCount: (current.drawCount || 0) + 1,
-                    lastDrawTime: now
-                };
+                return { ...current, won: chosen.name, code, time: now, group: myGroup, drawCount: (current.drawCount || 0) + 1, lastDrawTime: now };
             }
         });
 
@@ -1610,7 +1596,7 @@ async function startDraw() {
             return;
         }
 
-        // 寫入抽獎紀錄（使用 push 產生唯一鍵）
+        // 寫入抽獎紀錄
         await push(ref(db, `drawRecords/${name}`), {
             won: chosen.name,
             code: code,
@@ -1629,10 +1615,11 @@ async function startDraw() {
         };
 
         // 發放點數
+        let awardedPoints = 0;
         const minP = Number(chosen.minPoints);
         const maxP = Number(chosen.maxPoints);
         if (!isNaN(minP) && !isNaN(maxP) && maxP >= minP && maxP > 0) {
-            const awardedPoints = Math.floor(Math.random() * (maxP - minP + 1)) + minP;
+            awardedPoints = Math.floor(Math.random() * (maxP - minP + 1)) + minP;
             try {
                 await runTransaction(ref(db, `pointUsers/${name}/points`), cur => (cur || 0) + awardedPoints);
                 await push(ref(db, "pendingPoints"), {
@@ -1648,51 +1635,89 @@ async function startDraw() {
             }
         }
 
-        // 動畫與彈窗
+        // 播放動畫
         const container = document.getElementById("gachaGlass");
         const lucky = document.getElementById("luckyEgg");
         const crank = document.getElementById("gachaCrank");
-        const color = eggColors[Math.floor(Math.random() * eggColors.length)];
-        const matches = container.querySelectorAll(`.gacha-egg.${color}:not(.egg-falling-out)`);
-        crank.classList.add("rotating-crank");
-        playCrankSound();
-        if (matches.length) matches[Math.floor(Math.random() * matches.length)].classList.add("egg-falling-out");
-        container.classList.add("eggs-drop-down");
-        lucky.className = "gacha-lucky-egg";
-        lucky.style.opacity = "0";
-        lucky.classList.add(color);
-        setTimeout(() => lucky.classList.add("dropped-egg"), 1000);
-        setTimeout(() => {
-            document.getElementById("modalPrizeName").innerText = chosen.name;
-            currentPrizeUrl = code;
-            const pointsInfo = document.getElementById("modalPointsInfo");
-            if (pointsInfo) {
-                if (awardedPoints > 0) {
-                    pointsInfo.innerText = `🪙 獲得 ${awardedPoints} 點`;
-                    pointsInfo.classList.remove("hidden");
-                } else {
-                    pointsInfo.classList.add("hidden");
-                }
+
+        if (container && lucky && crank) {
+            const color = eggColors[Math.floor(Math.random() * eggColors.length)];
+            const matches = container.querySelectorAll(`.gacha-egg.${color}:not(.egg-falling-out)`);
+            crank.classList.add("rotating-crank");
+            playCrankSound();
+            if (matches.length) {
+                matches[Math.floor(Math.random() * matches.length)].classList.add("egg-falling-out");
             }
-            const isThanks = chosen.name && chosen.name.includes("銘謝惠顧");
-            document.getElementById("modalTitle").innerText = isThanks ? "😢 差一點點！" : "🎉 恭喜中獎！";
-            document.getElementById("modalTitle").className = `text-2xl font-black mb-2 ${isThanks ? 'text-gray-500' : 'text-rose-500'}`;
-            document.getElementById("modalTicketCode").style.display = isThanks ? "none" : "block";
-            document.getElementById("copyHint").style.display = isThanks ? "none" : "block";
-            document.querySelector("#winModal button:last-child").innerText = isThanks ? "再接再厲" : "收下好禮";
-            document.getElementById("winModal").style.display = "flex";
-            playWinSound();
-            crank.classList.remove("rotating-crank");
-            container.classList.remove("eggs-drop-down");
+            container.classList.add("eggs-drop-down");
+            lucky.className = "gacha-lucky-egg";
+            lucky.style.opacity = "0";
+            lucky.classList.add(color);
+            setTimeout(() => {
+                lucky.classList.add("dropped-egg");
+            }, 1000);
+
+            // 顯示結果
+            setTimeout(() => {
+                try {
+                    // 確保彈窗元素存在
+                    const modalTitle = document.getElementById("modalTitle");
+                    const modalPrizeName = document.getElementById("modalPrizeName");
+                    const modalTicketCode = document.getElementById("modalTicketCode");
+                    const copyHint = document.getElementById("copyHint");
+                    const pointsInfo = document.getElementById("modalPointsInfo");
+                    const closeBtn = document.querySelector("#winModal button:last-child");
+
+                    if (modalPrizeName) modalPrizeName.innerText = chosen.name;
+                    currentPrizeUrl = code;
+
+                    if (pointsInfo) {
+                        if (awardedPoints > 0) {
+                            pointsInfo.innerText = `🪙 獲得 ${awardedPoints} 點`;
+                            pointsInfo.classList.remove("hidden");
+                        } else {
+                            pointsInfo.classList.add("hidden");
+                        }
+                    }
+
+                    const isThanks = chosen.name && chosen.name.includes("銘謝惠顧");
+                    if (modalTitle) {
+                        modalTitle.innerText = isThanks ? "😢 差一點點！" : "🎉 恭喜中獎！";
+                        modalTitle.className = `text-2xl font-black mb-2 ${isThanks ? 'text-gray-500' : 'text-rose-500'}`;
+                    }
+                    if (modalTicketCode) {
+                        modalTicketCode.style.display = isThanks ? "none" : "block";
+                    }
+                    if (copyHint) {
+                        copyHint.style.display = isThanks ? "none" : "block";
+                    }
+                    if (closeBtn) {
+                        closeBtn.innerText = isThanks ? "再接再厲" : "收下好禮";
+                    }
+
+                    const winModal = document.getElementById("winModal");
+                    if (winModal) winModal.style.display = "flex";
+                    playWinSound();
+                } catch (err) {
+                    console.error("顯示結果時發生錯誤：", err);
+                } finally {
+                    // 無論如何都恢復按鈕與狀態
+                    if (crank) crank.classList.remove("rotating-crank");
+                    if (container) container.classList.remove("eggs-drop-down");
+                    isDrawing = false;
+                    if (spinBtn) spinBtn.disabled = false;
+                }
+            }, 2500);
+        } else {
+            // 若動畫元素缺失，直接顯示結果
+            alert(`抽獎完成！獲得：${chosen.name}`);
             isDrawing = false;
             if (spinBtn) spinBtn.disabled = false;
-        }, 2100);
+        }
 
     } catch (e) {
         console.error("抽獎失敗: ", e);
         alert("抽獎失敗，請稍後再試");
         isDrawing = false;
-        const spinBtn = document.getElementById("spinBtn");
         if (spinBtn) spinBtn.disabled = false;
     }
 }
