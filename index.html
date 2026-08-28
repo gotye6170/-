@@ -1320,6 +1320,18 @@
         function chooseDraw() {
             closeChoiceModal();
             showDrawSystem();
+            if (!currentPlayerName) return;
+            const drawCount = globalPlayedUsers[currentPlayerName]?.drawCount || 0;
+            const limit = getMaxDrawsForPlayer(currentPlayerName);
+            const canDraw = isAdminMode || drawCount < limit;
+            if (canDraw) {
+                document.getElementById("drawActionArea").classList.remove("hidden");
+                document.getElementById("alreadyPlayedMsg").classList.add("hidden");
+            } else {
+                document.getElementById("drawActionArea").classList.add("hidden");
+                document.getElementById("alreadyPlayedMsg").classList.remove("hidden");
+            }
+            updateDrawCountDisplay();
         }
         function choosePoints() {
             closeChoiceModal();
@@ -1343,21 +1355,22 @@
             content.classList.remove("hidden");
             listenToWallet(val);
 
+            // 無論是否能抽獎，都先顯示選擇模式
+            showChoiceModal(val);
+            showDrawSystem();
+
             const drawCount = globalPlayedUsers[val]?.drawCount || 0;
             const limit = getMaxDrawsForPlayer(val);
             const canDraw = isAdminMode || drawCount < limit;
 
             if (canDraw) {
-                showChoiceModal(val);
-                showDrawSystem();
                 document.getElementById("drawActionArea").classList.remove("hidden");
                 document.getElementById("alreadyPlayedMsg").classList.add("hidden");
-                updateDrawCountDisplay();
             } else {
-                showPointsSystem();
                 document.getElementById("drawActionArea").classList.add("hidden");
                 document.getElementById("alreadyPlayedMsg").classList.remove("hidden");
             }
+            updateDrawCountDisplay();
         }
 
         function showControlPanel() {
