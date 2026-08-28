@@ -1384,25 +1384,25 @@
                     group: myGroup,
                     drawCount: newDrawCount
                 };
-                
-                const minP = Number(chosen.minPoints), maxP = Number(chosen.maxPoints);
-                if (!isNaN(minP) && !isNaN(maxP) && maxP>=minP && maxP>0) {
-                    awardedPoints = Math.floor(Math.random()*(maxP-minP+1))+minP;
-                    const yearEnd = getYearEndTimestamp();
-                    try {
-                        await runTransaction(ref(db, `pointUsers/${name}`), cur => {
-                            if (!cur) return { points: awardedPoints, expiry: yearEnd, personalPassHash: "", boundUid: "" };
-                            cur.points = (cur.points || 0) + awardedPoints;
-                            cur.expiry = yearEnd;
-                            return cur;
-                        });
-                        await push(ref(db, "pendingPoints"), {
-                            playerName: name, points: awardedPoints, prizeName: chosen.name,
-                            timestamp: Date.now(), status: "approved", processedAt: Date.now()
-                        });
-                    } catch(e) { console.error("點數發放失敗", e); }
-                }
-                
+
+const minP = Number(chosen.minPoints), maxP = Number(chosen.maxPoints);
+if (!isNaN(minP) && !isNaN(maxP) && maxP>=minP && maxP>0) {
+    awardedPoints = Math.floor(Math.random()*(maxP-minP+1))+minP;
+    const yearEnd = getYearEndTimestamp();
+    try {
+        // 只更新 points 子節點，避免權限問題
+        await runTransaction(ref(db, `pointUsers/${name}/points`), cur => {
+            return (cur || 0) + awardedPoints;
+        });
+        // 可選：更新到期日（需管理員權限，故省略或另用 update 更新 expiry 但可能被拒，這裡不處理到期日）
+        // 寫入點數記錄
+        await push(ref(db, "pendingPoints"), {
+            playerName: name, points: awardedPoints, prizeName: chosen.name,
+            timestamp: Date.now(), status: "approved", processedAt: Date.now()
+        });
+    } catch(e) { console.error("點數發放失敗（不影響抽獎）", e); }
+}
+
                 const container = document.getElementById("gachaGlass"), lucky = document.getElementById("luckyEgg"), crank = document.getElementById("gachaCrank");
                 const color = eggColors[Math.floor(Math.random()*eggColors.length)];
                 const matches = container.querySelectorAll(`.gacha-egg.${color}:not(.egg-falling-out)`);
