@@ -1239,56 +1239,94 @@
             }
         }
 
-        // 🔥 修正：兌換商品時同時寫入點數記錄（負數）
-        window.redeemItem = async function(itemId) {
-            if (!currentPlayerName || !walletUnlocked) return;
-            const it = shopItems[itemId];
-            if (!it) return;
-            if (!confirm(`確定要用 ${it.cost} 點兌換「${it.name}」嗎？`)) return;
+// 🔥 修正：兌換商品時同時寫入點數記錄並發送通知
+window.redeemItem = async function(itemId) {
+    if (!currentPlayerName || !walletUnlocked) return;
+    const it = shopItems[itemId];
+    if (!it) return;
+    if (!confirm(`確定要用 ${it.cost} 點兌換「${it.name}」嗎？`)) return;
+    try {
+        const sr = ref(db, `shopItems/${itemId}/stock`);
+        const pr = ref(db, `pointUsers/${currentPlayerName}/points`);
+
+        const srRes = await runTransaction(sr, cur => (cur === null || cur <= 0) ? undefined : cur - 1);
+        if (!srRes.committed) { alert("❌ 庫存不足"); return; }
+
+        const prRes = await runTransaction(pr, cur => (cur === null || cur < it.cost) ? undefined : cur - it.cost);
+        if (!prRes.committed) {
+            await runTransaction(sr, cur => (cur || 0) + 1);
+            alert("❌ 點數不足");
+            return;
+        }
+
+        // 寫入兌換記錄
+        await push(ref(db, "redeemRequests"), {
+            playerName: currentPlayerName,
+            itemId: itemId,
+            itemName: it.name,
+            cost: it.cost,
+            timestamp: Date.now(),
+            status: "approved",
+            processedAt: Date.now(),
+            prizeDelivered: false
+        });
+
+        // 新增點數記錄（負數，代表扣除）
+        await push(ref(db, "pendingPoints"), {
+            playerName: currentPlayerName,
+            points: -it.cost,
+            prizeName: `🛍️ 兌換：${it.name}`,
+            timestamp: Date.now(),
+            status: "approved",
+            processedAt: Date.now()
+        });
+
+        alert(`✅ 兌換成功！獲得「${it.name}」`);
+        loadPlayerPointsHistory();
+        loadPlayerRedeemHistory();
+
+        // 📣 發送通知（二選一，請填入你的憑證）
+        const notifyMessage = `🛍️ 玩家兌換通知\n玩家：${currentPlayerName}\n商品：${it.name}\n花費點數：${it.cost}\n時間：${new Date().toLocaleString("zh-TW")}`;
+
+        // === Telegram 通知（填入 Bot Token 和 Chat ID） ===
+        const TELEGRAM_BOT_TOKEN = "你的_TELEGRAM_BOT_TOKEN";
+        const TELEGRAM_CHAT_ID = "你的_TELEGRAM_CHAT_ID";
+        if (TELEGRAM_BOT_TOKEN !== "你的_TELEGRAM_BOT_TOKEN" && TELEGRAM_CHAT_ID !== "你的_TELEGRAM_CHAT_ID") {
             try {
-                const sr = ref(db, `shopItems/${itemId}/stock`);
-                const pr = ref(db, `pointUsers/${currentPlayerName}/points`);
-
-                const srRes = await runTransaction(sr, cur => (cur === null || cur <= 0) ? undefined : cur - 1);
-                if (!srRes.committed) { alert("❌ 庫存不足"); return; }
-
-                const prRes = await runTransaction(pr, cur => (cur === null || cur < it.cost) ? undefined : cur - it.cost);
-                if (!prRes.committed) {
-                    await runTransaction(sr, cur => (cur || 0) + 1);
-                    alert("❌ 點數不足");
-                    return;
-                }
-
-                // 寫入兌換記錄
-                await push(ref(db, "redeemRequests"), {
-                    playerName: currentPlayerName,
-                    itemId: itemId,
-                    itemName: it.name,
-                    cost: it.cost,
-                    timestamp: Date.now(),
-                    status: "approved",
-                    processedAt: Date.now(),
-                    prizeDelivered: false
+                await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        chat_id: TELEGRAM_CHAT_ID,
+                        text: notifyMessage
+                    })
                 });
-
-                // 🔥 新增：寫入點數記錄（負數，代表扣除）
-                await push(ref(db, "pendingPoints"), {
-                    playerName: currentPlayerName,
-                    points: -it.cost,
-                    prizeName: `🛍️ 兌換：${it.name}`,
-                    timestamp: Date.now(),
-                    status: "approved",
-                    processedAt: Date.now()
-                });
-
-                alert(`✅ 兌換成功！獲得「${it.name}」`);
-                loadPlayerPointsHistory();
-                loadPlayerRedeemHistory();
             } catch (e) {
-                console.error(e);
-                alert("兌換失敗");
+                console.error("Telegram 通知發送失敗：", e);
             }
-        };
+        }
+
+        // === Discord 通知（填入 Webhook URL） ===
+        const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1542945444957519982/F4oenbKde22wMG-mc5qikOARL5ClbF7Q5mj2SHyqfnOgdryDROTpr2KqYyyu51bdGzYO";
+        if (DISCORD_WEBHOOK_URL !== "https://discord.com/api/webhooks/1542945444957519982/F4oenbKde22wMG-mc5qikOARL5ClbF7Q5mj2SHyqfnOgdryDROTpr2KqYyyu51bdGzYO") {
+            try {
+                await fetch(DISCORD_WEBHOOK_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        content: notifyMessage
+                    })
+                });
+            } catch (e) {
+                console.error("Discord 通知發送失敗：", e);
+            }
+        }
+
+    } catch (e) {
+        console.error(e);
+        alert("兌換失敗");
+    }
+};
 
         // ---------- 管理員測試模式 ----------
         function promptAdminMode() {
