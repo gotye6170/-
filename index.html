@@ -1494,7 +1494,10 @@
             return new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999).getTime();
         }
 
-        // ---------- 抽獎核心（最終修正版） ----------
+        // ---------- Firebase 鎖節點 ----------
+        const drawLocksRef = (name) => ref(db, `drawLocks/${name}`);
+
+        // ---------- 抽獎核心（含 Firebase 鎖保護） ----------
         async function startDraw() {
             const name = document.getElementById("playerName").value;
             if (!name) { alert("請先選擇名字"); return; }
@@ -1506,14 +1509,24 @@
             if (spinBtn) spinBtn.disabled = true;
 
             try {
-                const playerData = globalPlayedUsers[name];
-                if (playerData && playerData.lastDrawTime && (Date.now() - playerData.lastDrawTime < 3000)) {
+                // 🔥 嘗試獲取 Firebase 鎖
+                const lockRef = drawLocksRef(name);
+                const lockResult = await runTransaction(lockRef, (current) => {
+                    const now = Date.now();
+                    if (current && (now - current < 3000)) {
+                        return; // 上一個抽獎仍在鎖定期，拒絕
+                    }
+                    return now; // 設置新鎖
+                });
+
+                if (!lockResult.committed) {
                     alert("抽獎過於頻繁，請稍後再試。");
                     isDrawing = false;
                     if (spinBtn) spinBtn.disabled = false;
                     return;
                 }
 
+                const playerData = globalPlayedUsers[name];
                 const drawCount = playerData?.drawCount || 0;
                 const limit = getMaxDrawsForPlayer(name);
                 if (!isAdminMode && drawCount >= limit) {
@@ -1523,6 +1536,7 @@
                     return;
                 }
 
+                let awardedPoints = 0;
                 const myGroup = getGroupKeyForName(name);
                 let pool = [];
                 let totalW = 0;
@@ -1577,36 +1591,18 @@
                     }
                 } catch (e) {}
 
-                // 更新 playedUsers 的 drawCount 和 lastDrawTime
+                // 更新 playedUsers
                 const playedRef = ref(db, `playedUsers/${name}`);
                 await runTransaction(playedRef, (current) => {
                     const now = Date.now();
-                    if (current && current.lastDrawTime && (now - current.lastDrawTime < 3000)) {
-                        return; // 中止
-                    }
                     if (current === null) {
-                        return {
-                            won: chosen.name,
-                            code: code,
-                            time: now,
-                            group: myGroup,
-                            drawCount: 1,
-                            lastDrawTime: now
-                        };
+                        return { won: chosen.name, code, time: now, group: myGroup, drawCount: 1, lastDrawTime: now };
                     } else {
-                        return {
-                            ...current,
-                            won: chosen.name,
-                            code: code,
-                            time: now,
-                            group: myGroup,
-                            drawCount: (current.drawCount || 0) + 1,
-                            lastDrawTime: now
-                        };
+                        return { ...current, won: chosen.name, code, time: now, group: myGroup, drawCount: (current.drawCount || 0) + 1, lastDrawTime: now };
                     }
                 });
 
-                // 寫入 drawRecords（使用 push 產生唯一鍵）
+                // 新增抽獎紀錄
                 await push(ref(db, `drawRecords/${name}`), {
                     won: chosen.name,
                     code: code,
@@ -1628,7 +1624,7 @@
                 const minP = Number(chosen.minPoints);
                 const maxP = Number(chosen.maxPoints);
                 if (!isNaN(minP) && !isNaN(maxP) && maxP >= minP && maxP > 0) {
-                    const awardedPoints = Math.floor(Math.random() * (maxP - minP + 1)) + minP;
+                    awardedPoints = Math.floor(Math.random() * (maxP - minP + 1)) + minP;
                     try {
                         await runTransaction(ref(db, `pointUsers/${name}/points`), cur => (cur || 0) + awardedPoints);
                         await push(ref(db, "pendingPoints"), {
