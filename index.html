@@ -830,12 +830,12 @@
 
         // ---------- 全域狀態 ----------
         let isDrawing = false;
-        let currentPrizeUrl = ""; 
-        let globalPlayedUsers = {};   // { name: { won, code, time, group, drawCount } }
+        let currentPrizeUrl = "";
+        let globalPlayedUsers = {};
         let honorUnlockedGroup = null;
         let lastPlayedList = [];
         let lastPrizes = null;
-        let deviceId = null;          // 僅用於錢包綁定，不再用於抽獎限制
+        let deviceId = null;
 
         let currentPlayerName = null;
         let currentWalletData = null;
@@ -843,30 +843,74 @@
         let personalPassHash = null;
         let shopItems = {};
         let disabledPlayers = {};
-        let drawLimits = {};          // { name: limit }
+        let drawLimits = {};
         let isAdminMode = false;
         const ADMIN_TEST_PASSWORD = "test123";
-        
-        let defaultMaxDraws = 1;      // 全域預設
+
+        let defaultMaxDraws = 1;
 
         // ---------- 音效 ----------
         let audioCtx = null;
         let soundEnabled = true;
-        function getAudioCtx() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); if (audioCtx.state === "suspended") audioCtx.resume(); return audioCtx; }
-        function playTone(f, d, t, s, g) { try { const ctx = getAudioCtx(); const o = ctx.createOscillator(); const gn = ctx.createGain(); o.type = t; o.frequency.value = f; o.connect(gn); gn.connect(ctx.destination); const st = ctx.currentTime + s; gn.gain.setValueAtTime(g, st); gn.gain.exponentialRampToValueAtTime(0.001, st + d); o.start(st); o.stop(st + d + 0.02); } catch (e) {} }
-        function playCrankSound() { if (!soundEnabled) return; for (let i = 0; i < 6; i++) playTone(300 + Math.random() * 150, 0.08, "square", i * 0.15, 0.06); }
-        function playWinSound() { if (!soundEnabled) return; playTone(523.25, 0.15, "triangle", 0, 0.18); playTone(659.25, 0.15, "triangle", 0.15, 0.18); playTone(783.99, 0.28, "triangle", 0.3, 0.2); }
-        function toggleSound() { soundEnabled = !soundEnabled; document.getElementById("soundToggleBtn").textContent = soundEnabled ? "🔊 音效" : "🔇 靜音"; }
+        function getAudioCtx() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === "suspended") audioCtx.resume();
+            return audioCtx;
+        }
+        function playTone(freq, duration, type, startDelay, gainValue) {
+            try {
+                const ctx = getAudioCtx();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = type;
+                osc.frequency.value = freq;
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                const t = ctx.currentTime + startDelay;
+                gain.gain.setValueAtTime(gainValue, t);
+                gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
+                osc.start(t);
+                osc.stop(t + duration + 0.02);
+            } catch (e) {}
+        }
+        function playCrankSound() {
+            if (!soundEnabled) return;
+            for (let i = 0; i < 6; i++) playTone(300 + Math.random() * 150, 0.08, "square", i * 0.15, 0.06);
+        }
+        function playWinSound() {
+            if (!soundEnabled) return;
+            playTone(523.25, 0.15, "triangle", 0, 0.18);
+            playTone(659.25, 0.15, "triangle", 0.15, 0.18);
+            playTone(783.99, 0.28, "triangle", 0.3, 0.2);
+        }
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            document.getElementById("soundToggleBtn").textContent = soundEnabled ? "🔊 音效" : "🔇 靜音";
+        }
 
+        // ---------- 群組名單 ----------
         const groupLists = {
             "皮皮": { label: "✨ 皮皮群", names: ["貝果", "怡蒨", "７７", "安鴻", "當家", "立涵", "皮夾", "睏寶"] },
             "GM": { label: "✨ 龜蜜群", names: ["伶", "昀", "瑜"] }
         };
         const eggColors = ["egg-pink", "egg-blue", "egg-yellow", "egg-green", "egg-purple", "egg-orange"];
 
-        function getGroupKeyForName(name) { for (const k in groupLists) if (groupLists[k].names.includes(name)) return k; return null; }
-        function isPrizeTakenByOtherGroup(pn) { if (!honorUnlockedGroup) return false; for (const u in globalPlayedUsers) { if (globalPlayedUsers[u].won === pn && globalPlayedUsers[u].group === honorUnlockedGroup) return false; } return true; }
-        async function sha256(m) { const b = new TextEncoder().encode(m); const h = await crypto.subtle.digest("SHA-256", b); return Array.from(new Uint8Array(h)).map(x => x.toString(16).padStart(2, "0")).join(""); }
+        function getGroupKeyForName(name) {
+            for (const k in groupLists) if (groupLists[k].names.includes(name)) return k;
+            return null;
+        }
+        function isPrizeTakenByOtherGroup(pn) {
+            if (!honorUnlockedGroup) return false;
+            for (const u in globalPlayedUsers) {
+                if (globalPlayedUsers[u].won === pn && globalPlayedUsers[u].group === honorUnlockedGroup) return false;
+            }
+            return true;
+        }
+        async function sha256(message) {
+            const buf = new TextEncoder().encode(message);
+            const hash = await crypto.subtle.digest("SHA-256", buf);
+            return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, "0")).join("");
+        }
 
         // ---------- 獲取某玩家的抽獎上限 ----------
         function getMaxDrawsForPlayer(name) {
@@ -906,37 +950,69 @@
         }
 
         // ---------- 跑馬燈、榮譽榜、禮物列表 ----------
-        function buildMarqueeText(list) { const def = "🎉 歡迎來到呆呆扭蛋機！快來試試手氣！ 🎟️ "; if (!honorUnlockedGroup) return def; const f = list.filter(i => i.group === honorUnlockedGroup); if (!f.length) return def; return "🔥 中獎快報 🔥 " + f.map(i => `【${i.user}】喜獲大獎：${i.won}！`).join(" 🌟 ") + " 歡慶連連，好運不斷！"; }
+        function buildMarqueeText(list) {
+            const def = "🎉 歡迎來到呆呆扭蛋機！快來試試手氣！ 🎟️ ";
+            if (!honorUnlockedGroup) return def;
+            const f = list.filter(i => i.group === honorUnlockedGroup);
+            if (!f.length) return def;
+            return "🔥 中獎快報 🔥 " + f.map(i => `【${i.user}】喜獲大獎：${i.won}！`).join(" 🌟 ") + " 歡慶連連，好運不斷！";
+        }
         function renderHonorBoard(list) {
-            const b = document.getElementById("honorBoard"); if (!b) return;
+            const b = document.getElementById("honorBoard");
+            if (!b) return;
             let h = '<span class="board-title-text honor-title-text">👑 幸運中獎者</span>';
-            if (!honorUnlockedGroup) { b.innerHTML = h + '<div class="flex-grow flex flex-col items-center justify-center text-center gap-2 px-4"><span class="text-2xl">🔒</span><p class="text-xs text-gray-400">請先解鎖群組</p></div>'; return; }
+            if (!honorUnlockedGroup) {
+                b.innerHTML = h + '<div class="flex-grow flex flex-col items-center justify-center text-center gap-2 px-4"><span class="text-2xl">🔒</span><p class="text-xs text-gray-400">請先解鎖群組</p></div>';
+                return;
+            }
             const f = list.filter(i => i.group === honorUnlockedGroup);
             h += '<div class="scroller-content">';
-            if (f.length) f.forEach(i => h += `<div class="honor-item-row"><span class="honor-badge">已得獎</span><div class="honor-info"><span>恭喜 <b style="color:#ec4899;">${i.user}</b> 抽中 🎁 <b style="color:#7c3aed;">${i.won}</b></span></div></div>`);
-            else h += '<div style="color:#9ca3af;font-size:13px;text-align:center;padding:20px;">目前還沒有人中獎哦！</div>';
-            h += '</div>'; b.innerHTML = h;
+            if (f.length) {
+                f.forEach(i => {
+                    h += `<div class="honor-item-row"><span class="honor-badge">已得獎</span><div class="honor-info"><span>恭喜 <b style="color:#ec4899;">${i.user}</b> 抽中 🎁 <b style="color:#7c3aed;">${i.won}</b></span></div></div>`;
+                });
+            } else {
+                h += '<div style="color:#9ca3af;font-size:13px;text-align:center;padding:20px;">目前還沒有人中獎哦！</div>';
+            }
+            h += '</div>';
+            b.innerHTML = h;
         }
         function updateMarquee(t) {
-            const i1 = document.getElementById("marqueeItem1"), i2 = document.getElementById("marqueeItem2"), tr = document.getElementById("marqueeTrack");
-            i1.textContent = t; i2.textContent = t;
-            requestAnimationFrame(() => { const w = i1.offsetWidth; const d = Math.max(w / 70, 8); tr.style.animation = "none"; void tr.offsetWidth; tr.style.animation = `marqueeScroll ${d}s linear infinite`; });
+            const i1 = document.getElementById("marqueeItem1");
+            const i2 = document.getElementById("marqueeItem2");
+            const tr = document.getElementById("marqueeTrack");
+            i1.textContent = t;
+            i2.textContent = t;
+            requestAnimationFrame(() => {
+                const w = i1.offsetWidth;
+                const d = Math.max(w / 70, 8);
+                tr.style.animation = "none";
+                void tr.offsetWidth;
+                tr.style.animation = `marqueeScroll ${d}s linear infinite`;
+            });
         }
         function renderStatusBoard(pz) {
-            const b = document.getElementById("statusBoard"); if (!b || !pz) return;
+            const b = document.getElementById("statusBoard");
+            if (!b || !pz) return;
             let h = '<span class="prize-title-text">📋 禮物列表</span>';
-            if (!honorUnlockedGroup) { b.innerHTML = h + '<div style="color:#9ca3af;font-size:13px;padding:10px;">🔒 請先解鎖群組</div>'; return; }
+            if (!honorUnlockedGroup) {
+                b.innerHTML = h + '<div style="color:#9ca3af;font-size:13px;padding:10px;">🔒 請先解鎖群組</div>';
+                return;
+            }
             let has = false;
             for (let id in pz) {
-                const p = pz[id]; if (p.name && p.name.includes("銘謝惠顧")) continue;
+                const p = pz[id];
+                if (p.name && p.name.includes("銘謝惠顧")) continue;
                 const g = Array.isArray(p.groups) ? p.groups : [];
                 if (!g.includes(honorUnlockedGroup)) continue;
                 has = true;
                 const img = p.image ? `<img class="prize-thumb" src="${p.image}" alt="${p.name}">` : '<div class="prize-thumb" style="background:#f3f4f6;"></div>';
-                const rem = Number(p.quantity||0), total = Number(p.totalQuantity||0), st = total > 1;
+                const rem = Number(p.quantity || 0);
+                const total = Number(p.totalQuantity || 0);
+                const st = total > 1;
                 if (rem > 0) {
                     const ql = st ? `🟢 剩餘 <b>${rem}</b> 份 / 共 <b>${total}</b> 份` : `🟢 剩餘 <b>${rem}</b> 份`;
-                    const pb = st ? `<div class="prize-progress-track"><div class="prize-progress-fill is-available" style="width:${Math.round(rem/total*100)}%;"></div></div>` : '';
+                    const pb = st ? `<div class="prize-progress-track"><div class="prize-progress-fill is-available" style="width:${Math.round(rem / total * 100)}%;"></div></div>` : '';
                     h += `<div class="prize-item-row">${img}<div class="prize-info"><span class="prize-name-label">${p.name}</span><span style="color:#059669;font-size:13px;font-weight:bold;">${ql}</span>${pb}</div></div>`;
                 } else {
                     const on = isPrizeTakenByOtherGroup(p.name) ? '<div style="color:#f97316;font-size:11px;font-weight:bold;margin-top:1px;">🔸 已被其他組抽走</div>' : '';
@@ -955,39 +1031,84 @@
                 currentWalletData = snap.val();
                 if (currentWalletData) {
                     personalPassHash = currentWalletData.personalPassHash || null;
-                    if (currentWalletData.boundUid === deviceId) { walletUnlocked = true; updateWalletDisplay(); }
-                    else if (!currentWalletData.boundUid) { walletUnlocked = false; document.getElementById("walletDisplay").innerText = "🔒 請驗證錢包"; document.getElementById("walletExpiry").innerText = "點擊商品專區以驗證"; }
-                    else { walletUnlocked = false; document.getElementById("walletDisplay").innerText = "🔒 錢包已綁定其他裝置"; document.getElementById("walletExpiry").innerText = ""; }
-                } else { walletUnlocked = false; document.getElementById("walletDisplay").innerText = "🪙 錢包未開通"; document.getElementById("walletExpiry").innerText = "請聯繫管理員"; }
+                    if (currentWalletData.boundUid === deviceId) {
+                        walletUnlocked = true;
+                        updateWalletDisplay();
+                    } else if (!currentWalletData.boundUid) {
+                        walletUnlocked = false;
+                        document.getElementById("walletDisplay").innerText = "🔒 請驗證錢包";
+                        document.getElementById("walletExpiry").innerText = "點擊商品專區以驗證";
+                    } else {
+                        walletUnlocked = false;
+                        document.getElementById("walletDisplay").innerText = "🔒 錢包已綁定其他裝置";
+                        document.getElementById("walletExpiry").innerText = "";
+                    }
+                } else {
+                    walletUnlocked = false;
+                    document.getElementById("walletDisplay").innerText = "🪙 錢包未開通";
+                    document.getElementById("walletExpiry").innerText = "請聯繫管理員";
+                }
             });
         }
         function updateWalletDisplay() {
             if (!currentWalletData || !walletUnlocked) return;
-            const pts = currentWalletData.points||0, exp = currentWalletData.expiry||0, now = Date.now();
+            const pts = currentWalletData.points || 0;
+            const exp = currentWalletData.expiry || 0;
+            const now = Date.now();
             let txt = "";
-            if (exp && exp !== 0 && exp < now) { txt = "（已過期）"; document.getElementById("walletDisplay").innerText = `🪙 ${pts} 點 (已過期)`; }
-            else if (exp && exp !== 0) { const d = new Date(exp); txt = `有效至 ${d.toLocaleDateString("zh-TW")}`; document.getElementById("walletDisplay").innerText = `🪙 ${pts} 點`; }
-            else { document.getElementById("walletDisplay").innerText = `🪙 ${pts} 點`; txt = "無期限"; }
+            if (exp && exp !== 0 && exp < now) {
+                txt = "（已過期）";
+                document.getElementById("walletDisplay").innerText = `🪙 ${pts} 點 (已過期)`;
+            } else if (exp && exp !== 0) {
+                const d = new Date(exp);
+                txt = `有效至 ${d.toLocaleDateString("zh-TW")}`;
+                document.getElementById("walletDisplay").innerText = `🪙 ${pts} 點`;
+            } else {
+                document.getElementById("walletDisplay").innerText = `🪙 ${pts} 點`;
+                txt = "無期限";
+            }
             document.getElementById("walletExpiry").innerText = txt;
         }
-        function promptWalletPass() { if (!currentPlayerName) return; document.getElementById("walletPassName").innerText = currentPlayerName; document.getElementById("personalPassInput").value = ""; document.getElementById("walletPassError").innerText = ""; document.getElementById("walletPassModal").style.display = "flex"; }
-        function closeWalletPassModal() { document.getElementById("walletPassModal").style.display = "none"; }
+        function promptWalletPass() {
+            if (!currentPlayerName) return;
+            document.getElementById("walletPassName").innerText = currentPlayerName;
+            document.getElementById("personalPassInput").value = "";
+            document.getElementById("walletPassError").innerText = "";
+            document.getElementById("walletPassModal").style.display = "flex";
+        }
+        function closeWalletPassModal() {
+            document.getElementById("walletPassModal").style.display = "none";
+        }
         async function verifyPersonalPass() {
             const inp = document.getElementById("personalPassInput").value.trim();
-            if (!inp) { document.getElementById("walletPassError").innerText = "請輸入密語"; return; }
-            if (!personalPassHash) { document.getElementById("walletPassError").innerText = "尚未設定個人密語"; return; }
+            if (!inp) {
+                document.getElementById("walletPassError").innerText = "請輸入密語";
+                return;
+            }
+            if (!personalPassHash) {
+                document.getElementById("walletPassError").innerText = "尚未設定個人密語";
+                return;
+            }
             if (await sha256(inp) === personalPassHash) {
                 walletUnlocked = true;
-                if (!currentWalletData || currentWalletData.boundUid !== deviceId) try { await update(ref(db, `pointUsers/${currentPlayerName}`), { boundUid: deviceId }); } catch(e){}
-                closeWalletPassModal(); updateWalletDisplay();
+                if (!currentWalletData || currentWalletData.boundUid !== deviceId) {
+                    try { await update(ref(db, `pointUsers/${currentPlayerName}`), { boundUid: deviceId }); } catch (e) {}
+                }
+                closeWalletPassModal();
+                updateWalletDisplay();
                 if (document.getElementById("shopModal").style.display === "flex") renderShopItems();
-            } else document.getElementById("walletPassError").innerText = "密語錯誤";
+            } else {
+                document.getElementById("walletPassError").innerText = "密語錯誤";
+            }
         }
 
         // ---------- 商品專區（含分頁） ----------
         function openShop() {
             if (!currentPlayerName) return;
-            if (!walletUnlocked) { promptWalletPass(); return; }
+            if (!walletUnlocked) {
+                promptWalletPass();
+                return;
+            }
             document.getElementById("shopModal").style.display = "flex";
             document.getElementById("shopWalletDisplay").innerText = `🪙 ${currentWalletData ? currentWalletData.points || 0 : 0} 點`;
             switchShopTab('shop');
@@ -995,7 +1116,9 @@
             loadPlayerPointsHistory();
             loadPlayerRedeemHistory();
         }
-        function closeShop() { document.getElementById("shopModal").style.display = "none"; }
+        function closeShop() {
+            document.getElementById("shopModal").style.display = "none";
+        }
 
         function switchShopTab(tab) {
             const tabs = {
@@ -1003,19 +1126,22 @@
                 points: document.getElementById('tabPointsHistory'),
                 redeem: document.getElementById('tabRedeemHistory')
             };
-            Object.values(tabs).forEach(b => { b.classList.remove('bg-emerald-100','text-emerald-700'); b.classList.add('bg-gray-100','text-gray-500'); });
+            Object.values(tabs).forEach(b => {
+                b.classList.remove('bg-emerald-100', 'text-emerald-700');
+                b.classList.add('bg-gray-100', 'text-gray-500');
+            });
             if (tab === 'shop') {
-                tabs.shop.classList.add('bg-emerald-100','text-emerald-700');
+                tabs.shop.classList.add('bg-emerald-100', 'text-emerald-700');
                 document.getElementById('shopItemList').classList.remove('hidden');
                 document.getElementById('pointsHistoryList').classList.add('hidden');
                 document.getElementById('redeemHistoryList').classList.add('hidden');
             } else if (tab === 'points') {
-                tabs.points.classList.add('bg-emerald-100','text-emerald-700');
+                tabs.points.classList.add('bg-emerald-100', 'text-emerald-700');
                 document.getElementById('shopItemList').classList.add('hidden');
                 document.getElementById('pointsHistoryList').classList.remove('hidden');
                 document.getElementById('redeemHistoryList').classList.add('hidden');
             } else if (tab === 'redeem') {
-                tabs.redeem.classList.add('bg-emerald-100','text-emerald-700');
+                tabs.redeem.classList.add('bg-emerald-100', 'text-emerald-700');
                 document.getElementById('shopItemList').classList.add('hidden');
                 document.getElementById('pointsHistoryList').classList.add('hidden');
                 document.getElementById('redeemHistoryList').classList.remove('hidden');
@@ -1030,16 +1156,21 @@
 
         function renderShopItems() {
             const c = document.getElementById("shopItemList");
-            if (!shopItems || !Object.keys(shopItems).length) { c.innerHTML = '<p class="text-gray-400 text-sm text-center">目前沒有可兌換的商品</p>'; return; }
+            if (!shopItems || !Object.keys(shopItems).length) {
+                c.innerHTML = '<p class="text-gray-400 text-sm text-center">目前沒有可兌換的商品</p>';
+                return;
+            }
             const pts = currentWalletData ? currentWalletData.points || 0 : 0;
-            const now = Date.now(), expired = (currentWalletData && currentWalletData.expiry && currentWalletData.expiry !== 0 && currentWalletData.expiry < now);
+            const now = Date.now();
+            const expired = (currentWalletData && currentWalletData.expiry && currentWalletData.expiry !== 0 && currentWalletData.expiry < now);
             let h = "";
             for (const id in shopItems) {
-                const it = shopItems[id], ok = !expired && pts >= it.cost && it.stock > 0;
+                const it = shopItems[id];
+                const ok = !expired && pts >= it.cost && it.stock > 0;
                 h += `<div class="flex items-center gap-4 bg-gray-50 rounded-xl p-3">
-                    <img src="${it.image||''}" class="w-16 h-16 rounded-lg object-cover bg-white" onerror="this.style.display='none'">
+                    <img src="${it.image || ''}" class="w-16 h-16 rounded-lg object-cover bg-white" onerror="this.style.display='none'">
                     <div class="flex-grow"><div class="font-bold text-slate-700">${it.name}</div><div class="text-sm text-gray-500">需要 🪙 ${it.cost} 點 | 庫存 ${it.stock}</div></div>
-                    <button onclick="redeemItem('${id}')" class="text-xs font-bold px-4 py-2 rounded-xl text-white transition-all ${ok?'bg-emerald-500 hover:bg-emerald-600':'bg-gray-300 cursor-not-allowed'}" ${ok?'':'disabled'}>兌換</button>
+                    <button onclick="redeemItem('${id}')" class="text-xs font-bold px-4 py-2 rounded-xl text-white transition-all ${ok ? 'bg-emerald-500 hover:bg-emerald-600' : 'bg-gray-300 cursor-not-allowed'}" ${ok ? '' : 'disabled'}>兌換</button>
                 </div>`;
             }
             c.innerHTML = h;
@@ -1047,14 +1178,20 @@
 
         async function loadPlayerPointsHistory() {
             const container = document.getElementById("pointsHistoryList");
-            if (!currentPlayerName) { container.innerHTML = '<p class="text-gray-400 text-sm text-center">請先選擇玩家</p>'; return; }
+            if (!currentPlayerName) {
+                container.innerHTML = '<p class="text-gray-400 text-sm text-center">請先選擇玩家</p>';
+                return;
+            }
             try {
                 const snap = await get(ref(db, "pendingPoints"));
                 const all = snap.val() || {};
                 const playerRecords = Object.entries(all)
                     .filter(([id, rec]) => rec.playerName === currentPlayerName)
                     .sort((a, b) => (b[1].timestamp || 0) - (a[1].timestamp || 0));
-                if (!playerRecords.length) { container.innerHTML = '<p class="text-gray-400 text-sm text-center">尚無點數記錄</p>'; return; }
+                if (!playerRecords.length) {
+                    container.innerHTML = '<p class="text-gray-400 text-sm text-center">尚無點數記錄</p>';
+                    return;
+                }
                 container.innerHTML = playerRecords.map(([id, rec]) => {
                     const time = rec.timestamp ? new Date(rec.timestamp).toLocaleString("zh-TW") : "未知時間";
                     const status = rec.status === "approved" ? "✅" : rec.status === "rejected" ? "🗑️" : "🕒";
@@ -1064,19 +1201,27 @@
                         <div class="text-gray-400">${rec.prizeName || ''}</div>
                     </div>`;
                 }).join("");
-            } catch(e) { container.innerHTML = '<p class="text-gray-400 text-sm text-center">讀取失敗</p>'; }
+            } catch (e) {
+                container.innerHTML = '<p class="text-gray-400 text-sm text-center">讀取失敗</p>';
+            }
         }
 
         async function loadPlayerRedeemHistory() {
             const container = document.getElementById("redeemHistoryList");
-            if (!currentPlayerName) { container.innerHTML = '<p class="text-gray-400 text-sm text-center">請先選擇玩家</p>'; return; }
+            if (!currentPlayerName) {
+                container.innerHTML = '<p class="text-gray-400 text-sm text-center">請先選擇玩家</p>';
+                return;
+            }
             try {
                 const snap = await get(ref(db, "redeemRequests"));
                 const all = snap.val() || {};
                 const playerRecords = Object.entries(all)
                     .filter(([id, rec]) => rec.playerName === currentPlayerName)
                     .sort((a, b) => (b[1].timestamp || 0) - (a[1].timestamp || 0));
-                if (!playerRecords.length) { container.innerHTML = '<p class="text-gray-400 text-sm text-center">尚無兌換記錄</p>'; return; }
+                if (!playerRecords.length) {
+                    container.innerHTML = '<p class="text-gray-400 text-sm text-center">尚無兌換記錄</p>';
+                    return;
+                }
                 container.innerHTML = playerRecords.map(([id, rec]) => {
                     const time = rec.timestamp ? new Date(rec.timestamp).toLocaleString("zh-TW") : "未知時間";
                     const delivered = rec.prizeDelivered ? "🎁 已發放" : "⏳ 未發放";
@@ -1089,19 +1234,27 @@
                         <div class="text-gray-500">${delivered}</div>
                     </div>`;
                 }).join("");
-            } catch(e) { container.innerHTML = '<p class="text-gray-400 text-sm text-center">讀取失敗</p>'; }
+            } catch (e) {
+                container.innerHTML = '<p class="text-gray-400 text-sm text-center">讀取失敗</p>';
+            }
         }
 
         window.redeemItem = async function(itemId) {
             if (!currentPlayerName || !walletUnlocked) return;
-            const it = shopItems[itemId]; if (!it) return;
+            const it = shopItems[itemId];
+            if (!it) return;
             if (!confirm(`確定要用 ${it.cost} 點兌換「${it.name}」嗎？`)) return;
             try {
-                const sr = ref(db, `shopItems/${itemId}/stock`), pr = ref(db, `pointUsers/${currentPlayerName}/points`);
-                const srRes = await runTransaction(sr, cur => (cur===null||cur<=0)?undefined:cur-1);
+                const sr = ref(db, `shopItems/${itemId}/stock`);
+                const pr = ref(db, `pointUsers/${currentPlayerName}/points`);
+                const srRes = await runTransaction(sr, cur => (cur === null || cur <= 0) ? undefined : cur - 1);
                 if (!srRes.committed) { alert("❌ 庫存不足"); return; }
-                const prRes = await runTransaction(pr, cur => (cur===null||cur<it.cost)?undefined:cur-it.cost);
-                if (!prRes.committed) { await runTransaction(sr, cur => (cur||0)+1); alert("❌ 點數不足"); return; }
+                const prRes = await runTransaction(pr, cur => (cur === null || cur < it.cost) ? undefined : cur - it.cost);
+                if (!prRes.committed) {
+                    await runTransaction(sr, cur => (cur || 0) + 1);
+                    alert("❌ 點數不足");
+                    return;
+                }
                 alert(`✅ 兌換成功！獲得「${it.name}」`);
                 await push(ref(db, "redeemRequests"), {
                     playerName: currentPlayerName,
@@ -1114,7 +1267,10 @@
                     prizeDelivered: false
                 });
                 loadPlayerRedeemHistory();
-            } catch(e) { console.error(e); alert("兌換失敗"); }
+            } catch (e) {
+                console.error(e);
+                alert("兌換失敗");
+            }
         };
 
         // ---------- 管理員測試模式 ----------
@@ -1136,7 +1292,7 @@
             document.getElementById("honorBoardPanel").style.display = "";
         }
 
-        // ---------- 顯示抽獎系統（顯示側邊欄） ----------
+        // ---------- 顯示抽獎系統 ----------
         function showDrawSystem() {
             document.getElementById("drawSystemArea").style.display = "block";
             document.getElementById("pointsSystemArea").style.display = "none";
@@ -1145,7 +1301,7 @@
             updateDrawCountDisplay();
         }
 
-        // ---------- 顯示點數兌換系統（隱藏側邊欄） ----------
+        // ---------- 顯示點數兌換系統 ----------
         function showPointsSystem() {
             document.getElementById("drawSystemArea").style.display = "none";
             document.getElementById("pointsSystemArea").style.display = "block";
@@ -1158,16 +1314,13 @@
             document.getElementById("choicePlayerName").innerText = playerName;
             document.getElementById("choiceModal").style.display = "flex";
         }
-
         function closeChoiceModal() {
             document.getElementById("choiceModal").style.display = "none";
         }
-
         function chooseDraw() {
             closeChoiceModal();
             showDrawSystem();
         }
-
         function choosePoints() {
             closeChoiceModal();
             showPointsSystem();
@@ -1222,7 +1375,9 @@
             if (groupLists[inputPass]) {
                 const group = groupLists[inputPass];
                 const defOpt = document.createElement("option");
-                defOpt.value = ""; defOpt.disabled = true; defOpt.selected = true;
+                defOpt.value = "";
+                defOpt.disabled = true;
+                defOpt.selected = true;
                 defOpt.innerText = "▼ 請選擇你的名字 ▼";
                 selectEl.appendChild(defOpt);
                 const optGroup = document.createElement("optgroup");
@@ -1252,7 +1407,9 @@
                 alert(`🔓 【${inputPass}】名單已成功解鎖！`);
             } else {
                 const lockOpt = document.createElement("option");
-                lockOpt.value = ""; lockOpt.disabled = true; lockOpt.selected = true;
+                lockOpt.value = "";
+                lockOpt.disabled = true;
+                lockOpt.selected = true;
                 lockOpt.innerText = "🔒 請先解鎖群組名單 🔒";
                 selectEl.appendChild(lockOpt);
                 alert("❌ 密碼錯誤");
@@ -1282,22 +1439,34 @@
             let list = [];
             for (let u in globalPlayedUsers) {
                 if (globalPlayedUsers[u].won && globalPlayedUsers[u].won.includes("銘謝惠顧")) continue;
-                list.push({ user: u, won: globalPlayedUsers[u].won, time: globalPlayedUsers[u].time||0, group: globalPlayedUsers[u].group||null, drawCount: globalPlayedUsers[u].drawCount || 0 });
+                list.push({
+                    user: u,
+                    won: globalPlayedUsers[u].won,
+                    time: globalPlayedUsers[u].time || 0,
+                    group: globalPlayedUsers[u].group || null,
+                    drawCount: globalPlayedUsers[u].drawCount || 0
+                });
             }
-            list.sort((a,b) => b.time - a.time);
+            list.sort((a, b) => b.time - a.time);
             lastPlayedList = list;
             updateMarquee(buildMarqueeText(list));
             renderHonorBoard(list);
         }
 
         function initApp() {
-            onValue(ref(db, "prizes"), snap => { lastPrizes = snap.val()||{}; renderStatusBoard(lastPrizes); });
+            onValue(ref(db, "prizes"), snap => {
+                lastPrizes = snap.val() || {};
+                renderStatusBoard(lastPrizes);
+            });
             onValue(ref(db, "playedUsers"), snap => {
                 globalPlayedUsers = snap.val() || {};
                 refreshPlayedUsersUI();
                 if (currentPlayerName) updateDrawCountDisplay();
             });
-            onValue(ref(db, "shopItems"), snap => { shopItems = snap.val()||{}; if (document.getElementById("shopModal").style.display === "flex") renderShopItems(); });
+            onValue(ref(db, "shopItems"), snap => {
+                shopItems = snap.val() || {};
+                if (document.getElementById("shopModal").style.display === "flex") renderShopItems();
+            });
             onValue(ref(db, "disabledPlayers"), snap => {
                 disabledPlayers = snap.val() || {};
                 if (honorUnlockedGroup) refreshPlayedUsersUI();
@@ -1310,52 +1479,66 @@
             return new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999).getTime();
         }
 
-        // ---------- 抽獎核心（使用 transaction 避免權限錯誤） ----------
+        // ---------- 抽獎核心 ----------
         async function startDraw() {
             const name = document.getElementById("playerName").value;
             if (!name) { alert("請先選擇名字"); return; }
             if (disabledPlayers[name]) { alert("此玩家已被禁止抽獎"); return; }
             if (isDrawing) return;
-            
+
             const drawCount = globalPlayedUsers[name]?.drawCount || 0;
             const limit = getMaxDrawsForPlayer(name);
             if (!isAdminMode && drawCount >= limit) {
                 alert("抽獎次數已用完");
                 return;
             }
-            
+
             isDrawing = true;
             let awardedPoints = 0;
             try {
                 const myGroup = getGroupKeyForName(name);
-                let pool = [], totalW = 0;
+                let pool = [];
+                let totalW = 0;
                 for (let id in lastPrizes) {
                     const p = lastPrizes[id];
                     if (!Array.isArray(p.groups) || !p.groups.includes(myGroup)) continue;
-                    const q = Number(p.quantity||0), w = Number(p.weight||0);
-                    if (q>0 && w>0) { pool.push({id, prizeData:p, weight:w}); totalW += w; }
+                    const q = Number(p.quantity || 0);
+                    const w = Number(p.weight || 0);
+                    if (q > 0 && w > 0) {
+                        pool.push({ id, prizeData: p, weight: w });
+                        totalW += w;
+                    }
                 }
                 if (!pool.length) { alert("庫存已空"); isDrawing = false; return; }
-                let roll = Math.floor(Math.random()*totalW), sum = 0, chosenId = pool[0].id;
-                for (let i=0;i<pool.length;i++) { sum += pool[i].weight; if (roll < sum) { chosenId = pool[i].id; break; } }
-                const chosen = pool.find(p=>p.id===chosenId).prizeData;
-                
+
+                let roll = Math.floor(Math.random() * totalW);
+                let sum = 0;
+                let chosenId = pool[0].id;
+                for (let i = 0; i < pool.length; i++) {
+                    sum += pool[i].weight;
+                    if (roll < sum) {
+                        chosenId = pool[i].id;
+                        break;
+                    }
+                }
+                const chosen = pool.find(p => p.id === chosenId).prizeData;
+
                 const qRef = ref(db, `prizes/${chosenId}/quantity`);
-                const tx = await runTransaction(qRef, cur => (cur===null||cur<=0)?undefined:cur-1);
+                const tx = await runTransaction(qRef, cur => (cur === null || cur <= 0) ? undefined : cur - 1);
                 if (!tx.committed) { alert("獎品被秒殺"); isDrawing = false; return; }
-                
+
                 let code = "";
                 try {
                     const cs = await get(ref(db, `prizeCodes/${chosenId}`));
                     if (cs.exists()) {
                         const cObj = cs.val();
-                        const used = new Set(Object.values(globalPlayedUsers).map(u=>u&&u.code).filter(c=>c));
-                        const av = Object.values(cObj).filter(c=>c&&!used.has(c));
+                        const used = new Set(Object.values(globalPlayedUsers).map(u => u && u.code).filter(c => c));
+                        const av = Object.values(cObj).filter(c => c && !used.has(c));
                         if (av.length) code = av[0];
                     }
-                } catch(e){}
-                
-                // 更新玩家抽獎紀錄（使用 transaction 避免第一次抽獎時因 validate 問題失敗）
+                } catch (e) {}
+
+                // 更新玩家抽獎紀錄
                 const playedRef = ref(db, `playedUsers/${name}`);
                 await runTransaction(playedRef, (current) => {
                     if (current === null) {
@@ -1364,7 +1547,15 @@
                         return { ...current, won: chosen.name, code, time: Date.now(), group: myGroup, drawCount: (current.drawCount || 0) + 1 };
                     }
                 });
-                
+
+                // 新增每一筆抽獎紀錄
+                await push(ref(db, `drawRecords/${name}`), {
+                    won: chosen.name,
+                    code: code,
+                    time: Date.now(),
+                    group: myGroup
+                });
+
                 globalPlayedUsers[name] = {
                     won: chosen.name,
                     code: code,
@@ -1372,28 +1563,40 @@
                     group: myGroup,
                     drawCount: (globalPlayedUsers[name]?.drawCount || 0) + 1
                 };
-                
-                // 點數發放（只更新 points 子節點）
-                const minP = Number(chosen.minPoints), maxP = Number(chosen.maxPoints);
-                if (!isNaN(minP) && !isNaN(maxP) && maxP>=minP && maxP>0) {
-                    awardedPoints = Math.floor(Math.random()*(maxP-minP+1))+minP;
+
+                // 點數發放
+                const minP = Number(chosen.minPoints);
+                const maxP = Number(chosen.maxPoints);
+                if (!isNaN(minP) && !isNaN(maxP) && maxP >= minP && maxP > 0) {
+                    awardedPoints = Math.floor(Math.random() * (maxP - minP + 1)) + minP;
                     try {
                         await runTransaction(ref(db, `pointUsers/${name}/points`), cur => (cur || 0) + awardedPoints);
                         await push(ref(db, "pendingPoints"), {
-                            playerName: name, points: awardedPoints, prizeName: chosen.name,
-                            timestamp: Date.now(), status: "approved", processedAt: Date.now()
+                            playerName: name,
+                            points: awardedPoints,
+                            prizeName: chosen.name,
+                            timestamp: Date.now(),
+                            status: "approved",
+                            processedAt: Date.now()
                         });
-                    } catch(e) { console.error("點數發放失敗（不影響抽獎）", e); }
+                    } catch (e) {
+                        console.error("點數發放失敗（不影響抽獎）", e);
+                    }
                 }
-                
+
                 // 動畫與彈窗
-                const container = document.getElementById("gachaGlass"), lucky = document.getElementById("luckyEgg"), crank = document.getElementById("gachaCrank");
-                const color = eggColors[Math.floor(Math.random()*eggColors.length)];
+                const container = document.getElementById("gachaGlass");
+                const lucky = document.getElementById("luckyEgg");
+                const crank = document.getElementById("gachaCrank");
+                const color = eggColors[Math.floor(Math.random() * eggColors.length)];
                 const matches = container.querySelectorAll(`.gacha-egg.${color}:not(.egg-falling-out)`);
-                crank.classList.add("rotating-crank"); playCrankSound();
-                if (matches.length) matches[Math.floor(Math.random()*matches.length)].classList.add("egg-falling-out");
+                crank.classList.add("rotating-crank");
+                playCrankSound();
+                if (matches.length) matches[Math.floor(Math.random() * matches.length)].classList.add("egg-falling-out");
                 container.classList.add("eggs-drop-down");
-                lucky.className = "gacha-lucky-egg"; lucky.style.opacity = "0"; lucky.classList.add(color);
+                lucky.className = "gacha-lucky-egg";
+                lucky.style.opacity = "0";
+                lucky.classList.add(color);
                 setTimeout(() => lucky.classList.add("dropped-egg"), 1000);
                 setTimeout(() => {
                     document.getElementById("modalPrizeName").innerText = chosen.name;
@@ -1403,27 +1606,38 @@
                         if (awardedPoints > 0) {
                             pointsInfo.innerText = `🪙 獲得 ${awardedPoints} 點`;
                             pointsInfo.classList.remove("hidden");
-                        } else pointsInfo.classList.add("hidden");
+                        } else {
+                            pointsInfo.classList.add("hidden");
+                        }
                     }
                     const isThanks = chosen.name && chosen.name.includes("銘謝惠顧");
                     document.getElementById("modalTitle").innerText = isThanks ? "😢 差一點點！" : "🎉 恭喜中獎！";
-                    document.getElementById("modalTitle").className = `text-2xl font-black mb-2 ${isThanks?'text-gray-500':'text-rose-500'}`;
+                    document.getElementById("modalTitle").className = `text-2xl font-black mb-2 ${isThanks ? 'text-gray-500' : 'text-rose-500'}`;
                     document.getElementById("modalTicketCode").style.display = isThanks ? "none" : "block";
                     document.getElementById("copyHint").style.display = isThanks ? "none" : "block";
                     document.querySelector("#winModal button:last-child").innerText = isThanks ? "再接再厲" : "收下好禮";
                     document.getElementById("winModal").style.display = "flex";
                     playWinSound();
-                    crank.classList.remove("rotating-crank"); container.classList.remove("eggs-drop-down");
+                    crank.classList.remove("rotating-crank");
+                    container.classList.remove("eggs-drop-down");
                     isDrawing = false;
                 }, 2100);
-            } catch(e) {
+            } catch (e) {
                 console.error("抽獎失敗: ", e);
                 alert("伺服器擁擠，請稍後再試");
                 isDrawing = false;
             }
         }
 
-        function clickTicket() { if (currentPrizeUrl&&currentPrizeUrl.startsWith("http")) window.open(currentPrizeUrl,"_blank"); else if (currentPrizeUrl) alert(currentPrizeUrl); else alert("無連結"); }
+        function clickTicket() {
+            if (currentPrizeUrl && currentPrizeUrl.startsWith("http")) {
+                window.open(currentPrizeUrl, "_blank");
+            } else if (currentPrizeUrl) {
+                alert(currentPrizeUrl);
+            } else {
+                alert("無連結");
+            }
+        }
 
         function closeModal() {
             document.getElementById("winModal").style.display = "none";
@@ -1454,15 +1668,22 @@
             if (disabledPlayers[name]) { alert("此玩家已被禁止抽獎"); return; }
             document.getElementById("confirmModal").style.display = "flex";
         }
-        function closeConfirmModal() { document.getElementById("confirmModal").style.display = "none"; }
-        function confirmAndDraw() { closeConfirmModal(); startDraw(); }
+        function closeConfirmModal() {
+            document.getElementById("confirmModal").style.display = "none";
+        }
+        function confirmAndDraw() {
+            closeConfirmModal();
+            startDraw();
+        }
 
-        document.addEventListener("DOMContentLoaded", () => { bindShopTabs(); });
+        document.addEventListener("DOMContentLoaded", () => {
+            bindShopTabs();
+        });
         onAuthStateChanged(auth, user => {
             if (user) {
                 deviceId = user.uid;
                 onValue(ref(db, "settings/closed"), snap => {
-                    document.getElementById("closedOverlay").style.display = snap.val()===true ? "flex" : "none";
+                    document.getElementById("closedOverlay").style.display = snap.val() === true ? "flex" : "none";
                 });
                 initApp();
             }
