@@ -1239,7 +1239,7 @@
             }
         }
 
-// 🔥 修正：兌換商品時同時寫入點數記錄並發送通知
+// 🔥 修正：兌換商品時同時寫入點數記錄並發送 Discord 通知（含除錯）
 window.redeemItem = async function(itemId) {
     if (!currentPlayerName || !walletUnlocked) return;
     const it = shopItems[itemId];
@@ -1285,41 +1285,29 @@ window.redeemItem = async function(itemId) {
         loadPlayerPointsHistory();
         loadPlayerRedeemHistory();
 
-        // 📣 發送通知（二選一，請填入你的憑證）
+        // ---------- 發送 Discord 通知 ----------
+        const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1542945444957519982/F4oenbKde22wMG-mc5qikOARL5ClbF7Q5mj2SHyqfnOgdryDROTpr2KqYyyu51bdGzYO";
+
         const notifyMessage = `🛍️ 玩家兌換通知\n玩家：${currentPlayerName}\n商品：${it.name}\n花費點數：${it.cost}\n時間：${new Date().toLocaleString("zh-TW")}`;
 
-        // === Telegram 通知（填入 Bot Token 和 Chat ID） ===
-        const TELEGRAM_BOT_TOKEN = "你的_TELEGRAM_BOT_TOKEN";
-        const TELEGRAM_CHAT_ID = "你的_TELEGRAM_CHAT_ID";
-        if (TELEGRAM_BOT_TOKEN !== "你的_TELEGRAM_BOT_TOKEN" && TELEGRAM_CHAT_ID !== "你的_TELEGRAM_CHAT_ID") {
-            try {
-                await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        chat_id: TELEGRAM_CHAT_ID,
-                        text: notifyMessage
-                    })
-                });
-            } catch (e) {
-                console.error("Telegram 通知發送失敗：", e);
-            }
-        }
+        console.log("準備發送 Discord 通知");
+        console.log("Webhook URL:", DISCORD_WEBHOOK_URL);
 
-        // === Discord 通知（填入 Webhook URL） ===
-        const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1542945444957519982/F4oenbKde22wMG-mc5qikOARL5ClbF7Q5mj2SHyqfnOgdryDROTpr2KqYyyu51bdGzYO";
-        if (DISCORD_WEBHOOK_URL !== "https://discord.com/api/webhooks/1542945444957519982/F4oenbKde22wMG-mc5qikOARL5ClbF7Q5mj2SHyqfnOgdryDROTpr2KqYyyu51bdGzYO") {
-            try {
-                await fetch(DISCORD_WEBHOOK_URL, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        content: notifyMessage
-                    })
-                });
-            } catch (e) {
-                console.error("Discord 通知發送失敗：", e);
+        try {
+            const response = await fetch(DISCORD_WEBHOOK_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ content: notifyMessage })
+            });
+            console.log("Discord 回應狀態碼:", response.status);
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error("Discord 通知失敗，回應內容:", errorText);
+            } else {
+                console.log("Discord 通知已成功發送");
             }
+        } catch (e) {
+            console.error("Discord 通知發送錯誤:", e);
         }
 
     } catch (e) {
@@ -1833,4 +1821,4 @@ window.redeemItem = async function(itemId) {
         signInAnonymously(auth).catch(e => alert("連線失敗"));
     </script>
 </body>
-</html>
+</html>        
