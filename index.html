@@ -795,7 +795,7 @@
     <!-- 🔊 音效開關 -->
     <button id="soundToggleBtn" onclick="toggleSound()" class="music-control-btn fixed bottom-5 right-5 bg-slate-900 text-cyan-400 text-sm font-bold px-4 py-2 rounded-full shadow-lg border border-cyan-500/30 z-40 transition-all active:scale-95">🔊 音效</button>
 
-        <script type="module">
+    <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
         import { getDatabase, ref, runTransaction, onValue, get, update, push } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
@@ -1380,7 +1380,7 @@
             document.getElementById("honorBoardPanel").style.display = "";
         }
 
-        // ---------- 解鎖群組 ----------
+        // ---------- 解鎖群組（不再禁用已達上限玩家） ----------
         function verifyGroupPass() {
             const inputPass = document.getElementById("secretPass").value.trim();
             const selectEl = document.getElementById("playerName");
@@ -1404,11 +1404,14 @@
                     if (disabledPlayers[name]) {
                         opt.disabled = true;
                         opt.innerText = `${name} (已禁用)`;
-                    } else if (remaining <= 0) {
-                        opt.disabled = true;
-                        opt.innerText = `${name} (已達上限)`;
                     } else {
-                        opt.innerText = `${name}（剩餘 ${remaining}/${limit} 次）`;
+                        // 不因次數用完而禁用，仍可選擇
+                        opt.disabled = false;
+                        if (remaining <= 0) {
+                            opt.innerText = `${name} (已達上限)`;
+                        } else {
+                            opt.innerText = `${name}（剩餘 ${remaining}/${limit} 次）`;
+                        }
                     }
                     optGroup.appendChild(opt);
                 });
@@ -1441,12 +1444,13 @@
                 if (disabledPlayers[name]) {
                     opt.disabled = true;
                     opt.innerText = name + " (已禁用)";
-                } else if (remaining <= 0) {
-                    opt.disabled = true;
-                    opt.innerText = name + " (已達上限)";
                 } else {
                     opt.disabled = false;
-                    opt.innerText = `${name}（剩餘 ${remaining}/${limit} 次）`;
+                    if (remaining <= 0) {
+                        opt.innerText = name + " (已達上限)";
+                    } else {
+                        opt.innerText = `${name}（剩餘 ${remaining}/${limit} 次）`;
+                    }
                 }
             }
             let list = [];
