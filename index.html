@@ -1628,6 +1628,11 @@ function refreshPlayedUsersUI() {
                     }
                 } catch (e) {}
 
+                // 🔥 修正：若獎品有隨機點數但讀不到序號，顯示預設文字
+                if (!code && !isNaN(Number(chosen.minPoints)) && !isNaN(Number(chosen.maxPoints)) && Number(chosen.maxPoints) > 0) {
+                    code = "點數已自動匯入你的錢包";
+                }
+
                 // 更新 playedUsers（含 lastDrawTime 防止重複）
                 const playedRef = ref(db, `playedUsers/${name}`);
                 const result = await runTransaction(playedRef, (current) => {
