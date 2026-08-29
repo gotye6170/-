@@ -1002,38 +1002,39 @@
                 tr.style.animation = `marqueeScroll ${d}s linear infinite`;
             });
         }
-        function renderStatusBoard(pz) {
-            const b = document.getElementById("statusBoard");
-            if (!b || !pz) return;
-            let h = '<span class="board-title-text prize-title-text">📋 禮物列表</span>';
-            if (!honorUnlockedGroup) {
-                b.innerHTML = h + '<div style="color:#9ca3af;font-size:13px;padding:10px;">🔒 請先解鎖群組</div>';
-                return;
-            }
-            let has = false;
-            for (let id in pz) {
-                const p = pz[id];
-                if (p.name && p.name.includes("銘謝惠顧")) continue;
-                const g = Array.isArray(p.groups) ? p.groups : [];
-                if (!g.includes(honorUnlockedGroup)) continue;
-                has = true;
-                const img = p.image ? `<img class="prize-thumb" src="${p.image}" alt="${p.name}">` : '<div class="prize-thumb" style="background:#f3f4f6;"></div>';
-                const rem = Number(p.quantity || 0);
-                const total = Number(p.totalQuantity || 0);
-                const st = total > 1;
-                if (rem > 0) {
-                    const ql = st ? `🟢 剩餘 <b>${rem}</b> 份 / 共 <b>${total}</b> 份` : `🟢 剩餘 <b>${rem}</b> 份`;
-                    const pb = st ? `<div class="prize-progress-track"><div class="prize-progress-fill is-available" style="width:${Math.round(rem / total * 100)}%;"></div></div>` : '';
-                    h += `<div class="prize-item-row">${img}<div class="prize-info"><span class="prize-name-label">${p.name}</span><span style="color:#059669;font-size:13px;font-weight:bold;">${ql}</span>${pb}</div></div>`;
-                } else {
-                    const on = isPrizeTakenByOtherGroup(p.name) ? '<div style="color:#f97316;font-size:11px;font-weight:bold;margin-top:1px;">🔸 已被其他組抽走</div>' : '';
-                    const sl = st ? `🔴 已全數送完（共 <b>${total}</b> 份）` : `🔴 已全數送完`;
-                    h += `<div class="prize-item-row" style="opacity:0.4;">${img}<div class="prize-info"><span class="prize-name-label" style="text-decoration:line-through;color:#9ca3af;">${p.name}</span><span style="color:#dc2626;font-size:13px;font-weight:bold;">${sl}</span><div class="prize-progress-track"><div class="prize-progress-fill is-empty" style="width:100%;"></div></div>${on}</div></div>`;
-                }
-            }
-            if (!has) h += '<div style="color:#9ca3af;font-size:13px;padding:10px;">目前無公開好禮。</div>';
-            b.innerHTML = h;
+
+function renderStatusBoard(pz) {
+    const b = document.getElementById("statusBoard");
+    if (!b || !pz) return;
+    let h = '<span class="board-title-text prize-title-text">📋 禮物列表</span>';
+    if (!honorUnlockedGroup) {
+        b.innerHTML = h + '<div class="flex-grow flex flex-col items-center justify-center text-center gap-2 px-4"><span class="text-2xl">🔒</span><p class="text-xs text-gray-400">請先解鎖群組</p></div>';
+        return;
+    }
+    let has = false;
+    for (let id in pz) {
+        const p = pz[id];
+        if (p.name && p.name.includes("銘謝惠顧")) continue;
+        const g = Array.isArray(p.groups) ? p.groups : [];
+        if (!g.includes(honorUnlockedGroup)) continue;
+        has = true;
+        const img = p.image ? `<img class="prize-thumb" src="${p.image}" alt="${p.name}">` : '<div class="prize-thumb" style="background:#f3f4f6;"></div>';
+        const rem = Number(p.quantity || 0);
+        const total = Number(p.totalQuantity || 0);
+        const st = total > 1;
+        if (rem > 0) {
+            const ql = st ? `🟢 剩餘 <b>${rem}</b> 份 / 共 <b>${total}</b> 份` : `🟢 剩餘 <b>${rem}</b> 份`;
+            const pb = st ? `<div class="prize-progress-track"><div class="prize-progress-fill is-available" style="width:${Math.round(rem / total * 100)}%;"></div></div>` : '';
+            h += `<div class="prize-item-row">${img}<div class="prize-info"><span class="prize-name-label">${p.name}</span><span style="color:#059669;font-size:13px;font-weight:bold;">${ql}</span>${pb}</div></div>`;
+        } else {
+            const on = isPrizeTakenByOtherGroup(p.name) ? '<div style="color:#f97316;font-size:11px;font-weight:bold;margin-top:1px;">🔸 已被其他組抽走</div>' : '';
+            const sl = st ? `🔴 已全數送完（共 <b>${total}</b> 份）` : `🔴 已全數送完`;
+            h += `<div class="prize-item-row" style="opacity:0.4;">${img}<div class="prize-info"><span class="prize-name-label" style="text-decoration:line-through;color:#9ca3af;">${p.name}</span><span style="color:#dc2626;font-size:13px;font-weight:bold;">${sl}</span><div class="prize-progress-track"><div class="prize-progress-fill is-empty" style="width:100%;"></div></div>${on}</div></div>`;
         }
+    }
+    if (!has) h += '<div style="color:#9ca3af;font-size:13px;padding:10px;">目前無公開好禮。</div>';
+    b.innerHTML = h;
+}
 
         // ---------- 點數錢包 ----------
         function listenToWallet(playerName) {
