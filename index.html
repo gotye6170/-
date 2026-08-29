@@ -1005,7 +1005,7 @@
         function renderStatusBoard(pz) {
             const b = document.getElementById("statusBoard");
             if (!b || !pz) return;
-            let h = '<span class="prize-title-text">📋 禮物列表</span>';
+            let h = '<span class="board-title-text prize-title-text">📋 禮物列表</span>';
             if (!honorUnlockedGroup) {
                 b.innerHTML = h + '<div style="color:#9ca3af;font-size:13px;padding:10px;">🔒 請先解鎖群組</div>';
                 return;
