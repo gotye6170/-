@@ -1434,94 +1434,88 @@ window.redeemItem = async function(itemId) {
             document.getElementById("honorBoardPanel").style.display = "";
         }
 
-        // ---------- 解鎖群組（不再禁用已達上限玩家） ----------
-        function verifyGroupPass() {
-            const inputPass = document.getElementById("secretPass").value.trim();
-            const selectEl = document.getElementById("playerName");
-            selectEl.innerHTML = "";
-            if (groupLists[inputPass]) {
-                const group = groupLists[inputPass];
-                const defOpt = document.createElement("option");
-                defOpt.value = "";
-                defOpt.disabled = true;
-                defOpt.selected = true;
-                defOpt.innerText = "▼ 請選擇你的名字 ▼";
-                selectEl.appendChild(defOpt);
-                const optGroup = document.createElement("optgroup");
-                optGroup.label = group.label;
-                group.names.forEach(name => {
-                    const opt = document.createElement("option");
-                    opt.value = name;
-                    const drawCount = globalPlayedUsers[name]?.drawCount || 0;
-                    const limit = getMaxDrawsForPlayer(name);
-                    const remaining = limit - drawCount;
-                    if (disabledPlayers[name]) {
-                        opt.disabled = true;
-                        opt.innerText = `${name} (已禁用)`;
-                    } else {
-                        opt.disabled = false;
-                        if (remaining <= 0) {
-                            opt.innerText = `${name} (已達上限)`;
-                        } else {
-                            opt.innerText = `${name}（剩餘 ${remaining}/${limit} 次）`;
-                        }
-                    }
-                    optGroup.appendChild(opt);
-                });
-                selectEl.appendChild(optGroup);
-                honorUnlockedGroup = inputPass;
-                renderHonorBoard(lastPlayedList);
-                updateMarquee(buildMarqueeText(lastPlayedList));
-                if (lastPrizes) renderStatusBoard(lastPrizes);
-                alert(`🔓 【${inputPass}】名單已成功解鎖！`);
+// ---------- 解鎖群組（已達上限只顯示名字，不顯示後綴） ----------
+function verifyGroupPass() {
+    const inputPass = document.getElementById("secretPass").value.trim();
+    const selectEl = document.getElementById("playerName");
+    selectEl.innerHTML = "";
+    if (groupLists[inputPass]) {
+        const group = groupLists[inputPass];
+        const defOpt = document.createElement("option");
+        defOpt.value = "";
+        defOpt.disabled = true;
+        defOpt.selected = true;
+        defOpt.innerText = "▼ 請選擇你的名字 ▼";
+        selectEl.appendChild(defOpt);
+        const optGroup = document.createElement("optgroup");
+        optGroup.label = group.label;
+        group.names.forEach(name => {
+            const opt = document.createElement("option");
+            opt.value = name;
+            const drawCount = globalPlayedUsers[name]?.drawCount || 0;
+            const limit = getMaxDrawsForPlayer(name);
+            const remaining = limit - drawCount;
+            if (disabledPlayers[name]) {
+                opt.disabled = true;
+                opt.innerText = `${name} (已禁用)`;
             } else {
-                const lockOpt = document.createElement("option");
-                lockOpt.value = "";
-                lockOpt.disabled = true;
-                lockOpt.selected = true;
-                lockOpt.innerText = "🔒 請先解鎖群組名單 🔒";
-                selectEl.appendChild(lockOpt);
-                alert("❌ 密碼錯誤");
+                opt.disabled = false;
+                // 不再加上 (已達上限)，只顯示名字
+                opt.innerText = name;
             }
-        }
+            optGroup.appendChild(opt);
+        });
+        selectEl.appendChild(optGroup);
+        honorUnlockedGroup = inputPass;
+        renderHonorBoard(lastPlayedList);
+        updateMarquee(buildMarqueeText(lastPlayedList));
+        if (lastPrizes) renderStatusBoard(lastPrizes);
+        alert(`🔓 【${inputPass}】名單已成功解鎖！`);
+    } else {
+        const lockOpt = document.createElement("option");
+        lockOpt.value = "";
+        lockOpt.disabled = true;
+        lockOpt.selected = true;
+        lockOpt.innerText = "🔒 請先解鎖群組名單 🔒";
+        selectEl.appendChild(lockOpt);
+        alert("❌ 密碼錯誤");
+    }
+}
 
-        // ---------- UI 更新 ----------
-        function refreshPlayedUsersUI() {
-            const sel = document.getElementById("playerName");
-            for (let opt of sel.options) {
-                if (!opt.value) continue;
-                const name = opt.value;
-                const drawCount = globalPlayedUsers[name]?.drawCount || 0;
-                const limit = getMaxDrawsForPlayer(name);
-                const remaining = limit - drawCount;
-                if (disabledPlayers[name]) {
-                    opt.disabled = true;
-                    opt.innerText = name + " (已禁用)";
-                } else {
-                    opt.disabled = false;
-                    if (remaining <= 0) {
-                        opt.innerText = name + " (已達上限)";
-                    } else {
-                        opt.innerText = `${name}（剩餘 ${remaining}/${limit} 次）`;
-                    }
-                }
-            }
-            let list = [];
-            for (let u in globalPlayedUsers) {
-                if (globalPlayedUsers[u].won && globalPlayedUsers[u].won.includes("銘謝惠顧")) continue;
-                list.push({
-                    user: u,
-                    won: globalPlayedUsers[u].won,
-                    time: globalPlayedUsers[u].time || 0,
-                    group: globalPlayedUsers[u].group || null,
-                    drawCount: globalPlayedUsers[u].drawCount || 0
-                });
-            }
-            list.sort((a, b) => b.time - a.time);
-            lastPlayedList = list;
-            updateMarquee(buildMarqueeText(list));
-            renderHonorBoard(list);
+// ---------- UI 更新（已達上限只顯示名字，不顯示後綴） ----------
+function refreshPlayedUsersUI() {
+    const sel = document.getElementById("playerName");
+    for (let opt of sel.options) {
+        if (!opt.value) continue;
+        const name = opt.value;
+        const drawCount = globalPlayedUsers[name]?.drawCount || 0;
+        const limit = getMaxDrawsForPlayer(name);
+        const remaining = limit - drawCount;
+        if (disabledPlayers[name]) {
+            opt.disabled = true;
+            opt.innerText = name + " (已禁用)";
+        } else {
+            opt.disabled = false;
+            // 只顯示名字，不再加上（剩餘次數）或（已達上限）
+            opt.innerText = name;
         }
+    }
+    let list = [];
+    for (let u in globalPlayedUsers) {
+        if (globalPlayedUsers[u].won && globalPlayedUsers[u].won.includes("銘謝惠顧")) continue;
+        list.push({
+            user: u,
+            won: globalPlayedUsers[u].won,
+            time: globalPlayedUsers[u].time || 0,
+            group: globalPlayedUsers[u].group || null,
+            drawCount: globalPlayedUsers[u].drawCount || 0
+        });
+    }
+    list.sort((a, b) => b.time - a.time);
+    lastPlayedList = list;
+    updateMarquee(buildMarqueeText(list));
+    renderHonorBoard(list);
+}
 
         function initApp() {
             onValue(ref(db, "prizes"), snap => {
