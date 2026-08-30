@@ -233,6 +233,7 @@
         max-height: 380px;
         display: flex;
         flex-direction: column;
+        overflow: hidden; /* 🔥 防止內容溢出面板 */
     }
 
     .board-title-text {
@@ -262,6 +263,7 @@
     .scroller-content {
         overflow-y: auto;
         flex-grow: 1;
+        min-height: 0; /* 🔥 避免 flex 子元素溢出 */
         padding-right: 4px;
         -webkit-overflow-scrolling: touch;
     }
