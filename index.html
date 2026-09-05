@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#ff3366">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>呆呆扭蛋機 🌟</title>
+    <title>呆呆幸運抽獎 🌟</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -743,8 +743,8 @@
         <span class="bg-cyan-500 text-slate-950 text-xs px-2.5 py-1 rounded-full flex-shrink-0 animate-pulse">📢 最新動態</span>
         <div class="marquee-viewport">
             <div class="marquee-track" id="marqueeTrack">
-                <span class="marquee-item text-sm tracking-wide" id="marqueeItem1">🎉 歡迎來到呆呆扭蛋機！快來試試手氣！ 🎟️</span>
-                <span class="marquee-item text-sm tracking-wide" id="marqueeItem2">🎉 歡迎來到呆呆扭蛋機！快來試試手氣！ 🎟️</span>
+                <span class="marquee-item text-sm tracking-wide" id="marqueeItem1">🎉 歡迎來到呆呆幸運抽獎！快來試試手氣！ 🎟️</span>
+                <span class="marquee-item text-sm tracking-wide" id="marqueeItem2">🎉 歡迎來到呆呆幸運抽獎！快來試試手氣！ 🎟️</span>
             </div>
         </div>
     </div>
@@ -914,7 +914,7 @@
             <p class="text-sm text-gray-500 mb-5">請選擇你要進行的項目</p>
             <div class="space-y-3">
                 <button onclick="chooseDraw()" class="choice-btn choice-btn-draw w-full">
-                    <span class="text-2xl">🎰</span>
+                    <span class="text-2xl">🟡</span>
                     <span>扭蛋機</span>
                 </button>
                 <button onclick="chooseSlot()" class="choice-btn choice-btn-slot w-full">
@@ -1195,7 +1195,7 @@
 
         // ---------- 跑馬燈、榮譽榜、禮物列表 ----------
         function buildMarqueeText(list) {
-            const def = "🎉 歡迎來到呆呆扭蛋機！快來試試手氣！ 🎟️ ";
+            const def = "🎉 歡迎來到呆呆幸運抽獎！快來試試手氣！ 🎟️ ";
             if (!honorUnlockedGroup) return def;
             const f = list.filter(i => i.group === honorUnlockedGroup);
             if (!f.length) return def;
@@ -2088,43 +2088,73 @@
                 // 播放拉霸音效
                 playSlotSound();
 
-                // 開始滾動動畫：為每個轉輪設定目標位置
-                const symbolHeight = 140; // 必須與 CSS 中 .slot-reel-symbol 的高度一致
-                // 為了讓滾動看起來更長，將目標位置設定在隨機較遠的符號索引（例如 15~19）
-                const targetIndex1 = 15 + Math.floor(Math.random() * 5); // 15-19
-                const targetIndex2 = 15 + Math.floor(Math.random() * 5);
-                const targetIndex3 = 15 + Math.floor(Math.random() * 5);
-                const translateY1 = -targetIndex1 * symbolHeight;
-                const translateY2 = -targetIndex2 * symbolHeight;
-                const translateY3 = -targetIndex3 * symbolHeight;
+// 開始滾動動畫：為每個轉輪建立內容，並設定最終停止在目標符號
+const symbolHeight = 140; // 與 CSS .slot-reel-symbol 高度一致
 
-                const strip1 = document.getElementById('reelStrip1');
-                const strip2 = document.getElementById('reelStrip2');
-                const strip3 = document.getElementById('reelStrip3');
+function prepareReel(strip, targetKey) {
+    const symbolKeys = Object.keys(slotSymbols);
+    strip.innerHTML = '';
+    const totalSymbols = 20; // 滾動的符號數量，越多感覺越久
+    // 前面填充隨機符號
+    for (let i = 0; i < totalSymbols - 1; i++) {
+        const key = symbolKeys[Math.floor(Math.random() * symbolKeys.length)];
+        const sym = slotSymbols[key] || {};
+        const div = document.createElement('div');
+        div.className = 'slot-reel-symbol';
+        if (sym.image) {
+            div.innerHTML = `<img src="${sym.image}" alt="${sym.name || key}">`;
+        } else if (sym.emoji) {
+            div.textContent = sym.emoji;
+        } else {
+            div.textContent = key;
+        }
+        strip.appendChild(div);
+    }
+    // 最後一個符號是目標符號（最終停止時顯示）
+    const sym = slotSymbols[targetKey] || {};
+    const div = document.createElement('div');
+    div.className = 'slot-reel-symbol';
+    if (sym.image) {
+        div.innerHTML = `<img src="${sym.image}" alt="${sym.name || targetKey}">`;
+    } else if (sym.emoji) {
+        div.textContent = sym.emoji;
+    } else {
+        div.textContent = targetKey;
+    }
+    strip.appendChild(div);
+    // 返回最終應用的 transform，使最後一個符號出現在窗口中央
+    return `translateY(-${(totalSymbols - 1) * symbolHeight}px)`;
+}
 
-                // 先重置，再設定 transition 和 transform
-                [strip1, strip2, strip3].forEach(strip => {
-                    if (strip) {
-                        strip.style.transition = 'none';
-                        strip.style.transform = 'translateY(0)';
-                    }
-                });
+const strip1 = document.getElementById('reelStrip1');
+const strip2 = document.getElementById('reelStrip2');
+const strip3 = document.getElementById('reelStrip3');
 
-                // 強制回流
-                void strip1.offsetHeight;
-                void strip2.offsetHeight;
-                void strip3.offsetHeight;
+// 先重置轉輪位置（無動畫）
+[strip1, strip2, strip3].forEach(strip => {
+    strip.style.transition = 'none';
+    strip.style.transform = 'translateY(0)';
+});
+// 強制回流，確保重置生效
+void strip1.offsetHeight;
+void strip2.offsetHeight;
+void strip3.offsetHeight;
 
-                // 設置過渡和目標位置
-                strip1.style.transition = 'transform 3s cubic-bezier(0.15, 0.85, 0.25, 1)';
-                strip2.style.transition = 'transform 3s cubic-bezier(0.15, 0.85, 0.25, 1)';
-                strip3.style.transition = 'transform 3s cubic-bezier(0.15, 0.85, 0.25, 1)';
-                strip1.style.transform = `translateY(${translateY1}px)`;
-                strip2.style.transform = `translateY(${translateY2}px)`;
-                strip3.style.transform = `translateY(${translateY3}px)`;
+// 準備轉輪內容並取得最終 transform
+const targetTransform1 = prepareReel(strip1, reel1);
+const targetTransform2 = prepareReel(strip2, reel2);
+const targetTransform3 = prepareReel(strip3, reel3);
 
-                // 等待動畫完成（3秒）
-                await new Promise(resolve => setTimeout(resolve, 3000));
+// 設定過渡動畫與最終位置
+strip1.style.transition = 'transform 3s cubic-bezier(0.15, 0.85, 0.25, 1)';
+strip2.style.transition = 'transform 3s cubic-bezier(0.15, 0.85, 0.25, 1)';
+strip3.style.transition = 'transform 3s cubic-bezier(0.15, 0.85, 0.25, 1)';
+strip1.style.transform = targetTransform1;
+strip2.style.transform = targetTransform2;
+strip3.style.transform = targetTransform3;
+
+// 等待動畫完成
+await new Promise(resolve => setTimeout(resolve, 3000));
 
                 // 更新顯示的符號（確保最終顯示正確的目標符號）
                 // 因為我們設定的目標索引是隨機的，但實際中獎結果是 reel1, reel2, reel3，
@@ -2171,48 +2201,122 @@
                 setFinalSymbol(strip2, reel2);
                 setFinalSymbol(strip3, reel3);
 
+function showSlotWinModal(prizeName, code, awardedPoints) {
+    // 設定彈窗內容
+    const isThanks = prizeName && prizeName.includes("銘謝惠顧");
+    document.getElementById("modalTitle").innerText = isThanks ? "😢 差一點點！" : "🎉 恭喜中獎！";
+    document.getElementById("modalTitle").className = `text-2xl font-black mb-2 ${isThanks ? 'text-gray-500' : 'text-rose-500'}`;
+    document.getElementById("modalPrizeName").innerText = prizeName || "未知獎品";
+    const pointsInfo = document.getElementById("modalPointsInfo");
+    if (pointsInfo) {
+        if (awardedPoints > 0) {
+            pointsInfo.innerText = `🪙 獲得 ${awardedPoints} 點`;
+            pointsInfo.classList.remove("hidden");
+        } else {
+            pointsInfo.classList.add("hidden");
+        }
+    }
+    currentPrizeUrl = code;
+    const ticketEl = document.getElementById("modalTicketCode");
+    const copyHint = document.getElementById("copyHint");
+    if (code && code !== "點數已自動匯入你的錢包") {
+        ticketEl.style.display = "block";
+        copyHint.style.display = "block";
+        ticketEl.innerText = code;
+    } else {
+        ticketEl.style.display = "none";
+        copyHint.style.display = "none";
+    }
+    document.querySelector("#winModal button:last-child").innerText = isThanks ? "再接再厲" : "收下好禮";
+    document.getElementById("winModal").style.display = "flex";
+    playWinSound();
+}
+                
                 // 處理中獎邏輯
-                const isWin = (reel1 === reel2 && reel2 === reel3);
-                const symbolData = slotSymbols[reel1] || {};
-                const prizeId = symbolData.prizeId || reel1;
-                const prizeData = lastPrizes?.[prizeId];
+const isWin = (reel1 === reel2 && reel2 === reel3);
+const symbolData = slotSymbols[reel1] || {};
+const prizeId = symbolData.prizeId || reel1;
+const prizeData = lastPrizes?.[prizeId];
 
-                if (isWin && prizeData) {
-                    runTransaction(ref(db, `prizes/${prizeId}/quantity`), cur => (cur === null || cur <= 0) ? undefined : cur - 1)
-                        .then((res) => {
-                            if (res.committed) {
-                                push(ref(db, `drawRecords/${currentPlayerName}`), {
-                                    type: "slot",
-                                    won: prizeData.name || prizeId,
-                                    code: prizeData.name ? `獲得「${prizeData.name}」` : prizeId,
-                                    time: Date.now()
-                                });
-                                alert(`🎉 拉霸中獎！獲得「${prizeData.name || prizeId}」`);
-                            } else {
-                                alert("獎品已無庫存");
-                            }
-                        })
-                        .catch(err => {
-                            console.error(err);
-                            alert("中獎處理失敗，請聯繫管理員");
-                        });
-                } else if (isWin && !prizeData) {
-                    push(ref(db, `drawRecords/${currentPlayerName}`), {
-                        type: "slot",
-                        won: `符號 ${prizeId} 未設定獎品`,
-                        code: "",
-                        time: Date.now()
-                    }).catch(err => console.error(err));
-                    alert(`🎰 三個相同符號，但「${prizeId}」尚未設定獎品`);
-                } else {
-                    push(ref(db, `drawRecords/${currentPlayerName}`), {
-                        type: "slot",
-                        won: "未中獎",
-                        code: "",
-                        time: Date.now()
-                    }).catch(err => console.error(err));
-                    alert("😢 差一點，再試一次！");
+if (isWin && prizeData) {
+    // 嘗試扣減庫存
+    try {
+        const qRef = ref(db, `prizes/${prizeId}/quantity`);
+        const tx = await runTransaction(qRef, cur => (cur === null || cur <= 0) ? undefined : cur - 1);
+        if (!tx.committed) {
+            alert(`很抱歉，「${prizeData.name || prizeId}」已無庫存。`);
+        } else {
+            // 取得序號/連結（與扭蛋機相同邏輯）
+            let code = "";
+            try {
+                const cs = await get(ref(db, `prizeCodes/${prizeId}`));
+                if (cs.exists()) {
+                    const cObj = cs.val();
+                    const used = new Set(Object.values(globalPlayedUsers).map(u => u && u.code).filter(c => c));
+                    const av = Object.values(cObj).filter(c => c && !used.has(c));
+                    if (av.length) code = av[0];
                 }
+            } catch (e) {}
+            // 如果沒有序號但有設定點數，則顯示點數訊息
+            let awardedPoints = 0;
+            const minP = Number(prizeData.minPoints);
+            const maxP = Number(prizeData.maxPoints);
+            if (!code && !isNaN(minP) && !isNaN(maxP) && maxP >= minP && maxP > 0) {
+                awardedPoints = Math.floor(Math.random() * (maxP - minP + 1)) + minP;
+                try {
+                    await runTransaction(ref(db, `pointUsers/${currentPlayerName}/points`), cur => (cur || 0) + awardedPoints);
+                    await push(ref(db, "pendingPoints"), {
+                        playerName: currentPlayerName,
+                        points: awardedPoints,
+                        prizeName: prizeData.name,
+                        timestamp: Date.now(),
+                        status: "approved",
+                        processedAt: Date.now()
+                    });
+                } catch (e) {
+                    console.error("點數發放失敗（不影響中獎）", e);
+                }
+                code = "點數已自動匯入你的錢包";
+            }
+
+            // 寫入抽獎紀錄
+            await push(ref(db, `drawRecords/${currentPlayerName}`), {
+                type: "slot",
+                won: prizeData.name || prizeId,
+                code: code,
+                time: Date.now()
+            });
+
+            // 顯示與扭蛋機相同的中獎彈窗
+            showSlotWinModal(prizeData.name, code, awardedPoints);
+        }
+    } catch (e) {
+        console.error(e);
+        alert("中獎處理失敗，請聯繫管理員");
+    }
+} else if (isWin && !prizeData) {
+    // 中獎但獎品未設定
+    try {
+        await push(ref(db, `drawRecords/${currentPlayerName}`), {
+            type: "slot",
+            won: `符號 ${prizeId} 未設定獎品`,
+            code: "",
+            time: Date.now()
+        });
+    } catch (e) { console.error(e); }
+    alert(`🎰 三個相同符號，但「${prizeId}」尚未設定獎品`);
+} else {
+    // 未中獎
+    try {
+        await push(ref(db, `drawRecords/${currentPlayerName}`), {
+            type: "slot",
+            won: "未中獎",
+            code: "",
+            time: Date.now()
+        });
+    } catch (e) { console.error(e); }
+    alert("😢 差一點，再試一次！");
+}
 
             } catch (e) {
                 console.error("拉霸錯誤:", e);
