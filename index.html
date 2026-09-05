@@ -1732,52 +1732,54 @@
         }
 
         // ---------- UI 更新 ----------
-        function refreshPlayedUsersUI() {
-            // 更新玩家下拉選單的狀態
-            const sel = document.getElementById("playerName");
-            for (let opt of sel.options) {
-                if (!opt.value) continue;
-                const name = opt.value;
-                const drawCount = globalPlayedUsers[name]?.drawCount || 0;
-                const limit = getMaxDrawsForPlayer(name);
-                const remaining = limit - drawCount;
-                if (disabledPlayers[name]) {
-                    opt.disabled = true;
-                    opt.innerText = name + " (已禁用)";
-                } else {
-                    opt.disabled = false;
-                    opt.innerText = name;
-                }
-            }
 
-            // 從 drawRecordsData 提取所有中獎紀錄（排除銘謝惠顧、未中獎、未設定獎品）
-            let list = [];
-            for (const name in drawRecordsData) {
-                const records = drawRecordsData[name];
-                if (!records || typeof records !== 'object') continue;
-                for (const key in records) {
-                    const rec = records[key];
-                    if (!rec || !rec.won) continue;
-                    if (rec.won.includes("銘謝惠顧") || rec.won === "未中獎" || rec.won.includes("未設定獎品")) continue;
-                    list.push({
-                        user: name,
-                        won: rec.won,
-                        time: rec.time || 0,
-                        group: getGroupKeyForName(name),
-                        drawCount: globalPlayedUsers[name]?.drawCount || 0
-                    });
-                }
-            }
-
-            // 依時間排序（新的在前）
-            list.sort((a, b) => (b.time || 0) - (a.time || 0));
-            lastPlayedList = list;
-
-            // 更新跑馬燈與中獎者看板
-            updateMarquee(buildMarqueeText(list));
-            renderHonorBoard(list);
-            updateDrawCountDisplay();
+function refreshPlayedUsersUI() {
+    // 更新玩家下拉選單的狀態
+    const sel = document.getElementById("playerName");
+    for (let opt of sel.options) {
+        if (!opt.value) continue;
+        const name = opt.value;
+        const drawCount = globalPlayedUsers[name]?.drawCount || 0;
+        const limit = getMaxDrawsForPlayer(name);
+        const remaining = limit - drawCount;
+        if (disabledPlayers[name]) {
+            opt.disabled = true;
+            opt.innerText = name + " (已禁用)";
+        } else {
+            opt.disabled = false;
+            opt.innerText = name;
         }
+    }
+
+    // 從 drawRecordsData 提取所有中獎紀錄（排除銘謝惠顧、未中獎、未設定獎品）
+    let list = [];
+    for (const name in drawRecordsData) {
+        const records = drawRecordsData[name];
+        if (!records || typeof records !== 'object') continue;
+        for (const key in records) {
+            const rec = records[key];
+            if (!rec || !rec.won) continue;
+            if (rec.won.includes("銘謝惠顧") || rec.won === "未中獎" || rec.won.includes("未設定獎品")) continue;
+            list.push({
+                user: name,
+                won: rec.won,
+                time: rec.time || 0,
+                // 直接用玩家姓名判斷群組，不再依賴 drawRecords 中的 group 欄位
+                group: getGroupKeyForName(name),
+                drawCount: globalPlayedUsers[name]?.drawCount || 0
+            });
+        }
+    }
+
+    // 依時間排序（新的在前）
+    list.sort((a, b) => (b.time || 0) - (a.time || 0));
+    lastPlayedList = list;
+
+    // 更新跑馬燈與中獎者看板
+    updateMarquee(buildMarqueeText(list));
+    renderHonorBoard(list);
+    updateDrawCountDisplay();
+}
 
         function initApp() {
             onValue(ref(db, "prizes"), snap => {
