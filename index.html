@@ -2251,7 +2251,43 @@
                                 time: Date.now()
                             });
 
+                            // 更新 playedUsers，讓跑馬燈與中獎者看板顯示
+                            try {
+                                await update(ref(db, `playedUsers/${currentPlayerName}`), {
+                                    won: prizeData.name || prizeId,
+                                    time: Date.now(),
+                                    code: code
+                                });
+                                globalPlayedUsers[currentPlayerName] = {
+                                    ...(globalPlayedUsers[currentPlayerName] || {}),
+                                    won: prizeData.name || prizeId,
+                                    time: Date.now(),
+                                    code: code
+                                };
+                                refreshPlayedUsersUI();
+                            } catch (e) {
+                                console.error("更新 playedUsers 失敗", e);
+                            }
+
+                            try {
+                                await update(ref(db, `playedUsers/${currentPlayerName}`), {
+                                    won: prizeData.name || prizeId,
+                                    time: Date.now(),
+                                    code: code
+                                });
+                                globalPlayedUsers[currentPlayerName] = {
+                                    ...(globalPlayedUsers[currentPlayerName] || {}),
+                                    won: prizeData.name || prizeId,
+                                    time: Date.now(),
+                                    code: code
+                                };
+                                refreshPlayedUsersUI();
+                            } catch (e) {
+                                console.error("更新 playedUsers 失敗", e);
+                            }
+
                             showSlotWinModal(prizeData.name, code, awardedPoints);
+
                         }
                     } catch (e) {
                         console.error(e);
@@ -2269,6 +2305,7 @@
                     alert(`🎰 三個相同符號，但「${prizeId}」尚未設定獎品`);
 
                 } else {
+                    // 未中獎，視為銘謝惠顧
                     try {
                         await push(ref(db, `drawRecords/${currentPlayerName}`), {
                             type: "slot",
@@ -2276,8 +2313,19 @@
                             code: "",
                             time: Date.now()
                         });
+                        await update(ref(db, `playedUsers/${currentPlayerName}`), {
+                            won: "銘謝惠顧",
+                            time: Date.now(),
+                            code: ""
+                        });
+                        globalPlayedUsers[currentPlayerName] = {
+                            ...(globalPlayedUsers[currentPlayerName] || {}),
+                            won: "銘謝惠顧",
+                            time: Date.now(),
+                            code: ""
+                        };
+                        refreshPlayedUsersUI();
                     } catch (e) { console.error(e); }
-                    // 使用與中獎相同的中獎彈窗，顯示銘謝惠顧
                     showSlotWinModal("銘謝惠顧", "", 0);
                 }
 
