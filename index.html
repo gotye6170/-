@@ -1734,74 +1734,77 @@
         }
 
         // ---------- UI 更新 ----------
-        function refreshPlayedUsersUI() {
-            // 更新玩家下拉選單的狀態
-            const sel = document.getElementById("playerName");
-            for (let opt of sel.options) {
-                if (!opt.value) continue;
-                const name = opt.value;
-                const drawCount = globalPlayedUsers[name]?.drawCount || 0;
-                const limit = getMaxDrawsForPlayer(name);
-                const remaining = limit - drawCount;
-                if (disabledPlayers[name]) {
-                    opt.disabled = true;
-                    opt.innerText = name + " (已禁用)";
-                } else {
-                    opt.disabled = false;
-                    opt.innerText = name;
-                }
-            }
 
-            // 從 drawRecordsData 提取所有中獎紀錄，並從 playedUsers 兜底
-            let list = [];
-            const seenKeys = new Set();
-
-            // 先處理 drawRecordsData
-            for (const name in drawRecordsData) {
-                const records = drawRecordsData[name];
-                if (!records || typeof records !== 'object') continue;
-                for (const key in records) {
-                    const rec = records[key];
-                    if (!rec || !rec.won) continue;
-                    if (rec.won.includes("銘謝惠顧") || rec.won === "未中獎" || rec.won.includes("未設定獎品")) continue;
-                    const uniqueKey = `${name}_${rec.time}_${rec.won}`;
-                    if (seenKeys.has(uniqueKey)) continue;
-                    seenKeys.add(uniqueKey);
-                    list.push({
-                        user: name,
-                        won: rec.won,
-                        time: rec.time || 0,
-                        group: getGroupKeyForName(name),
-                        drawCount: globalPlayedUsers[name]?.drawCount || 0
-                    });
-                }
-            }
-
-            // 再處理 playedUsers 中沒有被 drawRecords 覆蓋的資料（舊版紀錄）
-            for (const name in globalPlayedUsers) {
-                const u = globalPlayedUsers[name];
-                if (!u || !u.won || u.won.includes("銘謝惠顧")) continue;
-                const uniqueKey = `${name}_${u.time}_${u.won}`;
-                if (seenKeys.has(uniqueKey)) continue;
-                seenKeys.add(uniqueKey);
-                list.push({
-                    user: name,
-                    won: u.won,
-                    time: u.time || 0,
-                    group: u.group || getGroupKeyForName(name),
-                    drawCount: u.drawCount || 0
-                });
-            }
-
-            // 依時間排序（新的在前）
-            list.sort((a, b) => (b.time || 0) - (a.time || 0));
-            lastPlayedList = list;
-
-            // 更新跑馬燈與中獎者看板
-            updateMarquee(buildMarqueeText(list));
-            renderHonorBoard(list);
-            updateDrawCountDisplay();
+function refreshPlayedUsersUI() {
+    // 更新玩家下拉選單的狀態
+    const sel = document.getElementById("playerName");
+    for (let opt of sel.options) {
+        if (!opt.value) continue;
+        const name = opt.value;
+        const drawCount = globalPlayedUsers[name]?.drawCount || 0;
+        const limit = getMaxDrawsForPlayer(name);
+        const remaining = limit - drawCount;
+        if (disabledPlayers[name]) {
+            opt.disabled = true;
+            opt.innerText = name + " (已禁用)";
+        } else {
+            opt.disabled = false;
+            opt.innerText = name;
         }
+    }
+
+    let list = [];
+    const seenKeys = new Set();
+    const playerTimesInDrawRecords = {};
+
+    // 先處理 drawRecordsData 中的所有紀錄
+    for (const name in drawRecordsData) {
+        const records = drawRecordsData[name];
+        if (!records || typeof records !== 'object') continue;
+        if (!playerTimesInDrawRecords[name]) playerTimesInDrawRecords[name] = new Set();
+        for (const key in records) {
+            const rec = records[key];
+            if (!rec || !rec.won) continue;
+            if (rec.won.includes("銘謝惠顧") || rec.won === "未中獎" || rec.won.includes("未設定獎品")) continue;
+            const uniqueKey = `${name}_${rec.time}_${rec.won}`;
+            if (seenKeys.has(uniqueKey)) continue;
+            seenKeys.add(uniqueKey);
+            playerTimesInDrawRecords[name].add(rec.time);
+            list.push({
+                user: name,
+                won: rec.won,
+                time: rec.time || 0,
+                group: getGroupKeyForName(name),
+                drawCount: globalPlayedUsers[name]?.drawCount || 0
+            });
+        }
+    }
+
+    // 再從 playedUsers 兜底，但排除時間戳已在 drawRecords 中出現過的紀錄
+    for (const name in globalPlayedUsers) {
+        const u = globalPlayedUsers[name];
+        if (!u || !u.won || u.won.includes("銘謝惠顧")) continue;
+        if (playerTimesInDrawRecords[name] && playerTimesInDrawRecords[name].has(u.time)) continue;
+        const uniqueKey = `${name}_${u.time}_${u.won}`;
+        if (seenKeys.has(uniqueKey)) continue;
+        seenKeys.add(uniqueKey);
+        list.push({
+            user: name,
+            won: u.won,
+            time: u.time || 0,
+            group: u.group || getGroupKeyForName(name),
+            drawCount: u.drawCount || 0
+        });
+    }
+
+    // 依時間排序（新的在前）
+    list.sort((a, b) => (b.time || 0) - (a.time || 0));
+    lastPlayedList = list;
+
+    updateMarquee(buildMarqueeText(list));
+    renderHonorBoard(list);
+    updateDrawCountDisplay();
+}
 
         function initApp() {
             onValue(ref(db, "prizes"), snap => {
