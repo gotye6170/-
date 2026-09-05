@@ -2256,14 +2256,14 @@
                                 await update(ref(db, `playedUsers/${currentPlayerName}`), {
                                     won: prizeData.name || prizeId,
                                     time: Date.now(),
-                                    code: code
+                                    code: code,
                                     group: honorUnlockedGroup
                                 });
                                 globalPlayedUsers[currentPlayerName] = {
                                     ...(globalPlayedUsers[currentPlayerName] || {}),
                                     won: prizeData.name || prizeId,
                                     time: Date.now(),
-                                    code: code
+                                    code: code,
                                     group: honorUnlockedGroup
                                 };
                                 refreshPlayedUsersUI();
@@ -2300,14 +2300,14 @@
                         await update(ref(db, `playedUsers/${currentPlayerName}`), {
                             won: "銘謝惠顧",
                             time: Date.now(),
-                            code: ""
+                            code: "",
                             group: honorUnlockedGroup
                         });
                         globalPlayedUsers[currentPlayerName] = {
                             ...(globalPlayedUsers[currentPlayerName] || {}),
                             won: "銘謝惠顧",
                             time: Date.now(),
-                            code: ""
+                            code: "",
                             group: honorUnlockedGroup
                         };
                         refreshPlayedUsersUI();
