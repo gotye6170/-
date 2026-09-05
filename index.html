@@ -1145,13 +1145,6 @@
             for (const k in groupLists) if (groupLists[k].names.includes(name)) return k;
             return null;
         }
-        function isPrizeTakenByOtherGroup(pn) {
-            if (!honorUnlockedGroup) return false;
-            for (const u in globalPlayedUsers) {
-                if (globalPlayedUsers[u].won === pn && globalPlayedUsers[u].group === honorUnlockedGroup) return false;
-            }
-            return true;
-        }
         async function sha256(message) {
             const buf = new TextEncoder().encode(message);
             const hash = await crypto.subtle.digest("SHA-256", buf);
@@ -1299,7 +1292,6 @@
                     const pb = st ? `<div class="prize-progress-track"><div class="prize-progress-fill is-available" style="width:${Math.round(rem / total * 100)}%;"></div></div>` : '';
                     h += `<div class="prize-item-row">${img}<div class="prize-info"><span class="prize-name-label">${p.name}</span><span style="color:#059669;font-size:13px;font-weight:bold;">${ql}</span>${pb}</div></div>`;
                 } else {
-                    const on = isPrizeTakenByOtherGroup(p.name) ? '<div style="color:#f97316;font-size:11px;font-weight:bold;margin-top:1px;">🔸 已被其他組抽走</div>' : '';
                     const sl = st ? `🔴 已全數送完（共 <b>${total}</b> 份）` : `🔴 已全數送完`;
                     h += `<div class="prize-item-row" style="opacity:0.4;">${img}<div class="prize-info"><span class="prize-name-label" style="text-decoration:line-through;color:#9ca3af;">${p.name}</span><span style="color:#dc2626;font-size:13px;font-weight:bold;">${sl}</span><div class="prize-progress-track"><div class="prize-progress-fill is-empty" style="width:100%;"></div></div>${on}</div></div>`;
                 }
