@@ -35,7 +35,6 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* ========== 大標題 ========== */
         .gacha-title {
             font-family: 'Noto Sans TC', sans-serif;
             font-weight: 900;
@@ -46,7 +45,6 @@
             filter: drop-shadow(4px 4px 0px rgba(0,0,0,0.08)) drop-shadow(0px 8px 15px rgba(244,63,94,0.2));
         }
 
-        /* ========== 扭蛋機 ========== */
         .gacha-machine {
             position: relative;
             width: 320px;
@@ -225,7 +223,6 @@
             100% { top: 12px; opacity: 1; transform: scaleY(1) scaleX(1) rotate(360deg); }
         }
 
-        /* ========== 看板 ========== */
         .dashboard-panel {
             background: rgba(255,255,255,0.85);
             backdrop-filter: blur(10px);
@@ -457,18 +454,39 @@
             box-shadow: 0 8px 20px rgba(124, 58, 237, 0.35);
         }
 
-        /* ========== 拉霸機樣式 ========== */
+        /* ========== 拉霸機樣式（老虎機風格） ========== */
+        .slot-machine {
+            background: linear-gradient(145deg, #1a1a2e, #16213e);
+            border-radius: 24px;
+            padding: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5), inset 0 0 20px rgba(255,215,0,0.2);
+            border: 4px solid #ffd700;
+            position: relative;
+            overflow: hidden;
+        }
+        .slot-machine::before {
+            content: "★ ★ ★";
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #ffd700;
+            font-size: 14px;
+            letter-spacing: 8px;
+            text-shadow: 0 0 10px #ffd700;
+        }
         .slot-reel {
-            width: 80px;
-            height: 100px;
-            background: linear-gradient(145deg, #f3f4f6, #e5e7eb);
-            border-radius: 16px;
+            width: 90px;
+            height: 110px;
+            background: linear-gradient(180deg, #1a1a2e, #16213e);
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 48px;
-            box-shadow: inset 0 4px 8px rgba(0,0,0,0.1), 0 6px 12px rgba(0,0,0,0.08);
-            transition: transform 0.3s;
+            font-size: 56px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8), 0 6px 0 #0f0f1a;
+            border: 2px solid #ffd700;
+            transition: transform 0.15s ease-out;
         }
         .slot-reel img {
             max-width: 80%;
@@ -476,11 +494,33 @@
             object-fit: contain;
         }
         .slot-reel.spinning {
-            animation: slotShake 0.1s linear infinite;
+            animation: slotShake 0.08s linear infinite;
         }
         @keyframes slotShake {
-            0% { transform: translateY(-2px); }
-            100% { transform: translateY(2px); }
+            0% { transform: translateY(-3px); }
+            100% { transform: translateY(3px); }
+        }
+        .slot-button {
+            background: linear-gradient(180deg, #ff6b6b, #c0392b);
+            color: white;
+            font-weight: 900;
+            font-size: 18px;
+            padding: 14px 40px;
+            border-radius: 50px;
+            border: 3px solid #ffd700;
+            box-shadow: 0 10px 0 #8e1f1f, 0 10px 20px rgba(0,0,0,0.4);
+            text-shadow: 0 2px 0 #8e1f1f;
+            transition: all 0.1s;
+            cursor: pointer;
+        }
+        .slot-button:active {
+            transform: translateY(6px);
+            box-shadow: 0 4px 0 #8e1f1f, 0 6px 12px rgba(0,0,0,0.4);
+        }
+        .slot-info {
+            color: #ffd700;
+            font-weight: bold;
+            text-shadow: 0 0 8px #ffd700;
         }
 
         .modal-overlay {
@@ -596,7 +636,6 @@
             }
         }
 
-        /* ========== 桌面版樣式 ========== */
         @media (min-width: 1024px) {
             .gacha-title {
                 font-size: 3rem;
@@ -714,14 +753,16 @@
                     </div>
                 </div>
 
-                <!-- 🎰 拉霸機區塊（新增） -->
+                <!-- 🎰 拉霸機區塊（老虎機風格，消耗抽獎次數） -->
                 <div id="slotSystemArea" class="w-full hidden">
-                    <div class="w-full bg-white/80 backdrop-blur-md rounded-2xl p-5 shadow-md border border-white">
-                        <h3 class="text-center text-base font-black text-purple-600 mb-3">🎰 拉霸機</h3>
-                        <p class="text-xs text-gray-500 text-center mb-3">每次拉霸花費 <b id="slotCostDisplay">20</b> 點，三個相同圖案即可獲得對應獎品！</p>
+                    <div class="slot-machine w-full max-w-sm mx-auto">
+                        <h3 class="text-center text-2xl font-black text-yellow-300 mb-2" style="text-shadow: 0 0 10px #ffd700;">🎰 拉霸機</h3>
+                        <p class="text-center text-sm slot-info mb-4">
+                            剩餘次數：<span id="slotCountDisplay">0</span> 次
+                        </p>
                         
                         <!-- 三個轉輪 -->
-                        <div class="flex justify-center gap-2 mb-4">
+                        <div class="flex justify-center gap-3 mb-6">
                             <div class="slot-reel" id="slotReel1"><span id="slotSymbol1">❓</span></div>
                             <div class="slot-reel" id="slotReel2"><span id="slotSymbol2">❓</span></div>
                             <div class="slot-reel" id="slotReel3"><span id="slotSymbol3">❓</span></div>
@@ -729,7 +770,7 @@
 
                         <!-- 拉霸按鈕 -->
                         <div class="flex justify-center">
-                            <button id="slotSpinBtn" onclick="startSlot()" class="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-black py-3 px-8 rounded-2xl shadow-lg transition-all tracking-wider text-base cursor-pointer">拉霸！</button>
+                            <button id="slotSpinBtn" onclick="startSlot()" class="slot-button">🎰 拉霸！</button>
                         </div>
                     </div>
                 </div>
@@ -920,7 +961,6 @@
 
         // 拉霸機相關
         let slotSymbols = {};
-        let slotCost = 20;
         let isSlotSpinning = false;
         let gameMode = "both"; // 可為 "gacha" | "slot" | "both"
 
@@ -1018,13 +1058,6 @@
                 gameMode = val || "both";
                 updateGameModeUI();
             });
-            // 讀取拉霸機設定
-            onValue(ref(db, "slotSettings"), (snap) => {
-                const data = snap.val() || {};
-                slotCost = data.cost || 20;
-                const costDisplay = document.getElementById("slotCostDisplay");
-                if (costDisplay) costDisplay.innerText = slotCost;
-            });
             // 讀取拉霸機符號
             onValue(ref(db, "slotSymbols"), (snap) => {
                 slotSymbols = snap.val() || {};
@@ -1058,6 +1091,11 @@
                 display.innerText = `剩餘抽獎次數：${remaining} 次（上限 ${limit} 次）`;
             } else {
                 display.innerText = "抽獎次數已用完";
+            }
+            // 更新拉霸機剩餘次數顯示
+            const slotDisplay = document.getElementById("slotCountDisplay");
+            if (slotDisplay) {
+                slotDisplay.innerText = remaining > 0 ? `${remaining} 次` : "0 次";
             }
         }
 
@@ -1429,6 +1467,7 @@
             document.getElementById("pointsSystemArea").style.display = "none";
             document.getElementById("prizeListPanel").style.display = "none";
             document.getElementById("honorBoardPanel").style.display = "none";
+            updateDrawCountDisplay();
         }
 
         function showPointsSystem() {
@@ -1596,6 +1635,7 @@
             lastPlayedList = list;
             updateMarquee(buildMarqueeText(list));
             renderHonorBoard(list);
+            updateDrawCountDisplay();
         }
 
         function initApp() {
@@ -1821,9 +1861,10 @@
             }
         }
 
-        // ---------- 拉霸機核心 ----------
+        // ---------- 拉霸機核心（消耗抽獎次數） ----------
         function pickWeightedSymbol() {
             const keys = Object.keys(slotSymbols);
+            if (keys.length === 0) return null;
             const totalWeight = keys.reduce((sum, key) => sum + (slotSymbols[key].weight || 10), 0);
             let rand = Math.random() * totalWeight;
             for (const key of keys) {
@@ -1841,15 +1882,42 @@
             if (btn) btn.disabled = true;
 
             try {
-                if (!walletUnlocked || !currentWalletData || (currentWalletData.points || 0) < slotCost) {
-                    alert(`❌ 點數不足，需要 ${slotCost} 點`);
+                const playerData = globalPlayedUsers[currentPlayerName];
+                const drawCount = playerData?.drawCount || 0;
+                const limit = getMaxDrawsForPlayer(currentPlayerName);
+
+                if (!isAdminMode && drawCount >= limit) {
+                    alert("❌ 拉霸次數已用完");
                     isSlotSpinning = false;
                     if (btn) btn.disabled = false;
                     return;
                 }
 
-                // 扣點
-                await runTransaction(ref(db, `pointUsers/${currentPlayerName}/points`), cur => (cur || 0) - slotCost);
+                // 原子性扣減次數（更新 playedUsers）
+                const playedRef = ref(db, `playedUsers/${currentPlayerName}`);
+                const result = await runTransaction(playedRef, (current) => {
+                    if (current && current.drawCount >= limit) return; // 中止
+                    if (current === null) {
+                        return { drawCount: 1, lastDrawTime: Date.now() };
+                    } else {
+                        return { ...current, drawCount: (current.drawCount || 0) + 1, lastDrawTime: Date.now() };
+                    }
+                });
+
+                if (!result.committed) {
+                    alert("拉霸過於頻繁，請稍後再試。");
+                    isSlotSpinning = false;
+                    if (btn) btn.disabled = false;
+                    return;
+                }
+
+                // 更新本地快取
+                globalPlayedUsers[currentPlayerName] = {
+                    ...(globalPlayedUsers[currentPlayerName] || {}),
+                    drawCount: (drawCount + 1),
+                    lastDrawTime: Date.now()
+                };
+                updateDrawCountDisplay();
 
                 const keys = Object.keys(slotSymbols);
                 if (keys.length < 2) {
@@ -1905,7 +1973,6 @@
                                 }
                             });
                     } else if (isWin && !prizeData) {
-                        // 符號存在但沒有對應獎品
                         push(ref(db, `drawRecords/${currentPlayerName}`), {
                             type: "slot",
                             won: `符號 ${prizeId} 未設定獎品`,
@@ -1914,7 +1981,6 @@
                         });
                         alert(`🎰 三個相同符號，但「${prizeId}」尚未設定獎品`);
                     } else {
-                        // 未中獎
                         push(ref(db, `drawRecords/${currentPlayerName}`), {
                             type: "slot",
                             won: "未中獎",
@@ -1926,6 +1992,7 @@
 
                     isSlotSpinning = false;
                     if (btn) btn.disabled = false;
+                    updateDrawCountDisplay();
                 }, 1500);
 
             } catch (e) {
