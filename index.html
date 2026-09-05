@@ -1951,6 +1951,12 @@
                         try {
                             document.getElementById("modalPrizeName").innerText = chosen.name;
                             currentPrizeUrl = code;
+                            const ticketEl = document.getElementById("modalTicketCode");
+if (code && code.startsWith("http")) {
+    ticketEl.innerText = "🎁 點我領取獎品";
+} else {
+    ticketEl.innerText = code || "點我打開獎品連結";
+}
                             const pointsInfo = document.getElementById("modalPointsInfo");
                             if (pointsInfo) {
                                 if (awardedPoints > 0) {
@@ -2122,7 +2128,9 @@
                 playSlotSound();
 
 // 開始滾動動畫：為每個轉輪建立內容，並設定最終停止在目標符號
-const symbolHeight = 140; // 與 CSS .slot-reel-symbol 高度一致
+// 動態取得符號實際高度（兼容手機與桌面版）
+const firstSymbol = document.querySelector('.slot-reel-symbol');
+const symbolHeight = firstSymbol ? firstSymbol.offsetHeight : 140;
 
 function prepareReel(strip, targetKey) {
     const symbolKeys = Object.keys(slotSymbols);
@@ -2155,6 +2163,8 @@ function prepareReel(strip, targetKey) {
         div.textContent = targetKey;
     }
     strip.appendChild(div);
+    // 動態取得最後一個符號的實際高度（兼容手機與桌面版）
+    const symbolHeight = div.offsetHeight || 140;
     // 返回最終應用的 transform，使最後一個符號出現在窗口中央
     return `translateY(-${(totalSymbols - 1) * symbolHeight}px)`;
 }
@@ -2255,7 +2265,11 @@ function showSlotWinModal(prizeName, code, awardedPoints) {
     if (code && code !== "點數已自動匯入你的錢包") {
         ticketEl.style.display = "block";
         copyHint.style.display = "block";
-        ticketEl.innerText = code;
+        if (code && code.startsWith("http")) {
+    ticketEl.innerText = "🎁 點我領取獎品";
+} else {
+    ticketEl.innerText = code || "點我打開獎品連結";
+}
     } else {
         ticketEl.style.display = "none";
         copyHint.style.display = "none";
