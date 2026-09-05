@@ -1015,7 +1015,7 @@
     <!-- 🔊 音效開關 -->
     <button id="soundToggleBtn" onclick="toggleSound()" class="music-control-btn fixed bottom-5 right-5 bg-slate-900 text-cyan-400 text-sm font-bold px-4 py-2 rounded-full shadow-lg border border-cyan-500/30 z-40 transition-all active:scale-95">🔊 音效</button>
 
-        <script type="module">
+    <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
         import { getDatabase, ref, runTransaction, onValue, get, update, push, set } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
@@ -1076,6 +1076,9 @@
         let isSlotSpinning = false;
         let gameMode = "both";
 
+        // 音效相關
+        let soundUrls = {};
+
         // ---------- 音效 ----------
         let audioCtx = null;
         let soundEnabled = true;
@@ -1102,17 +1105,29 @@
         }
         function playCrankSound() {
             if (!soundEnabled) return;
-            for (let i = 0; i < 6; i++) playTone(300 + Math.random() * 150, 0.08, "square", i * 0.15, 0.06);
+            if (soundUrls.crank) {
+                new Audio(soundUrls.crank).play().catch(() => {});
+            } else {
+                for (let i = 0; i < 6; i++) playTone(300 + Math.random() * 150, 0.08, "square", i * 0.15, 0.06);
+            }
         }
         function playWinSound() {
             if (!soundEnabled) return;
-            playTone(523.25, 0.15, "triangle", 0, 0.18);
-            playTone(659.25, 0.15, "triangle", 0.15, 0.18);
-            playTone(783.99, 0.28, "triangle", 0.3, 0.2);
+            if (soundUrls.win) {
+                new Audio(soundUrls.win).play().catch(() => {});
+            } else {
+                playTone(523.25, 0.15, "triangle", 0, 0.18);
+                playTone(659.25, 0.15, "triangle", 0.15, 0.18);
+                playTone(783.99, 0.28, "triangle", 0.3, 0.2);
+            }
         }
         function playSlotSound() {
             if (!soundEnabled) return;
-            for (let i = 0; i < 10; i++) playTone(500 + Math.random() * 200, 0.06, "square", i * 0.1, 0.05);
+            if (soundUrls.slot) {
+                new Audio(soundUrls.slot).play().catch(() => {});
+            } else {
+                for (let i = 0; i < 10; i++) playTone(500 + Math.random() * 200, 0.06, "square", i * 0.1, 0.05);
+            }
         }
         function toggleSound() {
             soundEnabled = !soundEnabled;
@@ -1175,6 +1190,11 @@
                 slotSymbols = snap.val() || {};
                 console.log("拉霸符號已更新:", slotSymbols);
                 buildSlotReels();
+            });
+            // 讀取音效設定
+            onValue(ref(db, "settings/sounds"), (snap) => {
+                soundUrls = snap.val() || {};
+                console.log("音效設定已更新:", soundUrls);
             });
         }
 
