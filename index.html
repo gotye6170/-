@@ -1079,6 +1079,9 @@
         // 音效相關
         let soundUrls = {};
 
+        // 新增：儲存 drawRecords 的資料
+        let drawRecordsData = {};
+
         // ---------- 音效 ----------
         let audioCtx = null;
         let soundEnabled = true;
@@ -1730,6 +1733,7 @@
 
         // ---------- UI 更新 ----------
         function refreshPlayedUsersUI() {
+            // 更新玩家下拉選單的狀態
             const sel = document.getElementById("playerName");
             for (let opt of sel.options) {
                 if (!opt.value) continue;
@@ -1745,19 +1749,31 @@
                     opt.innerText = name;
                 }
             }
+
+            // 從 drawRecordsData 提取所有中獎紀錄（排除銘謝惠顧、未中獎、未設定獎品）
             let list = [];
-            for (let u in globalPlayedUsers) {
-                if (globalPlayedUsers[u].won && globalPlayedUsers[u].won.includes("銘謝惠顧")) continue;
-                list.push({
-                    user: u,
-                    won: globalPlayedUsers[u].won,
-                    time: globalPlayedUsers[u].time || 0,
-                    group: globalPlayedUsers[u].group || null,
-                    drawCount: globalPlayedUsers[u].drawCount || 0
-                });
+            for (const name in drawRecordsData) {
+                const records = drawRecordsData[name];
+                if (!records || typeof records !== 'object') continue;
+                for (const key in records) {
+                    const rec = records[key];
+                    if (!rec || !rec.won) continue;
+                    if (rec.won.includes("銘謝惠顧") || rec.won === "未中獎" || rec.won.includes("未設定獎品")) continue;
+                    list.push({
+                        user: name,
+                        won: rec.won,
+                        time: rec.time || 0,
+                        group: rec.group || getGroupKeyForName(name),
+                        drawCount: globalPlayedUsers[name]?.drawCount || 0
+                    });
+                }
             }
-            list.sort((a, b) => b.time - a.time);
+
+            // 依時間排序（新的在前）
+            list.sort((a, b) => (b.time || 0) - (a.time || 0));
             lastPlayedList = list;
+
+            // 更新跑馬燈與中獎者看板
             updateMarquee(buildMarqueeText(list));
             renderHonorBoard(list);
             updateDrawCountDisplay();
@@ -1772,6 +1788,11 @@
                 globalPlayedUsers = snap.val() || {};
                 refreshPlayedUsersUI();
                 if (currentPlayerName) updateDrawCountDisplay();
+            });
+            // 新增：監聽 drawRecords
+            onValue(ref(db, "drawRecords"), snap => {
+                drawRecordsData = snap.val() || {};
+                refreshPlayedUsersUI();
             });
             onValue(ref(db, "shopItems"), snap => {
                 shopItems = snap.val() || {};
@@ -2248,28 +2269,13 @@
                                 type: "slot",
                                 won: prizeData.name || prizeId,
                                 code: code,
-                                time: Date.now()
+                                time: Date.now(),
+                                group: honorUnlockedGroup
                             });
 
-                            // 更新 playedUsers，讓跑馬燈與中獎者看板顯示
-                            try {
-                                await update(ref(db, `playedUsers/${currentPlayerName}`), {
-                                    won: prizeData.name || prizeId,
-                                    time: Date.now(),
-                                    code: code,
-                                    group: honorUnlockedGroup
-                                });
-                                globalPlayedUsers[currentPlayerName] = {
-                                    ...(globalPlayedUsers[currentPlayerName] || {}),
-                                    won: prizeData.name || prizeId,
-                                    time: Date.now(),
-                                    code: code,
-                                    group: honorUnlockedGroup
-                                };
-                                refreshPlayedUsersUI();
-                            } catch (e) {
-                                console.error("更新 playedUsers 失敗", e);
-                            }
+                            // 更新 playedUsers，讓跑馬燈與中獎者看板顯示（現在多筆顯示，不需要再更新 playedUsers 的 won）
+                            // 但仍需保留 drawCount 等，這裡只更新 drawCount 已在前面交易中處理
+                            // 我們可以省略原本的 update，因為 drawRecords 監聽會自動刷新
 
                             showSlotWinModal(prizeData.name, code, awardedPoints);
                         }
@@ -2283,7 +2289,8 @@
                             type: "slot",
                             won: `符號 ${prizeId} 未設定獎品`,
                             code: "",
-                            time: Date.now()
+                            time: Date.now(),
+                            group: honorUnlockedGroup
                         });
                     } catch (e) { console.error(e); }
                     alert(`🎰 三個相同符號，但「${prizeId}」尚未設定獎品`);
@@ -2294,23 +2301,9 @@
                             type: "slot",
                             won: "銘謝惠顧",
                             code: "",
-                            time: Date.now()
-                        });
-                        // 更新 playedUsers
-                        await update(ref(db, `playedUsers/${currentPlayerName}`), {
-                            won: "銘謝惠顧",
                             time: Date.now(),
-                            code: "",
                             group: honorUnlockedGroup
                         });
-                        globalPlayedUsers[currentPlayerName] = {
-                            ...(globalPlayedUsers[currentPlayerName] || {}),
-                            won: "銘謝惠顧",
-                            time: Date.now(),
-                            code: "",
-                            group: honorUnlockedGroup
-                        };
-                        refreshPlayedUsersUI();
                     } catch (e) { console.error(e); }
                     // 顯示銘謝惠顧彈窗
                     showSlotWinModal("銘謝惠顧", "", 0);
