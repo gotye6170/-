@@ -12,568 +12,595 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
     
-<style>
-    * {
-        -webkit-tap-highlight-color: transparent;
-    }
+    <style>
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
 
-    body {
-        background: linear-gradient(135deg, #fbcfe8, #e0e7ff, #ccfbf1);
-        background-size: 400% 400%;
-        animation: gradientBG 15s ease infinite;
-        font-family: 'Noto Sans TC', sans-serif;
-        overflow-x: hidden;
-        min-height: 100vh;
-        min-height: 100dvh;
-        padding-bottom: env(safe-area-inset-bottom);
-    }
+        body {
+            background: linear-gradient(135deg, #fbcfe8, #e0e7ff, #ccfbf1);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            font-family: 'Noto Sans TC', sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+            min-height: 100dvh;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
 
-    @keyframes gradientBG {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
-    }
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
 
-    .gacha-title {
-        font-family: 'Noto Sans TC', sans-serif;
-        font-weight: 900;
-        color: #ff3366;
-        letter-spacing: 2px;
-        -webkit-text-stroke: 10px #ffffff;
-        paint-order: stroke fill;
-        filter: drop-shadow(4px 4px 0px rgba(0,0,0,0.08)) drop-shadow(0px 8px 15px rgba(244,63,94,0.2));
-    }
-
-    .gacha-machine {
-        position: relative;
-        width: 320px;
-        background: linear-gradient(to bottom, #ef4444, #dc2626);
-        border-radius: 40px 40px 20px 20px;
-        box-shadow: 0 20px 0 #b91c1c, 0 30px 40px rgba(0,0,0,0.3);
-        padding: 25px;
-        margin: 24px auto 24px auto;
-        border: 6px solid #fee2e2;
-    }
-
-    .gacha-glass {
-        position: relative;
-        height: 240px;
-        background: radial-gradient(circle at 50% 30%, rgba(255,255,255,0.4) 0%, rgba(243,244,246,0.8) 70%);
-        border-radius: 30px;
-        border: 6px solid #b91c1c;
-        overflow: hidden;
-        box-shadow: inset 0 10px 20px rgba(0,0,0,0.15);
-        margin-bottom: 25px;
-    }
-
-    .gacha-egg {
-        position: absolute;
-        width: 38px;
-        height: 38px;
-        border-radius: 50%;
-        box-shadow: inset -4px -4px 8px rgba(0,0,0,0.2), 2px 4px 6px rgba(0,0,0,0.1);
-        transition: transform 0.3s ease, opacity 0.5s ease;
-    }
-
-    .gacha-egg::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 50%;
-        background: rgba(255,255,255,0.35);
-        border-radius: 19px 19px 0 0;
-    }
-
-    .egg-pink { background: #ec4899; }
-    .egg-blue { background: #3b82f6; }
-    .egg-yellow { background: #eab308; }
-    .egg-green { background: #22c55e; }
-    .egg-purple { background: #a855f7; }
-    .egg-orange { background: #f97316; }
-
-    .egg-layer-a { bottom: 8px; }
-    .egg-layer-b { bottom: 25px; }
-    .egg-layer-c { bottom: 42px; }
-
-    .egg-falling-out {
-        animation: eggFallOut 0.8s cubic-bezier(0.55, 0.055, 0.675, 0.19) forwards !important;
-    }
-
-    @keyframes eggFallOut {
-        0% { transform: translateY(0) scale(1); opacity: 1; }
-        50% { transform: translateY(60px) scale(0.9); opacity: 0.6; }
-        100% { transform: translateY(120px) scale(0.7); opacity: 0; }
-    }
-
-    .eggs-drop-down .gacha-egg:not(.egg-falling-out) {
-        animation: gravitySettle 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.3s forwards;
-    }
-
-    @keyframes gravitySettle {
-        0% { transform: translateY(0); }
-        50% { transform: translateY(6px); }
-        75% { transform: translateY(3px); }
-        100% { transform: translateY(4px); }
-    }
-
-    .gacha-panel {
-        background: #991b1b;
-        border-radius: 20px;
-        padding: 20px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 15px;
-        box-shadow: inset 0 4px 8px rgba(0,0,0,0.3);
-    }
-
-    .gacha-crank {
-        width: 70px;
-        height: 70px;
-        background: radial-gradient(circle, #f3f4f6 30%, #9ca3af 70%);
-        border-radius: 50%;
-        border: 6px solid #4b5563;
-        position: relative;
-        cursor: pointer;
-        box-shadow: 0 4px 0 #374151, 0 6px 10px rgba(0,0,0,0.3);
-    }
-
-    .gacha-crank::before {
-        content: '';
-        position: absolute;
-        width: 14px;
-        height: 45px;
-        background: #4b5563;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        border-radius: 7px;
-    }
-
-    .gacha-crank::after {
-        content: '';
-        position: absolute;
-        width: 24px;
-        height: 24px;
-        background: #dc2626;
-        border-radius: 50%;
-        top: -5px;
-        left: 50%;
-        transform: translateX(-50%);
-        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    }
-
-    .rotating-crank {
-        animation: rotateCrank 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-    }
-
-    @keyframes rotateCrank {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(720deg); }
-    }
-
-    .gacha-gate {
-        width: 75px;
-        height: 75px;
-        background: #1f2937;
-        border-radius: 20px 20px 5px 5px;
-        border: 4px solid #4b5563;
-        position: relative;
-        box-shadow: inset 0 5px 10px rgba(0,0,0,0.5);
-        overflow: hidden;
-    }
-
-    .gacha-lucky-egg {
-        position: absolute;
-        width: 46px;
-        height: 46px;
-        border-radius: 50%;
-        top: -60px;
-        left: 11px;
-        opacity: 0;
-        z-index: 10;
-        box-shadow: inset -5px -5px 10px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.4);
-    }
-
-    .gacha-lucky-egg::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 50%;
-        background: rgba(255,255,255,0.35);
-        border-radius: 23px 23px 0 0;
-    }
-
-    .dropped-egg {
-        animation: realGravityDrop 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.3s forwards;
-    }
-
-    @keyframes realGravityDrop {
-        0% { top: -60px; opacity: 0; transform: scaleY(1.1) scaleX(0.9) rotate(0deg); }
-        30% { top: 12px; opacity: 1; transform: scaleY(0.8) scaleX(1.15) rotate(120deg); }
-        48% { top: -12px; transform: scaleY(1.05) scaleX(0.95) rotate(190deg); }
-        65% { top: 12px; transform: scaleY(0.92) scaleX(1.06) rotate(260deg); }
-        78% { top: 2px; transform: scaleY(1.02) scaleX(0.98) rotate(310deg); }
-        90% { top: 12px; transform: scaleY(1) scaleX(1) rotate(350deg); }
-        100% { top: 12px; opacity: 1; transform: scaleY(1) scaleX(1) rotate(360deg); }
-    }
-
-    .dashboard-panel {
-        background: rgba(255,255,255,0.85);
-        backdrop-filter: blur(10px);
-        border-radius: 24px;
-        border: 2px solid rgba(255,255,255,0.5);
-        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-        padding: 20px;
-        height: auto;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .board-title-text {
-        font-size: 18px;
-        font-weight: 900;
-        display: flex;
-        align-items: center;
-        padding-bottom: 10px;
-        border-bottom: 2px dashed rgba(0,0,0,0.1);
-        margin-bottom: 12px;
-        flex-shrink: 0;
-    }
-
-    .prize-title-text { color: #06b6d4; }
-    .honor-title-text { color: #ec4899; }
-
-    /* 🔥 強化：確保禮物列表和幸運中獎者標題完全一致 */
-    #statusBoard .board-title-text,
-    #honorBoard .board-title-text {
-        font-size: 18px;
-        font-weight: 900;
-        padding-bottom: 10px;
-        border-bottom: 2px dashed rgba(0,0,0,0.1);
-        margin-bottom: 12px;
-    }
-
-    .scroller-content {
-        overflow-y: auto;
-        flex-grow: 1;
-        min-height: 0; /* 🔥 避免 flex 子元素溢出 */
-        padding-right: 4px;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    .scroller-content::-webkit-scrollbar { width: 6px; }
-    .scroller-content::-webkit-scrollbar-track { background: transparent; }
-    .scroller-content::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
-
-    .prize-item-row {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        background: white;
-        padding: 8px 12px;
-        border-radius: 14px;
-        margin-bottom: 8px;
-        border: 1px solid #f3f4f6;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-    }
-
-    .prize-thumb {
-        width: 40px;
-        height: 40px;
-        border-radius: 8px;
-        object-fit: cover;
-        flex-shrink: 0;
-    }
-
-    .prize-info {
-        display: flex;
-        flex-direction: column;
-        gap: 1px;
-        flex: 1;
-        min-width: 0;
-    }
-
-    .prize-name-label {
-        font-size: 14px;
-        font-weight: bold;
-        color: #1f2937;
-    }
-
-    .honor-item-row {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        background: linear-gradient(to right, #fffdfa, #fff);
-        padding: 10px 12px;
-        border-radius: 14px;
-        margin-bottom: 8px;
-        border: 1px solid #fdf2e9;
-        box-shadow: 0 2px 4px rgba(236,72,153,0.05);
-    }
-
-    .honor-badge {
-        background: linear-gradient(135deg, #fbcfe8, #f472b6);
-        color: #9d174d;
-        font-size: 11px;
-        font-weight: bold;
-        padding: 2px 6px;
-        border-radius: 6px;
-        flex-shrink: 0;
-    }
-
-    .honor-info {
-        font-size: 13px;
-        color: #4b5563;
-    }
-
-    .prize-progress-track {
-        width: 100%;
-        height: 6px;
-        background: #f3f4f6;
-        border-radius: 999px;
-        overflow: hidden;
-        margin-top: 4px;
-    }
-
-    .prize-progress-fill {
-        height: 100%;
-        border-radius: 999px;
-        transition: width 0.3s ease;
-    }
-
-    .prize-progress-fill.is-available {
-        background: linear-gradient(to right, #6ee7b7, #059669);
-    }
-
-    .prize-progress-fill.is-empty {
-        background: linear-gradient(to right, #fca5a5, #dc2626);
-    }
-
-    .marquee-viewport {
-        flex: 1 1 auto;
-        min-width: 0;
-        overflow: hidden;
-        position: relative;
-    }
-
-    .marquee-track {
-        display: inline-flex;
-        white-space: nowrap;
-        will-change: transform;
-        animation: marqueeScroll 20s linear infinite;
-    }
-
-    .marquee-item {
-        padding-right: 60px;
-    }
-
-    @keyframes marqueeScroll {
-        from { transform: translateX(0); }
-        to { transform: translateX(-50%); }
-    }
-
-    .wallet-badge {
-        background: linear-gradient(135deg, #fbbf24, #f59e0b);
-        color: #78350f;
-        border-radius: 999px;
-        padding: 6px 18px;
-        font-weight: 900;
-        font-size: 14px;
-        box-shadow: 0 4px 10px rgba(245,158,11,0.3);
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-    }
-
-    .shop-btn {
-        background: linear-gradient(135deg, #10b981, #059669);
-        color: white;
-        border-radius: 999px;
-        padding: 8px 20px;
-        font-weight: 900;
-        font-size: 14px;
-        box-shadow: 0 4px 10px rgba(16,185,129,0.3);
-        cursor: pointer;
-        transition: transform 0.1s;
-    }
-
-    .shop-btn:active { transform: scale(0.95); }
-
-    .back-btn {
-        background: rgba(255,255,255,0.7);
-        border: 1px solid #e5e7eb;
-        color: #6b7280;
-        border-radius: 999px;
-        padding: 6px 16px;
-        font-size: 12px;
-        font-weight: bold;
-        cursor: pointer;
-        transition: background 0.2s;
-    }
-
-    .back-btn:hover { background: rgba(255,255,255,0.9); }
-
-    .admin-test-btn {
-        color: #a0aec0;
-        font-size: 11px;
-        text-decoration: underline;
-        cursor: pointer;
-        background: none;
-        border: none;
-    }
-
-    .admin-test-btn:hover { color: #718096; }
-
-    .choice-btn {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        padding: 20px 16px;
-        border-radius: 20px;
-        font-weight: 900;
-        font-size: 18px;
-        cursor: pointer;
-        transition: transform 0.15s;
-        border: none;
-    }
-    .choice-btn:active { transform: scale(0.96); }
-
-    .choice-btn-draw {
-        background: linear-gradient(135deg, #f472b6, #ec4899);
-        color: white;
-        box-shadow: 0 8px 20px rgba(236,72,153,0.35);
-    }
-
-    .choice-btn-points {
-        background: linear-gradient(135deg, #34d399, #059669);
-        color: white;
-        box-shadow: 0 8px 20px rgba(16,185,129,0.35);
-    }
-
-    .modal-overlay {
-        position: fixed;
-        inset: 0;
-        background: rgba(0,0,0,0.6);
-        backdrop-filter: blur(4px);
-        z-index: 50;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
-    }
-
-    .modal-card {
-        background: white;
-        border-radius: 24px;
-        width: 100%;
-        max-width: 400px;
-        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-    }
-
-    @media (max-width: 640px) {
         .gacha-title {
-            font-size: 1.8rem !important;
-            -webkit-text-stroke: 4px #fff;
-            margin-bottom: 12px;
-            letter-spacing: 1px;
+            font-family: 'Noto Sans TC', sans-serif;
+            font-weight: 900;
+            color: #ff3366;
+            letter-spacing: 2px;
+            -webkit-text-stroke: 10px #ffffff;
+            paint-order: stroke fill;
+            filter: drop-shadow(4px 4px 0px rgba(0,0,0,0.08)) drop-shadow(0px 8px 15px rgba(244,63,94,0.2));
         }
 
         .gacha-machine {
-            transform: scale(0.78);
-            transform-origin: top center;
+            position: relative;
+            width: 320px;
+            background: linear-gradient(to bottom, #ef4444, #dc2626);
+            border-radius: 40px 40px 20px 20px;
+            box-shadow: 0 20px 0 #b91c1c, 0 30px 40px rgba(0,0,0,0.3);
+            padding: 25px;
             margin: 24px auto 24px auto;
-            height: 300px;
+            border: 6px solid #fee2e2;
+        }
+
+        .gacha-glass {
+            position: relative;
+            height: 240px;
+            background: radial-gradient(circle at 50% 30%, rgba(255,255,255,0.4) 0%, rgba(243,244,246,0.8) 70%);
+            border-radius: 30px;
+            border: 6px solid #b91c1c;
+            overflow: hidden;
+            box-shadow: inset 0 10px 20px rgba(0,0,0,0.15);
+            margin-bottom: 25px;
+        }
+
+        .gacha-egg {
+            position: absolute;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            box-shadow: inset -4px -4px 8px rgba(0,0,0,0.2), 2px 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, opacity 0.5s ease;
+        }
+
+        .gacha-egg::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50%;
+            background: rgba(255,255,255,0.35);
+            border-radius: 19px 19px 0 0;
+        }
+
+        .egg-pink { background: #ec4899; }
+        .egg-blue { background: #3b82f6; }
+        .egg-yellow { background: #eab308; }
+        .egg-green { background: #22c55e; }
+        .egg-purple { background: #a855f7; }
+        .egg-orange { background: #f97316; }
+
+        .egg-layer-a { bottom: 8px; }
+        .egg-layer-b { bottom: 25px; }
+        .egg-layer-c { bottom: 42px; }
+
+        .egg-falling-out {
+            animation: eggFallOut 0.8s cubic-bezier(0.55, 0.055, 0.675, 0.19) forwards !important;
+        }
+
+        @keyframes eggFallOut {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            50% { transform: translateY(60px) scale(0.9); opacity: 0.6; }
+            100% { transform: translateY(120px) scale(0.7); opacity: 0; }
+        }
+
+        .eggs-drop-down .gacha-egg:not(.egg-falling-out) {
+            animation: gravitySettle 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.3s forwards;
+        }
+
+        @keyframes gravitySettle {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(6px); }
+            75% { transform: translateY(3px); }
+            100% { transform: translateY(4px); }
+        }
+
+        .gacha-panel {
+            background: #991b1b;
+            border-radius: 20px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            box-shadow: inset 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .gacha-crank {
+            width: 70px;
+            height: 70px;
+            background: radial-gradient(circle, #f3f4f6 30%, #9ca3af 70%);
+            border-radius: 50%;
+            border: 6px solid #4b5563;
+            position: relative;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #374151, 0 6px 10px rgba(0,0,0,0.3);
+        }
+
+        .gacha-crank::before {
+            content: '';
+            position: absolute;
+            width: 14px;
+            height: 45px;
+            background: #4b5563;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 7px;
+        }
+
+        .gacha-crank::after {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            background: #dc2626;
+            border-radius: 50%;
+            top: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .rotating-crank {
+            animation: rotateCrank 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes rotateCrank {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(720deg); }
+        }
+
+        .gacha-gate {
+            width: 75px;
+            height: 75px;
+            background: #1f2937;
+            border-radius: 20px 20px 5px 5px;
+            border: 4px solid #4b5563;
+            position: relative;
+            box-shadow: inset 0 5px 10px rgba(0,0,0,0.5);
+            overflow: hidden;
+        }
+
+        .gacha-lucky-egg {
+            position: absolute;
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            top: -60px;
+            left: 11px;
+            opacity: 0;
+            z-index: 10;
+            box-shadow: inset -5px -5px 10px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.4);
+        }
+
+        .gacha-lucky-egg::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50%;
+            background: rgba(255,255,255,0.35);
+            border-radius: 23px 23px 0 0;
+        }
+
+        .dropped-egg {
+            animation: realGravityDrop 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.3s forwards;
+        }
+
+        @keyframes realGravityDrop {
+            0% { top: -60px; opacity: 0; transform: scaleY(1.1) scaleX(0.9) rotate(0deg); }
+            30% { top: 12px; opacity: 1; transform: scaleY(0.8) scaleX(1.15) rotate(120deg); }
+            48% { top: -12px; transform: scaleY(1.05) scaleX(0.95) rotate(190deg); }
+            65% { top: 12px; transform: scaleY(0.92) scaleX(1.06) rotate(260deg); }
+            78% { top: 2px; transform: scaleY(1.02) scaleX(0.98) rotate(310deg); }
+            90% { top: 12px; transform: scaleY(1) scaleX(1) rotate(350deg); }
+            100% { top: 12px; opacity: 1; transform: scaleY(1) scaleX(1) rotate(360deg); }
         }
 
         .dashboard-panel {
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            border: 2px solid rgba(255,255,255,0.5);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            padding: 20px;
             height: auto;
-            min-height: 150px;
-            padding: 14px;
+            display: flex;
+            flex-direction: column;
         }
 
-        .music-control-btn {
-            bottom: 15px;
-            right: 15px;
-            font-size: 12px;
-            padding: 10px 16px;
+        .board-title-text {
+            font-size: 18px;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            padding-bottom: 10px;
+            border-bottom: 2px dashed rgba(0,0,0,0.1);
+            margin-bottom: 12px;
+            flex-shrink: 0;
         }
 
-        .shop-btn {
-            padding: 12px 28px;
-            font-size: 16px;
+        .prize-title-text { color: #06b6d4; }
+        .honor-title-text { color: #ec4899; }
+
+        .scroller-content {
+            overflow-y: auto;
+            flex-grow: 1;
+            min-height: 0;
+            padding-right: 4px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .scroller-content::-webkit-scrollbar { width: 6px; }
+        .scroller-content::-webkit-scrollbar-track { background: transparent; }
+        .scroller-content::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
+
+        .prize-item-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: white;
+            padding: 8px 12px;
+            border-radius: 14px;
+            margin-bottom: 8px;
+            border: 1px solid #f3f4f6;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .prize-thumb {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .prize-info {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .prize-name-label {
+            font-size: 14px;
+            font-weight: bold;
+            color: #1f2937;
+        }
+
+        .honor-item-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(to right, #fffdfa, #fff);
+            padding: 10px 12px;
+            border-radius: 14px;
+            margin-bottom: 8px;
+            border: 1px solid #fdf2e9;
+            box-shadow: 0 2px 4px rgba(236,72,153,0.05);
+        }
+
+        .honor-badge {
+            background: linear-gradient(135deg, #fbcfe8, #f472b6);
+            color: #9d174d;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 6px;
+            flex-shrink: 0;
+        }
+
+        .honor-info {
+            font-size: 13px;
+            color: #4b5563;
+        }
+
+        .prize-progress-track {
+            width: 100%;
+            height: 6px;
+            background: #f3f4f6;
+            border-radius: 999px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+
+        .prize-progress-fill {
+            height: 100%;
+            border-radius: 999px;
+            transition: width 0.3s ease;
+        }
+
+        .prize-progress-fill.is-available {
+            background: linear-gradient(to right, #6ee7b7, #059669);
+        }
+
+        .prize-progress-fill.is-empty {
+            background: linear-gradient(to right, #fca5a5, #dc2626);
+        }
+
+        .marquee-viewport {
+            flex: 1 1 auto;
+            min-width: 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .marquee-track {
+            display: inline-flex;
+            white-space: nowrap;
+            will-change: transform;
+            animation: marqueeScroll 20s linear infinite;
+        }
+
+        .marquee-item {
+            padding-right: 60px;
+        }
+
+        @keyframes marqueeScroll {
+            from { transform: translateX(0); }
+            to { transform: translateX(-50%); }
         }
 
         .wallet-badge {
-            padding: 8px 20px;
-            font-size: 15px;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #78350f;
+            border-radius: 999px;
+            padding: 6px 18px;
+            font-weight: 900;
+            font-size: 14px;
+            box-shadow: 0 4px 10px rgba(245,158,11,0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
         }
+
+        .shop-btn {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border-radius: 999px;
+            padding: 8px 20px;
+            font-weight: 900;
+            font-size: 14px;
+            box-shadow: 0 4px 10px rgba(16,185,129,0.3);
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .shop-btn:active { transform: scale(0.95); }
 
         .back-btn {
-            padding: 8px 18px;
-            font-size: 13px;
+            background: rgba(255,255,255,0.7);
+            border: 1px solid #e5e7eb;
+            color: #6b7280;
+            border-radius: 999px;
+            padding: 6px 16px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
         }
 
-        input, select, textarea {
-            font-size: 16px !important;
+        .back-btn:hover { background: rgba(255,255,255,0.9); }
+
+        .admin-test-btn {
+            color: #a0aec0;
+            font-size: 11px;
+            text-decoration: underline;
+            cursor: pointer;
+            background: none;
+            border: none;
         }
 
-        .mobile-main-area {
-            width: 100%;
-            max-width: 420px;
-            margin: 0 auto;
-        }
+        .admin-test-btn:hover { color: #718096; }
 
-        .mobile-side-panels {
+        .choice-btn {
             display: flex;
             flex-direction: column;
-            gap: 24px;
-            margin-top: 24px;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 20px 16px;
+            border-radius: 20px;
+            font-weight: 900;
+            font-size: 18px;
+            cursor: pointer;
+            transition: transform 0.15s;
+            border: none;
+        }
+        .choice-btn:active { transform: scale(0.96); }
+
+        .choice-btn-draw {
+            background: linear-gradient(135deg, #f472b6, #ec4899);
+            color: white;
+            box-shadow: 0 8px 20px rgba(236,72,153,0.35);
         }
 
-        .secret-pass-row {
-            flex-direction: column !important;
-            gap: 8px !important;
+        .choice-btn-points {
+            background: linear-gradient(135deg, #34d399, #059669);
+            color: white;
+            box-shadow: 0 8px 20px rgba(16,185,129,0.35);
         }
-        .secret-pass-row input {
-            width: 100% !important;
-        }
-        .secret-pass-row button {
-            width: 100% !important;
-            padding: 12px !important;
-            font-size: 15px !important;
+
+        .choice-btn-slot {
+            background: linear-gradient(135deg, #a78bfa, #7c3aed);
+            color: white;
+            box-shadow: 0 8px 20px rgba(124, 58, 237, 0.35);
         }
 
         .modal-overlay {
-            align-items: flex-end;
-            padding: 0;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
         }
+
         .modal-card {
-            border-radius: 24px 24px 0 0;
-            max-width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            padding-bottom: env(safe-area-inset-bottom);
+            background: white;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
-    }
 
-    @media (min-width: 1024px) {
-        .gacha-title {
-            font-size: 3rem;
+        /* ========== 拉霸機樣式 ========== */
+        .slot-reel {
+            width: 80px;
+            height: 100px;
+            background: linear-gradient(145deg, #f3f4f6, #e5e7eb);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            box-shadow: inset 0 4px 8px rgba(0,0,0,0.1), 0 6px 12px rgba(0,0,0,0.08);
+            transition: transform 0.3s;
         }
-        .gacha-machine {
-            transform: scale(1);
-            margin: 32px auto 32px auto;
+        .slot-reel img {
+            max-width: 80%;
+            max-height: 80%;
+            object-fit: contain;
         }
-    }
-</style>
+        .slot-reel.spinning {
+            animation: slotShake 0.1s linear infinite;
+        }
+        @keyframes slotShake {
+            0% { transform: translateY(-2px); }
+            100% { transform: translateY(2px); }
+        }
 
+        @media (max-width: 640px) {
+            .gacha-title {
+                font-size: 1.8rem !important;
+                -webkit-text-stroke: 4px #fff;
+                margin-bottom: 12px;
+                letter-spacing: 1px;
+            }
+
+            .gacha-machine {
+                transform: scale(0.78);
+                transform-origin: top center;
+                margin: 24px auto 24px auto;
+                height: 300px;
+            }
+
+            .dashboard-panel {
+                height: auto;
+                min-height: 150px;
+                padding: 14px;
+            }
+
+            .music-control-btn {
+                bottom: 15px;
+                right: 15px;
+                font-size: 12px;
+                padding: 10px 16px;
+            }
+
+            .shop-btn {
+                padding: 12px 28px;
+                font-size: 16px;
+            }
+
+            .wallet-badge {
+                padding: 8px 20px;
+                font-size: 15px;
+            }
+
+            .back-btn {
+                padding: 8px 18px;
+                font-size: 13px;
+            }
+
+            input, select, textarea {
+                font-size: 16px !important;
+            }
+
+            .mobile-main-area {
+                width: 100%;
+                max-width: 420px;
+                margin: 0 auto;
+            }
+
+            .mobile-side-panels {
+                display: flex;
+                flex-direction: column;
+                gap: 24px;
+                margin-top: 24px;
+            }
+
+            .secret-pass-row {
+                flex-direction: column !important;
+                gap: 8px !important;
+            }
+            .secret-pass-row input {
+                width: 100% !important;
+            }
+            .secret-pass-row button {
+                width: 100% !important;
+                padding: 12px !important;
+                font-size: 15px !important;
+            }
+
+            .modal-overlay {
+                align-items: flex-end;
+                padding: 0;
+            }
+            .modal-card {
+                border-radius: 24px 24px 0 0;
+                max-width: 100%;
+                max-height: 90vh;
+                overflow-y: auto;
+                padding-bottom: env(safe-area-inset-bottom);
+            }
+
+            .slot-reel {
+                width: 70px;
+                height: 90px;
+                font-size: 40px;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .gacha-title {
+                font-size: 3rem;
+            }
+            .gacha-machine {
+                transform: scale(1);
+                margin: 32px auto 32px auto;
+            }
+        }
+    </style>
 </head>
 
 <body class="p-4 md:p-8 min-h-screen flex flex-col items-center justify-center">
@@ -640,7 +667,7 @@
                     <div style="width:60px;"></div>
                 </div>
 
-                <!-- 🎰 抽獎專屬區塊 -->
+                <!-- 🎰 抽獎專屬區塊（扭蛋機） -->
                 <div id="drawSystemArea" class="w-full">
                     <!-- 剩餘抽獎次數提示 -->
                     <div id="drawCountDisplay" class="w-full text-center mb-2 text-sm font-bold text-gray-600"></div>
@@ -677,6 +704,26 @@
                             <div class="gacha-gate">
                                 <div class="gacha-lucky-egg" id="luckyEgg"></div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 🎰 拉霸機區塊 -->
+                <div id="slotSystemArea" class="w-full hidden">
+                    <div class="w-full bg-white/80 backdrop-blur-md rounded-2xl p-5 shadow-md border border-white">
+                        <h3 class="text-center text-base font-black text-purple-600 mb-3">🎰 拉霸機</h3>
+                        <p class="text-xs text-gray-500 text-center mb-3">每次拉霸花費 <b id="slotCostDisplay">20</b> 點，三個相同符號即可獲得對應獎品！</p>
+                        
+                        <!-- 三個轉輪顯示 -->
+                        <div class="flex justify-center gap-2 mb-4">
+                            <div id="slotReel1" class="slot-reel"><span id="slotSymbol1">❓</span></div>
+                            <div id="slotReel2" class="slot-reel"><span id="slotSymbol2">❓</span></div>
+                            <div id="slotReel3" class="slot-reel"><span id="slotSymbol3">❓</span></div>
+                        </div>
+
+                        <!-- 拉霸按鈕 -->
+                        <div class="flex justify-center">
+                            <button id="slotSpinBtn" onclick="startSlot()" class="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-black py-3 px-8 rounded-2xl shadow-lg transition-all tracking-wider text-base cursor-pointer">拉霸！</button>
                         </div>
                     </div>
                 </div>
@@ -729,7 +776,11 @@
             <div class="space-y-3">
                 <button onclick="chooseDraw()" class="choice-btn choice-btn-draw w-full">
                     <span class="text-2xl">🎰</span>
-                    <span>抽獎</span>
+                    <span>扭蛋機</span>
+                </button>
+                <button onclick="chooseSlot()" class="choice-btn choice-btn-slot w-full">
+                    <span class="text-2xl">🎰</span>
+                    <span>拉霸機</span>
                 </button>
                 <button onclick="choosePoints()" class="choice-btn choice-btn-points w-full">
                     <span class="text-2xl">🎁</span>
@@ -739,7 +790,7 @@
         </div>
     </div>
 
-    <!-- ❓ 抽獎確認彈窗 -->
+    <!-- ❓ 扭蛋確認彈窗（保留原本所有） -->
     <div id="confirmModal" class="modal-overlay" style="display: none;">
         <div class="modal-card p-6 text-center border-4 border-rose-300">
             <h2 class="text-xl font-black text-slate-800 mb-2">🎯 確定要抽獎嗎？</h2>
@@ -751,7 +802,7 @@
         </div>
     </div>
 
-    <!-- 🏆 獲獎彈窗 -->
+    <!-- 🏆 獲獎彈窗（扭蛋用） -->
     <div id="winModal" class="modal-overlay" style="display: none;">
         <div class="modal-card p-6 text-center border-4 border-amber-400">
             <h2 id="modalTitle" class="text-2xl font-black text-rose-500 mb-2">🎉 恭喜中獎！</h2>
@@ -760,7 +811,7 @@
                 <p id="modalPrizeName" class="text-xl font-extrabold text-slate-800">載入中...</p>
                 <p id="modalPointsInfo" class="text-sm font-bold text-amber-600 mt-1 hidden"></p>
             </div>
-            <div id="modalTicketCode" onclick="clickTicket()" class="bg-slate-900 text-cyan-400 font-mono text-base font-bold py-3 px-4 rounded-xl cursor-pointer hover:bg-slate-800 active:scale-98 transition-all border border-cyan-500/30 break-all select-none">點我打開獎品</div>
+            <div id="modalTicketCode" onclick="clickTicket()" class="bg-slate-900 text-cyan-400 font-mono text-base font-bold py-3 px-4 rounded-xl cursor-pointer hover:bg-slate-800 active:scale-98 transition-all border border-cyan-500/30 break-all select-none">點我打開獎品連結</div>
             <p id="copyHint" class="text-[11px] text-gray-400 mt-1.5 font-medium">💡 點擊上方即可查看獎品</p>
             <button onclick="closeModal()" class="w-full bg-gray-800 hover:bg-gray-700 text-white font-bold py-3 rounded-xl text-base transition-all mt-4">收下好禮</button>
         </div>
@@ -805,9 +856,9 @@
     <!-- 🔊 音效開關 -->
     <button id="soundToggleBtn" onclick="toggleSound()" class="music-control-btn fixed bottom-5 right-5 bg-slate-900 text-cyan-400 text-sm font-bold px-4 py-2 rounded-full shadow-lg border border-cyan-500/30 z-40 transition-all active:scale-95">🔊 音效</button>
 
-    <script type="module">
+        <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
-        import { getDatabase, ref, runTransaction, onValue, get, update, push } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
+        import { getDatabase, ref, runTransaction, onValue, get, update, push, set } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
 
         const firebaseConfig = {
@@ -837,6 +888,8 @@
         window.promptAdminMode = promptAdminMode;
         window.chooseDraw = chooseDraw;
         window.choosePoints = choosePoints;
+        window.chooseSlot = chooseSlot;
+        window.startSlot = startSlot;
 
         // ---------- 全域狀態 ----------
         let isDrawing = false;
@@ -858,6 +911,15 @@
         const ADMIN_TEST_PASSWORD = "test123";
 
         let defaultMaxDraws = 1;
+
+        // 拉霸機相關
+        let slotSymbols = {};
+        let slotPrizes = {};
+        let slotCost = 20;
+        let isSlotSpinning = false;
+
+        // 遊戲開關
+        let gameMode = "both"; // 可為 "gacha" | "slot" | "both"
 
         // ---------- 音效 ----------
         let audioCtx = null;
@@ -892,6 +954,10 @@
             playTone(523.25, 0.15, "triangle", 0, 0.18);
             playTone(659.25, 0.15, "triangle", 0.15, 0.18);
             playTone(783.99, 0.28, "triangle", 0.3, 0.2);
+        }
+        function playSlotSound() {
+            if (!soundEnabled) return;
+            for (let i = 0; i < 10; i++) playTone(500 + Math.random() * 200, 0.06, "square", i * 0.1, 0.05);
         }
         function toggleSound() {
             soundEnabled = !soundEnabled;
@@ -943,6 +1009,44 @@
                 if (honorUnlockedGroup) verifyGroupPass();
                 if (currentPlayerName) updateDrawCountDisplay();
             });
+            // 讀取遊戲模式設定
+            onValue(ref(db, "settings/global/gameMode"), (snap) => {
+                const val = snap.val();
+                gameMode = val || "both";
+                updateGameModeUI();
+            });
+            // 讀取拉霸機設定
+            onValue(ref(db, "slotSettings"), (snap) => {
+                const data = snap.val() || {};
+                slotCost = data.cost || 20;
+                const costDisplay = document.getElementById("slotCostDisplay");
+                if (costDisplay) costDisplay.innerText = slotCost;
+            });
+            // 讀取拉霸機符號
+            onValue(ref(db, "slotSymbols"), (snap) => {
+                slotSymbols = snap.val() || {};
+            });
+            // 讀取拉霸機獎品
+            onValue(ref(db, "slotPrizes"), (snap) => {
+                slotPrizes = snap.val() || {};
+            });
+        }
+
+        function updateGameModeUI() {
+            // 根據 gameMode 顯示或隱藏對應的區塊在選擇模式彈窗
+            const drawBtn = document.querySelector(".choice-btn-draw");
+            const slotBtn = document.querySelector(".choice-btn-slot");
+            if (!drawBtn || !slotBtn) return;
+            if (gameMode === "gacha") {
+                drawBtn.style.display = "flex";
+                slotBtn.style.display = "none";
+            } else if (gameMode === "slot") {
+                drawBtn.style.display = "none";
+                slotBtn.style.display = "flex";
+            } else {
+                drawBtn.style.display = "flex";
+                slotBtn.style.display = "flex";
+            }
         }
 
         // ---------- 更新剩餘次數顯示 ----------
@@ -1001,39 +1105,38 @@
                 tr.style.animation = `marqueeScroll ${d}s linear infinite`;
             });
         }
-
-function renderStatusBoard(pz) {
-    const b = document.getElementById("statusBoard");
-    if (!b || !pz) return;
-    let h = '<span class="board-title-text prize-title-text">📋 禮物列表</span>';
-    if (!honorUnlockedGroup) {
-        b.innerHTML = h + '<div class="flex-grow flex flex-col items-center justify-center text-center gap-2 px-4"><span class="text-2xl">🔒</span><p class="text-xs text-gray-400">請先解鎖群組</p></div>';
-        return;
-    }
-    let has = false;
-    for (let id in pz) {
-        const p = pz[id];
-        if (p.name && p.name.includes("銘謝惠顧")) continue;
-        const g = Array.isArray(p.groups) ? p.groups : [];
-        if (!g.includes(honorUnlockedGroup)) continue;
-        has = true;
-        const img = p.image ? `<img class="prize-thumb" src="${p.image}" alt="${p.name}">` : '<div class="prize-thumb" style="background:#f3f4f6;"></div>';
-        const rem = Number(p.quantity || 0);
-        const total = Number(p.totalQuantity || 0);
-        const st = total > 1;
-        if (rem > 0) {
-            const ql = st ? `🟢 剩餘 <b>${rem}</b> 份 / 共 <b>${total}</b> 份` : `🟢 剩餘 <b>${rem}</b> 份`;
-            const pb = st ? `<div class="prize-progress-track"><div class="prize-progress-fill is-available" style="width:${Math.round(rem / total * 100)}%;"></div></div>` : '';
-            h += `<div class="prize-item-row">${img}<div class="prize-info"><span class="prize-name-label">${p.name}</span><span style="color:#059669;font-size:13px;font-weight:bold;">${ql}</span>${pb}</div></div>`;
-        } else {
-            const on = isPrizeTakenByOtherGroup(p.name) ? '<div style="color:#f97316;font-size:11px;font-weight:bold;margin-top:1px;">🔸 已被其他組抽走</div>' : '';
-            const sl = st ? `🔴 已全數送完（共 <b>${total}</b> 份）` : `🔴 已全數送完`;
-            h += `<div class="prize-item-row" style="opacity:0.4;">${img}<div class="prize-info"><span class="prize-name-label" style="text-decoration:line-through;color:#9ca3af;">${p.name}</span><span style="color:#dc2626;font-size:13px;font-weight:bold;">${sl}</span><div class="prize-progress-track"><div class="prize-progress-fill is-empty" style="width:100%;"></div></div>${on}</div></div>`;
+        function renderStatusBoard(pz) {
+            const b = document.getElementById("statusBoard");
+            if (!b || !pz) return;
+            let h = '<span class="board-title-text prize-title-text">📋 禮物列表</span>';
+            if (!honorUnlockedGroup) {
+                b.innerHTML = h + '<div class="flex-grow flex flex-col items-center justify-center text-center gap-2 px-4"><span class="text-2xl">🔒</span><p class="text-xs text-gray-400">請先解鎖群組</p></div>';
+                return;
+            }
+            let has = false;
+            for (let id in pz) {
+                const p = pz[id];
+                if (p.name && p.name.includes("銘謝惠顧")) continue;
+                const g = Array.isArray(p.groups) ? p.groups : [];
+                if (!g.includes(honorUnlockedGroup)) continue;
+                has = true;
+                const img = p.image ? `<img class="prize-thumb" src="${p.image}" alt="${p.name}">` : '<div class="prize-thumb" style="background:#f3f4f6;"></div>';
+                const rem = Number(p.quantity || 0);
+                const total = Number(p.totalQuantity || 0);
+                const st = total > 1;
+                if (rem > 0) {
+                    const ql = st ? `🟢 剩餘 <b>${rem}</b> 份 / 共 <b>${total}</b> 份` : `🟢 剩餘 <b>${rem}</b> 份`;
+                    const pb = st ? `<div class="prize-progress-track"><div class="prize-progress-fill is-available" style="width:${Math.round(rem / total * 100)}%;"></div></div>` : '';
+                    h += `<div class="prize-item-row">${img}<div class="prize-info"><span class="prize-name-label">${p.name}</span><span style="color:#059669;font-size:13px;font-weight:bold;">${ql}</span>${pb}</div></div>`;
+                } else {
+                    const on = isPrizeTakenByOtherGroup(p.name) ? '<div style="color:#f97316;font-size:11px;font-weight:bold;margin-top:1px;">🔸 已被其他組抽走</div>' : '';
+                    const sl = st ? `🔴 已全數送完（共 <b>${total}</b> 份）` : `🔴 已全數送完`;
+                    h += `<div class="prize-item-row" style="opacity:0.4;">${img}<div class="prize-info"><span class="prize-name-label" style="text-decoration:line-through;color:#9ca3af;">${p.name}</span><span style="color:#dc2626;font-size:13px;font-weight:bold;">${sl}</span><div class="prize-progress-track"><div class="prize-progress-fill is-empty" style="width:100%;"></div></div>${on}</div></div>`;
+                }
+            }
+            if (!has) h += '<div style="color:#9ca3af;font-size:13px;padding:10px;">目前無公開好禮。</div>';
+            b.innerHTML = h;
         }
-    }
-    if (!has) h += '<div style="color:#9ca3af;font-size:13px;padding:10px;">目前無公開好禮。</div>';
-    b.innerHTML = h;
-}
 
         // ---------- 點數錢包 ----------
         function listenToWallet(playerName) {
@@ -1051,7 +1154,7 @@ function renderStatusBoard(pz) {
                         document.getElementById("walletExpiry").innerText = "點擊商品專區以驗證";
                     } else {
                         walletUnlocked = false;
-                        document.getElementById("walletDisplay").innerText = "🔒 請按下方「🎁 商品專區」並輸入密語";
+                        document.getElementById("walletDisplay").innerText = "🔒 錢包已綁定其他裝置";
                         document.getElementById("walletExpiry").innerText = "";
                     }
                 } else {
@@ -1250,82 +1353,48 @@ function renderStatusBoard(pz) {
             }
         }
 
-// 🔥 修正：兌換商品時同時寫入點數記錄並發送 Discord 通知（含除錯）
-window.redeemItem = async function(itemId) {
-    if (!currentPlayerName || !walletUnlocked) return;
-    const it = shopItems[itemId];
-    if (!it) return;
-    if (!confirm(`確定要用 ${it.cost} 點兌換「${it.name}」嗎？`)) return;
-    try {
-        const sr = ref(db, `shopItems/${itemId}/stock`);
-        const pr = ref(db, `pointUsers/${currentPlayerName}/points`);
-
-        const srRes = await runTransaction(sr, cur => (cur === null || cur <= 0) ? undefined : cur - 1);
-        if (!srRes.committed) { alert("❌ 庫存不足"); return; }
-
-        const prRes = await runTransaction(pr, cur => (cur === null || cur < it.cost) ? undefined : cur - it.cost);
-        if (!prRes.committed) {
-            await runTransaction(sr, cur => (cur || 0) + 1);
-            alert("❌ 點數不足");
-            return;
-        }
-
-        // 寫入兌換記錄
-        await push(ref(db, "redeemRequests"), {
-            playerName: currentPlayerName,
-            itemId: itemId,
-            itemName: it.name,
-            cost: it.cost,
-            timestamp: Date.now(),
-            status: "approved",
-            processedAt: Date.now(),
-            prizeDelivered: false
-        });
-
-        // 新增點數記錄（負數，代表扣除）
-        await push(ref(db, "pendingPoints"), {
-            playerName: currentPlayerName,
-            points: -it.cost,
-            prizeName: `🛍️ 兌換：${it.name}`,
-            timestamp: Date.now(),
-            status: "approved",
-            processedAt: Date.now()
-        });
-
-        alert(`✅ 兌換成功！獲得「${it.name}」`);
-        loadPlayerPointsHistory();
-        loadPlayerRedeemHistory();
-
-        // ---------- 發送 Discord 通知 ----------
-        const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1542945444957519982/F4oenbKde22wMG-mc5qikOARL5ClbF7Q5mj2SHyqfnOgdryDROTpr2KqYyyu51bdGzYO";
-
-        const notifyMessage = `🛍️ 玩家兌換通知\n玩家：${currentPlayerName}\n商品：${it.name}\n花費點數：${it.cost}\n時間：${new Date().toLocaleString("zh-TW")}`;
-
-        console.log("準備發送 Discord 通知");
-        console.log("Webhook URL:", DISCORD_WEBHOOK_URL);
-
-        try {
-            const response = await fetch(DISCORD_WEBHOOK_URL, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ content: notifyMessage })
-            });
-            console.log("Discord 回應狀態碼:", response.status);
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error("Discord 通知失敗，回應內容:", errorText);
-            } else {
-                console.log("Discord 通知已成功發送");
+        window.redeemItem = async function(itemId) {
+            if (!currentPlayerName || !walletUnlocked) return;
+            const it = shopItems[itemId];
+            if (!it) return;
+            if (!confirm(`確定要用 ${it.cost} 點兌換「${it.name}」嗎？`)) return;
+            try {
+                const sr = ref(db, `shopItems/${itemId}/stock`);
+                const pr = ref(db, `pointUsers/${currentPlayerName}/points`);
+                const srRes = await runTransaction(sr, cur => (cur === null || cur <= 0) ? undefined : cur - 1);
+                if (!srRes.committed) { alert("❌ 庫存不足"); return; }
+                const prRes = await runTransaction(pr, cur => (cur === null || cur < it.cost) ? undefined : cur - it.cost);
+                if (!prRes.committed) {
+                    await runTransaction(sr, cur => (cur || 0) + 1);
+                    alert("❌ 點數不足");
+                    return;
+                }
+                alert(`✅ 兌換成功！獲得「${it.name}」`);
+                await push(ref(db, "redeemRequests"), {
+                    playerName: currentPlayerName,
+                    itemId: itemId,
+                    itemName: it.name,
+                    cost: it.cost,
+                    timestamp: Date.now(),
+                    status: "approved",
+                    processedAt: Date.now(),
+                    prizeDelivered: false
+                });
+                await push(ref(db, "pendingPoints"), {
+                    playerName: currentPlayerName,
+                    points: -it.cost,
+                    prizeName: `🛍️ 兌換：${it.name}`,
+                    timestamp: Date.now(),
+                    status: "approved",
+                    processedAt: Date.now()
+                });
+                loadPlayerPointsHistory();
+                loadPlayerRedeemHistory();
+            } catch (e) {
+                console.error(e);
+                alert("兌換失敗");
             }
-        } catch (e) {
-            console.error("Discord 通知發送錯誤:", e);
-        }
-
-    } catch (e) {
-        console.error(e);
-        alert("兌換失敗");
-    }
-};
+        };
 
         // ---------- 管理員測試模式 ----------
         function promptAdminMode() {
@@ -1346,18 +1415,27 @@ window.redeemItem = async function(itemId) {
             document.getElementById("honorBoardPanel").style.display = "";
         }
 
-        // ---------- 顯示抽獎系統 ----------
+        // ---------- 顯示各系統 ----------
         function showDrawSystem() {
             document.getElementById("drawSystemArea").style.display = "block";
+            document.getElementById("slotSystemArea").style.display = "none";
             document.getElementById("pointsSystemArea").style.display = "none";
             document.getElementById("prizeListPanel").style.display = "";
             document.getElementById("honorBoardPanel").style.display = "";
             updateDrawCountDisplay();
         }
 
-        // ---------- 顯示點數兌換系統 ----------
+        function showSlotSystem() {
+            document.getElementById("drawSystemArea").style.display = "none";
+            document.getElementById("slotSystemArea").style.display = "block";
+            document.getElementById("pointsSystemArea").style.display = "none";
+            document.getElementById("prizeListPanel").style.display = "none";
+            document.getElementById("honorBoardPanel").style.display = "none";
+        }
+
         function showPointsSystem() {
             document.getElementById("drawSystemArea").style.display = "none";
+            document.getElementById("slotSystemArea").style.display = "none";
             document.getElementById("pointsSystemArea").style.display = "block";
             document.getElementById("prizeListPanel").style.display = "none";
             document.getElementById("honorBoardPanel").style.display = "none";
@@ -1367,6 +1445,7 @@ window.redeemItem = async function(itemId) {
         function showChoiceModal(playerName) {
             document.getElementById("choicePlayerName").innerText = playerName;
             document.getElementById("choiceModal").style.display = "flex";
+            updateGameModeUI();
         }
         function closeChoiceModal() {
             document.getElementById("choiceModal").style.display = "none";
@@ -1374,6 +1453,7 @@ window.redeemItem = async function(itemId) {
         function chooseDraw() {
             closeChoiceModal();
             showDrawSystem();
+            // ... 原有的抽獎次數判斷與按鈕顯示 ...
             if (!currentPlayerName) return;
             const drawCount = globalPlayedUsers[currentPlayerName]?.drawCount || 0;
             const limit = getMaxDrawsForPlayer(currentPlayerName);
@@ -1386,6 +1466,10 @@ window.redeemItem = async function(itemId) {
                 document.getElementById("alreadyPlayedMsg").classList.remove("hidden");
             }
             updateDrawCountDisplay();
+        }
+        function chooseSlot() {
+            closeChoiceModal();
+            showSlotSystem();
         }
         function choosePoints() {
             closeChoiceModal();
@@ -1410,7 +1494,12 @@ window.redeemItem = async function(itemId) {
             listenToWallet(val);
 
             showChoiceModal(val);
-            showDrawSystem();
+            // 預設顯示扭蛋機（若 gameMode 為 slot 則顯示拉霸機）
+            if (gameMode === "slot") {
+                showSlotSystem();
+            } else {
+                showDrawSystem();
+            }
 
             const drawCount = globalPlayedUsers[val]?.drawCount || 0;
             const limit = getMaxDrawsForPlayer(val);
@@ -1433,88 +1522,86 @@ window.redeemItem = async function(itemId) {
             document.getElementById("honorBoardPanel").style.display = "";
         }
 
-// ---------- 解鎖群組（已達上限只顯示名字，不顯示後綴） ----------
-function verifyGroupPass() {
-    const inputPass = document.getElementById("secretPass").value.trim();
-    const selectEl = document.getElementById("playerName");
-    selectEl.innerHTML = "";
-    if (groupLists[inputPass]) {
-        const group = groupLists[inputPass];
-        const defOpt = document.createElement("option");
-        defOpt.value = "";
-        defOpt.disabled = true;
-        defOpt.selected = true;
-        defOpt.innerText = "▼ 請選擇你的名字 ▼";
-        selectEl.appendChild(defOpt);
-        const optGroup = document.createElement("optgroup");
-        optGroup.label = group.label;
-        group.names.forEach(name => {
-            const opt = document.createElement("option");
-            opt.value = name;
-            const drawCount = globalPlayedUsers[name]?.drawCount || 0;
-            const limit = getMaxDrawsForPlayer(name);
-            const remaining = limit - drawCount;
-            if (disabledPlayers[name]) {
-                opt.disabled = true;
-                opt.innerText = `${name} (已禁用)`;
+        // ---------- 解鎖群組 ----------
+        function verifyGroupPass() {
+            const inputPass = document.getElementById("secretPass").value.trim();
+            const selectEl = document.getElementById("playerName");
+            selectEl.innerHTML = "";
+            if (groupLists[inputPass]) {
+                const group = groupLists[inputPass];
+                const defOpt = document.createElement("option");
+                defOpt.value = "";
+                defOpt.disabled = true;
+                defOpt.selected = true;
+                defOpt.innerText = "▼ 請選擇你的名字 ▼";
+                selectEl.appendChild(defOpt);
+                const optGroup = document.createElement("optgroup");
+                optGroup.label = group.label;
+                group.names.forEach(name => {
+                    const opt = document.createElement("option");
+                    opt.value = name;
+                    const drawCount = globalPlayedUsers[name]?.drawCount || 0;
+                    const limit = getMaxDrawsForPlayer(name);
+                    const remaining = limit - drawCount;
+                    if (disabledPlayers[name]) {
+                        opt.disabled = true;
+                        opt.innerText = `${name} (已禁用)`;
+                    } else {
+                        opt.disabled = false;
+                        opt.innerText = name;
+                    }
+                    optGroup.appendChild(opt);
+                });
+                selectEl.appendChild(optGroup);
+                honorUnlockedGroup = inputPass;
+                renderHonorBoard(lastPlayedList);
+                updateMarquee(buildMarqueeText(lastPlayedList));
+                if (lastPrizes) renderStatusBoard(lastPrizes);
+                alert(`🔓 【${inputPass}】名單已成功解鎖！`);
             } else {
-                opt.disabled = false;
-                // 不再加上 (已達上限)，只顯示名字
-                opt.innerText = name;
+                const lockOpt = document.createElement("option");
+                lockOpt.value = "";
+                lockOpt.disabled = true;
+                lockOpt.selected = true;
+                lockOpt.innerText = "🔒 請先解鎖群組名單 🔒";
+                selectEl.appendChild(lockOpt);
+                alert("❌ 密碼錯誤");
             }
-            optGroup.appendChild(opt);
-        });
-        selectEl.appendChild(optGroup);
-        honorUnlockedGroup = inputPass;
-        renderHonorBoard(lastPlayedList);
-        updateMarquee(buildMarqueeText(lastPlayedList));
-        if (lastPrizes) renderStatusBoard(lastPrizes);
-        alert(`🔓 【${inputPass}】名單已成功解鎖！`);
-    } else {
-        const lockOpt = document.createElement("option");
-        lockOpt.value = "";
-        lockOpt.disabled = true;
-        lockOpt.selected = true;
-        lockOpt.innerText = "🔒 請先解鎖群組名單 🔒";
-        selectEl.appendChild(lockOpt);
-        alert("❌ 密碼錯誤");
-    }
-}
-
-// ---------- UI 更新（已達上限只顯示名字，不顯示後綴） ----------
-function refreshPlayedUsersUI() {
-    const sel = document.getElementById("playerName");
-    for (let opt of sel.options) {
-        if (!opt.value) continue;
-        const name = opt.value;
-        const drawCount = globalPlayedUsers[name]?.drawCount || 0;
-        const limit = getMaxDrawsForPlayer(name);
-        const remaining = limit - drawCount;
-        if (disabledPlayers[name]) {
-            opt.disabled = true;
-            opt.innerText = name + " (已禁用)";
-        } else {
-            opt.disabled = false;
-            // 只顯示名字，不再加上（剩餘次數）或（已達上限）
-            opt.innerText = name;
         }
-    }
-    let list = [];
-    for (let u in globalPlayedUsers) {
-        if (globalPlayedUsers[u].won && globalPlayedUsers[u].won.includes("銘謝惠顧")) continue;
-        list.push({
-            user: u,
-            won: globalPlayedUsers[u].won,
-            time: globalPlayedUsers[u].time || 0,
-            group: globalPlayedUsers[u].group || null,
-            drawCount: globalPlayedUsers[u].drawCount || 0
-        });
-    }
-    list.sort((a, b) => b.time - a.time);
-    lastPlayedList = list;
-    updateMarquee(buildMarqueeText(list));
-    renderHonorBoard(list);
-}
+
+        // ---------- UI 更新 ----------
+        function refreshPlayedUsersUI() {
+            const sel = document.getElementById("playerName");
+            for (let opt of sel.options) {
+                if (!opt.value) continue;
+                const name = opt.value;
+                const drawCount = globalPlayedUsers[name]?.drawCount || 0;
+                const limit = getMaxDrawsForPlayer(name);
+                const remaining = limit - drawCount;
+                if (disabledPlayers[name]) {
+                    opt.disabled = true;
+                    opt.innerText = name + " (已禁用)";
+                } else {
+                    opt.disabled = false;
+                    opt.innerText = name;
+                }
+            }
+            let list = [];
+            for (let u in globalPlayedUsers) {
+                if (globalPlayedUsers[u].won && globalPlayedUsers[u].won.includes("銘謝惠顧")) continue;
+                list.push({
+                    user: u,
+                    won: globalPlayedUsers[u].won,
+                    time: globalPlayedUsers[u].time || 0,
+                    group: globalPlayedUsers[u].group || null,
+                    drawCount: globalPlayedUsers[u].drawCount || 0
+                });
+            }
+            list.sort((a, b) => b.time - a.time);
+            lastPlayedList = list;
+            updateMarquee(buildMarqueeText(list));
+            renderHonorBoard(list);
+        }
 
         function initApp() {
             onValue(ref(db, "prizes"), snap => {
@@ -1542,7 +1629,7 @@ function refreshPlayedUsersUI() {
             return new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999).getTime();
         }
 
-        // ---------- 抽獎核心（最終修正版） ----------
+        // ---------- 扭蛋機抽獎核心 ----------
         async function startDraw() {
             const name = document.getElementById("playerName").value;
             if (!name) { alert("請先選擇名字"); return; }
@@ -1555,7 +1642,7 @@ function refreshPlayedUsersUI() {
 
             try {
                 const playerData = globalPlayedUsers[name];
-                if (playerData && playerData.lastDrawTime && (Date.now() - playerData.lastDrawTime < 5000)) {
+                if (playerData && playerData.lastDrawTime && (Date.now() - playerData.lastDrawTime < 3000)) {
                     alert("抽獎過於頻繁，請稍後再試。");
                     isDrawing = false;
                     if (spinBtn) spinBtn.disabled = false;
@@ -1571,6 +1658,7 @@ function refreshPlayedUsersUI() {
                     return;
                 }
 
+                let awardedPoints = 0;
                 const myGroup = getGroupKeyForName(name);
                 let pool = [];
                 let totalW = 0;
@@ -1605,7 +1693,6 @@ function refreshPlayedUsersUI() {
                 }
                 const chosen = pool.find(p => p.id === chosenId).prizeData;
 
-                // 扣庫存
                 const qRef = ref(db, `prizes/${chosenId}/quantity`);
                 const tx = await runTransaction(qRef, cur => (cur === null || cur <= 0) ? undefined : cur - 1);
                 if (!tx.committed) {
@@ -1615,7 +1702,6 @@ function refreshPlayedUsersUI() {
                     return;
                 }
 
-                // 讀取序號
                 let code = "";
                 try {
                     const cs = await get(ref(db, `prizeCodes/${chosenId}`));
@@ -1626,26 +1712,20 @@ function refreshPlayedUsersUI() {
                         if (av.length) code = av[0];
                     }
                 } catch (e) {}
-
-                // 🔥 修正：若獎品有隨機點數但讀不到序號，顯示預設文字
                 if (!code && !isNaN(Number(chosen.minPoints)) && !isNaN(Number(chosen.maxPoints)) && Number(chosen.maxPoints) > 0) {
                     code = "點數已自動匯入你的錢包";
                 }
 
-                // 更新 playedUsers（含 lastDrawTime 防止重複）
                 const playedRef = ref(db, `playedUsers/${name}`);
                 const result = await runTransaction(playedRef, (current) => {
                     const now = Date.now();
-                    if (current && current.lastDrawTime && (now - current.lastDrawTime < 5000)) {
-                        return; // 中止
-                    }
+                    if (current && current.lastDrawTime && (now - current.lastDrawTime < 5000)) return;
                     if (current === null) {
                         return { won: chosen.name, code, time: now, group: myGroup, drawCount: 1, lastDrawTime: now };
                     } else {
                         return { ...current, won: chosen.name, code, time: now, group: myGroup, drawCount: (current.drawCount || 0) + 1, lastDrawTime: now };
                     }
                 });
-
                 if (!result.committed) {
                     alert("抽獎過於頻繁，請稍後再試。");
                     isDrawing = false;
@@ -1653,7 +1733,6 @@ function refreshPlayedUsersUI() {
                     return;
                 }
 
-                // 寫入抽獎紀錄
                 await push(ref(db, `drawRecords/${name}`), {
                     won: chosen.name,
                     code: code,
@@ -1661,7 +1740,6 @@ function refreshPlayedUsersUI() {
                     group: myGroup
                 });
 
-                // 更新本地快取
                 globalPlayedUsers[name] = {
                     won: chosen.name,
                     code: code,
@@ -1671,8 +1749,6 @@ function refreshPlayedUsersUI() {
                     lastDrawTime: Date.now()
                 };
 
-                // 發放點數
-                let awardedPoints = 0;
                 const minP = Number(chosen.minPoints);
                 const maxP = Number(chosen.maxPoints);
                 if (!isNaN(minP) && !isNaN(maxP) && maxP >= minP && maxP > 0) {
@@ -1696,61 +1772,41 @@ function refreshPlayedUsersUI() {
                 const container = document.getElementById("gachaGlass");
                 const lucky = document.getElementById("luckyEgg");
                 const crank = document.getElementById("gachaCrank");
-
                 if (container && lucky && crank) {
                     const color = eggColors[Math.floor(Math.random() * eggColors.length)];
                     const matches = container.querySelectorAll(`.gacha-egg.${color}:not(.egg-falling-out)`);
                     crank.classList.add("rotating-crank");
                     playCrankSound();
-                    if (matches.length) {
-                        matches[Math.floor(Math.random() * matches.length)].classList.add("egg-falling-out");
-                    }
+                    if (matches.length) matches[Math.floor(Math.random() * matches.length)].classList.add("egg-falling-out");
                     container.classList.add("eggs-drop-down");
                     lucky.className = "gacha-lucky-egg";
                     lucky.style.opacity = "0";
                     lucky.classList.add(color);
-                    setTimeout(() => {
-                        lucky.classList.add("dropped-egg");
-                    }, 1000);
-
+                    setTimeout(() => lucky.classList.add("dropped-egg"), 1000);
                     setTimeout(() => {
                         try {
-                            const modalTitle = document.getElementById("modalTitle");
-                            const modalPrizeName = document.getElementById("modalPrizeName");
-                            const modalTicketCode = document.getElementById("modalTicketCode");
-                            const copyHint = document.getElementById("copyHint");
-                            const pointsInfo = document.getElementById("modalPointsInfo");
-                            const closeBtn = document.querySelector("#winModal button:last-child");
-
-                            if (modalPrizeName) modalPrizeName.innerText = chosen.name;
+                            document.getElementById("modalPrizeName").innerText = chosen.name;
                             currentPrizeUrl = code;
-
+                            const pointsInfo = document.getElementById("modalPointsInfo");
                             if (pointsInfo) {
                                 if (awardedPoints > 0) {
                                     pointsInfo.innerText = `🪙 獲得 ${awardedPoints} 點`;
                                     pointsInfo.classList.remove("hidden");
-                                } else {
-                                    pointsInfo.classList.add("hidden");
-                                }
+                                } else pointsInfo.classList.add("hidden");
                             }
-
                             const isThanks = chosen.name && chosen.name.includes("銘謝惠顧");
-                            if (modalTitle) {
-                                modalTitle.innerText = isThanks ? "😢 差一點點！" : "🎉 恭喜中獎！";
-                                modalTitle.className = `text-2xl font-black mb-2 ${isThanks ? 'text-gray-500' : 'text-rose-500'}`;
-                            }
-                            if (modalTicketCode) modalTicketCode.style.display = isThanks ? "none" : "block";
-                            if (copyHint) copyHint.style.display = isThanks ? "none" : "block";
-                            if (closeBtn) closeBtn.innerText = isThanks ? "再接再厲" : "收下好禮";
-
-                            const winModal = document.getElementById("winModal");
-                            if (winModal) winModal.style.display = "flex";
+                            document.getElementById("modalTitle").innerText = isThanks ? "😢 差一點點！" : "🎉 恭喜中獎！";
+                            document.getElementById("modalTitle").className = `text-2xl font-black mb-2 ${isThanks ? 'text-gray-500' : 'text-rose-500'}`;
+                            document.getElementById("modalTicketCode").style.display = isThanks ? "none" : "block";
+                            document.getElementById("copyHint").style.display = isThanks ? "none" : "block";
+                            document.querySelector("#winModal button:last-child").innerText = isThanks ? "再接再厲" : "收下好禮";
+                            document.getElementById("winModal").style.display = "flex";
                             playWinSound();
                         } catch (err) {
-                            console.error("顯示結果錯誤：", err);
+                            console.error(err);
                         } finally {
-                            if (crank) crank.classList.remove("rotating-crank");
-                            if (container) container.classList.remove("eggs-drop-down");
+                            crank.classList.remove("rotating-crank");
+                            container.classList.remove("eggs-drop-down");
                             isDrawing = false;
                             if (spinBtn) spinBtn.disabled = false;
                         }
@@ -1760,12 +1816,119 @@ function refreshPlayedUsersUI() {
                     isDrawing = false;
                     if (spinBtn) spinBtn.disabled = false;
                 }
-
             } catch (e) {
-                console.error("抽獎失敗: ", e);
+                console.error(e);
                 alert("抽獎失敗，請稍後再試");
                 isDrawing = false;
                 if (spinBtn) spinBtn.disabled = false;
+            }
+        }
+
+        // ---------- 拉霸機核心 ----------
+        async function startSlot() {
+            if (!currentPlayerName) { alert("請先選擇名字"); return; }
+            if (isSlotSpinning) return;
+            isSlotSpinning = true;
+            const btn = document.getElementById("slotSpinBtn");
+            if (btn) btn.disabled = true;
+
+            try {
+                // 檢查點數是否足夠
+                if (!walletUnlocked || !currentWalletData || (currentWalletData.points || 0) < slotCost) {
+                    alert(`❌ 點數不足，需要 ${slotCost} 點`);
+                    isSlotSpinning = false;
+                    if (btn) btn.disabled = false;
+                    return;
+                }
+
+                // 扣點
+                await runTransaction(ref(db, `pointUsers/${currentPlayerName}/points`), cur => (cur || 0) - slotCost);
+
+                // 隨機決定三個轉輪結果
+                const symbolKeys = Object.keys(slotSymbols);
+                if (symbolKeys.length < 2) {
+                    alert("拉霸機尚未設定符號");
+                    isSlotSpinning = false;
+                    if (btn) btn.disabled = false;
+                    return;
+                }
+
+                const reel1 = symbolKeys[Math.floor(Math.random() * symbolKeys.length)];
+                const reel2 = symbolKeys[Math.floor(Math.random() * symbolKeys.length)];
+                const reel3 = symbolKeys[Math.floor(Math.random() * symbolKeys.length)];
+
+                // 動畫：先快速切換符號再停下
+                const reels = ["slotReel1", "slotReel2", "slotReel3"];
+                const results = [reel1, reel2, reel3];
+                const resultSymbols = [reel1, reel2, reel3];
+
+                for (let i = 0; i < 3; i++) {
+                    const reelEl = document.getElementById(reels[i]);
+                    if (reelEl) reelEl.classList.add("spinning");
+                }
+                playSlotSound();
+
+                setTimeout(() => {
+                    for (let i = 0; i < 3; i++) {
+                        const reelEl = document.getElementById(reels[i]);
+                        if (reelEl) reelEl.classList.remove("spinning");
+                        const symbolKey = resultSymbols[i];
+                        const symbolData = slotSymbols[symbolKey];
+                        const displayEl = document.getElementById(`slotSymbol${i+1}`);
+                        if (displayEl) {
+                            if (symbolData && symbolData.image) {
+                                displayEl.innerHTML = `<img src="${symbolData.image}" alt="${symbolData.name || symbolKey}" style="max-width:80%; max-height:80%; object-fit:contain;">`;
+                            } else {
+                                displayEl.textContent = symbolData?.emoji || symbolKey;
+                            }
+                        }
+                    }
+
+                    // 判斷是否中獎：三個相同
+                    const isWin = (reel1 === reel2 && reel2 === reel3);
+                    if (isWin) {
+                        const prizeKey = reel1;
+                        const prizeData = slotPrizes[prizeKey];
+                        if (prizeData && prizeData.quantity > 0) {
+                            // 扣庫存並記錄
+                            runTransaction(ref(db, `slotPrizes/${prizeKey}/quantity`), cur => (cur && cur > 0) ? cur - 1 : undefined)
+                                .then((res) => {
+                                    if (res.committed) {
+                                        push(ref(db, `slotRecords/${currentPlayerName}`), {
+                                            symbol: prizeKey,
+                                            prizeName: prizeData.name || prizeKey,
+                                            code: prizeData.code || "",
+                                            time: Date.now(),
+                                            status: "won"
+                                        });
+                                        alert(`🎉 恭喜中獎！獲得「${prizeData.name || prizeKey}」`);
+                                    } else {
+                                        alert("獎品已被搶完");
+                                    }
+                                });
+                        } else {
+                            alert("🎰 三個相同！但獎品已無庫存");
+                        }
+                    } else {
+                        push(ref(db, `slotRecords/${currentPlayerName}`), {
+                            symbol: `${reel1}-${reel2}-${reel3}`,
+                            prizeName: "未中獎",
+                            code: "",
+                            time: Date.now(),
+                            status: "lost"
+                        });
+                        alert("😢 差一點，再試一次！");
+                    }
+
+                    isSlotSpinning = false;
+                    if (btn) btn.disabled = false;
+                }, 1500);
+
+            } catch (e) {
+                console.error(e);
+                alert("拉霸失敗，請稍後再試");
+                isSlotSpinning = false;
+                if (btn) btn.disabled = false;
             }
         }
 
