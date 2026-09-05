@@ -550,11 +550,13 @@
             flex-shrink: 0;
             background: #fff;
         }
-        .slot-reel-symbol img {
-            max-width: 80%;
-            max-height: 80%;
-            object-fit: contain;
-        }
+.slot-reel-symbol img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: #ffffff; /* 多餘空間填白，可改其他顏色 */
+    display: block;
+}
         .slot-controls {
             display: flex;
             align-items: center;
@@ -744,8 +746,11 @@
     font-size: 45px;
 }
 .slot-reel-symbol img {
-    max-width: 70%;
-    max-height: 70%;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: #ffffff;
+    display: block;
 }
 
         @media (min-width: 1024px) {
