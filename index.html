@@ -557,7 +557,7 @@
             object-position: center;
             background: #ffffff;
             display: block;
-            border-radius: 8px;   /* 可加圓角，讓「回」字更柔和 */
+            border-radius: 8px;
         }
         .slot-controls {
             display: flex;
@@ -1734,70 +1734,74 @@
         }
 
         // ---------- UI 更新 ----------
+        function refreshPlayedUsersUI() {
+            // 更新玩家下拉選單的狀態
+            const sel = document.getElementById("playerName");
+            for (let opt of sel.options) {
+                if (!opt.value) continue;
+                const name = opt.value;
+                const drawCount = globalPlayedUsers[name]?.drawCount || 0;
+                const limit = getMaxDrawsForPlayer(name);
+                const remaining = limit - drawCount;
+                if (disabledPlayers[name]) {
+                    opt.disabled = true;
+                    opt.innerText = name + " (已禁用)";
+                } else {
+                    opt.disabled = false;
+                    opt.innerText = name;
+                }
+            }
 
-function refreshPlayedUsersUI() {
-    // 更新玩家下拉選單的狀態
-    const sel = document.getElementById("playerName");
-    for (let opt of sel.options) {
-        if (!opt.value) continue;
-        const name = opt.value;
-        const drawCount = globalPlayedUsers[name]?.drawCount || 0;
-        const limit = getMaxDrawsForPlayer(name);
-        const remaining = limit - drawCount;
-        if (disabledPlayers[name]) {
-            opt.disabled = true;
-            opt.innerText = name + " (已禁用)";
-        } else {
-            opt.disabled = false;
-            opt.innerText = name;
+            // 從 drawRecordsData 提取所有中獎紀錄，並從 playedUsers 兜底
+            let list = [];
+            const seenKeys = new Set();
+
+            // 先處理 drawRecordsData
+            for (const name in drawRecordsData) {
+                const records = drawRecordsData[name];
+                if (!records || typeof records !== 'object') continue;
+                for (const key in records) {
+                    const rec = records[key];
+                    if (!rec || !rec.won) continue;
+                    if (rec.won.includes("銘謝惠顧") || rec.won === "未中獎" || rec.won.includes("未設定獎品")) continue;
+                    const uniqueKey = `${name}_${rec.time}_${rec.won}`;
+                    if (seenKeys.has(uniqueKey)) continue;
+                    seenKeys.add(uniqueKey);
+                    list.push({
+                        user: name,
+                        won: rec.won,
+                        time: rec.time || 0,
+                        group: getGroupKeyForName(name),
+                        drawCount: globalPlayedUsers[name]?.drawCount || 0
+                    });
+                }
+            }
+
+            // 再處理 playedUsers 中沒有被 drawRecords 覆蓋的資料（舊版紀錄）
+            for (const name in globalPlayedUsers) {
+                const u = globalPlayedUsers[name];
+                if (!u || !u.won || u.won.includes("銘謝惠顧")) continue;
+                const uniqueKey = `${name}_${u.time}_${u.won}`;
+                if (seenKeys.has(uniqueKey)) continue;
+                seenKeys.add(uniqueKey);
+                list.push({
+                    user: name,
+                    won: u.won,
+                    time: u.time || 0,
+                    group: u.group || getGroupKeyForName(name),
+                    drawCount: u.drawCount || 0
+                });
+            }
+
+            // 依時間排序（新的在前）
+            list.sort((a, b) => (b.time || 0) - (a.time || 0));
+            lastPlayedList = list;
+
+            // 更新跑馬燈與中獎者看板
+            updateMarquee(buildMarqueeText(list));
+            renderHonorBoard(list);
+            updateDrawCountDisplay();
         }
-    }
-
-    let list = [];
-    const playersInDrawRecords = new Set();
-
-    // 1. 從 drawRecordsData 提取所有中獎紀錄（排除銘謝惠顧、未中獎、未設定獎品）
-    for (const name in drawRecordsData) {
-        playersInDrawRecords.add(name);
-        const records = drawRecordsData[name];
-        if (!records || typeof records !== 'object') continue;
-        for (const key in records) {
-            const rec = records[key];
-            if (!rec || !rec.won) continue;
-            if (rec.won.includes("銘謝惠顧") || rec.won === "未中獎" || rec.won.includes("未設定獎品")) continue;
-            list.push({
-                user: name,
-                won: rec.won,
-                time: rec.time || 0,
-                group: rec.group || getGroupKeyForName(name),
-                drawCount: globalPlayedUsers[name]?.drawCount || 0
-            });
-        }
-    }
-
-    // 2. 從 playedUsers 兜底（沒有 drawRecords 的玩家，使用他們的最新一筆）
-    for (const name in globalPlayedUsers) {
-        if (playersInDrawRecords.has(name)) continue; // 已有 drawRecords 的玩家跳過
-        const u = globalPlayedUsers[name];
-        if (!u || !u.won || u.won.includes("銘謝惠顧")) continue;
-        list.push({
-            user: name,
-            won: u.won,
-            time: u.time || 0,
-            group: u.group || getGroupKeyForName(name),
-            drawCount: u.drawCount || 0
-        });
-    }
-
-    // 依時間排序（新的在前）
-    list.sort((a, b) => (b.time || 0) - (a.time || 0));
-    lastPlayedList = list;
-
-    // 更新跑馬燈與中獎者看板
-    updateMarquee(buildMarqueeText(list));
-    renderHonorBoard(list);
-    updateDrawCountDisplay();
-}
 
         function initApp() {
             onValue(ref(db, "prizes"), snap => {
@@ -1809,7 +1813,7 @@ function refreshPlayedUsersUI() {
                 refreshPlayedUsersUI();
                 if (currentPlayerName) updateDrawCountDisplay();
             });
-            // 新增：監聽 drawRecords
+            // 監聽 drawRecords
             onValue(ref(db, "drawRecords"), snap => {
                 drawRecordsData = snap.val() || {};
                 refreshPlayedUsersUI();
@@ -1917,14 +1921,15 @@ function refreshPlayedUsersUI() {
                     code = "點數已自動匯入你的錢包";
                 }
 
+                // 更新 playedUsers 時不覆蓋 won/code/time/group，只更新 drawCount 和 lastDrawTime
                 const playedRef = ref(db, `playedUsers/${name}`);
                 const result = await runTransaction(playedRef, (current) => {
                     const now = Date.now();
                     if (current && current.lastDrawTime && (now - current.lastDrawTime < 5000)) return;
                     if (current === null) {
-                        return { won: chosen.name, code, time: now, group: myGroup, drawCount: 1, lastDrawTime: now };
+                        return { drawCount: 1, lastDrawTime: now };
                     } else {
-                        return { ...current, won: chosen.name, code, time: now, group: myGroup, drawCount: (current.drawCount || 0) + 1, lastDrawTime: now };
+                        return { ...current, drawCount: (current.drawCount || 0) + 1, lastDrawTime: now };
                     }
                 });
                 if (!result.committed) {
@@ -1934,6 +1939,14 @@ function refreshPlayedUsersUI() {
                     return;
                 }
 
+                // 更新本地快取（保留原有 won/code/time/group，只更新 drawCount 和 lastDrawTime）
+                globalPlayedUsers[name] = {
+                    ...(globalPlayedUsers[name] || {}),
+                    drawCount: (playerData?.drawCount || 0) + 1,
+                    lastDrawTime: Date.now()
+                };
+
+                // 寫入 drawRecords（包含 group）
                 await push(ref(db, `drawRecords/${name}`), {
                     type: "gacha",
                     won: chosen.name,
@@ -1941,15 +1954,6 @@ function refreshPlayedUsersUI() {
                     time: Date.now(),
                     group: myGroup
                 });
-
-                globalPlayedUsers[name] = {
-                    won: chosen.name,
-                    code: code,
-                    time: Date.now(),
-                    group: myGroup,
-                    drawCount: (playerData?.drawCount || 0) + 1,
-                    lastDrawTime: Date.now()
-                };
 
                 const minP = Number(chosen.minPoints);
                 const maxP = Number(chosen.maxPoints);
@@ -1970,6 +1974,7 @@ function refreshPlayedUsersUI() {
                     }
                 }
 
+                // 動畫與彈窗
                 const container = document.getElementById("gachaGlass");
                 const lucky = document.getElementById("luckyEgg");
                 const crank = document.getElementById("gachaCrank");
@@ -2293,10 +2298,6 @@ function refreshPlayedUsersUI() {
                                 group: honorUnlockedGroup
                             });
 
-                            // 更新 playedUsers，讓跑馬燈與中獎者看板顯示（現在多筆顯示，不需要再更新 playedUsers 的 won）
-                            // 但仍需保留 drawCount 等，這裡只更新 drawCount 已在前面交易中處理
-                            // 我們可以省略原本的 update，因為 drawRecords 監聽會自動刷新
-
                             showSlotWinModal(prizeData.name, code, awardedPoints);
                         }
                     } catch (e) {
@@ -2325,7 +2326,6 @@ function refreshPlayedUsersUI() {
                             group: honorUnlockedGroup
                         });
                     } catch (e) { console.error(e); }
-                    // 顯示銘謝惠顧彈窗
                     showSlotWinModal("銘謝惠顧", "", 0);
                 }
 
