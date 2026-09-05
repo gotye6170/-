@@ -1734,6 +1734,7 @@
         // ---------- UI 更新 ----------
 
 function refreshPlayedUsersUI() {
+    console.log("refreshPlayedUsersUI 被呼叫，drawRecordsData 內容：", drawRecordsData);
     // 更新玩家下拉選單的狀態
     const sel = document.getElementById("playerName");
     for (let opt of sel.options) {
