@@ -892,13 +892,12 @@
                                 <div class="slot-reel-strip" id="reelStrip3"></div>
                             </div>
                         </div>
-                        <div class="slot-controls">
-                            <div class="slot-lever" id="slotLever" onclick="startSlot()">
-                                <div class="lever-ball"></div>
-                                <div class="lever-stick"></div>
-                            </div>
-                            <button id="slotSpinBtn" onclick="startSlot()" class="slot-button">點我拉霸</button>
-                        </div>
+<div class="slot-controls">
+    <div class="slot-lever" id="slotLever" onclick="startSlot()">
+        <div class="lever-ball"></div>
+        <div class="lever-stick"></div>
+    </div>
+</div>
                         <p class="slot-info">
                             剩餘次數：<span id="slotCountDisplay">0</span>
                         </p>
@@ -2063,8 +2062,8 @@ if (code && code.startsWith("http")) {
             if (!currentPlayerName) { alert("請先選擇名字"); return; }
             if (isSlotSpinning) return;
             isSlotSpinning = true;
-            const btn = document.getElementById("slotSpinBtn");
-            if (btn) btn.disabled = true;
+const lever = document.getElementById("slotLever");
+if (lever) lever.style.pointerEvents = 'none';   // 禁用點擊
             const lever = document.getElementById("slotLever");
             if (lever) lever.style.pointerEvents = 'none';
 
@@ -2072,7 +2071,7 @@ if (code && code.startsWith("http")) {
                 if (!slotSymbols || Object.keys(slotSymbols).length < 2) {
                     alert("拉霸機尚未設定足夠的符號，請聯繫管理員。");
                     isSlotSpinning = false;
-                    if (btn) btn.disabled = false;
+                    if (lever) lever.style.pointerEvents = 'auto';   // 恢復點擊
                     if (lever) lever.style.pointerEvents = 'auto';
                     return;
                 }
@@ -2084,7 +2083,7 @@ if (code && code.startsWith("http")) {
                 if (!isAdminMode && drawCount >= limit) {
                     alert("❌ 拉霸次數已用完");
                     isSlotSpinning = false;
-                    if (btn) btn.disabled = false;
+                    if (lever) lever.style.pointerEvents = 'auto';   // 恢復點擊
                     if (lever) lever.style.pointerEvents = 'auto';
                     return;
                 }
@@ -2103,7 +2102,7 @@ if (code && code.startsWith("http")) {
                 if (!result.committed) {
                     alert("拉霸過於頻繁，請稍後再試。");
                     isSlotSpinning = false;
-                    if (btn) btn.disabled = false;
+                    if (lever) lever.style.pointerEvents = 'auto';   // 恢復點擊
                     if (lever) lever.style.pointerEvents = 'auto';
                     return;
                 }
@@ -2124,7 +2123,7 @@ if (code && code.startsWith("http")) {
                 if (!reel1 || !reel2 || !reel3) {
                     alert("拉霸機符號權重設定錯誤，請聯繫管理員。");
                     isSlotSpinning = false;
-                    if (btn) btn.disabled = false;
+                    if (lever) lever.style.pointerEvents = 'auto';   // 恢復點擊
                     if (lever) lever.style.pointerEvents = 'auto';
                     return;
                 }
@@ -2375,7 +2374,7 @@ if (isWin && prizeData) {
                 alert("拉霸失敗，請稍後再試。錯誤：" + e.message);
             } finally {
                 isSlotSpinning = false;
-                if (btn) btn.disabled = false;
+                if (lever) lever.style.pointerEvents = 'auto';   // 恢復點擊
                 const lever = document.getElementById("slotLever");
                 if (lever) lever.style.pointerEvents = 'auto';
             }
