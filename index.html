@@ -1293,7 +1293,7 @@
                     h += `<div class="prize-item-row">${img}<div class="prize-info"><span class="prize-name-label">${p.name}</span><span style="color:#059669;font-size:13px;font-weight:bold;">${ql}</span>${pb}</div></div>`;
                 } else {
                     const sl = st ? `🔴 已全數送完（共 <b>${total}</b> 份）` : `🔴 已全數送完`;
-                    h += `<div class="prize-item-row" style="opacity:0.4;">${img}<div class="prize-info"><span class="prize-name-label" style="text-decoration:line-through;color:#9ca3af;">${p.name}</span><span style="color:#dc2626;font-size:13px;font-weight:bold;">${sl}</span><div class="prize-progress-track"><div class="prize-progress-fill is-empty" style="width:100%;"></div></div>${on}</div></div>`;
+                    h += `<div class="prize-item-row" style="opacity:0.4;">${img}<div class="prize-info"><span class="prize-name-label" style="text-decoration:line-through;color:#9ca3af;">${p.name}</span><span style="color:#dc2626;font-size:13px;font-weight:bold;">${sl}</span><div class="prize-progress-track"><div class="prize-progress-fill is-empty" style="width:100%;"></div></div></div></div>`;
                 }
             }
             if (!has) h += '<div style="color:#9ca3af;font-size:13px;padding:10px;">目前無公開好禮。</div>';
@@ -2269,25 +2269,7 @@
                                 console.error("更新 playedUsers 失敗", e);
                             }
 
-                            try {
-                                await update(ref(db, `playedUsers/${currentPlayerName}`), {
-                                    won: prizeData.name || prizeId,
-                                    time: Date.now(),
-                                    code: code
-                                });
-                                globalPlayedUsers[currentPlayerName] = {
-                                    ...(globalPlayedUsers[currentPlayerName] || {}),
-                                    won: prizeData.name || prizeId,
-                                    time: Date.now(),
-                                    code: code
-                                };
-                                refreshPlayedUsersUI();
-                            } catch (e) {
-                                console.error("更新 playedUsers 失敗", e);
-                            }
-
                             showSlotWinModal(prizeData.name, code, awardedPoints);
-
                         }
                     } catch (e) {
                         console.error(e);
@@ -2303,7 +2285,6 @@
                         });
                     } catch (e) { console.error(e); }
                     alert(`🎰 三個相同符號，但「${prizeId}」尚未設定獎品`);
-
                 } else {
                     // 未中獎，視為銘謝惠顧
                     try {
@@ -2313,6 +2294,7 @@
                             code: "",
                             time: Date.now()
                         });
+                        // 更新 playedUsers
                         await update(ref(db, `playedUsers/${currentPlayerName}`), {
                             won: "銘謝惠顧",
                             time: Date.now(),
@@ -2326,6 +2308,7 @@
                         };
                         refreshPlayedUsersUI();
                     } catch (e) { console.error(e); }
+                    // 顯示銘謝惠顧彈窗
                     showSlotWinModal("銘謝惠顧", "", 0);
                 }
 
