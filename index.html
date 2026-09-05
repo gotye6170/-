@@ -1734,7 +1734,6 @@
         // ---------- UI 更新 ----------
 
 function refreshPlayedUsersUI() {
-    console.log("refreshPlayedUsersUI 被呼叫，drawRecordsData 內容：", drawRecordsData);
     // 更新玩家下拉選單的狀態
     const sel = document.getElementById("playerName");
     for (let opt of sel.options) {
@@ -1752,9 +1751,12 @@ function refreshPlayedUsersUI() {
         }
     }
 
-    // 從 drawRecordsData 提取所有中獎紀錄（排除銘謝惠顧、未中獎、未設定獎品）
     let list = [];
+    const playersInDrawRecords = new Set();
+
+    // 1. 從 drawRecordsData 提取所有中獎紀錄（排除銘謝惠顧、未中獎、未設定獎品）
     for (const name in drawRecordsData) {
+        playersInDrawRecords.add(name);
         const records = drawRecordsData[name];
         if (!records || typeof records !== 'object') continue;
         for (const key in records) {
@@ -1765,11 +1767,24 @@ function refreshPlayedUsersUI() {
                 user: name,
                 won: rec.won,
                 time: rec.time || 0,
-                // 直接用玩家姓名判斷群組，不再依賴 drawRecords 中的 group 欄位
-                group: getGroupKeyForName(name),
+                group: rec.group || getGroupKeyForName(name),
                 drawCount: globalPlayedUsers[name]?.drawCount || 0
             });
         }
+    }
+
+    // 2. 從 playedUsers 兜底（沒有 drawRecords 的玩家，使用他們的最新一筆）
+    for (const name in globalPlayedUsers) {
+        if (playersInDrawRecords.has(name)) continue; // 已有 drawRecords 的玩家跳過
+        const u = globalPlayedUsers[name];
+        if (!u || !u.won || u.won.includes("銘謝惠顧")) continue;
+        list.push({
+            user: name,
+            won: u.won,
+            time: u.time || 0,
+            group: u.group || getGroupKeyForName(name),
+            drawCount: u.drawCount || 0
+        });
     }
 
     // 依時間排序（新的在前）
