@@ -1763,7 +1763,7 @@
                         user: name,
                         won: rec.won,
                         time: rec.time || 0,
-                        group: rec.group || getGroupKeyForName(name),
+                        group: getGroupKeyForName(name),
                         drawCount: globalPlayedUsers[name]?.drawCount || 0
                     });
                 }
