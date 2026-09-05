@@ -1061,6 +1061,7 @@
             // 讀取拉霸機符號
             onValue(ref(db, "slotSymbols"), (snap) => {
                 slotSymbols = snap.val() || {};
+                console.log("拉霸符號已更新:", slotSymbols);
             });
         }
 
@@ -1865,10 +1866,15 @@
         function pickWeightedSymbol() {
             const keys = Object.keys(slotSymbols);
             if (keys.length === 0) return null;
-            const totalWeight = keys.reduce((sum, key) => sum + (slotSymbols[key].weight || 10), 0);
+            const totalWeight = keys.reduce((sum, key) => {
+                const w = Number(slotSymbols[key].weight);
+                return sum + (isNaN(w) ? 0 : w);
+            }, 0);
+            if (totalWeight <= 0) return null;
             let rand = Math.random() * totalWeight;
             for (const key of keys) {
-                rand -= (slotSymbols[key].weight || 10);
+                const w = Number(slotSymbols[key].weight) || 0;
+                rand -= w;
                 if (rand <= 0) return key;
             }
             return keys[keys.length - 1];
@@ -1882,6 +1888,14 @@
             if (btn) btn.disabled = true;
 
             try {
+                // 檢查拉霸符號是否已載入
+                if (!slotSymbols || Object.keys(slotSymbols).length < 2) {
+                    alert("拉霸機尚未設定足夠的符號，請聯繫管理員。");
+                    isSlotSpinning = false;
+                    if (btn) btn.disabled = false;
+                    return;
+                }
+
                 const playerData = globalPlayedUsers[currentPlayerName];
                 const drawCount = playerData?.drawCount || 0;
                 const limit = getMaxDrawsForPlayer(currentPlayerName);
@@ -1919,17 +1933,16 @@
                 };
                 updateDrawCountDisplay();
 
-                const keys = Object.keys(slotSymbols);
-                if (keys.length < 2) {
-                    alert("拉霸機尚未設定符號");
+                const reel1 = pickWeightedSymbol();
+                const reel2 = pickWeightedSymbol();
+                const reel3 = pickWeightedSymbol();
+
+                if (!reel1 || !reel2 || !reel3) {
+                    alert("拉霸機符號權重設定錯誤，請聯繫管理員。");
                     isSlotSpinning = false;
                     if (btn) btn.disabled = false;
                     return;
                 }
-
-                const reel1 = pickWeightedSymbol();
-                const reel2 = pickWeightedSymbol();
-                const reel3 = pickWeightedSymbol();
 
                 const reelEls = [document.getElementById("slotReel1"), document.getElementById("slotReel2"), document.getElementById("slotReel3")];
                 reelEls.forEach(reel => reel?.classList.add("spinning"));
@@ -1953,7 +1966,9 @@
                     });
 
                     const isWin = (reel1 === reel2 && reel2 === reel3);
-                    const prizeId = reel1;
+                    // 取得符號對應的獎品 ID
+                    const symbolData = slotSymbols[reel1] || {};
+                    const prizeId = symbolData.prizeId || reel1; // 若有設定 prizeId 則使用，否則用符號代號
                     const prizeData = lastPrizes?.[prizeId];
 
                     if (isWin && prizeData) {
@@ -1971,6 +1986,10 @@
                                 } else {
                                     alert("獎品已無庫存");
                                 }
+                            })
+                            .catch(err => {
+                                console.error(err);
+                                alert("中獎處理失敗，請聯繫管理員");
                             });
                     } else if (isWin && !prizeData) {
                         push(ref(db, `drawRecords/${currentPlayerName}`), {
@@ -1978,7 +1997,7 @@
                             won: `符號 ${prizeId} 未設定獎品`,
                             code: "",
                             time: Date.now()
-                        });
+                        }).catch(err => console.error(err));
                         alert(`🎰 三個相同符號，但「${prizeId}」尚未設定獎品`);
                     } else {
                         push(ref(db, `drawRecords/${currentPlayerName}`), {
@@ -1986,7 +2005,7 @@
                             won: "未中獎",
                             code: "",
                             time: Date.now()
-                        });
+                        }).catch(err => console.error(err));
                         alert("😢 差一點，再試一次！");
                     }
 
@@ -1996,8 +2015,8 @@
                 }, 1500);
 
             } catch (e) {
-                console.error(e);
-                alert("拉霸失敗，請稍後再試");
+                console.error("拉霸錯誤:", e);
+                alert("拉霸失敗，請稍後再試。錯誤：" + e.message);
                 isSlotSpinning = false;
                 if (btn) btn.disabled = false;
             }
