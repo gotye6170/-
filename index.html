@@ -1755,13 +1755,11 @@ function refreshPlayedUsersUI() {
 
     let list = [];
     const seenKeys = new Set();
-    const playerTimesInDrawRecords = {};
 
     // 先處理 drawRecordsData 中的所有紀錄
     for (const name in drawRecordsData) {
         const records = drawRecordsData[name];
         if (!records || typeof records !== 'object') continue;
-        if (!playerTimesInDrawRecords[name]) playerTimesInDrawRecords[name] = new Set();
         for (const key in records) {
             const rec = records[key];
             if (!rec || !rec.won) continue;
@@ -1769,7 +1767,6 @@ function refreshPlayedUsersUI() {
             const uniqueKey = `${name}_${rec.time}_${rec.won}`;
             if (seenKeys.has(uniqueKey)) continue;
             seenKeys.add(uniqueKey);
-            playerTimesInDrawRecords[name].add(rec.time);
             list.push({
                 user: name,
                 won: rec.won,
@@ -1780,11 +1777,18 @@ function refreshPlayedUsersUI() {
         }
     }
 
-    // 再從 playedUsers 兜底，但排除時間戳已在 drawRecords 中出現過的紀錄
+    // 再從 playedUsers 兜底，但排除時間相近且獎品相同的重複項
     for (const name in globalPlayedUsers) {
         const u = globalPlayedUsers[name];
         if (!u || !u.won || u.won.includes("銘謝惠顧")) continue;
-        if (playerTimesInDrawRecords[name] && playerTimesInDrawRecords[name].has(u.time)) continue;
+        let isDuplicate = false;
+        for (const item of list) {
+            if (item.user === name && item.won === u.won && Math.abs(item.time - (u.time || 0)) <= 5000) {
+                isDuplicate = true;
+                break;
+            }
+        }
+        if (isDuplicate) continue;
         const uniqueKey = `${name}_${u.time}_${u.won}`;
         if (seenKeys.has(uniqueKey)) continue;
         seenKeys.add(uniqueKey);
