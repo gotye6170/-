@@ -13,6 +13,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
     
     <style>
+        /* ========== 全域樣式 ========== */
         * {
             -webkit-tap-highlight-color: transparent;
         }
@@ -34,6 +35,7 @@
             100% { background-position: 0% 50%; }
         }
 
+        /* ========== 大標題 ========== */
         .gacha-title {
             font-family: 'Noto Sans TC', sans-serif;
             font-weight: 900;
@@ -44,6 +46,7 @@
             filter: drop-shadow(4px 4px 0px rgba(0,0,0,0.08)) drop-shadow(0px 8px 15px rgba(244,63,94,0.2));
         }
 
+        /* ========== 扭蛋機 ========== */
         .gacha-machine {
             position: relative;
             width: 320px;
@@ -222,6 +225,7 @@
             100% { top: 12px; opacity: 1; transform: scaleY(1) scaleX(1) rotate(360deg); }
         }
 
+        /* ========== 看板 ========== */
         .dashboard-panel {
             background: rgba(255,255,255,0.85);
             backdrop-filter: blur(10px);
@@ -453,26 +457,6 @@
             box-shadow: 0 8px 20px rgba(124, 58, 237, 0.35);
         }
 
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(4px);
-            z-index: 50;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .modal-card {
-            background: white;
-            border-radius: 24px;
-            width: 100%;
-            max-width: 400px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-        }
-
         /* ========== 拉霸機樣式 ========== */
         .slot-reel {
             width: 80px;
@@ -499,6 +483,27 @@
             100% { transform: translateY(2px); }
         }
 
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-card {
+            background: white;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        /* ========== 手機版樣式 ========== */
         @media (max-width: 640px) {
             .gacha-title {
                 font-size: 1.8rem !important;
@@ -591,6 +596,7 @@
             }
         }
 
+        /* ========== 桌面版樣式 ========== */
         @media (min-width: 1024px) {
             .gacha-title {
                 font-size: 3rem;
@@ -708,17 +714,17 @@
                     </div>
                 </div>
 
-                <!-- 🎰 拉霸機區塊 -->
+                <!-- 🎰 拉霸機區塊（新增） -->
                 <div id="slotSystemArea" class="w-full hidden">
                     <div class="w-full bg-white/80 backdrop-blur-md rounded-2xl p-5 shadow-md border border-white">
                         <h3 class="text-center text-base font-black text-purple-600 mb-3">🎰 拉霸機</h3>
-                        <p class="text-xs text-gray-500 text-center mb-3">每次拉霸花費 <b id="slotCostDisplay">20</b> 點，三個相同符號即可獲得對應獎品！</p>
+                        <p class="text-xs text-gray-500 text-center mb-3">每次拉霸花費 <b id="slotCostDisplay">20</b> 點，三個相同圖案即可獲得對應獎品！</p>
                         
-                        <!-- 三個轉輪顯示 -->
+                        <!-- 三個轉輪 -->
                         <div class="flex justify-center gap-2 mb-4">
-                            <div id="slotReel1" class="slot-reel"><span id="slotSymbol1">❓</span></div>
-                            <div id="slotReel2" class="slot-reel"><span id="slotSymbol2">❓</span></div>
-                            <div id="slotReel3" class="slot-reel"><span id="slotSymbol3">❓</span></div>
+                            <div class="slot-reel" id="slotReel1"><span id="slotSymbol1">❓</span></div>
+                            <div class="slot-reel" id="slotReel2"><span id="slotSymbol2">❓</span></div>
+                            <div class="slot-reel" id="slotReel3"><span id="slotSymbol3">❓</span></div>
                         </div>
 
                         <!-- 拉霸按鈕 -->
@@ -790,7 +796,7 @@
         </div>
     </div>
 
-    <!-- ❓ 扭蛋確認彈窗（保留原本所有） -->
+    <!-- ❓ 扭蛋確認彈窗 -->
     <div id="confirmModal" class="modal-overlay" style="display: none;">
         <div class="modal-card p-6 text-center border-4 border-rose-300">
             <h2 class="text-xl font-black text-slate-800 mb-2">🎯 確定要抽獎嗎？</h2>
@@ -812,7 +818,7 @@
                 <p id="modalPointsInfo" class="text-sm font-bold text-amber-600 mt-1 hidden"></p>
             </div>
             <div id="modalTicketCode" onclick="clickTicket()" class="bg-slate-900 text-cyan-400 font-mono text-base font-bold py-3 px-4 rounded-xl cursor-pointer hover:bg-slate-800 active:scale-98 transition-all border border-cyan-500/30 break-all select-none">點我打開獎品連結</div>
-            <p id="copyHint" class="text-[11px] text-gray-400 mt-1.5 font-medium">💡 點擊上方即可查看獎品</p>
+            <p id="copyHint" class="text-[11px] text-gray-400 mt-1.5 font-medium">💡 點擊上方並輸入密碼「3064」即可查看獎品</p>
             <button onclick="closeModal()" class="w-full bg-gray-800 hover:bg-gray-700 text-white font-bold py-3 rounded-xl text-base transition-all mt-4">收下好禮</button>
         </div>
     </div>
@@ -914,11 +920,8 @@
 
         // 拉霸機相關
         let slotSymbols = {};
-        let slotPrizes = {};
         let slotCost = 20;
         let isSlotSpinning = false;
-
-        // 遊戲開關
         let gameMode = "both"; // 可為 "gacha" | "slot" | "both"
 
         // ---------- 音效 ----------
@@ -1026,14 +1029,9 @@
             onValue(ref(db, "slotSymbols"), (snap) => {
                 slotSymbols = snap.val() || {};
             });
-            // 讀取拉霸機獎品
-            onValue(ref(db, "slotPrizes"), (snap) => {
-                slotPrizes = snap.val() || {};
-            });
         }
 
         function updateGameModeUI() {
-            // 根據 gameMode 顯示或隱藏對應的區塊在選擇模式彈窗
             const drawBtn = document.querySelector(".choice-btn-draw");
             const slotBtn = document.querySelector(".choice-btn-slot");
             if (!drawBtn || !slotBtn) return;
@@ -1453,7 +1451,6 @@
         function chooseDraw() {
             closeChoiceModal();
             showDrawSystem();
-            // ... 原有的抽獎次數判斷與按鈕顯示 ...
             if (!currentPlayerName) return;
             const drawCount = globalPlayedUsers[currentPlayerName]?.drawCount || 0;
             const limit = getMaxDrawsForPlayer(currentPlayerName);
@@ -1494,25 +1491,23 @@
             listenToWallet(val);
 
             showChoiceModal(val);
-            // 預設顯示扭蛋機（若 gameMode 為 slot 則顯示拉霸機）
+            // 根據遊戲模式決定預設顯示
             if (gameMode === "slot") {
                 showSlotSystem();
             } else {
                 showDrawSystem();
+                const drawCount = globalPlayedUsers[val]?.drawCount || 0;
+                const limit = getMaxDrawsForPlayer(val);
+                const canDraw = isAdminMode || drawCount < limit;
+                if (canDraw) {
+                    document.getElementById("drawActionArea").classList.remove("hidden");
+                    document.getElementById("alreadyPlayedMsg").classList.add("hidden");
+                } else {
+                    document.getElementById("drawActionArea").classList.add("hidden");
+                    document.getElementById("alreadyPlayedMsg").classList.remove("hidden");
+                }
+                updateDrawCountDisplay();
             }
-
-            const drawCount = globalPlayedUsers[val]?.drawCount || 0;
-            const limit = getMaxDrawsForPlayer(val);
-            const canDraw = isAdminMode || drawCount < limit;
-
-            if (canDraw) {
-                document.getElementById("drawActionArea").classList.remove("hidden");
-                document.getElementById("alreadyPlayedMsg").classList.add("hidden");
-            } else {
-                document.getElementById("drawActionArea").classList.add("hidden");
-                document.getElementById("alreadyPlayedMsg").classList.remove("hidden");
-            }
-            updateDrawCountDisplay();
         }
 
         function showControlPanel() {
@@ -1733,7 +1728,9 @@
                     return;
                 }
 
+                // 寫入扭蛋抽獎紀錄（加入 type: 'gacha'）
                 await push(ref(db, `drawRecords/${name}`), {
+                    type: "gacha",
                     won: chosen.name,
                     code: code,
                     time: Date.now(),
@@ -1825,6 +1822,17 @@
         }
 
         // ---------- 拉霸機核心 ----------
+        function pickWeightedSymbol() {
+            const keys = Object.keys(slotSymbols);
+            const totalWeight = keys.reduce((sum, key) => sum + (slotSymbols[key].weight || 10), 0);
+            let rand = Math.random() * totalWeight;
+            for (const key of keys) {
+                rand -= (slotSymbols[key].weight || 10);
+                if (rand <= 0) return key;
+            }
+            return keys[keys.length - 1];
+        }
+
         async function startSlot() {
             if (!currentPlayerName) { alert("請先選擇名字"); return; }
             if (isSlotSpinning) return;
@@ -1833,7 +1841,6 @@
             if (btn) btn.disabled = true;
 
             try {
-                // 檢查點數是否足夠
                 if (!walletUnlocked || !currentWalletData || (currentWalletData.points || 0) < slotCost) {
                     alert(`❌ 點數不足，需要 ${slotCost} 點`);
                     isSlotSpinning = false;
@@ -1844,78 +1851,75 @@
                 // 扣點
                 await runTransaction(ref(db, `pointUsers/${currentPlayerName}/points`), cur => (cur || 0) - slotCost);
 
-                // 隨機決定三個轉輪結果
-                const symbolKeys = Object.keys(slotSymbols);
-                if (symbolKeys.length < 2) {
+                const keys = Object.keys(slotSymbols);
+                if (keys.length < 2) {
                     alert("拉霸機尚未設定符號");
                     isSlotSpinning = false;
                     if (btn) btn.disabled = false;
                     return;
                 }
 
-                const reel1 = symbolKeys[Math.floor(Math.random() * symbolKeys.length)];
-                const reel2 = symbolKeys[Math.floor(Math.random() * symbolKeys.length)];
-                const reel3 = symbolKeys[Math.floor(Math.random() * symbolKeys.length)];
+                const reel1 = pickWeightedSymbol();
+                const reel2 = pickWeightedSymbol();
+                const reel3 = pickWeightedSymbol();
 
-                // 動畫：先快速切換符號再停下
-                const reels = ["slotReel1", "slotReel2", "slotReel3"];
-                const results = [reel1, reel2, reel3];
-                const resultSymbols = [reel1, reel2, reel3];
-
-                for (let i = 0; i < 3; i++) {
-                    const reelEl = document.getElementById(reels[i]);
-                    if (reelEl) reelEl.classList.add("spinning");
-                }
+                const reelEls = [document.getElementById("slotReel1"), document.getElementById("slotReel2"), document.getElementById("slotReel3")];
+                reelEls.forEach(reel => reel?.classList.add("spinning"));
                 playSlotSound();
 
                 setTimeout(() => {
-                    for (let i = 0; i < 3; i++) {
-                        const reelEl = document.getElementById(reels[i]);
-                        if (reelEl) reelEl.classList.remove("spinning");
-                        const symbolKey = resultSymbols[i];
-                        const symbolData = slotSymbols[symbolKey];
-                        const displayEl = document.getElementById(`slotSymbol${i+1}`);
-                        if (displayEl) {
-                            if (symbolData && symbolData.image) {
-                                displayEl.innerHTML = `<img src="${symbolData.image}" alt="${symbolData.name || symbolKey}" style="max-width:80%; max-height:80%; object-fit:contain;">`;
-                            } else {
-                                displayEl.textContent = symbolData?.emoji || symbolKey;
-                            }
-                        }
-                    }
+                    reelEls.forEach(reel => reel?.classList.remove("spinning"));
 
-                    // 判斷是否中獎：三個相同
-                    const isWin = (reel1 === reel2 && reel2 === reel3);
-                    if (isWin) {
-                        const prizeKey = reel1;
-                        const prizeData = slotPrizes[prizeKey];
-                        if (prizeData && prizeData.quantity > 0) {
-                            // 扣庫存並記錄
-                            runTransaction(ref(db, `slotPrizes/${prizeKey}/quantity`), cur => (cur && cur > 0) ? cur - 1 : undefined)
-                                .then((res) => {
-                                    if (res.committed) {
-                                        push(ref(db, `slotRecords/${currentPlayerName}`), {
-                                            symbol: prizeKey,
-                                            prizeName: prizeData.name || prizeKey,
-                                            code: prizeData.code || "",
-                                            time: Date.now(),
-                                            status: "won"
-                                        });
-                                        alert(`🎉 恭喜中獎！獲得「${prizeData.name || prizeKey}」`);
-                                    } else {
-                                        alert("獎品已被搶完");
-                                    }
-                                });
+                    const resultSymbols = [reel1, reel2, reel3];
+                    const displayEls = [document.getElementById("slotSymbol1"), document.getElementById("slotSymbol2"), document.getElementById("slotSymbol3")];
+                    displayEls.forEach((el, idx) => {
+                        if (!el) return;
+                        const sym = slotSymbols[resultSymbols[idx]] || {};
+                        if (sym.image) {
+                            el.innerHTML = `<img src="${sym.image}" alt="${sym.name || resultSymbols[idx]}" style="max-width:80%; max-height:80%; object-fit:contain;">`;
+                        } else if (sym.emoji) {
+                            el.textContent = sym.emoji;
                         } else {
-                            alert("🎰 三個相同！但獎品已無庫存");
+                            el.textContent = resultSymbols[idx];
                         }
-                    } else {
-                        push(ref(db, `slotRecords/${currentPlayerName}`), {
-                            symbol: `${reel1}-${reel2}-${reel3}`,
-                            prizeName: "未中獎",
+                    });
+
+                    const isWin = (reel1 === reel2 && reel2 === reel3);
+                    const prizeId = reel1;
+                    const prizeData = lastPrizes?.[prizeId];
+
+                    if (isWin && prizeData) {
+                        // 從共用扭蛋機獎品扣庫存
+                        runTransaction(ref(db, `prizes/${prizeId}/quantity`), cur => (cur === null || cur <= 0) ? undefined : cur - 1)
+                            .then((res) => {
+                                if (res.committed) {
+                                    push(ref(db, `drawRecords/${currentPlayerName}`), {
+                                        type: "slot",
+                                        won: prizeData.name || prizeId,
+                                        code: prizeData.name ? `獲得「${prizeData.name}」` : prizeId,
+                                        time: Date.now()
+                                    });
+                                    alert(`🎉 拉霸中獎！獲得「${prizeData.name || prizeId}」`);
+                                } else {
+                                    alert("獎品已無庫存");
+                                }
+                            });
+                    } else if (isWin && !prizeData) {
+                        // 符號存在但沒有對應獎品
+                        push(ref(db, `drawRecords/${currentPlayerName}`), {
+                            type: "slot",
+                            won: `符號 ${prizeId} 未設定獎品`,
                             code: "",
-                            time: Date.now(),
-                            status: "lost"
+                            time: Date.now()
+                        });
+                        alert(`🎰 三個相同符號，但「${prizeId}」尚未設定獎品`);
+                    } else {
+                        // 未中獎
+                        push(ref(db, `drawRecords/${currentPlayerName}`), {
+                            type: "slot",
+                            won: "未中獎",
+                            code: "",
+                            time: Date.now()
                         });
                         alert("😢 差一點，再試一次！");
                     }
