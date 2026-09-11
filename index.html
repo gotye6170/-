@@ -2133,22 +2133,31 @@
                 Bodies.rectangle(renderWidth/2, renderHeight - 5, renderWidth, 20, { isStatic: true, render: inv })
             ]);
 
-            // ---------- 弧形軌道（起點接在垂直軌道頂端） ----------
-            const railLeftX = renderWidth - 58;
-            const railTopY = 130;
+            // ---------- 弧形軌道（弧形最高點在機台右上角） ----------
+            const railLeftX = renderWidth - 55;
+            const railTopY = 100;  // 軌道左壁從 y=100 開始
             const railBottomY = renderHeight - 25;
 
-            // ★ 起點接在垂直軌道左壁的頂點上（x = railLeftX, y = railTopY）
-            const curveP0 = { x: railLeftX, y: railTopY };
-            const curveP1 = { x: railLeftX - 20, y: railTopY - 95 };
-            const curveP2 = { x: railLeftX - 130, y: railTopY - 80 };
+            // ★ 弧形從右上角彎下來，起點接在軌道左壁頂端
+            // 弧形的頂點在機台最右上角（接近 renderWidth - 20, 30）
+            const curveP0 = { x: renderWidth - 22, y: 32 };       // 右上角：弧形的「頂點」
+            const curveP1 = { x: renderWidth - 30, y: 100 };      // 控制點：往下往左
+            const curveP2 = { x: railLeftX - 130, y: 90 };        // 終點：左側遊戲區上方
 
-            const curveSegments = 24;
+            // 但球從軌道左壁上升，需要先在 x = railLeftX 附近被引導到弧形上
+            // 所以我們改成從軌道左壁頂端往上，經過一個「小平台」連到弧形
+            // 換一種設計：弧形的起點就是軌道左壁的頂端
+            const curveStart = { x: railLeftX, y: railTopY };
+            const curveCtrl = { x: renderWidth - 10, y: 25 };
+            const curveEnd = { x: railLeftX - 130, y: 50 };
+
+            // 用二次貝茲從 (railLeftX, railTopY) 經過 (renderWidth-10, 25) 到 (railLeftX-130, 50)
+            const curveSegments = 28;
             for (let i = 0; i < curveSegments; i++) {
                 const t1 = i / curveSegments;
                 const t2 = (i + 1) / curveSegments;
-                const pt1 = bezierPoint(t1, curveP0, curveP1, curveP2);
-                const pt2 = bezierPoint(t2, curveP0, curveP1, curveP2);
+                const pt1 = bezierPoint(t1, curveStart, curveCtrl, curveEnd);
+                const pt2 = bezierPoint(t2, curveStart, curveCtrl, curveEnd);
                 const mx = (pt1.x + pt2.x) / 2;
                 const my = (pt1.y + pt2.y) / 2;
                 const len = Math.hypot(pt2.x - pt1.x, pt2.y - pt1.y) + 4;
@@ -2209,7 +2218,7 @@
             pachinkoBallRestX = ballRestX;
             pachinkoBallRestY = ballRestY;
 
-            // ★ 在彈珠下方加一個隱形小平台，讓彈珠掉回時會停在彈簧頂端
+            // 隱形小平台讓彈珠掉回時停在彈簧頂端
             const springPlatform = Bodies.rectangle(ballRestX, ballRestY + 10, 30, 6, {
                 isStatic: true,
                 render: inv
@@ -2298,7 +2307,8 @@
             bgCanvas.width = renderWidth;
             bgCanvas.height = renderHeight;
             const bctx = bgCanvas.getContext('2d');
-            drawPachinkoSceneStatic(bctx, renderWidth, renderHeight, playAreaRight, curveP0, curveP1, curveP2, pegs, {
+            // 給 drawPachinkoSceneStatic 傳入曲線三點
+            drawPachinkoSceneStatic(bctx, renderWidth, renderHeight, playAreaRight, curveStart, curveCtrl, curveEnd, pegs, {
                 x: springX, topY: springTopY, bottomY: springBottomY, leverY: leverY
             }, railLeftX, railTopY, railBottomY);
 
@@ -2461,11 +2471,10 @@
             const limit = getMaxDrawsForPlayer(currentPlayerName);
             if (!isAdminMode && drawCount >= limit) return;
 
-            // 保險：如果真的沒有彈珠，重新建立
             if (!pachinkoBall) {
                 const renderWidth = pachinkoRender ? pachinkoRender.options.width : pachinkoWidth;
                 const renderHeight = pachinkoRender ? pachinkoRender.options.height : pachinkoHeight;
-                const railLeftX = renderWidth - 58;
+                const railLeftX = renderWidth - 55;
                 pachinkoBall = Matter.Bodies.circle(railLeftX + 22, renderHeight - 95, 8, {
                     isStatic: true,
                     restitution: 0.5,
@@ -2478,12 +2487,14 @@
             }
 
             Matter.Body.setStatic(pachinkoBall, false);
-            // ★ 力道範圍拉大：最小 18，最大 58（差距 3.2 倍）
-            // power = 0.2 (20%) → speed = 18 + 0.2 * 40 = 26（太弱，無法進 Pin 區）
-            // power = 0.5 (50%) → speed = 38
-            // power = 1.0 (100%) → speed = 58
-            const minSpeed = 18;
-            const maxSpeed = 58;
+            // ★ 力道範圍縮小：最小 2，最大 17（差距 8.5 倍）
+            // power = 0.05 (5%) → speed = 2.75（極小力，球只能上升約 15px）
+            // power = 0.20 (20%) → speed = 5（約上升 50px，到不了弧形）
+            // power = 0.50 (50%) → speed = 9.5（約上升 200px，接近弧形但可能還不到）
+            // power = 0.80 (80%) → speed = 14（約上升 400px，可以進弧形區）
+            // power = 1.00 (100%) → speed = 17（可以到頂端）
+            const minSpeed = 2;
+            const maxSpeed = 17;
             const speed = minSpeed + power * (maxSpeed - minSpeed);
             Matter.Body.setVelocity(pachinkoBall, { x: 0, y: -speed });
 
@@ -2504,7 +2515,6 @@
                 const pos = pachinkoBall.position;
                 if (pos.x < renderWidth - 90) enteredPlayArea = true;
 
-                // 進入遊戲區時才扣次數（只扣一次）
                 if (enteredPlayArea && !countDeducted) {
                     countDeducted = true;
                     runTransaction(playedRef, (current) => {
@@ -2527,7 +2537,6 @@
                     }).catch((e) => console.error("扣次數失敗", e));
                 }
 
-                // 進入遊戲區且到底部，正常結算
                 if (enteredPlayArea && pos.y > renderHeight - 55) {
                     clearInterval(checkInterval);
                     let targetBin = null;
@@ -2552,15 +2561,12 @@
                     return;
                 }
 
-                // 超時判斷
                 if (checkCount > 500) {
                     clearInterval(checkInterval);
                     if (!enteredPlayArea) {
-                        // 彈珠未進入遊戲區 → 不扣次數，重置彈珠讓玩家重試
                         resetPachinkoAfterDraw();
                         return;
                     }
-                    // 已進入過遊戲區（可能卡住），正常結算
                     let targetBin = null;
                     for (const bin of pachinkoBins) {
                         if (pos.x >= bin.x - bin.width / 2 && pos.x < bin.x + bin.width / 2) {
