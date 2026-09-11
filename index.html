@@ -2121,8 +2121,9 @@
 
             pachinkoEngine = Engine.create();
             pachinkoEngine.gravity.y = 1.0;
-            pachinkoEngine.positionIterations = 10;
-            pachinkoEngine.velocityIterations = 10;
+            pachinkoEngine.positionIterations = 18;
+            pachinkoEngine.velocityIterations = 18;
+            pachinkoEngine.constraintIterations = 4;
 
             let renderWidth = Math.min(pachinkoWidth, container.clientWidth || pachinkoWidth);
             if (!renderWidth || renderWidth < 200) renderWidth = pachinkoWidth;
@@ -2183,7 +2184,7 @@
             ));
 
             // ===== 障礙物與釘子（固定佈局，加密版） =====
-            const pegRadius = 5;
+            const pegRadius = 4;
             const BALL_D = 16;
             const SAFETY = 3;   // 從 4 縮到 2，讓釘子能更貼近障礙物
 
@@ -2210,12 +2211,13 @@
 
             function isNearObstacle(x, y) {
                 for (const b of bumpers) {
-                    const need = b.r + pegRadius + BALL_D + SAFETY;
+                    // 用 BALL_D/2（半徑）取代 BALL_D，只保留通過所需的最小淨空
+                    const need = b.r + pegRadius + (BALL_D / 2) + SAFETY;
                     if (Math.hypot(x - b.x, y - b.y) < need) return true;
                 }
                 for (const s of spinnerDefs) {
                     const sweep = Math.hypot(s.w / 2, s.h / 2);
-                    const need = sweep + pegRadius + BALL_D + SAFETY;
+                    const need = sweep + pegRadius + (BALL_D / 2) + SAFETY;
                     if (Math.hypot(x - s.x, y - s.y) < need) return true;
                 }
                 return false;
@@ -2230,8 +2232,13 @@
                     const x = areaLeft + col * dx + offset;
                     if (x > areaRight + 0.5) continue;
                     if (isNearObstacle(x, y)) continue;
-                    Composite.add(pachinkoEngine.world, Bodies.circle(x, y, pegRadius, {
-                        isStatic: true, restitution: 0.55, friction: 0, frictionStatic: 0, render: inv
+                        Composite.add(pachinkoEngine.world, Bodies.circle(x, y, pegRadius, {
+                        isStatic: true,
+                        restitution: 0.92,
+                        friction: 0,
+                        frictionStatic: 0,
+                        slop: 0.01,
+                        render: inv
                     }));
                     pegs.push({ x, y, r: pegRadius, isBumper: false });
                 }
