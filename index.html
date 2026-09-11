@@ -2182,29 +2182,30 @@
                 { isStatic: true, render: inv, restitution: 0.2 }
             ));
 
-            // ===== 障礙物與釘子（固定佈局） =====
+            // ===== 障礙物與釘子（固定佈局，加密版） =====
             const pegRadius = 5;
             const BALL_D = 16;
-            const SAFETY = 4;
+            const SAFETY = 2;   // 從 4 縮到 2，讓釘子能更貼近障礙物
 
             const areaLeft = 60;
             const areaRight = railRightX - 30;
-            const areaTop = 160;
-            const areaBottom = 400;
+            const areaTop = 148;      // 往上多爭取一點空間
+            const areaBottom = 408;   // 往下多爭取一點空間
 
-            const pegCols = 7;
-            const pegRows = 10;
+            const pegCols = 9;        // 7 → 9
+            const pegRows = 11;       // 10 → 11
             const dx = (areaRight - areaLeft) / (pegCols - 1);
             const dy = (areaBottom - areaTop) / (pegRows - 1);
 
+            // 紅球微縮、葉片微縮，讓淨空圈變小
             const bumpers = [
-                { x: areaLeft + dx * 1.0, y: areaTop + dy * 3, r: 14 },
-                { x: areaLeft + dx * 4.0, y: areaTop + dy * 3, r: 14 },
-                { x: areaLeft + dx * 3.0, y: areaTop + dy * 6, r: 15 }
+                { x: areaLeft + dx * 1.5, y: areaTop + dy * 2.5, r: 13 },
+                { x: areaLeft + dx * 5.5, y: areaTop + dy * 2.5, r: 13 },
+                { x: areaLeft + dx * 3.5, y: areaTop + dy * 5.5, r: 14 }
             ];
             const spinnerDefs = [
-                { x: areaLeft + dx * 0.5, y: areaTop + dy * 5, w: 40, h: 8, speed: 0.028, dir:  1 },
-                { x: areaLeft + dx * 5.5, y: areaTop + dy * 5, w: 40, h: 8, speed: 0.028, dir: -1 }
+                { x: areaLeft + dx * 0.7, y: areaTop + dy * 4.5, w: 36, h: 8, speed: 0.028, dir:  1 },
+                { x: areaLeft + dx * 6.3, y: areaTop + dy * 4.5, w: 36, h: 8, speed: 0.028, dir: -1 }
             ];
 
             function isNearObstacle(x, y) {
