@@ -2198,74 +2198,98 @@
                 { isStatic: true, render: inv, restitution: 0.2 }
             ));
 
-            // ---------- 釘子陣列與特殊機關（固定位置，所有玩家一致） ----------
+            // ---------- 障礙物定義（先定義，釘子生成時要避開） ----------
+            const pegRadius = 5;
+            const minGap = pegRadius * 2 + 16 + 6; // 釘子直徑 + 彈珠直徑 + 安全餘量 = 32
+
+            // 3 個紅色緩衝墊（固定位置）
+            const bumpers = [
+                { x: 140, y: 230, r: 18 },
+                { x: 240, y: 230, r: 18 },
+                { x: 190, y: 320, r: 20 }
+            ];
+
+            // 2 個旋轉葉片（固定位置）
+            const spinnerDefs = [
+                { x: 95,  y: 285, w: 56, h: 9, speed: 0.028, dir: 1 },
+                { x: 285, y: 285, w: 56, h: 9, speed: 0.028, dir: -1 }
+            ];
+
+            // 障礙物淨空半徑：釘子不能進到這個範圍
+            function isNearObstacle(x, y) {
+                for (const b of bumpers) {
+                    const need = b.r + pegRadius + 16 + 4;
+                    if (Math.hypot(x - b.x, y - b.y) < need) return true;
+                }
+                for (const s of spinnerDefs) {
+                    const sweep = Math.hypot(s.w / 2, s.h / 2);
+                    const need = sweep + pegRadius + 16 + 4;
+                    if (Math.hypot(x - s.x, y - s.y) < need) return true;
+                }
+                return false;
+            }
+
+            // ---------- 固定交錯網格釘子 ----------
             const pegs = [];
             const pegAreaTop = 160;
             const pegAreaBottom = 420;
-            const pegAreaLeft = 40;
-            const pegAreaRight = railRightX - 25;
+            const pegAreaLeft = 48;
+            const pegAreaRight = 250;
             const pegAreaWidth = pegAreaRight - pegAreaLeft;
-            const pegAreaHeight = pegAreaBottom - pegAreaTop;
 
-            // 固定交錯網格釘子
-            const pegRows = 10;
-            const pegCols = 8;
-            const pegRadius = 5;
-            const rowGap = pegAreaHeight / (pegRows - 1);
-            const colGap = pegAreaWidth / pegCols;
+            const pegRows = 9;
+            const pegCols = 7;
+            const rowGap = (pegAreaBottom - pegAreaTop) / (pegRows - 1);
+            const colGap = pegAreaWidth / (pegCols - 1);
+
             for (let row = 0; row < pegRows; row++) {
                 const y = pegAreaTop + row * rowGap;
                 const isOdd = row % 2 === 1;
-                const startX = isOdd ? pegAreaLeft + colGap : pegAreaLeft + colGap / 2;
-                const count = isOdd ? pegCols - 1 : pegCols;
-                for (let i = 0; i < count; i++) {
-                    const x = startX + i * colGap;
-                    if (x < pegAreaLeft || x > pegAreaRight) continue;
+                const colsInRow = isOdd ? pegCols - 1 : pegCols;
+                for (let i = 0; i < colsInRow; i++) {
+                    const x = isOdd
+                        ? pegAreaLeft + colGap * 0.5 + i * colGap
+                        : pegAreaLeft + i * colGap;
+                    if (isNearObstacle(x, y)) continue;
                     Composite.add(pachinkoEngine.world, Bodies.circle(x, y, pegRadius, {
                         isStatic: true,
-                        restitution: 0.6,
+                        restitution: 0.55,
                         friction: 0,
+                        frictionStatic: 0,
                         render: inv
                     }));
                     pegs.push({ x, y, r: pegRadius, isBumper: false });
                 }
             }
 
-            // 3 個固定位置的紅色緩衝墊
-            const bumpers = [
-                { x: pegAreaLeft + pegAreaWidth * 0.25, y: pegAreaTop + pegAreaHeight * 0.25, r: 18 },
-                { x: pegAreaLeft + pegAreaWidth * 0.75, y: pegAreaTop + pegAreaHeight * 0.25, r: 18 },
-                { x: pegAreaLeft + pegAreaWidth * 0.50, y: pegAreaTop + pegAreaHeight * 0.55, r: 20 }
-            ];
+            // ---------- 加入紅球 ----------
             for (const b of bumpers) {
                 Composite.add(pachinkoEngine.world, Bodies.circle(b.x, b.y, b.r, {
                     isStatic: true,
-                    restitution: 0.9,
+                    restitution: 0.95,
                     friction: 0,
+                    frictionStatic: 0,
                     render: inv
                 }));
                 pegs.push({ x: b.x, y: b.y, r: b.r, isBumper: true });
             }
 
-            // ---------- 旋轉葉片（特殊障礙物） ----------
+            // ---------- 加入旋轉葉片 ----------
             const spinners = [];
-            const spinnerDefs = [
-                { x: pegAreaLeft + pegAreaWidth * 0.20, y: pegAreaTop + pegAreaHeight * 0.45, w: 70, h: 10, speed: 0.028, dir: 1 },
-                { x: pegAreaLeft + pegAreaWidth * 0.80, y: pegAreaTop + pegAreaHeight * 0.45, w: 70, h: 10, speed: 0.028, dir: -1 }
-            ];
             for (const d of spinnerDefs) {
-                const body = Bodies.polygon(d.x, d.y, d.w, d.h, {
+                const body = Bodies.rectangle(d.x, d.y, d.w, d.h, {
                     isStatic: true,
                     restitution: 1.0,
                     friction: 0,
                     frictionStatic: 0,
                     render: inv
                 });
+                Matter.Body.setAngle(body, Math.random() * Math.PI);
                 Composite.add(pachinkoEngine.world, body);
                 spinners.push({ body, w: d.w, h: d.h, speed: d.speed * d.dir });
             }
 
-            // 讓葉片每幀旋轉（靜態 body 也能用 Body.rotate 轉）
+            // 每幀旋轉葉片
             Events.on(pachinkoEngine, 'beforeUpdate', () => {
                 for (const s of spinners) {
                     Matter.Body.rotate(s.body, s.speed);
