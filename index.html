@@ -2202,17 +2202,17 @@
             const pegRadius = 5;
             const minGap = pegRadius * 2 + 16 + 6; // 釘子直徑 + 彈珠直徑 + 安全餘量 = 32
 
-            // 3 個紅色緩衝墊（固定位置）
+            // 3 個紅色緩衝墊（用 railRightX 相對定位，不會撞軌道牆）
             const bumpers = [
-                { x: 140, y: 230, r: 18 },
-                { x: 240, y: 230, r: 18 },
-                { x: 190, y: 320, r: 20 }
+                { x: railRightX - 168, y: 235, r: 16 },
+                { x: railRightX - 84,  y: 235, r: 16 },
+                { x: railRightX - 126, y: 330, r: 18 }
             ];
 
-            // 2 個旋轉葉片（固定位置）
+            // 2 個旋轉葉片（用 railRightX 相對定位）
             const spinnerDefs = [
-                { x: 95,  y: 285, w: 56, h: 9, speed: 0.028, dir: 1 },
-                { x: 285, y: 285, w: 56, h: 9, speed: 0.028, dir: -1 }
+                { x: railRightX - 210, y: 285, w: 52, h: 9, speed: 0.028, dir: 1 },
+                { x: railRightX - 66,  y: 285, w: 52, h: 9, speed: 0.028, dir: -1 }
             ];
 
             // 障礙物淨空半徑：釘子不能進到這個範圍
