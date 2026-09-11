@@ -336,6 +336,7 @@
         .choice-btn-points { background: linear-gradient(135deg, #34d399, #059669); color: white; box-shadow: 0 8px 20px rgba(16,185,129,0.35); }
         .choice-btn-slot { background: linear-gradient(135deg, #a78bfa, #7c3aed); color: white; box-shadow: 0 8px 20px rgba(124, 58, 237, 0.35); }
         .choice-btn-pachinko { background: linear-gradient(135deg, #60a5fa, #2563eb); color: white; box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35); }
+
         .casino-slot-machine {
             width: 100%;
             max-width: 420px;
@@ -457,6 +458,8 @@
             margin-top: 10px;
             text-align: center;
         }
+
+        /* ===== 彈珠台 ===== */
         .pachinko-machine {
             width: 100%;
             max-width: 420px;
@@ -490,7 +493,7 @@
         }
         .pachinko-container canvas { display: block; max-width: 100%; height: auto !important; }
 
-        /* ===== 彈珠台拉桿 ===== */
+        /* ===== 彈珠台拉桿區 ===== */
         .pachinko-lever-area {
             display: flex;
             align-items: center;
@@ -501,39 +504,78 @@
         }
         .pachinko-lever-track {
             position: relative;
-            width: 56px;
-            height: 120px;
+            width: 60px;
+            height: 130px;
             background: linear-gradient(180deg, #0a0612, #1a0d2e);
-            border-radius: 28px;
+            border-radius: 30px;
             border: 3px solid #d4af37;
             box-shadow: inset 0 4px 12px rgba(0,0,0,0.9), 0 0 15px rgba(212,175,55,0.3);
             touch-action: none;
             user-select: none;
             -webkit-user-select: none;
             flex-shrink: 0;
+            overflow: visible;
         }
         .pachinko-lever-knob {
             position: absolute;
             top: 6px;
             left: 50%;
             transform: translateX(-50%);
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            background: radial-gradient(circle at 35% 30%, #ff9999, #cc0000 55%, #660000 100%);
-            box-shadow: 0 5px 0 #4d0000, 0 8px 15px rgba(0,0,0,0.7), inset 0 -4px 10px rgba(0,0,0,0.4), inset 0 4px 8px rgba(255,255,255,0.4);
+            width: 50px;
+            height: 74px;
             cursor: grab;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            color: rgba(255,255,255,0.85);
             touch-action: none;
             user-select: none;
             -webkit-user-select: none;
             will-change: top;
         }
         .pachinko-lever-knob:active { cursor: grabbing; }
+        .pachinko-lever-ball {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background:
+                radial-gradient(circle at 32% 26%, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0) 40%),
+                radial-gradient(circle at 40% 40%, #ff7a7a 0%, #cc0000 55%, #660000 100%);
+            box-shadow:
+                inset -4px -5px 10px rgba(0,0,0,0.55),
+                inset 3px 3px 6px rgba(255,255,255,0.35),
+                0 3px 0 #4d0000,
+                0 6px 12px rgba(0,0,0,0.6);
+            position: relative;
+            z-index: 2;
+            flex-shrink: 0;
+        }
+        .pachinko-lever-rod {
+            width: 12px;
+            height: 32px;
+            background: linear-gradient(to right, #5a5a5a, #cfcfcf 35%, #ffffff 50%, #a8a8a8 65%, #4a4a4a);
+            margin-top: -4px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.6), inset 0 0 3px rgba(255,255,255,0.3);
+            position: relative;
+            z-index: 1;
+        }
+        .pachinko-lever-rod::before {
+            content: '';
+            position: absolute;
+            top: 4px; left: 1px; right: 1px;
+            height: 1px;
+            background: rgba(255,255,255,0.5);
+            border-radius: 1px;
+        }
+        .pachinko-lever-rod::after {
+            content: '';
+            position: absolute;
+            bottom: 4px; left: 1px; right: 1px;
+            height: 1px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 1px;
+        }
+
         .pachinko-power-display { flex: 1; max-width: 180px; }
         .pachinko-power-bar {
             width: 100%;
@@ -597,8 +639,10 @@
             .slot-reel-window { width: 75px; height: 110px; border-radius: 12px; box-shadow: 0 0 0 4px #8b4513, 0 0 0 7px #d4af37, inset 0 0 12px rgba(0,0,0,0.8); }
             .slot-reel-symbol { height: 110px; width: 75px; font-size: 45px; }
             .slot-reel-symbol img { width: 65px; height: 65px; object-fit: cover; object-position: center; background: #ffffff; display: block; border-radius: 8px; }
-            .pachinko-lever-track { width: 52px; height: 108px; }
-            .pachinko-lever-knob { width: 40px; height: 40px; font-size: 16px; }
+            .pachinko-lever-track { width: 56px; height: 118px; }
+            .pachinko-lever-knob { width: 46px; height: 68px; }
+            .pachinko-lever-ball { width: 42px; height: 42px; }
+            .pachinko-lever-rod { height: 28px; width: 10px; }
             .pachinko-power-display { max-width: 150px; }
             .pachinko-power-text { font-size: 12px; }
         }
@@ -728,7 +772,10 @@
                         <div id="pachinkoContainer" class="pachinko-container"></div>
                         <div class="pachinko-lever-area">
                             <div class="pachinko-lever-track" id="pachinkoLeverTrack">
-                                <div class="pachinko-lever-knob" id="pachinkoLeverKnob">⬇</div>
+                                <div class="pachinko-lever-knob" id="pachinkoLeverKnob">
+                                    <div class="pachinko-lever-ball"></div>
+                                    <div class="pachinko-lever-rod"></div>
+                                </div>
                             </div>
                             <div class="pachinko-power-display">
                                 <div class="pachinko-power-bar">
@@ -1693,14 +1740,11 @@
                 strip1.style.transform = targetTransform1;
                 strip2.style.transform = targetTransform2;
                 strip3.style.transform = targetTransform3;
-
                 await new Promise(resolve => setTimeout(resolve, 3000));
-
                 const isWin = (reel1 === reel2 && reel2 === reel3);
                 const symbolData = slotSymbols[reel1] || {};
                 const prizeId = symbolData.prizeId || reel1;
                 const prizeData = lastPrizes?.[prizeId];
-
                 if (isWin && prizeData) {
                     try {
                         const qRef = ref(db, `prizes/${prizeId}/quantity`);
@@ -1738,7 +1782,6 @@
                                 }
                                 code = "點數已自動匯入你的錢包";
                             }
-
                             await push(ref(db, `drawRecords/${currentPlayerName}`), {
                                 type: "slot",
                                 won: prizeData.name || prizeId,
@@ -1746,7 +1789,6 @@
                                 time: Date.now(),
                                 group: honorUnlockedGroup
                             });
-
                             showSlotWinModal(prizeData.name, code, awardedPoints);
                         }
                     } catch (e) {
@@ -1776,7 +1818,6 @@
                     } catch (e) { console.error(e); }
                     showSlotWinModal("銘謝惠顧", "", 0);
                 }
-
             } catch (e) {
                 console.error("拉霸錯誤:", e);
                 alert("拉霸失敗，請稍後再試。錯誤：" + e.message);
@@ -1787,7 +1828,7 @@
             }
         }
 
-        // ---------- 彈珠台核心 ----------
+        // ---------- 彈珠台核心（全新設計） ----------
         function drawGlassBall(ctx, x, y, r) {
             const grad = ctx.createRadialGradient(x - r * 0.35, y - r * 0.35, r * 0.05, x, y, r);
             grad.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
@@ -1832,24 +1873,24 @@
             ctx.fill();
         }
 
-        function drawMetalBar(ctx, bar) {
+        function drawMetalBar(ctx, x, y, w, h, angle) {
             ctx.save();
-            ctx.translate(bar.x, bar.y);
-            ctx.rotate(bar.angle || 0);
-            const grad = ctx.createLinearGradient(0, -bar.h / 2, 0, bar.h / 2);
+            ctx.translate(x, y);
+            ctx.rotate(angle || 0);
+            const grad = ctx.createLinearGradient(0, -h / 2, 0, h / 2);
             grad.addColorStop(0, '#e0a866');
             grad.addColorStop(0.35, '#c07830');
             grad.addColorStop(0.65, '#8b4513');
             grad.addColorStop(1, '#4a2208');
             ctx.fillStyle = grad;
-            ctx.fillRect(-bar.w / 2, -bar.h / 2, bar.w, bar.h);
+            ctx.fillRect(-w / 2, -h / 2, w, h);
             ctx.fillStyle = 'rgba(255,220,160,0.5)';
-            ctx.fillRect(-bar.w / 2, -bar.h / 2 + 1, bar.w, 2);
+            ctx.fillRect(-w / 2, -h / 2 + 1, w, 2);
             ctx.fillStyle = 'rgba(0,0,0,0.4)';
-            ctx.fillRect(-bar.w / 2, bar.h / 2 - 3, bar.w, 3);
+            ctx.fillRect(-w / 2, h / 2 - 3, w, 3);
             ctx.strokeStyle = 'rgba(0,0,0,0.5)';
             ctx.lineWidth = 1;
-            ctx.strokeRect(-bar.w / 2 + 0.5, -bar.h / 2 + 0.5, bar.w - 1, bar.h - 1);
+            ctx.strokeRect(-w / 2 + 0.5, -h / 2 + 0.5, w - 1, h - 1);
             ctx.restore();
         }
 
@@ -1880,7 +1921,87 @@
             ctx.fill();
         }
 
-        function drawPachinkoSceneStatic(cctx, renderWidth, renderHeight, playWidth, trackWall, trackFloor, topPlate, pegs) {
+        // 畫彈簧線圈
+        function drawSpring(ctx, cx, topY, bottomY, radius, turns) {
+            ctx.save();
+            ctx.strokeStyle = '#c0c0c0';
+            ctx.lineWidth = 2.5;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            const totalH = bottomY - topY;
+            const segs = turns * 24;
+            for (let i = 0; i <= segs; i++) {
+                const t = i / segs;
+                const y = topY + t * totalH;
+                const angle = t * turns * Math.PI * 2;
+                const x = cx + Math.sin(angle) * radius;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+            // 高光
+            ctx.strokeStyle = 'rgba(255,255,255,0.7)';
+            ctx.lineWidth = 0.8;
+            ctx.beginPath();
+            for (let i = 0; i <= segs; i++) {
+                const t = i / segs;
+                const y = topY + t * totalH - 1;
+                const angle = t * turns * Math.PI * 2;
+                const x = cx + Math.sin(angle) * radius - 0.8;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        // 畫紅色拉桿 (扣板機樣式：紅球 + 金環 + 金屬桿)
+        function drawLeverKnob(ctx, cx, cy) {
+            // 金屬桿（連接彈簧底部與紅球）
+            const rodGrad = ctx.createLinearGradient(cx - 4, cy - 20, cx + 4, cy + 20);
+            rodGrad.addColorStop(0, '#4a4a4a');
+            rodGrad.addColorStop(0.35, '#cfcfcf');
+            rodGrad.addColorStop(0.5, '#ffffff');
+            rodGrad.addColorStop(0.65, '#a8a8a8');
+            rodGrad.addColorStop(1, '#3a3a3a');
+            ctx.fillStyle = rodGrad;
+            ctx.fillRect(cx - 4, cy - 22, 8, 22);
+
+            // 金色環
+            ctx.beginPath();
+            ctx.arc(cx, cy, 13, 0, Math.PI * 2);
+            const ringGrad = ctx.createRadialGradient(cx - 3, cy - 3, 3, cx, cy, 13);
+            ringGrad.addColorStop(0, '#fff4c2');
+            ringGrad.addColorStop(0.6, '#d4af37');
+            ringGrad.addColorStop(1, '#8b6914');
+            ctx.fillStyle = ringGrad;
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(0,0,0,0.6)';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            // 紅色球
+            const ballGrad = ctx.createRadialGradient(cx - 4, cy - 4, 2, cx, cy, 11);
+            ballGrad.addColorStop(0, '#ff9a9a');
+            ballGrad.addColorStop(0.45, '#e02020');
+            ballGrad.addColorStop(1, '#7a0000');
+            ctx.beginPath();
+            ctx.arc(cx, cy, 11, 0, Math.PI * 2);
+            ctx.fillStyle = ballGrad;
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(0,0,0,0.55)';
+            ctx.lineWidth = 1.2;
+            ctx.stroke();
+
+            // 高光
+            ctx.beginPath();
+            ctx.arc(cx - 4, cy - 4, 3, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(255,255,255,0.9)';
+            ctx.fill();
+        }
+
+        function drawPachinkoSceneStatic(cctx, renderWidth, renderHeight, playWidth, trackWall, topPlate, pegs, springCenter) {
+            // 背景漸層
             const bg = cctx.createLinearGradient(0, 0, 0, renderHeight);
             bg.addColorStop(0, '#101a35');
             bg.addColorStop(1, '#050810');
@@ -1893,6 +2014,7 @@
             cctx.fillStyle = playBg;
             cctx.fillRect(20, 20, playWidth - 20, renderHeight - 40);
 
+            // 星星
             cctx.fillStyle = 'rgba(200,220,255,0.4)';
             for (let i = 0; i < 60; i++) {
                 const x = 25 + Math.random() * (playWidth - 30);
@@ -1903,6 +2025,7 @@
                 cctx.fill();
             }
 
+            // 金色外框
             const goldGrad = cctx.createLinearGradient(0, 0, renderWidth, renderHeight);
             goldGrad.addColorStop(0, '#f6e27a');
             goldGrad.addColorStop(0.4, '#d4af37');
@@ -1921,6 +2044,7 @@
             cctx.lineWidth = 1;
             cctx.strokeRect(20.5, 20.5, renderWidth - 41, renderHeight - 41);
 
+            // 燈泡
             for (let x = 40; x < renderWidth - 30; x += 42) {
                 drawBulb(cctx, x, 10, 3.5);
                 drawBulb(cctx, x, renderHeight - 10, 3.5);
@@ -1930,39 +2054,19 @@
                 drawBulb(cctx, renderWidth - 10, y, 3.5);
             }
 
-            drawMetalBar(cctx, trackWall);
-            drawMetalBar(cctx, trackFloor);
-            drawMetalBar(cctx, topPlate);
+            // 右側軌道左壁
+            drawMetalBar(cctx, trackWall.x, trackWall.y, trackWall.w, trackWall.h, 0);
 
-            const springX = playWidth + 30;
-            const springTop = 180;
-            const springBottom = renderHeight - 70;
-            cctx.strokeStyle = '#cccccc';
-            cctx.lineWidth = 2.5;
-            cctx.beginPath();
-            for (let y = springTop; y < springBottom; y += 9) {
-                const off = (Math.floor((y - springTop) / 9) % 2 === 0) ? -7 : 7;
-                if (y === springTop) cctx.moveTo(springX + off, y);
-                else cctx.lineTo(springX + off, y);
-            }
-            cctx.stroke();
+            // 頂部弧形導引
+            drawMetalBar(cctx, topPlate.x, topPlate.y, topPlate.w, topPlate.h, topPlate.angle);
 
-            cctx.beginPath();
-            cctx.arc(springX, springBottom + 14, 13, 0, Math.PI * 2);
-            const btnGrad = cctx.createRadialGradient(springX - 4, springBottom + 10, 2, springX, springBottom + 14, 13);
-            btnGrad.addColorStop(0, '#ff8080');
-            btnGrad.addColorStop(1, '#b00020');
-            cctx.fillStyle = btnGrad;
-            cctx.fill();
-            cctx.strokeStyle = '#ffffff';
-            cctx.lineWidth = 2;
-            cctx.stroke();
-            cctx.fillStyle = '#ffffff';
-            cctx.font = 'bold 10px "Noto Sans TC", sans-serif';
-            cctx.textAlign = 'center';
-            cctx.textBaseline = 'middle';
-            cctx.fillText("發", springX, springBottom + 14);
+            // 彈簧（位於軌道底部）
+            drawSpring(cctx, springCenter.x, springCenter.topY, springCenter.bottomY, 9, 4.5);
 
+            // 紅色拉桿球（彈簧下方）
+            drawLeverKnob(cctx, springCenter.x, springCenter.leverY);
+
+            // 釘子
             for (const p of pegs) drawPeg(cctx, p.x, p.y, p.r);
         }
 
@@ -1993,7 +2097,6 @@
 
             const renderWidth = Math.min(pachinkoWidth, container.clientWidth || pachinkoWidth);
             const renderHeight = pachinkoHeight;
-            const playWidth = renderWidth - 60;
 
             pachinkoRender = Render.create({
                 element: container,
@@ -2009,7 +2112,7 @@
 
             const inv = { visible: false };
 
-            // 外框（物理）
+            // 外框物理
             Composite.add(pachinkoEngine.world, [
                 Bodies.rectangle(10, renderHeight/2, 20, renderHeight, { isStatic: true, render: inv }),
                 Bodies.rectangle(renderWidth/2, 10, renderWidth, 20, { isStatic: true, render: inv }),
@@ -2017,53 +2120,87 @@
                 Bodies.rectangle(renderWidth/2, renderHeight - 5, renderWidth, 20, { isStatic: true, render: inv })
             ]);
 
-            // ---------- 右側發射軌道 ----------
-            // 軌道左壁：從 y=140 到 y=450，形成一整條連續的發射管
-            const wallTopY = 140;
-            const wallBottomY = renderHeight - 30;
-            const wallHeight = wallBottomY - wallTopY;
-            const trackWall = { x: renderWidth - 54, y: wallTopY + wallHeight / 2, w: 12, h: wallHeight, angle: 0 };
-            Composite.add(pachinkoEngine.world, Bodies.rectangle(trackWall.x, trackWall.y, trackWall.w, trackWall.h, { isStatic: true, render: inv }));
+            // ---------- 右側軌道左壁 (從 y=130 到 y=renderHeight-25) ----------
+            const trackWallX = renderWidth - 58;
+            const trackWallW = 10;
+            const trackWallTop = 130;
+            const trackWallBottom = renderHeight - 25;
+            const trackWallH = trackWallBottom - trackWallTop;
+            const trackWallY = trackWallTop + trackWallH / 2;
 
-            // 軌道底板（彈珠起始平台）
-            const trackFloor = { x: renderWidth - 35, y: renderHeight - 25, w: 26, h: 20, angle: 0 };
-            Composite.add(pachinkoEngine.world, Bodies.rectangle(trackFloor.x, trackFloor.y, trackFloor.w, trackFloor.h, { isStatic: true, render: inv }));
+            Composite.add(pachinkoEngine.world, Bodies.rectangle(
+                trackWallX, trackWallY, trackWallW, trackWallH,
+                { isStatic: true, render: inv }
+            ));
 
-            // ---------- 頂部導引斜板（從右上角往左下斜，把彈珠導入遊戲區） ----------
-            // 起點：右上角外框內緣 (renderWidth - 20, 40)
-            // 終點：軌道左壁上方偏左 (trackWall.x - 30, 90)
-            const plateX1 = renderWidth - 20;
-            const plateY1 = 40;
-            const plateX2 = trackWall.x - 30;
-            const plateY2 = 90;
-            const plateCx = (plateX1 + plateX2) / 2;
-            const plateCy = (plateY1 + plateY2) / 2;
-            const plateLen = Math.hypot(plateX2 - plateX1, plateY2 - plateY1);
-            const plateAngle = Math.atan2(plateY2 - plateY1, plateX2 - plateX1);
-            const topPlate = { x: plateCx, y: plateCy, w: plateLen + 8, h: 22, angle: plateAngle };
-            Composite.add(pachinkoEngine.world, Bodies.rectangle(topPlate.x, topPlate.y, topPlate.w, topPlate.h, { isStatic: true, angle: topPlate.angle, render: inv }));
+            const trackWall = { x: trackWallX, y: trackWallY, w: trackWallW, h: trackWallH };
+
+            // ---------- 頂部弧形導引 ----------
+            // 弧心在軌道左壁的正上方
+            const arcCenterX = trackWallX - 30;
+            const arcCenterY = trackWallTop - 15;
+            const arcR = 75;
+            const arcSegments = 18;
+            const arcThickness = 12;
+
+            for (let i = 0; i <= arcSegments; i++) {
+                const t = i / arcSegments;
+                const theta = t * Math.PI; // 0 到 π (從右到左)
+                const r = arcR + arcThickness / 2;
+                const x = arcCenterX + r * Math.cos(theta);
+                const y = arcCenterY - r * Math.sin(theta);
+                const segAngle = Math.PI / 2 - theta;
+                const segWidth = (Math.PI * arcR) / arcSegments + 6;
+
+                Composite.add(pachinkoEngine.world, Bodies.rectangle(x, y, segWidth, arcThickness, {
+                    isStatic: true,
+                    angle: segAngle,
+                    render: inv
+                }));
+            }
+
+            // 弧形導引的視覺代表點（給靜態繪圖用，取中段）
+            const topPlate = {
+                x: arcCenterX,
+                y: arcCenterY - (arcR + arcThickness / 2),
+                w: arcR * 1.8,
+                h: arcThickness,
+                angle: 0
+            };
 
             // ---------- 釘子陣列 ----------
             const pegs = [];
-            const numRows = 10;
-            const startY = 150;
-            const lastY = 375;
+            const numRows = 9;
+            const startY = 165;
+            const lastY = 365;
             const rowSpacing = (lastY - startY) / (numRows - 1);
             const pegsPerRow = 9;
             const colSpacing = 30;
+            const playAreaLeft = 30;
+            const playAreaRight = trackWallX - trackWallW / 2 - 10;
+
             for (let row = 0; row < numRows; row++) {
                 const y = startY + row * rowSpacing;
                 const offset = (row % 2 === 0) ? 0 : 15;
                 for (let i = 0; i < pegsPerRow; i++) {
-                    const x = 30 + offset + i * colSpacing;
-                    if (x > 26 && x < playWidth - 20) {
+                    const x = playAreaLeft + offset + i * colSpacing;
+                    if (x > 26 && x < playAreaRight) {
                         Composite.add(pachinkoEngine.world, Bodies.circle(x, y, 4, { isStatic: true, restitution: 0.6, render: inv }));
                         pegs.push({ x, y, r: 4 });
                     }
                 }
             }
 
-            // ---------- 獎池 ----------
+            // ---------- 彈簧中心位置 ----------
+            const springCenterX = trackWallX + 22;
+            const springCenter = {
+                x: springCenterX,
+                topY: renderHeight - 85,
+                bottomY: renderHeight - 55,
+                leverY: renderHeight - 38
+            };
+
+            // ---------- 獎池（從左牆到軌道左壁，無縫隙） ----------
             pachinkoBins = [];
             pachinkoPrizeMap = {};
 
@@ -2077,10 +2214,11 @@
                 prizes.push({ id, data: p, weight: w });
             }
 
-            const binTopY = 395;
+            const binTopY = 385;
             const binBottomY = renderHeight - 25;
-            const binAreaLeft = 26;
-            const binAreaRight = playWidth - 16;
+            // 獎池區間：左牆內緣 (22) 到軌道左壁左緣 (trackWallX - trackWallW/2)
+            const binAreaLeft = 24;
+            const binAreaRight = trackWallX - trackWallW / 2;
             const binAreaWidth = binAreaRight - binAreaLeft;
 
             if (prizes.length > 0) {
@@ -2093,6 +2231,7 @@
                     const binX = binAreaLeft + i * binWidth + binWidth / 2;
                     const prize = binPrizes[i];
 
+                    // 每個格子的隔板
                     Composite.add(pachinkoEngine.world, Bodies.rectangle(
                         binAreaLeft + i * binWidth,
                         binTopY + (binBottomY - binTopY) / 2,
@@ -2113,10 +2252,20 @@
                     pachinkoPrizeMap[i] = prize.id;
                 }
 
+                // 最右側隔板
                 Composite.add(pachinkoEngine.world, Bodies.rectangle(
                     binAreaRight,
                     binTopY + (binBottomY - binTopY) / 2,
                     4, binBottomY - binTopY,
+                    { isStatic: true, render: inv }
+                ));
+
+                // 格子底部
+                Composite.add(pachinkoEngine.world, Bodies.rectangle(
+                    (binAreaLeft + binAreaRight) / 2,
+                    binBottomY + 5,
+                    binAreaWidth,
+                    10,
                     { isStatic: true, render: inv }
                 ));
             }
@@ -2126,7 +2275,7 @@
             bgCanvas.width = renderWidth;
             bgCanvas.height = renderHeight;
             const bctx = bgCanvas.getContext('2d');
-            drawPachinkoSceneStatic(bctx, renderWidth, renderHeight, playWidth, trackWall, trackFloor, topPlate, pegs);
+            drawPachinkoSceneStatic(bctx, renderWidth, renderHeight, trackWallX - trackWallW/2, trackWall, topPlate, pegs, springCenter);
 
             // 畫獎池
             const binColors = [
@@ -2173,18 +2322,17 @@
             }
 
             if (pachinkoBins.length > 0) {
+                // 隔板視覺
                 bctx.fillStyle = '#8b4513';
-                for (let i = 0; i <= pachinkoBins.length; i++) {
-                    const x = i === 0
-                        ? binAreaLeft
-                        : (i === pachinkoBins.length ? binAreaRight : pachinkoBins[i].x - pachinkoBins[i].width / 2);
-                    bctx.fillRect(x - 2, binTopY, 4, binBottomY - binTopY);
-                }
+                bctx.fillRect(binAreaLeft - 2, binTopY, 4, binBottomY - binTopY);
+                bctx.fillRect(binAreaRight - 2, binTopY, 4, binBottomY - binTopY);
+
+                // 底盤
                 const shelfGrad = bctx.createLinearGradient(0, binBottomY, 0, renderHeight - 20);
                 shelfGrad.addColorStop(0, '#d4af37');
                 shelfGrad.addColorStop(1, '#8b6914');
                 bctx.fillStyle = shelfGrad;
-                bctx.fillRect(20, binBottomY, playWidth - 20, renderHeight - 20 - binBottomY);
+                bctx.fillRect(20, binBottomY, renderWidth - 40, renderHeight - 20 - binBottomY);
             }
 
             Events.on(pachinkoRender, 'afterRender', () => {
@@ -2265,7 +2413,7 @@
                 leverCurrentOffset = 0;
                 updatePowerDisplay(0);
 
-                if (power > 0.05) {
+                if (power > 0.02) {
                     launchBall(power);
                 }
             }
@@ -2320,9 +2468,9 @@
                 const renderWidth = pachinkoRender ? pachinkoRender.options.width : pachinkoWidth;
                 const renderHeight = pachinkoRender ? pachinkoRender.options.height : pachinkoHeight;
 
-                // 彈珠從軌道底部起飛
-                const ballX = renderWidth - 35;
-                const ballY = renderHeight - 50;
+                // 彈珠從軌道底部起飛（彈簧上方）
+                const ballX = renderWidth - 58 + 22;
+                const ballY = renderHeight - 90;
 
                 pachinkoBall = Matter.Bodies.circle(ballX, ballY, 8, {
                     restitution: 0.5,
@@ -2333,8 +2481,10 @@
                 });
                 Matter.Composite.add(pachinkoEngine.world, pachinkoBall);
 
-                // 發射力道：24（最小）～28（最大）
-                const speed = 24 + power * 4;
+                // ★ 力道差異化：最小 28，最大 48（差距約 1.7 倍）
+                const minSpeed = 28;
+                const maxSpeed = 48;
+                const speed = minSpeed + power * (maxSpeed - minSpeed);
                 Matter.Body.setVelocity(pachinkoBall, { x: 0, y: -speed });
 
                 pachinkoBallDropped = true;
