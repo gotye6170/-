@@ -2227,7 +2227,8 @@
             const binTopY = 430;
             const binBottomY = renderHeight - 35;
             const binAreaLeft = 30;
-            const binAreaRight = railRightX - 20;
+            // 修改點1：獎池右邊界對齊軌道左壁，消除空隙
+            const binAreaRight = railRightX - 6;
             const binAreaWidth = binAreaRight - binAreaLeft;
 
             if (prizes.length > 0) {
@@ -2487,6 +2488,15 @@
                     clearInterval(checkInterval);
                     resetPachinkoAfterDraw();
                     return;
+                }
+
+                // 修改點2：如果球未進入遊戲區，且回到彈簧區靜止，則重置狀態，允許再次發射
+                if (!enteredPlayArea && pos.x > renderWidth - 100 && pos.y > renderHeight - 120) {
+                    if (Math.abs(pachinkoBall.velocity.y) < 1 && Math.abs(pachinkoBall.velocity.x) < 1) {
+                        clearInterval(checkInterval);
+                        resetPachinkoAfterDraw();
+                        return;
+                    }
                 }
 
                 if (pos.x < renderWidth - 90) enteredPlayArea = true;
