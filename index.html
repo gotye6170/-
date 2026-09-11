@@ -974,6 +974,7 @@
         let pachinkoBallRestX = 0;
         let pachinkoBallRestY = 0;
         let pachinkoRenderLoopId = null;
+        let pachinkoSealWall = null;
 
         let audioCtx = null;
         let soundEnabled = true;
@@ -2120,6 +2121,7 @@
             if (pachinkoEngine) { Matter.Engine.clear(pachinkoEngine); pachinkoEngine = null; }
             pachinkoBall = null;
             pachinkoBallDropped = false;
+            pachinkoSealWall = null;
 
             const Engine = Matter.Engine,
                   Runner = Matter.Runner,
@@ -2201,16 +2203,16 @@
             // ---------- 障礙物定義 ----------
             const pegRadius = 5;
 
-            // 3 個紅色緩衝墊（相對軌道牆定位）
+             // 3 個紅色緩衝墊（左側加保底 130，避免畫面窄時撞左牆）
             const bumpers = [
-                { x: railRightX - 170, y: 240, r: 16 },
+                { x: Math.max(railRightX - 170, 130), y: 240, r: 16 },
                 { x: railRightX - 82,  y: 240, r: 16 },
-                { x: railRightX - 126, y: 335, r: 18 }
+                { x: Math.max(railRightX - 126, 175), y: 335, r: 18 }
             ];
 
-            // 2 個旋轉葉片（相對軌道牆定位，不碰牆）
+            // 2 個旋轉葉片（左側保底 110）
             const spinnerDefs = [
-                { x: railRightX - 212, y: 290, w: 50, h: 9, speed: 0.028, dir: 1 },
+                { x: Math.max(railRightX - 200, 110), y: 290, w: 50, h: 9, speed: 0.028, dir: 1 },
                 { x: railRightX - 68,  y: 290, w: 50, h: 9, speed: 0.028, dir: -1 }
             ];
 
@@ -2260,17 +2262,45 @@
                 }
             }
 
-            // ---------- 加入紅球 ----------
+              // ---------- 加入紅球（加標籤，方便碰撞判定） ----------
             for (const b of bumpers) {
-                Composite.add(pachinkoEngine.world, Bodies.circle(b.x, b.y, b.r, {
+                const body = Bodies.circle(b.x, b.y, b.r, {
                     isStatic: true,
                     restitution: 0.95,
                     friction: 0,
                     frictionStatic: 0,
-                    render: inv
-                }));
+                    render: inv,
+                    label: 'bumper'
+                });
+                Composite.add(pachinkoEngine.world, body);
                 pegs.push({ x: b.x, y: b.y, r: b.r, isBumper: true });
             }
+
+            // ---------- 紅球碰撞脈衝：彈珠撞到會明顯被彈開 ----------
+            Events.on(pachinkoEngine, 'collisionStart', (event) => {
+                if (!pachinkoBall) return;
+                for (const pair of event.pairs) {
+                    const { bodyA, bodyB } = pair;
+                    let other = null;
+                    if (bodyA === pachinkoBall) other = bodyB;
+                    else if (bodyB === pachinkoBall) other = bodyA;
+                    else continue;
+                    if (other.label !== 'bumper') continue;
+
+                    const v = pachinkoBall.velocity;
+                    const speed = Math.hypot(v.x, v.y);
+                    if (speed < 1.5) continue;  // 慢速接觸不處理，避免卡住時不斷加速
+
+                    const dx = pachinkoBall.position.x - other.position.x;
+                    const dy = pachinkoBall.position.y - other.position.y;
+                    const dist = Math.hypot(dx, dy) || 1;
+                    const pulse = 5;  // 脈衝大小，想更彈就調大
+                    Matter.Body.setVelocity(pachinkoBall, {
+                        x: v.x + (dx / dist) * pulse,
+                        y: v.y + (dy / dist) * pulse
+                    });
+                }
+            });
 
             // ---------- 加入旋轉葉片 ----------
             const spinners = [];
@@ -2623,6 +2653,25 @@
             document.addEventListener('touchcancel', endDrag);
         }
 
+        function sealPachinkoExit() {
+            if (!pachinkoEngine || !pachinkoRender) return;
+            if (pachinkoSealWall) return;
+            const renderWidth = pachinkoRender.options.width;
+            const railRightX = renderWidth - 75;
+            const railTopY = 150;
+            const sealX = (railRightX + (renderWidth - 20)) / 2;
+            const sealW = (renderWidth - 20) - railRightX + 20;
+            const sealH = 40;
+            pachinkoSealWall = Matter.Bodies.rectangle(
+                sealX,
+                railTopY - sealH / 2,
+                sealW,
+                sealH,
+                { isStatic: true, render: { visible: false }, label: 'exitSeal' }
+            );
+            Matter.Composite.add(pachinkoEngine.world, pachinkoSealWall);
+        }
+        
         function launchBall(power) {
             if (!currentPlayerName) { alert("請先選擇名字"); return; }
             if (pachinkoBallDropped) return;
@@ -2690,7 +2739,13 @@
                     }
                 }
 
-                if (pos.x < renderWidth - 90) enteredPlayArea = true;
+                if (pos.x < renderWidth - 90) {
+                    if (!enteredPlayArea) {
+                        enteredPlayArea = true;
+                        // 彈珠已離開發射道，封住頂部出口，防止它再滾回彈簧
+                        sealPachinkoExit();
+                    }
+                }
 
                 if (enteredPlayArea && !countDeducted) {
                     countDeducted = true;
@@ -2832,6 +2887,10 @@
             if (pachinkoBall) {
                 Matter.Composite.remove(pachinkoEngine.world, pachinkoBall);
                 pachinkoBall = null;
+            }
+            if (pachinkoSealWall) {
+                Matter.Composite.remove(pachinkoEngine.world, pachinkoSealWall);
+                pachinkoSealWall = null;
             }
             if (pachinkoEngine && pachinkoRender) {
                 const ballRestX = pachinkoBallRestX;
