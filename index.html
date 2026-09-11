@@ -2229,16 +2229,16 @@
                 return false;
             }
 
-            // ---------- 固定交錯網格釘子 ----------
+             // ---------- 固定交錯網格釘子 ----------
             const pegs = [];
             const pegAreaTop = 160;
             const pegAreaBottom = 420;
             const pegAreaLeft = 48;
-            const pegAreaRight = 250;
+            const pegAreaRight = railRightX - 21;   // 貼近導軌左壁，右側不再留大空隙
             const pegAreaWidth = pegAreaRight - pegAreaLeft;
 
             const pegRows = 9;
-            const pegCols = 7;
+            const pegCols = 8;
             const rowGap = (pegAreaBottom - pegAreaTop) / (pegRows - 1);
             const colGap = pegAreaWidth / (pegCols - 1);
 
