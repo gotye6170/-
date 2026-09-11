@@ -2200,56 +2200,60 @@
                 { isStatic: true, render: inv, restitution: 0.2 }
             ));
 
-            // ---------- 障礙物定義 ----------
+            // ================================================================
+            //  障礙物與釘子（固定佈局，所有玩家完全一致）
+            //  最小淨空：彈珠直徑 16px，此設計預留 20px 以上
+            // ================================================================
             const pegRadius = 5;
+            const BALL_D = 16;
+            const SAFETY = 4;  // 安全餘量
 
-             // 3 個紅色緩衝墊（左側加保底 130，避免畫面窄時撞左牆）
+            // 遊戲區範圍（貼合綠色框）
+            const areaLeft   = 60;
+            const areaRight  = railRightX - 30;     // 離軌道左牆留 25px
+            const areaTop    = 160;
+            const areaBottom = 400;
+
+            // 釘子網格：7 列 × 10 行交錯
+            const pegCols = 7;
+            const pegRows = 10;
+            const dx = (areaRight - areaLeft) / (pegCols - 1);
+            const dy = (areaBottom - areaTop) / (pegRows - 1);
+
+            // 障礙物位置（全部在綠色框內）
             const bumpers = [
-                { x: Math.max(railRightX - 170, 130), y: 240, r: 16 },
-                { x: railRightX - 82,  y: 240, r: 16 },
-                { x: Math.max(railRightX - 126, 175), y: 335, r: 18 }
+                { x: areaLeft + dx * 1.0, y: areaTop + dy * 3, r: 14 },
+                { x: areaLeft + dx * 4.0, y: areaTop + dy * 3, r: 14 },
+                { x: areaLeft + dx * 3.0, y: areaTop + dy * 6, r: 15 }
             ];
-
-            // 2 個旋轉葉片（左側保底 110）
             const spinnerDefs = [
-                { x: Math.max(railRightX - 200, 110), y: 290, w: 50, h: 9, speed: 0.028, dir: 1 },
-                { x: railRightX - 68,  y: 290, w: 50, h: 9, speed: 0.028, dir: -1 }
+                { x: areaLeft + dx * 0.5, y: areaTop + dy * 5, w: 40, h: 8, speed: 0.028, dir:  1 },
+                { x: areaLeft + dx * 5.5, y: areaTop + dy * 5, w: 40, h: 8, speed: 0.028, dir: -1 }
             ];
 
+            // 判定是否與障礙物距離足夠
             function isNearObstacle(x, y) {
                 for (const b of bumpers) {
-                    const need = b.r + pegRadius + 16 + 6;
+                    const need = b.r + pegRadius + BALL_D + SAFETY;
                     if (Math.hypot(x - b.x, y - b.y) < need) return true;
                 }
                 for (const s of spinnerDefs) {
                     const sweep = Math.hypot(s.w / 2, s.h / 2);
-                    const need = sweep + pegRadius + 16 + 6;
+                    const need = sweep + pegRadius + BALL_D + SAFETY;
                     if (Math.hypot(x - s.x, y - s.y) < need) return true;
                 }
                 return false;
             }
 
-            // ---------- 固定交錯網格釘子 ----------
+            // ---------- 生成釘子 ----------
             const pegs = [];
-            const pegAreaTop = 155;
-            const pegAreaBottom = 405;
-            const pegAreaLeft = 58;
-            const pegAreaRight = railRightX - 30;
-            const pegAreaWidth = pegAreaRight - pegAreaLeft;
-
-            const pegRows = 10;
-            const pegCols = 8;
-            const rowGap = (pegAreaBottom - pegAreaTop) / (pegRows - 1);
-            const colGap = pegAreaWidth / (pegCols - 1);
-
             for (let row = 0; row < pegRows; row++) {
-                const y = pegAreaTop + row * rowGap;
+                const y = areaTop + row * dy;
                 const isOdd = row % 2 === 1;
-                const colsInRow = isOdd ? pegCols - 1 : pegCols;
-                for (let i = 0; i < colsInRow; i++) {
-                    const x = isOdd
-                        ? pegAreaLeft + colGap * 0.5 + i * colGap
-                        : pegAreaLeft + i * colGap;
+                const offset = isOdd ? dx / 2 : 0;
+                for (let col = 0; col < pegCols; col++) {
+                    const x = areaLeft + col * dx + offset;
+                    if (x > areaRight + 0.5) continue;
                     if (isNearObstacle(x, y)) continue;
                     Composite.add(pachinkoEngine.world, Bodies.circle(x, y, pegRadius, {
                         isStatic: true,
@@ -2262,7 +2266,7 @@
                 }
             }
 
-              // ---------- 加入紅球（加標籤，方便碰撞判定） ----------
+            // ---------- 紅球 ----------
             for (const b of bumpers) {
                 const body = Bodies.circle(b.x, b.y, b.r, {
                     isStatic: true,
@@ -2276,7 +2280,7 @@
                 pegs.push({ x: b.x, y: b.y, r: b.r, isBumper: true });
             }
 
-            // ---------- 紅球碰撞脈衝：彈珠撞到會明顯被彈開 ----------
+            // ---------- 紅球碰撞脈衝（撞到會明顯彈開） ----------
             Events.on(pachinkoEngine, 'collisionStart', (event) => {
                 if (!pachinkoBall) return;
                 for (const pair of event.pairs) {
@@ -2289,20 +2293,20 @@
 
                     const v = pachinkoBall.velocity;
                     const speed = Math.hypot(v.x, v.y);
-                    if (speed < 1.5) continue;  // 慢速接觸不處理，避免卡住時不斷加速
+                    if (speed < 1.5) continue;
 
-                    const dx = pachinkoBall.position.x - other.position.x;
-                    const dy = pachinkoBall.position.y - other.position.y;
-                    const dist = Math.hypot(dx, dy) || 1;
-                    const pulse = 5;  // 脈衝大小，想更彈就調大
+                    const rx = pachinkoBall.position.x - other.position.x;
+                    const ry = pachinkoBall.position.y - other.position.y;
+                    const dist = Math.hypot(rx, ry) || 1;
+                    const pulse = 5;
                     Matter.Body.setVelocity(pachinkoBall, {
-                        x: v.x + (dx / dist) * pulse,
-                        y: v.y + (dy / dist) * pulse
+                        x: v.x + (rx / dist) * pulse,
+                        y: v.y + (ry / dist) * pulse
                     });
                 }
             });
 
-            // ---------- 加入旋轉葉片 ----------
+            // ---------- 旋轉葉片 ----------
             const spinners = [];
             for (const d of spinnerDefs) {
                 const body = Bodies.rectangle(d.x, d.y, d.w, d.h, {
@@ -2317,7 +2321,6 @@
                 spinners.push({ body, w: d.w, h: d.h, speed: d.speed * d.dir });
             }
 
-            // 每幀旋轉葉片
             Events.on(pachinkoEngine, 'beforeUpdate', () => {
                 for (const s of spinners) {
                     Matter.Body.rotate(s.body, s.speed);
