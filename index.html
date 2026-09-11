@@ -2124,7 +2124,8 @@
             const Engine = Matter.Engine,
                   Runner = Matter.Runner,
                   Bodies = Matter.Bodies,
-                  Composite = Matter.Composite;
+                  Composite = Matter.Composite,
+                  Events = Matter.Events;
 
             pachinkoEngine = Engine.create();
             pachinkoEngine.gravity.y = 1.0;
@@ -2197,7 +2198,7 @@
                 { isStatic: true, render: inv, restitution: 0.2 }
             ));
 
-            // ---------- 釘子陣列與特殊機關 ----------
+            // ---------- 釘子陣列與特殊機關（固定位置，所有玩家一致） ----------
             const pegs = [];
             const pegAreaTop = 160;
             const pegAreaBottom = 420;
@@ -2206,32 +2207,70 @@
             const pegAreaWidth = pegAreaRight - pegAreaLeft;
             const pegAreaHeight = pegAreaBottom - pegAreaTop;
 
-            const numPegs = 90;
-            const minPegDist = 26;
-            let pegAttempts = 0;
-            while (pegs.length < numPegs && pegAttempts < 2000) {
-                pegAttempts++;
-                const x = pegAreaLeft + Math.random() * pegAreaWidth;
-                const y = pegAreaTop + Math.random() * pegAreaHeight;
-                let tooClose = false;
-                for (const p of pegs) {
-                    if (Math.hypot(p.x - x, p.y - y) < minPegDist) { tooClose = true; break; }
-                }
-                if (!tooClose) {
-                    Composite.add(pachinkoEngine.world, Bodies.circle(x, y, 5, { isStatic: true, restitution: 0.6, render: inv }));
-                    pegs.push({ x, y, r: 5, isBumper: false });
+            // 固定交錯網格釘子
+            const pegRows = 10;
+            const pegCols = 8;
+            const pegRadius = 5;
+            const rowGap = pegAreaHeight / (pegRows - 1);
+            const colGap = pegAreaWidth / pegCols;
+            for (let row = 0; row < pegRows; row++) {
+                const y = pegAreaTop + row * rowGap;
+                const isOdd = row % 2 === 1;
+                const startX = isOdd ? pegAreaLeft + colGap : pegAreaLeft + colGap / 2;
+                const count = isOdd ? pegCols - 1 : pegCols;
+                for (let i = 0; i < count; i++) {
+                    const x = startX + i * colGap;
+                    if (x < pegAreaLeft || x > pegAreaRight) continue;
+                    Composite.add(pachinkoEngine.world, Bodies.circle(x, y, pegRadius, {
+                        isStatic: true,
+                        restitution: 0.6,
+                        friction: 0,
+                        render: inv
+                    }));
+                    pegs.push({ x, y, r: pegRadius, isBumper: false });
                 }
             }
 
+            // 3 個固定位置的紅色緩衝墊
             const bumpers = [
-                { x: pegAreaLeft + pegAreaWidth * 0.25, y: pegAreaTop + pegAreaHeight * 0.3, r: 18 },
-                { x: pegAreaLeft + pegAreaWidth * 0.75, y: pegAreaTop + pegAreaHeight * 0.3, r: 18 },
-                { x: pegAreaLeft + pegAreaWidth * 0.5, y: pegAreaTop + pegAreaHeight * 0.65, r: 20 }
+                { x: pegAreaLeft + pegAreaWidth * 0.25, y: pegAreaTop + pegAreaHeight * 0.25, r: 18 },
+                { x: pegAreaLeft + pegAreaWidth * 0.75, y: pegAreaTop + pegAreaHeight * 0.25, r: 18 },
+                { x: pegAreaLeft + pegAreaWidth * 0.50, y: pegAreaTop + pegAreaHeight * 0.55, r: 20 }
             ];
             for (const b of bumpers) {
-                Composite.add(pachinkoEngine.world, Bodies.circle(b.x, b.y, b.r, { isStatic: true, restitution: 0.9, render: inv }));
+                Composite.add(pachinkoEngine.world, Bodies.circle(b.x, b.y, b.r, {
+                    isStatic: true,
+                    restitution: 0.9,
+                    friction: 0,
+                    render: inv
+                }));
                 pegs.push({ x: b.x, y: b.y, r: b.r, isBumper: true });
             }
+
+            // ---------- 旋轉葉片（特殊障礙物） ----------
+            const spinners = [];
+            const spinnerDefs = [
+                { x: pegAreaLeft + pegAreaWidth * 0.20, y: pegAreaTop + pegAreaHeight * 0.45, w: 70, h: 10, speed: 0.028, dir: 1 },
+                { x: pegAreaLeft + pegAreaWidth * 0.80, y: pegAreaTop + pegAreaHeight * 0.45, w: 70, h: 10, speed: 0.028, dir: -1 }
+            ];
+            for (const d of spinnerDefs) {
+                const body = Bodies.polygon(d.x, d.y, d.w, d.h, {
+                    isStatic: true,
+                    restitution: 1.0,
+                    friction: 0,
+                    frictionStatic: 0,
+                    render: inv
+                });
+                Composite.add(pachinkoEngine.world, body);
+                spinners.push({ body, w: d.w, h: d.h, speed: d.speed * d.dir });
+            }
+
+            // 讓葉片每幀旋轉（靜態 body 也能用 Body.rotate 轉）
+            Events.on(pachinkoEngine, 'beforeUpdate', () => {
+                for (const s of spinners) {
+                    Matter.Body.rotate(s.body, s.speed);
+                }
+            });
 
             // ---------- 彈簧與彈珠預備位置 ----------
             const ballRestX = renderWidth - 50;
@@ -2432,9 +2471,49 @@
             function renderLoop() {
                 ctx2d.clearRect(0, 0, renderWidth, renderHeight);
                 ctx2d.drawImage(bgCanvas, 0, 0);
+
+                // 旋轉葉片
+                for (const s of spinners) {
+                    ctx2d.save();
+                    ctx2d.translate(s.body.position.x, s.body.position.y);
+                    ctx2d.rotate(s.body.angle);
+
+                    // 本體漸層
+                    const grad = ctx2d.createLinearGradient(0, -s.h / 2, 0, s.h / 2);
+                    grad.addColorStop(0, '#ffe066');
+                    grad.addColorStop(0.5, '#f59f00');
+                    grad.addColorStop(1, '#8b6914');
+                    ctx2d.fillStyle = grad;
+                    ctx2d.fillRect(-s.w / 2, -s.h / 2, s.w, s.h);
+
+                    // 外框
+                    ctx2d.strokeStyle = 'rgba(0,0,0,0.6)';
+                    ctx2d.lineWidth = 1.5;
+                    ctx2d.strokeRect(-s.w / 2, -s.h / 2, s.w, s.h);
+
+                    // 上緣高光
+                    ctx2d.fillStyle = 'rgba(255,255,255,0.5)';
+                    ctx2d.fillRect(-s.w / 2 + 2, -s.h / 2 + 1, s.w - 4, 2);
+
+                    // 中心軸
+                    ctx2d.beginPath();
+                    ctx2d.arc(0, 0, 5, 0, Math.PI * 2);
+                    const axisGrad = ctx2d.createRadialGradient(-1, -1, 1, 0, 0, 5);
+                    axisGrad.addColorStop(0, '#fff4c2');
+                    axisGrad.addColorStop(1, '#b8860b');
+                    ctx2d.fillStyle = axisGrad;
+                    ctx2d.fill();
+                    ctx2d.strokeStyle = 'rgba(0,0,0,0.7)';
+                    ctx2d.stroke();
+
+                    ctx2d.restore();
+                }
+
+                // 彈珠
                 if (pachinkoBall) {
                     drawGlassBall(ctx2d, pachinkoBall.position.x, pachinkoBall.position.y, 8);
                 }
+
                 pachinkoRenderLoopId = requestAnimationFrame(renderLoop);
             }
             renderLoop();
