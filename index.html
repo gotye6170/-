@@ -1900,33 +1900,6 @@
             ctx.fill();
         }
 
-        function drawCurvedRail(ctx, p0, p1, p2) {
-            ctx.strokeStyle = 'rgba(0,0,0,0.6)';
-            ctx.lineWidth = 16;
-            ctx.lineCap = 'round';
-            ctx.beginPath();
-            ctx.moveTo(p0.x, p0.y);
-            ctx.quadraticCurveTo(p1.x, p1.y, p2.x, p2.y);
-            ctx.stroke();
-            const grad = ctx.createLinearGradient(p0.x, p0.y, p2.x, p2.y);
-            grad.addColorStop(0, '#e0a866');
-            grad.addColorStop(0.35, '#c07830');
-            grad.addColorStop(0.7, '#8b4513');
-            grad.addColorStop(1, '#4a2208');
-            ctx.strokeStyle = grad;
-            ctx.lineWidth = 12;
-            ctx.beginPath();
-            ctx.moveTo(p0.x, p0.y);
-            ctx.quadraticCurveTo(p1.x, p1.y, p2.x, p2.y);
-            ctx.stroke();
-            ctx.strokeStyle = 'rgba(255,220,160,0.7)';
-            ctx.lineWidth = 4;
-            ctx.beginPath();
-            ctx.moveTo(p0.x - 1, p0.y - 1);
-            ctx.quadraticCurveTo(p1.x - 1, p1.y - 1, p2.x - 1, p2.y - 1);
-            ctx.stroke();
-        }
-
         function drawSpring(ctx, cx, topY, bottomY, radius, turns) {
             ctx.save();
             ctx.strokeStyle = '#c0c0c0';
@@ -1999,7 +1972,7 @@
             ctx.fill();
         }
 
-        function drawPachinkoSceneStatic(cctx, renderWidth, renderHeight, playAreaRight, curveP0, curveP1, curveP2, pegs, springCenter, railRightX, railTopY, railBottomY) {
+        function drawPachinkoSceneStatic(cctx, renderWidth, renderHeight, playAreaRight, pegs, springCenter, railRightX, railTopY, railBottomY) {
             const bg = cctx.createLinearGradient(0, 0, 0, renderHeight);
             bg.addColorStop(0, '#101a35');
             bg.addColorStop(1, '#050810');
@@ -2049,10 +2022,39 @@
                 drawBulb(cctx, renderWidth - 10, y, 3.5);
             }
 
-            // 弧形軌道
-            drawCurvedRail(cctx, curveP0, curveP1, curveP2);
+            // 繪製右上與左上弧形牆
+            const cornerRadius = 80;
+            const seg = 15;
+            const railGrad = cctx.createLinearGradient(0, 0, renderWidth, renderHeight);
+            railGrad.addColorStop(0, '#e0a866');
+            railGrad.addColorStop(0.5, '#c07830');
+            railGrad.addColorStop(1, '#4a2208');
+            
+            cctx.strokeStyle = railGrad;
+            cctx.lineWidth = 12;
+            cctx.lineCap = 'round';
+            
+            // 右上角弧
+            cctx.beginPath();
+            for (let i = 0; i <= seg; i++) {
+                const aR = Math.PI / 2 + (i / seg) * (Math.PI / 2);
+                const xR = renderWidth - 20 - cornerRadius + Math.cos(aR) * cornerRadius;
+                const yR = 20 + cornerRadius - Math.sin(aR) * cornerRadius;
+                if (i === 0) cctx.moveTo(xR, yR); else cctx.lineTo(xR, yR);
+            }
+            cctx.stroke();
 
-            // 垂直軌道左壁
+            // 左上角弧
+            cctx.beginPath();
+            for (let i = 0; i <= seg; i++) {
+                const aL = Math.PI + (i / seg) * (Math.PI / 2);
+                const xL = 20 + cornerRadius + Math.cos(aL) * cornerRadius;
+                const yL = 20 + cornerRadius - Math.sin(aL) * cornerRadius;
+                if (i === 0) cctx.moveTo(xL, yL); else cctx.lineTo(xL, yL);
+            }
+            cctx.stroke();
+
+            // 繪製右側垂直軌道
             const barGrad = cctx.createLinearGradient(railRightX - 6, 0, railRightX + 6, 0);
             barGrad.addColorStop(0, '#4a2208');
             barGrad.addColorStop(0.35, '#c07830');
@@ -2074,14 +2076,6 @@
 
             // 釘子
             for (const p of pegs) drawPeg(cctx, p.x, p.y, p.r);
-        }
-
-        function bezierPoint(t, p0, p1, p2) {
-            const mt = 1 - t;
-            return {
-                x: mt * mt * p0.x + 2 * mt * t * p1.x + t * t * p2.x,
-                y: mt * mt * p0.y + 2 * mt * t * p1.y + t * t * p2.y
-            };
         }
 
         function buildPachinkoBoard() {
@@ -2107,8 +2101,8 @@
                   Events = Matter.Events;
 
             pachinkoEngine = Engine.create();
-            pachinkoEngine.gravity.y = 0.8; // 稍微降低重力，讓球速更可控
-            pachinkoEngine.positionIterations = 10; // 提高碰撞精度，防止穿透
+            pachinkoEngine.gravity.y = 0.8;
+            pachinkoEngine.positionIterations = 10;
             pachinkoEngine.velocityIterations = 10;
 
             const renderWidth = Math.min(pachinkoWidth, container.clientWidth || pachinkoWidth);
@@ -2127,50 +2121,40 @@
             });
 
             const inv = { visible: false };
-            const wallThickness = 80; // 加厚邊界，防止高速穿透
+            const wallThickness = 80;
 
-            // 修正：加厚四周邊界，確保球絕對不會飛出機台
+            // 1. 建立四周基礎邊界
             Composite.add(pachinkoEngine.world, [
-                Bodies.rectangle(-wallThickness/2, renderHeight/2, wallThickness, renderHeight*3, { isStatic: true, render: inv, restitution: 0.2 }), // 左
-                Bodies.rectangle(renderWidth + wallThickness/2, renderHeight/2, wallThickness, renderHeight*3, { isStatic: true, render: inv, restitution: 0.2 }), // 右
-                Bodies.rectangle(renderWidth/2, -wallThickness/2, renderWidth*3, wallThickness, { isStatic: true, render: inv, restitution: 0.2 }), // 上
-                Bodies.rectangle(renderWidth/2, renderHeight + wallThickness/2, renderWidth*3, wallThickness, { isStatic: true, render: inv, restitution: 0.2 }) // 下
+                Bodies.rectangle(-wallThickness/2, renderHeight/2, wallThickness, renderHeight*3, { isStatic: true, render: inv, restitution: 0.2 }),
+                Bodies.rectangle(renderWidth + wallThickness/2, renderHeight/2, wallThickness, renderHeight*3, { isStatic: true, render: inv, restitution: 0.2 }),
+                Bodies.rectangle(renderWidth/2, -wallThickness/2, renderWidth*3, wallThickness, { isStatic: true, render: inv, restitution: 0.2 }),
+                Bodies.rectangle(renderWidth/2, renderHeight + wallThickness/2, renderWidth*3, wallThickness, { isStatic: true, render: inv, restitution: 0.2 })
             ]);
 
-            // ---------- 修正：右側垂直軌道與頂部弧形軌道 ----------
-            const railRightX = renderWidth - 50; // 軌道位於距離右側牆壁 50px 處
-            const railTopY = 80;                 // 軌道垂直段頂端
-            const railBottomY = renderHeight - 100; // 軌道垂直段底端
-            const railThickness = 12;
-
-            // 垂直軌道壁
-            Composite.add(pachinkoEngine.world, Bodies.rectangle(
-                railRightX, (railTopY + railBottomY) / 2, railThickness, railBottomY - railTopY, { isStatic: true, render: inv, restitution: 0.2 }
-            ));
-
-            // 頂部弧形軌道（從右側垂直軌道頂端，向左彎曲）
-            const curveStart = { x: railRightX, y: railTopY };
-            const curveCtrl = { x: railRightX, y: 20 };          // 控制點，決定彎曲程度
-            const curveEnd = { x: railRightX - 160, y: 60 };     // 終點，落在遊戲區左上方
-
-            const curveSegments = 30;
-            for (let i = 0; i < curveSegments; i++) {
-                const t1 = i / curveSegments;
-                const t2 = (i + 1) / curveSegments;
-                const pt1 = bezierPoint(t1, curveStart, curveCtrl, curveEnd);
-                const pt2 = bezierPoint(t2, curveStart, curveCtrl, curveEnd);
-                const mx = (pt1.x + pt2.x) / 2;
-                const my = (pt1.y + pt2.y) / 2;
-                const len = Math.hypot(pt2.x - pt1.x, pt2.y - pt1.y) + 12; // 加厚軌道
-                const angle = Math.atan2(pt2.y - pt1.y, pt2.x - pt1.x);
-
-                Composite.add(pachinkoEngine.world, Bodies.rectangle(mx, my, len, 12, {
-                    isStatic: true,
-                    angle: angle,
-                    render: inv,
-                    restitution: 0.2
-                }));
+            // 2. 建立右上與左上弧形牆 (用多個小矩形拼接出物理弧線)
+            const cornerRadius = 80;
+            const seg = 15;
+            for (let i = 0; i <= seg; i++) {
+                // 右上角弧線
+                const aR = Math.PI / 2 + (i / seg) * (Math.PI / 2);
+                const xR = renderWidth - 20 - cornerRadius + Math.cos(aR) * cornerRadius;
+                const yR = 20 + cornerRadius - Math.sin(aR) * cornerRadius;
+                Composite.add(pachinkoEngine.world, Bodies.rectangle(xR, yR, 14, 14, { isStatic: true, angle: aR, render: inv, restitution: 0.2 }));
+                // 左上角弧線
+                const aL = Math.PI + (i / seg) * (Math.PI / 2);
+                const xL = 20 + cornerRadius + Math.cos(aL) * cornerRadius;
+                const yL = 20 + cornerRadius - Math.sin(aL) * cornerRadius;
+                Composite.add(pachinkoEngine.world, Bodies.rectangle(xL, yL, 14, 14, { isStatic: true, angle: aL, render: inv, restitution: 0.2 }));
             }
+
+            // 3. 右側垂直軌道 (讓球從右下角發射後能沿著右側上升)
+            const railRightX = renderWidth - 55;
+            const railTopY = 100;
+            const railBottomY = renderHeight - 100;
+            Composite.add(pachinkoEngine.world, Bodies.rectangle(
+                railRightX, (railTopY + railBottomY) / 2, 12, railBottomY - railTopY, 
+                { isStatic: true, render: inv, restitution: 0.2 }
+            ));
 
             // ---------- 釘子陣列 ----------
             const pegs = [];
@@ -2196,7 +2180,7 @@
             }
 
             // ---------- 彈簧與彈珠預備位置 ----------
-            const ballRestX = railRightX - 15; // 球在軌道內側
+            const ballRestX = railRightX - 15;
             const ballRestY = railBottomY - 15;
             const springX = ballRestX;
             const springTopY = ballRestY + 10;
@@ -2295,8 +2279,7 @@
             bgCanvas.width = renderWidth;
             bgCanvas.height = renderHeight;
             const bctx = bgCanvas.getContext('2d');
-            // 傳入新的曲線三點與軌道參數
-            drawPachinkoSceneStatic(bctx, renderWidth, renderHeight, playAreaRight, curveStart, curveCtrl, curveEnd, pegs, {
+            drawPachinkoSceneStatic(bctx, renderWidth, renderHeight, playAreaRight, pegs, {
                 x: springX, topY: springTopY, bottomY: springBottomY, leverY: leverY
             }, railRightX, railTopY, railBottomY);
 
@@ -2462,7 +2445,7 @@
             if (!pachinkoBall) {
                 const renderWidth = pachinkoRender ? pachinkoRender.options.width : pachinkoWidth;
                 const renderHeight = pachinkoRender ? pachinkoRender.options.height : pachinkoHeight;
-                const railRightX = renderWidth - 50;
+                const railRightX = renderWidth - 55;
                 pachinkoBall = Matter.Bodies.circle(railRightX - 15, renderHeight - 115, 8, {
                     isStatic: true,
                     restitution: 0.5,
@@ -2475,8 +2458,6 @@
             }
 
             Matter.Body.setStatic(pachinkoBall, false);
-            // ★ 修正：發射力道範圍大幅下修，並調整曲線
-            // 最小力道 8，最大力道 26（避免 1% 就太快，100% 也不會衝出機台）
             const minSpeed = 8;
             const maxSpeed = 26;
             const speed = minSpeed + power * (maxSpeed - minSpeed);
@@ -2498,7 +2479,6 @@
                 checkCount++;
                 const pos = pachinkoBall.position;
                 
-                // 安全檢查：如果球意外飛出邊界，強制拉回
                 if (pos.x < -20 || pos.x > renderWidth + 20 || pos.y < -20 || pos.y > renderHeight + 20) {
                     clearInterval(checkInterval);
                     resetPachinkoAfterDraw();
@@ -2529,7 +2509,6 @@
                     }).catch((e) => console.error("扣次數失敗", e));
                 }
 
-                // 檢查是否落入獎池
                 if (enteredPlayArea && pos.y > renderHeight - 65) {
                     clearInterval(checkInterval);
                     let targetBin = null;
