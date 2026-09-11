@@ -1784,8 +1784,7 @@ function buildPachinkoBoard() {
 
     const renderWidth = Math.min(pachinkoWidth, container.clientWidth || pachinkoWidth);
     const renderHeight = pachinkoHeight;
-    const trackWidth = 40;
-    const playWidth = renderWidth - trackWidth;
+    const playWidth = renderWidth - 60;
 
     pachinkoRender = Render.create({
         element: container,
@@ -1799,83 +1798,72 @@ function buildPachinkoBoard() {
         }
     });
 
-    // 外框
-    const wallThickness = 20;
-    const walls = [
+    // ---------- 外框金邊 ----------
+    Composite.add(pachinkoEngine.world, [
         Bodies.rectangle(10, renderHeight/2, 20, renderHeight, { isStatic: true, render: { fillStyle: '#d4af37' } }),
         Bodies.rectangle(renderWidth/2, 10, renderWidth, 20, { isStatic: true, render: { fillStyle: '#d4af37' } }),
         Bodies.rectangle(renderWidth - 10, renderHeight/2, 20, renderHeight, { isStatic: true, render: { fillStyle: '#d4af37' } }),
         Bodies.rectangle(renderWidth/2, renderHeight - 5, renderWidth, 20, { isStatic: true, render: { fillStyle: '#d4af37' } })
-    ];
-    Composite.add(pachinkoEngine.world, walls);
+    ]);
 
-    // ---------- 右側發射軌道（一整條連續管） ----------
-    // 軌道左壁：從 y = 150 一路到底部，形成發射管
-    const trackLeftWallTop = 150;
-    const trackLeftWallBottom = renderHeight - 20;
-    const trackLeftWallHeight = trackLeftWallBottom - trackLeftWallTop;
-    const trackLeftWall = Bodies.rectangle(
+    // ---------- 右側發射軌道（連續不中斷） ----------
+    // 軌道左牆：從 y = 70 一直到底部
+    const wallTopY = 70;
+    const wallBottomY = renderHeight - 20;
+    const wallHeight = wallBottomY - wallTopY;
+    Composite.add(pachinkoEngine.world, Bodies.rectangle(
         playWidth,
-        trackLeftWallTop + trackLeftWallHeight / 2,
-        12,
-        trackLeftWallHeight,
+        wallTopY + wallHeight / 2,
+        20, wallHeight,
         { isStatic: true, render: { fillStyle: '#8b4513' } }
-    );
-    Composite.add(pachinkoEngine.world, trackLeftWall);
+    ));
 
-    // 軌道底板（彈珠起始平台）
-    const trackFloor = Bodies.rectangle(
-        playWidth + trackWidth / 2,
+    // 軌道底板（發射台）
+    Composite.add(pachinkoEngine.world, Bodies.rectangle(
+        renderWidth - 35,
         renderHeight - 15,
-        trackWidth - 6,
-        20,
+        40, 20,
         { isStatic: true, render: { fillStyle: '#8b4513' } }
-    );
-    Composite.add(pachinkoEngine.world, trackFloor);
+    ));
 
-    // 頂部弧形導板：把上衝的彈珠導向左下，進入遊戲區
-    // 從 (playWidth - 60, 80) 到 (renderWidth, 120)，向右下傾斜
-    const guideStartX = playWidth - 60;
-    const guideStartY = 80;
-    const guideEndX = renderWidth;
-    const guideEndY = 120;
-    const guideCenterX = (guideStartX + guideEndX) / 2;
-    const guideCenterY = (guideStartY + guideEndY) / 2;
-    const guideLength = Math.hypot(guideEndX - guideStartX, guideEndY - guideStartY);
-    const guideAngle = Math.atan2(guideEndY - guideStartY, guideEndX - guideStartX);
-    const topGuide = Bodies.rectangle(
-        guideCenterX, guideCenterY,
-        guideLength, 12,
-        { isStatic: true, angle: guideAngle, render: { fillStyle: '#8b4513' } }
-    );
-    Composite.add(pachinkoEngine.world, topGuide);
+    // 頂部導引斜板：從外框右上角一路斜到軌道左牆頂端上方
+    // 起點 (renderWidth-20, 40) → 終點 (playWidth-10, 60)
+    const plateX1 = renderWidth - 20;
+    const plateY1 = 40;
+    const plateX2 = playWidth - 10;
+    const plateY2 = 60;
+    const plateCx = (plateX1 + plateX2) / 2;
+    const plateCy = (plateY1 + plateY2) / 2;
+    const plateLen = Math.hypot(plateX2 - plateX1, plateY2 - plateY1);
+    const plateAngle = Math.atan2(plateY2 - plateY1, plateX2 - plateX1);
+    Composite.add(pachinkoEngine.world, Bodies.rectangle(
+        plateCx, plateCy,
+        plateLen + 6, 18,
+        { isStatic: true, angle: plateAngle, render: { fillStyle: '#8b4513' } }
+    ));
 
-    // ---------- 釘子陣列（12 排、交錯、最後一排靠近獎池） ----------
+    // ---------- 釘子陣列（12 排，最後一排靠近獎池） ----------
     const numRows = 12;
-    const startY = 100;
+    const startY = 130;
     const lastY = 380;
     const rowSpacing = (lastY - startY) / (numRows - 1);
-    const colSpacing = 30;
-    const pegRadius = 4;
 
     for (let row = 0; row < numRows; row++) {
         const y = startY + row * rowSpacing;
-        const isOdd = row % 2 === 1;
-        const count = 10;
-        const startX = isOdd ? 45 : 30;
-        for (let i = 0; i < count; i++) {
-            const x = startX + i * colSpacing;
-            if (x > 20 && x < playWidth - 20) {
-                const peg = Bodies.circle(x, y, pegRadius, {
+        const offset = (row % 2 === 0) ? 0 : 15;
+        for (let i = 0; i < 11; i++) {
+            const x = 25 + offset + i * 30;
+            if (x > 20 && x < playWidth - 10) {
+                Composite.add(pachinkoEngine.world, Bodies.circle(x, y, 4, {
                     isStatic: true,
-                    restitution: 0.5,
+                    restitution: 0.6,
                     render: { fillStyle: '#ffd700' }
-                });
-                Composite.add(pachinkoEngine.world, peg);
+                }));
             }
         }
     }
 
+    // ---------- 獎池 ----------
     pachinkoBins = [];
     pachinkoPrizeMap = {};
 
@@ -1904,7 +1892,7 @@ function buildPachinkoBoard() {
     const binBottomY = renderHeight - 20;
     const binHeight = binBottomY - binTopY;
     const binAreaLeft = 20;
-    const binAreaRight = playWidth - 20;
+    const binAreaRight = playWidth - 10;
     const binAreaWidth = binAreaRight - binAreaLeft;
     const binWidth = binAreaWidth / binCount;
 
@@ -1912,13 +1900,12 @@ function buildPachinkoBoard() {
         const binX = binAreaLeft + i * binWidth + binWidth / 2;
         const prize = binPrizes[i];
 
-        const divider = Bodies.rectangle(
+        Composite.add(pachinkoEngine.world, Bodies.rectangle(
             binAreaLeft + i * binWidth,
             binTopY + binHeight / 2,
             4, binHeight,
             { isStatic: true, render: { fillStyle: '#8b4513' } }
-        );
-        Composite.add(pachinkoEngine.world, divider);
+        ));
 
         pachinkoBins.push({
             index: i,
@@ -1931,23 +1918,21 @@ function buildPachinkoBoard() {
         pachinkoPrizeMap[i] = prize.id;
     }
 
-    const lastDivider = Bodies.rectangle(
+    Composite.add(pachinkoEngine.world, Bodies.rectangle(
         binAreaRight,
         binTopY + binHeight / 2,
         4, binHeight,
         { isStatic: true, render: { fillStyle: '#8b4513' } }
-    );
-    Composite.add(pachinkoEngine.world, lastDivider);
+    ));
 
-    const binFloor = Bodies.rectangle(
+    Composite.add(pachinkoEngine.world, Bodies.rectangle(
         binAreaLeft + binAreaWidth / 2,
         binBottomY,
-        binAreaWidth,
-        10,
+        binAreaWidth, 10,
         { isStatic: true, render: { fillStyle: '#d4af37' } }
-    );
-    Composite.add(pachinkoEngine.world, binFloor);
+    ));
 
+    // ---------- 裝飾 & 彈珠繪製 ----------
     Events.on(pachinkoRender, 'afterRender', () => {
         const ctx = pachinkoRender.context;
         ctx.font = 'bold 11px "Noto Sans TC", sans-serif';
@@ -1958,9 +1943,10 @@ function buildPachinkoBoard() {
             const shortName = name.length > 4 ? name.slice(0, 4) + '…' : name;
             ctx.fillText(shortName, bin.x, bin.y - 5);
         }
-        // 發射彈簧裝飾
-        const springX = playWidth + trackWidth / 2;
-        const springTop = 220;
+
+        // 彈簧裝飾
+        const springX = playWidth + 30;
+        const springTop = 200;
         const springBottom = renderHeight - 60;
         ctx.strokeStyle = '#cccccc';
         ctx.lineWidth = 3;
@@ -2036,14 +2022,13 @@ function dropPachinkoBall() {
         if (pachinkoBall) {
             Matter.Composite.remove(pachinkoEngine.world, pachinkoBall);
         }
+
         const renderWidth = pachinkoRender ? pachinkoRender.options.width : pachinkoWidth;
-        const trackWidth = 40;
-        const playWidth = renderWidth - trackWidth;
+        const renderHeight = pachinkoRender ? pachinkoRender.options.height : pachinkoHeight;
+        const ballX = renderWidth - 35;
+        const ballY = renderHeight - 50;
 
-        const startX = playWidth + trackWidth / 2;
-        const startY = pachinkoHeight - 50;
-
-        pachinkoBall = Matter.Bodies.circle(startX, startY, 8, {
+        pachinkoBall = Matter.Bodies.circle(ballX, ballY, 8, {
             restitution: 0.5,
             friction: 0.001,
             frictionAir: 0.001,
@@ -2052,8 +2037,8 @@ function dropPachinkoBall() {
         });
         Matter.Composite.add(pachinkoEngine.world, pachinkoBall);
 
-        // 垂直向上發射（沿軌道上升）
-        Matter.Body.setVelocity(pachinkoBall, { x: 0, y: -17 });
+        // 垂直向上發射
+        Matter.Body.setVelocity(pachinkoBall, { x: 0, y: -18 });
 
         pachinkoBallDropped = true;
         playPachinkoSound();
@@ -2064,8 +2049,8 @@ function dropPachinkoBall() {
             if (!pachinkoBall) { clearInterval(checkInterval); return; }
             checkCount++;
             const pos = pachinkoBall.position;
-            if (pos.x < playWidth - 20) enteredPlayArea = true;
-            if ((enteredPlayArea && pos.y > pachinkoHeight - 60) || checkCount > 300) {
+            if (pos.x < renderWidth - 80) enteredPlayArea = true;
+            if ((enteredPlayArea && pos.y > renderHeight - 60) || checkCount > 400) {
                 clearInterval(checkInterval);
 
                 let targetBin = null;
