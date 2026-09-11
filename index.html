@@ -2198,47 +2198,45 @@
                 { isStatic: true, render: inv, restitution: 0.2 }
             ));
 
-            // ---------- 障礙物定義（先定義，釘子生成時要避開） ----------
+            // ---------- 障礙物定義 ----------
             const pegRadius = 5;
-            const minGap = pegRadius * 2 + 16 + 6; // 釘子直徑 + 彈珠直徑 + 安全餘量 = 32
 
-            // 3 個紅色緩衝墊（用 railRightX 相對定位，不會撞軌道牆）
+            // 3 個紅色緩衝墊（相對軌道牆定位）
             const bumpers = [
-                { x: railRightX - 168, y: 235, r: 16 },
-                { x: railRightX - 84,  y: 235, r: 16 },
-                { x: railRightX - 126, y: 330, r: 18 }
+                { x: railRightX - 170, y: 240, r: 16 },
+                { x: railRightX - 82,  y: 240, r: 16 },
+                { x: railRightX - 126, y: 335, r: 18 }
             ];
 
-            // 2 個旋轉葉片（用 railRightX 相對定位）
+            // 2 個旋轉葉片（相對軌道牆定位，不碰牆）
             const spinnerDefs = [
-                { x: railRightX - 210, y: 285, w: 52, h: 9, speed: 0.028, dir: 1 },
-                { x: railRightX - 66,  y: 285, w: 52, h: 9, speed: 0.028, dir: -1 }
+                { x: railRightX - 212, y: 290, w: 50, h: 9, speed: 0.028, dir: 1 },
+                { x: railRightX - 68,  y: 290, w: 50, h: 9, speed: 0.028, dir: -1 }
             ];
 
-            // 障礙物淨空半徑：釘子不能進到這個範圍
             function isNearObstacle(x, y) {
                 for (const b of bumpers) {
-                    const need = b.r + pegRadius + 16 + 4;
+                    const need = b.r + pegRadius + 16 + 6;
                     if (Math.hypot(x - b.x, y - b.y) < need) return true;
                 }
                 for (const s of spinnerDefs) {
                     const sweep = Math.hypot(s.w / 2, s.h / 2);
-                    const need = sweep + pegRadius + 16 + 4;
+                    const need = sweep + pegRadius + 16 + 6;
                     if (Math.hypot(x - s.x, y - s.y) < need) return true;
                 }
                 return false;
             }
 
-             // ---------- 固定交錯網格釘子 ----------
+            // ---------- 固定交錯網格釘子 ----------
             const pegs = [];
-            const pegAreaTop = 160;
-            const pegAreaBottom = 420;
-            const pegAreaLeft = 48;
-            const pegAreaRight = railRightX - 21;   // 貼近導軌左壁，右側不再留大空隙
+            const pegAreaTop = 155;
+            const pegAreaBottom = 405;
+            const pegAreaLeft = 58;
+            const pegAreaRight = railRightX - 30;
             const pegAreaWidth = pegAreaRight - pegAreaLeft;
 
-            const pegRows = 11;
-            const pegCols = 9;
+            const pegRows = 10;
+            const pegCols = 8;
             const rowGap = (pegAreaBottom - pegAreaTop) / (pegRows - 1);
             const colGap = pegAreaWidth / (pegCols - 1);
 
