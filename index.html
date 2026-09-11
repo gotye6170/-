@@ -2384,15 +2384,37 @@
                 bctx.fillStyle = hl;
                 bctx.fillRect(left, top, w, h * 0.4);
 
-                bctx.fillStyle = 'rgba(0,0,0,0.55)';
-                bctx.fillRect(left, top, w, 16);
-                bctx.fillStyle = '#ffffff';
-                bctx.font = 'bold 11px "Noto Sans TC", sans-serif';
+                // ===== 垂直堆疊繪製獎品名稱 =====
+                const nm = bin.prizeData.name || bin.prizeId;
+                const maxChars = Math.min(nm.length, 5);
+                const sn = nm.slice(0, maxChars);
+
+                // 依格子高度自適應：每字間距、字級
+                const availH = h - 10;
+                const charSpace = Math.max(10, Math.min(20, Math.floor(availH / Math.max(sn.length, 1))));
+                const fontSize = Math.max(9, Math.min(15, charSpace - 3));
+
+                bctx.font = `bold ${fontSize}px "Noto Sans TC", sans-serif`;
                 bctx.textAlign = 'center';
                 bctx.textBaseline = 'middle';
-                const nm = bin.prizeData.name || bin.prizeId;
-                const sn = nm.length > 4 ? nm.slice(0, 4) + '…' : nm;
-                bctx.fillText(sn, bin.x, top + 8);
+
+                const totalTextH = sn.length * charSpace;
+                const startY = top + (h - totalTextH) / 2 + charSpace / 2;
+
+                // 先鋪一層淡淡陰影底，提升可讀性
+                bctx.shadowColor = 'rgba(0,0,0,0.85)';
+                bctx.shadowBlur = 4;
+                bctx.shadowOffsetY = 1;
+                bctx.fillStyle = '#ffffff';
+
+                for (let ci = 0; ci < sn.length; ci++) {
+                    const cy = startY + ci * charSpace;
+                    bctx.fillText(sn[ci], bin.x, cy);
+                }
+
+                // 還原 shadow 設定，避免影響後續繪製
+                bctx.shadowBlur = 0;
+                bctx.shadowOffsetY = 0;
             }
 
             if (pachinkoBins.length > 0) {
