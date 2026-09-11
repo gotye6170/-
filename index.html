@@ -2185,14 +2185,14 @@
             // ===== 障礙物與釘子（固定佈局，加密版） =====
             const pegRadius = 5;
             const BALL_D = 16;
-            const SAFETY = 2;   // 從 4 縮到 2，讓釘子能更貼近障礙物
+            const SAFETY = 3;   // 從 4 縮到 2，讓釘子能更貼近障礙物
 
             const areaLeft = 60;
             const areaRight = railRightX - 30;
             const areaTop = 148;      // 往上多爭取一點空間
             const areaBottom = 408;   // 往下多爭取一點空間
 
-            const pegCols = 9;        // 7 → 9
+            const pegCols = 8;        // 7 → 9
             const pegRows = 11;       // 10 → 11
             const dx = (areaRight - areaLeft) / (pegCols - 1);
             const dy = (areaBottom - areaTop) / (pegRows - 1);
