@@ -489,30 +489,77 @@
             justify-content: center;
         }
         .pachinko-container canvas { display: block; max-width: 100%; height: auto !important; }
-        .pachinko-controls { display: flex; align-items: center; justify-content: center; margin-top: 15px; }
-        .pachinko-button {
-            background: linear-gradient(180deg, #ff4444, #990000);
-            color: white;
-            font-weight: 900;
+
+        /* ===== 彈珠台拉桿 ===== */
+        .pachinko-lever-area {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 15px;
+            padding: 8px 6px 4px;
+        }
+        .pachinko-lever-track {
+            position: relative;
+            width: 56px;
+            height: 120px;
+            background: linear-gradient(180deg, #0a0612, #1a0d2e);
+            border-radius: 28px;
+            border: 3px solid #d4af37;
+            box-shadow: inset 0 4px 12px rgba(0,0,0,0.9), 0 0 15px rgba(212,175,55,0.3);
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+            flex-shrink: 0;
+        }
+        .pachinko-lever-knob {
+            position: absolute;
+            top: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 30%, #ff9999, #cc0000 55%, #660000 100%);
+            box-shadow: 0 5px 0 #4d0000, 0 8px 15px rgba(0,0,0,0.7), inset 0 -4px 10px rgba(0,0,0,0.4), inset 0 4px 8px rgba(255,255,255,0.4);
+            cursor: grab;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 18px;
-            padding: 14px 30px;
-            border-radius: 50px;
-            border: 3px solid #ffcc00;
-            box-shadow: 0 10px 0 #660000, 0 15px 25px rgba(0,0,0,0.6), inset 0 2px 0 rgba(255,255,255,0.2);
-            text-shadow: 0 2px 0 #660000;
-            transition: all 0.1s;
-            cursor: pointer;
+            color: rgba(255,255,255,0.85);
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+            will-change: top;
         }
-        .pachinko-button:active {
-            transform: translateY(8px);
-            box-shadow: 0 2px 0 #660000, 0 5px 10px rgba(0,0,0,0.5);
+        .pachinko-lever-knob:active { cursor: grabbing; }
+        .pachinko-power-display { flex: 1; max-width: 180px; }
+        .pachinko-power-bar {
+            width: 100%;
+            height: 18px;
+            background: #0a0612;
+            border-radius: 9px;
+            border: 2px solid #d4af37;
+            overflow: hidden;
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.9);
         }
-        .pachinko-button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: translateY(4px);
-            box-shadow: 0 4px 0 #660000;
+        .pachinko-power-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #22c55e, #eab308 50%, #ef4444);
+            transition: width 0.05s linear;
+            border-radius: 7px;
         }
+        .pachinko-power-text {
+            text-align: center;
+            margin-top: 6px;
+            color: #ffd700;
+            font-weight: bold;
+            font-size: 13px;
+            text-shadow: 0 0 8px #ffd700;
+        }
+
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -550,6 +597,10 @@
             .slot-reel-window { width: 75px; height: 110px; border-radius: 12px; box-shadow: 0 0 0 4px #8b4513, 0 0 0 7px #d4af37, inset 0 0 12px rgba(0,0,0,0.8); }
             .slot-reel-symbol { height: 110px; width: 75px; font-size: 45px; }
             .slot-reel-symbol img { width: 65px; height: 65px; object-fit: cover; object-position: center; background: #ffffff; display: block; border-radius: 8px; }
+            .pachinko-lever-track { width: 52px; height: 108px; }
+            .pachinko-lever-knob { width: 40px; height: 40px; font-size: 16px; }
+            .pachinko-power-display { max-width: 150px; }
+            .pachinko-power-text { font-size: 12px; }
         }
         @media (min-width: 1024px) {
             .gacha-title { font-size: 3rem; }
@@ -675,8 +726,16 @@
                         </div>
                         <h3 class="pachinko-title"></h3>
                         <div id="pachinkoContainer" class="pachinko-container"></div>
-                        <div class="pachinko-controls">
-                            <button id="pachinkoDropBtn" onclick="dropPachinkoBall()" class="pachinko-button">🎱 發射彈珠</button>
+                        <div class="pachinko-lever-area">
+                            <div class="pachinko-lever-track" id="pachinkoLeverTrack">
+                                <div class="pachinko-lever-knob" id="pachinkoLeverKnob">⬇</div>
+                            </div>
+                            <div class="pachinko-power-display">
+                                <div class="pachinko-power-bar">
+                                    <div class="pachinko-power-fill" id="pachinkoPowerFill"></div>
+                                </div>
+                                <div class="pachinko-power-text">力道：<span id="pachinkoPowerText">0</span>%</div>
+                            </div>
                         </div>
                         <p class="slot-info">剩餘次數：<span id="pachinkoCountDisplay">0</span></p>
                     </div>
@@ -828,7 +887,6 @@
         window.chooseSlot = chooseSlot;
         window.startSlot = startSlot;
         window.choosePachinko = choosePachinko;
-        window.dropPachinkoBall = dropPachinkoBall;
 
         let isDrawing = false;
         let currentPrizeUrl = "";
@@ -1633,8 +1691,7 @@
                 strip2.style.transition = 'transform 3s cubic-bezier(0.15, 0.85, 0.25, 1)';
                 strip3.style.transition = 'transform 3s cubic-bezier(0.15, 0.85, 0.25, 1)';
                 strip1.style.transform = targetTransform1;
-                strip2.style.transform = targetTransform2
-
+                strip2.style.transform = targetTransform2;
                 strip3.style.transform = targetTransform3;
 
                 await new Promise(resolve => setTimeout(resolve, 3000));
@@ -1757,325 +1814,564 @@
             ctx.fill();
         }
 
-function buildPachinkoBoard() {
-    if (typeof Matter === 'undefined') {
-        console.error("Matter.js 尚未載入");
-        return;
-    }
-    const container = document.getElementById("pachinkoContainer");
-    if (!container) return;
-    container.innerHTML = "";
-
-    if (pachinkoRunner) { Matter.Runner.stop(pachinkoRunner); pachinkoRunner = null; }
-    if (pachinkoRender) { Matter.Render.stop(pachinkoRender); pachinkoRender = null; }
-    if (pachinkoEngine) { Matter.Engine.clear(pachinkoEngine); pachinkoEngine = null; }
-    pachinkoBall = null;
-    pachinkoBallDropped = false;
-
-    const Engine = Matter.Engine,
-          Render = Matter.Render,
-          Runner = Matter.Runner,
-          Bodies = Matter.Bodies,
-          Composite = Matter.Composite,
-          Events = Matter.Events;
-
-    pachinkoEngine = Engine.create();
-    pachinkoEngine.gravity.y = 1.0;
-
-    const renderWidth = Math.min(pachinkoWidth, container.clientWidth || pachinkoWidth);
-    const renderHeight = pachinkoHeight;
-    const playWidth = renderWidth - 60;
-
-    pachinkoRender = Render.create({
-        element: container,
-        engine: pachinkoEngine,
-        options: {
-            width: renderWidth,
-            height: renderHeight,
-            wireframes: false,
-            background: '#0f0f1a',
-            pixelRatio: 1
+        function drawBulb(ctx, x, y, r) {
+            const glow = ctx.createRadialGradient(x, y, 0, x, y, r * 3.5);
+            glow.addColorStop(0, 'rgba(255,240,150,0.7)');
+            glow.addColorStop(1, 'rgba(255,240,150,0)');
+            ctx.fillStyle = glow;
+            ctx.beginPath();
+            ctx.arc(x, y, r * 3.5, 0, Math.PI * 2);
+            ctx.fill();
+            const bulb = ctx.createRadialGradient(x - r*0.3, y - r*0.3, 0, x, y, r);
+            bulb.addColorStop(0, '#ffffff');
+            bulb.addColorStop(0.55, '#ffe066');
+            bulb.addColorStop(1, '#f59f00');
+            ctx.fillStyle = bulb;
+            ctx.beginPath();
+            ctx.arc(x, y, r, 0, Math.PI * 2);
+            ctx.fill();
         }
-    });
 
-    // ---------- 外框金邊 ----------
-    Composite.add(pachinkoEngine.world, [
-        Bodies.rectangle(10, renderHeight/2, 20, renderHeight, { isStatic: true, render: { fillStyle: '#d4af37' } }),
-        Bodies.rectangle(renderWidth/2, 10, renderWidth, 20, { isStatic: true, render: { fillStyle: '#d4af37' } }),
-        Bodies.rectangle(renderWidth - 10, renderHeight/2, 20, renderHeight, { isStatic: true, render: { fillStyle: '#d4af37' } }),
-        Bodies.rectangle(renderWidth/2, renderHeight - 5, renderWidth, 20, { isStatic: true, render: { fillStyle: '#d4af37' } })
-    ]);
+        function drawMetalBar(ctx, bar) {
+            ctx.save();
+            ctx.translate(bar.x, bar.y);
+            ctx.rotate(bar.angle || 0);
+            const grad = ctx.createLinearGradient(0, -bar.h / 2, 0, bar.h / 2);
+            grad.addColorStop(0, '#e0a866');
+            grad.addColorStop(0.35, '#c07830');
+            grad.addColorStop(0.65, '#8b4513');
+            grad.addColorStop(1, '#4a2208');
+            ctx.fillStyle = grad;
+            ctx.fillRect(-bar.w / 2, -bar.h / 2, bar.w, bar.h);
+            ctx.fillStyle = 'rgba(255,220,160,0.5)';
+            ctx.fillRect(-bar.w / 2, -bar.h / 2 + 1, bar.w, 2);
+            ctx.fillStyle = 'rgba(0,0,0,0.4)';
+            ctx.fillRect(-bar.w / 2, bar.h / 2 - 3, bar.w, 3);
+            ctx.strokeStyle = 'rgba(0,0,0,0.5)';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(-bar.w / 2 + 0.5, -bar.h / 2 + 0.5, bar.w - 1, bar.h - 1);
+            ctx.restore();
+        }
 
-    // ---------- 右側發射軌道（連續不中斷） ----------
-    // 軌道左牆：從 y = 70 一直到底部
-    const wallTopY = 70;
-    const wallBottomY = renderHeight - 20;
-    const wallHeight = wallBottomY - wallTopY;
-    Composite.add(pachinkoEngine.world, Bodies.rectangle(
-        playWidth,
-        wallTopY + wallHeight / 2,
-        20, wallHeight,
-        { isStatic: true, render: { fillStyle: '#8b4513' } }
-    ));
+        function drawPeg(ctx, x, y, r) {
+            ctx.beginPath();
+            ctx.arc(x + 1.2, y + 1.8, r * 1.05, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(0,0,0,0.55)';
+            ctx.fill();
+            const glow = ctx.createRadialGradient(x, y, r * 0.6, x, y, r * 2.2);
+            glow.addColorStop(0, 'rgba(255,220,80,0.45)');
+            glow.addColorStop(1, 'rgba(255,220,80,0)');
+            ctx.fillStyle = glow;
+            ctx.beginPath();
+            ctx.arc(x, y, r * 2.2, 0, Math.PI * 2);
+            ctx.fill();
+            const grad = ctx.createRadialGradient(x - r * 0.35, y - r * 0.35, 0, x, y, r);
+            grad.addColorStop(0, '#fffbd0');
+            grad.addColorStop(0.5, '#ffd700');
+            grad.addColorStop(0.85, '#e0a800');
+            grad.addColorStop(1, '#8b6914');
+            ctx.beginPath();
+            ctx.arc(x, y, r, 0, Math.PI * 2);
+            ctx.fillStyle = grad;
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(x - r * 0.35, y - r * 0.35, r * 0.3, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(255,255,255,0.95)';
+            ctx.fill();
+        }
 
-    // 軌道底板（發射台）
-    Composite.add(pachinkoEngine.world, Bodies.rectangle(
-        renderWidth - 35,
-        renderHeight - 15,
-        40, 20,
-        { isStatic: true, render: { fillStyle: '#8b4513' } }
-    ));
+        function drawPachinkoSceneStatic(cctx, renderWidth, renderHeight, playWidth, trackWall, trackFloor, topPlate, pegs) {
+            const bg = cctx.createLinearGradient(0, 0, 0, renderHeight);
+            bg.addColorStop(0, '#101a35');
+            bg.addColorStop(1, '#050810');
+            cctx.fillStyle = bg;
+            cctx.fillRect(0, 0, renderWidth, renderHeight);
 
-    // 頂部導引斜板：從外框右上角一路斜到軌道左牆頂端上方
-    // 起點 (renderWidth-20, 40) → 終點 (playWidth-10, 60)
-    const plateX1 = renderWidth - 20;
-    const plateY1 = 40;
-    const plateX2 = playWidth - 10;
-    const plateY2 = 60;
-    const plateCx = (plateX1 + plateX2) / 2;
-    const plateCy = (plateY1 + plateY2) / 2;
-    const plateLen = Math.hypot(plateX2 - plateX1, plateY2 - plateY1);
-    const plateAngle = Math.atan2(plateY2 - plateY1, plateX2 - plateX1);
-    Composite.add(pachinkoEngine.world, Bodies.rectangle(
-        plateCx, plateCy,
-        plateLen + 6, 18,
-        { isStatic: true, angle: plateAngle, render: { fillStyle: '#8b4513' } }
-    ));
+            const playBg = cctx.createRadialGradient(renderWidth * 0.4, renderHeight * 0.4, 30, renderWidth * 0.4, renderHeight * 0.4, renderHeight * 0.75);
+            playBg.addColorStop(0, 'rgba(40,80,160,0.35)');
+            playBg.addColorStop(1, 'rgba(0,0,0,0)');
+            cctx.fillStyle = playBg;
+            cctx.fillRect(20, 20, playWidth - 20, renderHeight - 40);
 
-    // ---------- 釘子陣列（12 排，最後一排靠近獎池） ----------
-    const numRows = 12;
-    const startY = 130;
-    const lastY = 380;
-    const rowSpacing = (lastY - startY) / (numRows - 1);
-
-    for (let row = 0; row < numRows; row++) {
-        const y = startY + row * rowSpacing;
-        const offset = (row % 2 === 0) ? 0 : 15;
-        for (let i = 0; i < 11; i++) {
-            const x = 25 + offset + i * 30;
-            if (x > 20 && x < playWidth - 10) {
-                Composite.add(pachinkoEngine.world, Bodies.circle(x, y, 4, {
-                    isStatic: true,
-                    restitution: 0.6,
-                    render: { fillStyle: '#ffd700' }
-                }));
+            cctx.fillStyle = 'rgba(200,220,255,0.4)';
+            for (let i = 0; i < 60; i++) {
+                const x = 25 + Math.random() * (playWidth - 30);
+                const y = 25 + Math.random() * (renderHeight - 50);
+                const rr = Math.random() * 1.4 + 0.2;
+                cctx.beginPath();
+                cctx.arc(x, y, rr, 0, Math.PI * 2);
+                cctx.fill();
             }
-        }
-    }
 
-    // ---------- 獎池 ----------
-    pachinkoBins = [];
-    pachinkoPrizeMap = {};
+            const goldGrad = cctx.createLinearGradient(0, 0, renderWidth, renderHeight);
+            goldGrad.addColorStop(0, '#f6e27a');
+            goldGrad.addColorStop(0.4, '#d4af37');
+            goldGrad.addColorStop(0.7, '#b8860b');
+            goldGrad.addColorStop(1, '#8b6914');
+            cctx.fillStyle = goldGrad;
+            cctx.fillRect(0, 0, renderWidth, 20);
+            cctx.fillRect(0, renderHeight - 20, renderWidth, 20);
+            cctx.fillRect(0, 0, 20, renderHeight);
+            cctx.fillRect(renderWidth - 20, 0, 20, renderHeight);
 
-    const prizes = [];
-    for (const id in lastPrizes) {
-        const p = lastPrizes[id];
-        if (!Array.isArray(p.groups) || !p.groups.includes(honorUnlockedGroup)) continue;
-        if (Number(p.quantity || 0) <= 0) continue;
-        const w = Number(p.weight || 0);
-        if (w <= 0) continue;
-        prizes.push({ id, data: p, weight: w });
-    }
+            cctx.strokeStyle = 'rgba(0,0,0,0.7)';
+            cctx.lineWidth = 3;
+            cctx.strokeRect(21.5, 21.5, renderWidth - 43, renderHeight - 43);
+            cctx.strokeStyle = 'rgba(255,255,255,0.35)';
+            cctx.lineWidth = 1;
+            cctx.strokeRect(20.5, 20.5, renderWidth - 41, renderHeight - 41);
 
-    if (prizes.length === 0) {
-        Matter.Render.run(pachinkoRender);
-        pachinkoRunner = Runner.create();
-        Runner.run(pachinkoRunner, pachinkoEngine);
-        return;
-    }
+            for (let x = 40; x < renderWidth - 30; x += 42) {
+                drawBulb(cctx, x, 10, 3.5);
+                drawBulb(cctx, x, renderHeight - 10, 3.5);
+            }
+            for (let y = 42; y < renderHeight - 30; y += 42) {
+                drawBulb(cctx, 10, y, 3.5);
+                drawBulb(cctx, renderWidth - 10, y, 3.5);
+            }
 
-    let binPrizes = prizes;
-    if (prizes.length > pachinkoBinCount) binPrizes = prizes.slice(0, pachinkoBinCount);
+            drawMetalBar(cctx, trackWall);
+            drawMetalBar(cctx, trackFloor);
+            drawMetalBar(cctx, topPlate);
 
-    const binCount = binPrizes.length;
-    const binTopY = 410;
-    const binBottomY = renderHeight - 20;
-    const binHeight = binBottomY - binTopY;
-    const binAreaLeft = 20;
-    const binAreaRight = playWidth - 10;
-    const binAreaWidth = binAreaRight - binAreaLeft;
-    const binWidth = binAreaWidth / binCount;
+            const springX = playWidth + 30;
+            const springTop = 180;
+            const springBottom = renderHeight - 70;
+            cctx.strokeStyle = '#cccccc';
+            cctx.lineWidth = 2.5;
+            cctx.beginPath();
+            for (let y = springTop; y < springBottom; y += 9) {
+                const off = (Math.floor((y - springTop) / 9) % 2 === 0) ? -7 : 7;
+                if (y === springTop) cctx.moveTo(springX + off, y);
+                else cctx.lineTo(springX + off, y);
+            }
+            cctx.stroke();
 
-    for (let i = 0; i < binCount; i++) {
-        const binX = binAreaLeft + i * binWidth + binWidth / 2;
-        const prize = binPrizes[i];
+            cctx.beginPath();
+            cctx.arc(springX, springBottom + 14, 13, 0, Math.PI * 2);
+            const btnGrad = cctx.createRadialGradient(springX - 4, springBottom + 10, 2, springX, springBottom + 14, 13);
+            btnGrad.addColorStop(0, '#ff8080');
+            btnGrad.addColorStop(1, '#b00020');
+            cctx.fillStyle = btnGrad;
+            cctx.fill();
+            cctx.strokeStyle = '#ffffff';
+            cctx.lineWidth = 2;
+            cctx.stroke();
+            cctx.fillStyle = '#ffffff';
+            cctx.font = 'bold 10px "Noto Sans TC", sans-serif';
+            cctx.textAlign = 'center';
+            cctx.textBaseline = 'middle';
+            cctx.fillText("發", springX, springBottom + 14);
 
-        Composite.add(pachinkoEngine.world, Bodies.rectangle(
-            binAreaLeft + i * binWidth,
-            binTopY + binHeight / 2,
-            4, binHeight,
-            { isStatic: true, render: { fillStyle: '#8b4513' } }
-        ));
-
-        pachinkoBins.push({
-            index: i,
-            x: binX,
-            width: binWidth,
-            y: binTopY + binHeight / 2,
-            prizeId: prize.id,
-            prizeData: prize.data
-        });
-        pachinkoPrizeMap[i] = prize.id;
-    }
-
-    Composite.add(pachinkoEngine.world, Bodies.rectangle(
-        binAreaRight,
-        binTopY + binHeight / 2,
-        4, binHeight,
-        { isStatic: true, render: { fillStyle: '#8b4513' } }
-    ));
-
-    Composite.add(pachinkoEngine.world, Bodies.rectangle(
-        binAreaLeft + binAreaWidth / 2,
-        binBottomY,
-        binAreaWidth, 10,
-        { isStatic: true, render: { fillStyle: '#d4af37' } }
-    ));
-
-    // ---------- 裝飾 & 彈珠繪製 ----------
-    Events.on(pachinkoRender, 'afterRender', () => {
-        const ctx = pachinkoRender.context;
-        ctx.font = 'bold 11px "Noto Sans TC", sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillStyle = '#ffd700';
-        for (const bin of pachinkoBins) {
-            const name = (bin.prizeData.name || bin.prizeId);
-            const shortName = name.length > 4 ? name.slice(0, 4) + '…' : name;
-            ctx.fillText(shortName, bin.x, bin.y - 5);
+            for (const p of pegs) drawPeg(cctx, p.x, p.y, p.r);
         }
 
-        // 彈簧裝飾
-        const springX = playWidth + 30;
-        const springTop = 200;
-        const springBottom = renderHeight - 60;
-        ctx.strokeStyle = '#cccccc';
-        ctx.lineWidth = 3;
-        ctx.beginPath();
-        for (let y = springTop; y < springBottom; y += 10) {
-            const offset = (Math.floor((y - springTop) / 10) % 2 === 0) ? -8 : 8;
-            if (y === springTop) ctx.moveTo(springX + offset, y);
-            else ctx.lineTo(springX + offset, y);
-        }
-        ctx.stroke();
-        ctx.fillStyle = '#ff3366';
-        ctx.beginPath();
-        ctx.arc(springX, springBottom + 10, 12, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = 2;
-        ctx.stroke();
-        ctx.fillStyle = '#ffd700';
-        ctx.font = 'bold 10px "Noto Sans TC", sans-serif';
-        ctx.fillText("發射", springX, springBottom + 40);
+        function buildPachinkoBoard() {
+            if (typeof Matter === 'undefined') {
+                console.error("Matter.js 尚未載入");
+                return;
+            }
+            const container = document.getElementById("pachinkoContainer");
+            if (!container) return;
+            container.innerHTML = "";
 
-        if (pachinkoBall) {
-            drawGlassBall(ctx, pachinkoBall.position.x, pachinkoBall.position.y, 8);
-        }
-    });
+            if (pachinkoRunner) { Matter.Runner.stop(pachinkoRunner); pachinkoRunner = null; }
+            if (pachinkoRender) { Matter.Render.stop(pachinkoRender); pachinkoRender = null; }
+            if (pachinkoEngine) { Matter.Engine.clear(pachinkoEngine); pachinkoEngine = null; }
+            pachinkoBall = null;
+            pachinkoBallDropped = false;
 
-    Matter.Render.run(pachinkoRender);
-    pachinkoRunner = Runner.create();
-    Runner.run(pachinkoRunner, pachinkoEngine);
-}
+            const Engine = Matter.Engine,
+                  Render = Matter.Render,
+                  Runner = Matter.Runner,
+                  Bodies = Matter.Bodies,
+                  Composite = Matter.Composite,
+                  Events = Matter.Events;
 
-function dropPachinkoBall() {
-    if (!currentPlayerName) { alert("請先選擇名字"); return; }
-    if (pachinkoBallDropped) { alert("彈珠還在滾動中，請稍後"); return; }
-    if (!pachinkoEngine || pachinkoBins.length === 0) {
-        alert("彈珠台尚未準備好");
-        return;
-    }
+            pachinkoEngine = Engine.create();
+            pachinkoEngine.gravity.y = 1.0;
 
-    const playerData = globalPlayedUsers[currentPlayerName];
-    const drawCount = playerData?.drawCount || 0;
-    const limit = getMaxDrawsForPlayer(currentPlayerName);
-    if (!isAdminMode && drawCount >= limit) {
-        alert("❌ 抽獎次數已用完");
-        return;
-    }
+            const renderWidth = Math.min(pachinkoWidth, container.clientWidth || pachinkoWidth);
+            const renderHeight = pachinkoHeight;
+            const playWidth = renderWidth - 60;
 
-    const dropBtn = document.getElementById("pachinkoDropBtn");
-    if (dropBtn) dropBtn.disabled = true;
+            pachinkoRender = Render.create({
+                element: container,
+                engine: pachinkoEngine,
+                options: {
+                    width: renderWidth,
+                    height: renderHeight,
+                    wireframes: false,
+                    background: '#050810',
+                    pixelRatio: 1
+                }
+            });
 
-    const playedRef = ref(db, `playedUsers/${currentPlayerName}`);
-    runTransaction(playedRef, (current) => {
-        if (current && current.drawCount >= limit) return;
-        if (current === null) {
-            return { drawCount: 1, lastDrawTime: Date.now() };
-        } else {
-            return { ...current, drawCount: (current.drawCount || 0) + 1, lastDrawTime: Date.now() };
-        }
-    }).then((result) => {
-        if (!result.committed) {
-            alert("抽獎過於頻繁，請稍後再試。");
-            if (dropBtn) dropBtn.disabled = false;
-            return;
-        }
+            const inv = { visible: false };
 
-        globalPlayedUsers[currentPlayerName] = {
-            ...(globalPlayedUsers[currentPlayerName] || {}),
-            drawCount: (drawCount + 1),
-            lastDrawTime: Date.now()
-        };
-        updateDrawCountDisplay();
+            // 外框（物理）
+            Composite.add(pachinkoEngine.world, [
+                Bodies.rectangle(10, renderHeight/2, 20, renderHeight, { isStatic: true, render: inv }),
+                Bodies.rectangle(renderWidth/2, 10, renderWidth, 20, { isStatic: true, render: inv }),
+                Bodies.rectangle(renderWidth - 10, renderHeight/2, 20, renderHeight, { isStatic: true, render: inv }),
+                Bodies.rectangle(renderWidth/2, renderHeight - 5, renderWidth, 20, { isStatic: true, render: inv })
+            ]);
 
-        if (pachinkoBall) {
-            Matter.Composite.remove(pachinkoEngine.world, pachinkoBall);
-        }
+            // ---------- 右側發射軌道 ----------
+            // 軌道左壁：從 y=140 到 y=450，形成一整條連續的發射管
+            const wallTopY = 140;
+            const wallBottomY = renderHeight - 30;
+            const wallHeight = wallBottomY - wallTopY;
+            const trackWall = { x: renderWidth - 54, y: wallTopY + wallHeight / 2, w: 12, h: wallHeight, angle: 0 };
+            Composite.add(pachinkoEngine.world, Bodies.rectangle(trackWall.x, trackWall.y, trackWall.w, trackWall.h, { isStatic: true, render: inv }));
 
-        const renderWidth = pachinkoRender ? pachinkoRender.options.width : pachinkoWidth;
-        const renderHeight = pachinkoRender ? pachinkoRender.options.height : pachinkoHeight;
-        const ballX = renderWidth - 35;
-        const ballY = renderHeight - 50;
+            // 軌道底板（彈珠起始平台）
+            const trackFloor = { x: renderWidth - 35, y: renderHeight - 25, w: 26, h: 20, angle: 0 };
+            Composite.add(pachinkoEngine.world, Bodies.rectangle(trackFloor.x, trackFloor.y, trackFloor.w, trackFloor.h, { isStatic: true, render: inv }));
 
-        pachinkoBall = Matter.Bodies.circle(ballX, ballY, 8, {
-            restitution: 0.5,
-            friction: 0.001,
-            frictionAir: 0.001,
-            density: 0.002,
-            render: { fillStyle: '#0f0f1a', strokeStyle: '#0f0f1a', lineWidth: 0 }
-        });
-        Matter.Composite.add(pachinkoEngine.world, pachinkoBall);
+            // ---------- 頂部導引斜板（從右上角往左下斜，把彈珠導入遊戲區） ----------
+            // 起點：右上角外框內緣 (renderWidth - 20, 40)
+            // 終點：軌道左壁上方偏左 (trackWall.x - 30, 90)
+            const plateX1 = renderWidth - 20;
+            const plateY1 = 40;
+            const plateX2 = trackWall.x - 30;
+            const plateY2 = 90;
+            const plateCx = (plateX1 + plateX2) / 2;
+            const plateCy = (plateY1 + plateY2) / 2;
+            const plateLen = Math.hypot(plateX2 - plateX1, plateY2 - plateY1);
+            const plateAngle = Math.atan2(plateY2 - plateY1, plateX2 - plateX1);
+            const topPlate = { x: plateCx, y: plateCy, w: plateLen + 8, h: 22, angle: plateAngle };
+            Composite.add(pachinkoEngine.world, Bodies.rectangle(topPlate.x, topPlate.y, topPlate.w, topPlate.h, { isStatic: true, angle: topPlate.angle, render: inv }));
 
-        // 垂直向上發射
-        Matter.Body.setVelocity(pachinkoBall, { x: 0, y: -18 });
-
-        pachinkoBallDropped = true;
-        playPachinkoSound();
-
-        let checkCount = 0;
-        let enteredPlayArea = false;
-        const checkInterval = setInterval(async () => {
-            if (!pachinkoBall) { clearInterval(checkInterval); return; }
-            checkCount++;
-            const pos = pachinkoBall.position;
-            if (pos.x < renderWidth - 80) enteredPlayArea = true;
-            if ((enteredPlayArea && pos.y > renderHeight - 60) || checkCount > 400) {
-                clearInterval(checkInterval);
-
-                let targetBin = null;
-                for (const bin of pachinkoBins) {
-                    if (pos.x >= bin.x - bin.width / 2 && pos.x < bin.x + bin.width / 2) {
-                        targetBin = bin;
-                        break;
+            // ---------- 釘子陣列 ----------
+            const pegs = [];
+            const numRows = 10;
+            const startY = 150;
+            const lastY = 375;
+            const rowSpacing = (lastY - startY) / (numRows - 1);
+            const pegsPerRow = 9;
+            const colSpacing = 30;
+            for (let row = 0; row < numRows; row++) {
+                const y = startY + row * rowSpacing;
+                const offset = (row % 2 === 0) ? 0 : 15;
+                for (let i = 0; i < pegsPerRow; i++) {
+                    const x = 30 + offset + i * colSpacing;
+                    if (x > 26 && x < playWidth - 20) {
+                        Composite.add(pachinkoEngine.world, Bodies.circle(x, y, 4, { isStatic: true, restitution: 0.6, render: inv }));
+                        pegs.push({ x, y, r: 4 });
                     }
                 }
-                if (!targetBin) {
-                    let minDist = Infinity;
-                    for (const bin of pachinkoBins) {
-                        const d = Math.abs(bin.x - pos.x);
-                        if (d < minDist) { minDist = d; targetBin = bin; }
-                    }
-                }
-                await settlePachinkoResult(targetBin);
             }
-        }, 100);
-    }).catch((e) => {
-        console.error(e);
-        alert("彈珠台失敗：" + e.message);
-        if (dropBtn) dropBtn.disabled = false;
-    });
-}
+
+            // ---------- 獎池 ----------
+            pachinkoBins = [];
+            pachinkoPrizeMap = {};
+
+            const prizes = [];
+            for (const id in lastPrizes) {
+                const p = lastPrizes[id];
+                if (!Array.isArray(p.groups) || !p.groups.includes(honorUnlockedGroup)) continue;
+                if (Number(p.quantity || 0) <= 0) continue;
+                const w = Number(p.weight || 0);
+                if (w <= 0) continue;
+                prizes.push({ id, data: p, weight: w });
+            }
+
+            const binTopY = 395;
+            const binBottomY = renderHeight - 25;
+            const binAreaLeft = 26;
+            const binAreaRight = playWidth - 16;
+            const binAreaWidth = binAreaRight - binAreaLeft;
+
+            if (prizes.length > 0) {
+                let binPrizes = prizes;
+                if (prizes.length > pachinkoBinCount) binPrizes = prizes.slice(0, pachinkoBinCount);
+                const binCount = binPrizes.length;
+                const binWidth = binAreaWidth / binCount;
+
+                for (let i = 0; i < binCount; i++) {
+                    const binX = binAreaLeft + i * binWidth + binWidth / 2;
+                    const prize = binPrizes[i];
+
+                    Composite.add(pachinkoEngine.world, Bodies.rectangle(
+                        binAreaLeft + i * binWidth,
+                        binTopY + (binBottomY - binTopY) / 2,
+                        4, binBottomY - binTopY,
+                        { isStatic: true, render: inv }
+                    ));
+
+                    pachinkoBins.push({
+                        index: i,
+                        x: binX,
+                        width: binWidth,
+                        y: (binTopY + binBottomY) / 2,
+                        topY: binTopY,
+                        bottomY: binBottomY,
+                        prizeId: prize.id,
+                        prizeData: prize.data
+                    });
+                    pachinkoPrizeMap[i] = prize.id;
+                }
+
+                Composite.add(pachinkoEngine.world, Bodies.rectangle(
+                    binAreaRight,
+                    binTopY + (binBottomY - binTopY) / 2,
+                    4, binBottomY - binTopY,
+                    { isStatic: true, render: inv }
+                ));
+            }
+
+            // ---------- 靜態場景預先畫好 ----------
+            const bgCanvas = document.createElement('canvas');
+            bgCanvas.width = renderWidth;
+            bgCanvas.height = renderHeight;
+            const bctx = bgCanvas.getContext('2d');
+            drawPachinkoSceneStatic(bctx, renderWidth, renderHeight, playWidth, trackWall, trackFloor, topPlate, pegs);
+
+            // 畫獎池
+            const binColors = [
+                ['#ff7aa2', '#c9184a'],
+                ['#f9c74f', '#e07a1f'],
+                ['#90be6d', '#2d6a4f'],
+                ['#4dabf7', '#1864ab'],
+                ['#b197fc', '#5f3dc4'],
+                ['#ffa94d', '#d9480f'],
+                ['#63e6be', '#087f5b'],
+                ['#ff8787', '#c92a2a'],
+                ['#74c0fc', '#1971c2']
+            ];
+
+            for (let i = 0; i < pachinkoBins.length; i++) {
+                const bin = pachinkoBins[i];
+                const left = bin.x - bin.width / 2 + 2;
+                const top = bin.topY + 4;
+                const w = bin.width - 4;
+                const h = bin.bottomY - bin.topY - 8;
+                const colors = binColors[i % binColors.length];
+
+                const bg2 = bctx.createLinearGradient(left, top, left, top + h);
+                bg2.addColorStop(0, colors[0]);
+                bg2.addColorStop(1, colors[1]);
+                bctx.fillStyle = bg2;
+                bctx.fillRect(left, top, w, h);
+
+                const hl = bctx.createLinearGradient(left, top, left, top + h * 0.4);
+                hl.addColorStop(0, 'rgba(255,255,255,0.5)');
+                hl.addColorStop(1, 'rgba(255,255,255,0)');
+                bctx.fillStyle = hl;
+                bctx.fillRect(left, top, w, h * 0.4);
+
+                bctx.fillStyle = 'rgba(0,0,0,0.55)';
+                bctx.fillRect(left, top, w, 16);
+                bctx.fillStyle = '#ffffff';
+                bctx.font = 'bold 11px "Noto Sans TC", sans-serif';
+                bctx.textAlign = 'center';
+                bctx.textBaseline = 'middle';
+                const nm = bin.prizeData.name || bin.prizeId;
+                const sn = nm.length > 4 ? nm.slice(0, 4) + '…' : nm;
+                bctx.fillText(sn, bin.x, top + 8);
+            }
+
+            if (pachinkoBins.length > 0) {
+                bctx.fillStyle = '#8b4513';
+                for (let i = 0; i <= pachinkoBins.length; i++) {
+                    const x = i === 0
+                        ? binAreaLeft
+                        : (i === pachinkoBins.length ? binAreaRight : pachinkoBins[i].x - pachinkoBins[i].width / 2);
+                    bctx.fillRect(x - 2, binTopY, 4, binBottomY - binTopY);
+                }
+                const shelfGrad = bctx.createLinearGradient(0, binBottomY, 0, renderHeight - 20);
+                shelfGrad.addColorStop(0, '#d4af37');
+                shelfGrad.addColorStop(1, '#8b6914');
+                bctx.fillStyle = shelfGrad;
+                bctx.fillRect(20, binBottomY, playWidth - 20, renderHeight - 20 - binBottomY);
+            }
+
+            Events.on(pachinkoRender, 'afterRender', () => {
+                const ctx = pachinkoRender.context;
+                ctx.drawImage(bgCanvas, 0, 0);
+                if (pachinkoBall) {
+                    drawGlassBall(ctx, pachinkoBall.position.x, pachinkoBall.position.y, 8);
+                }
+            });
+
+            Matter.Render.run(pachinkoRender);
+            pachinkoRunner = Runner.create();
+            Runner.run(pachinkoRunner, pachinkoEngine);
+        }
+
+        // ---------- 拉桿：初始化拖曳事件 ----------
+        let leverDragging = false;
+        let leverStartClientY = 0;
+        let leverStartTop = 6;
+        let leverCurrentOffset = 0;
+
+        function getPointerClientY(e) {
+            if (e.touches && e.touches.length) return e.touches[0].clientY;
+            if (e.changedTouches && e.changedTouches.length) return e.changedTouches[0].clientY;
+            return e.clientY;
+        }
+
+        function updatePowerDisplay(percent) {
+            const fill = document.getElementById("pachinkoPowerFill");
+            const text = document.getElementById("pachinkoPowerText");
+            if (fill) fill.style.width = percent + '%';
+            if (text) text.textContent = percent;
+        }
+
+        function initPachinkoLever() {
+            const track = document.getElementById('pachinkoLeverTrack');
+            const knob = document.getElementById('pachinkoLeverKnob');
+            if (!track || !knob || track.dataset.bound === '1') return;
+            track.dataset.bound = '1';
+
+            function startDrag(e) {
+                if (pachinkoBallDropped) return;
+                if (!currentPlayerName) return;
+                const playerData = globalPlayedUsers[currentPlayerName];
+                const drawCount = playerData?.drawCount || 0;
+                const limit = getMaxDrawsForPlayer(currentPlayerName);
+                if (!isAdminMode && drawCount >= limit) return;
+
+                leverDragging = true;
+                leverStartClientY = getPointerClientY(e);
+                leverStartTop = knob.offsetTop;
+                knob.style.transition = 'none';
+                e.preventDefault();
+            }
+
+            function moveDrag(e) {
+                if (!leverDragging) return;
+                const clientY = getPointerClientY(e);
+                const dy = clientY - leverStartClientY;
+                let newTop = leverStartTop + dy;
+                const maxTop = track.clientHeight - knob.offsetHeight - 6;
+                newTop = Math.max(6, Math.min(maxTop, newTop));
+                knob.style.top = newTop + 'px';
+                leverCurrentOffset = newTop - 6;
+                const powerPercent = Math.round((leverCurrentOffset / (maxTop - 6)) * 100);
+                updatePowerDisplay(powerPercent);
+                e.preventDefault();
+            }
+
+            function endDrag(e) {
+                if (!leverDragging) return;
+                leverDragging = false;
+                const maxTop = track.clientHeight - knob.offsetHeight - 6;
+                const power = Math.max(0, Math.min(1, leverCurrentOffset / (maxTop - 6)));
+
+                knob.style.transition = 'top 0.25s cubic-bezier(0.4, 0, 0.6, 1)';
+                knob.style.top = '6px';
+                leverCurrentOffset = 0;
+                updatePowerDisplay(0);
+
+                if (power > 0.05) {
+                    launchBall(power);
+                }
+            }
+
+            track.addEventListener('mousedown', startDrag);
+            track.addEventListener('touchstart', startDrag, { passive: false });
+            document.addEventListener('mousemove', moveDrag);
+            document.addEventListener('touchmove', moveDrag, { passive: false });
+            document.addEventListener('mouseup', endDrag);
+            document.addEventListener('touchend', endDrag);
+            document.addEventListener('touchcancel', endDrag);
+        }
+
+        function launchBall(power) {
+            if (!currentPlayerName) { alert("請先選擇名字"); return; }
+            if (pachinkoBallDropped) return;
+            if (!pachinkoEngine || pachinkoBins.length === 0) {
+                alert("彈珠台尚未準備好");
+                return;
+            }
+
+            const playerData = globalPlayedUsers[currentPlayerName];
+            const drawCount = playerData?.drawCount || 0;
+            const limit = getMaxDrawsForPlayer(currentPlayerName);
+            if (!isAdminMode && drawCount >= limit) return;
+
+            const playedRef = ref(db, `playedUsers/${currentPlayerName}`);
+            runTransaction(playedRef, (current) => {
+                if (current && current.drawCount >= limit) return;
+                if (current === null) {
+                    return { drawCount: 1, lastDrawTime: Date.now() };
+                } else {
+                    return { ...current, drawCount: (current.drawCount || 0) + 1, lastDrawTime: Date.now() };
+                }
+            }).then((result) => {
+                if (!result.committed) {
+                    alert("抽獎過於頻繁，請稍後再試。");
+                    return;
+                }
+
+                globalPlayedUsers[currentPlayerName] = {
+                    ...(globalPlayedUsers[currentPlayerName] || {}),
+                    drawCount: (drawCount + 1),
+                    lastDrawTime: Date.now()
+                };
+                updateDrawCountDisplay();
+
+                if (pachinkoBall) {
+                    Matter.Composite.remove(pachinkoEngine.world, pachinkoBall);
+                }
+
+                const renderWidth = pachinkoRender ? pachinkoRender.options.width : pachinkoWidth;
+                const renderHeight = pachinkoRender ? pachinkoRender.options.height : pachinkoHeight;
+
+                // 彈珠從軌道底部起飛
+                const ballX = renderWidth - 35;
+                const ballY = renderHeight - 50;
+
+                pachinkoBall = Matter.Bodies.circle(ballX, ballY, 8, {
+                    restitution: 0.5,
+                    friction: 0.001,
+                    frictionAir: 0.0008,
+                    density: 0.002,
+                    render: { fillStyle: '#0f0f1a', strokeStyle: '#0f0f1a', lineWidth: 0 }
+                });
+                Matter.Composite.add(pachinkoEngine.world, pachinkoBall);
+
+                // 發射力道：24（最小）～28（最大）
+                const speed = 24 + power * 4;
+                Matter.Body.setVelocity(pachinkoBall, { x: 0, y: -speed });
+
+                pachinkoBallDropped = true;
+                playPachinkoSound();
+
+                let checkCount = 0;
+                let enteredPlayArea = false;
+                const checkInterval = setInterval(async () => {
+                    if (!pachinkoBall) { clearInterval(checkInterval); return; }
+                    checkCount++;
+                    const pos = pachinkoBall.position;
+                    if (pos.x < renderWidth - 80) enteredPlayArea = true;
+                    if ((enteredPlayArea && pos.y > renderHeight - 60) || checkCount > 400) {
+                        clearInterval(checkInterval);
+
+                        let targetBin = null;
+                        for (const bin of pachinkoBins) {
+                            if (pos.x >= bin.x - bin.width / 2 && pos.x < bin.x + bin.width / 2) {
+                                targetBin = bin;
+                                break;
+                            }
+                        }
+                        if (!targetBin) {
+                            let minDist = Infinity;
+                            for (const bin of pachinkoBins) {
+                                const d = Math.abs(bin.x - pos.x);
+                                if (d < minDist) { minDist = d; targetBin = bin; }
+                            }
+                        }
+                        await settlePachinkoResult(targetBin);
+                    }
+                }, 100);
+            }).catch((e) => {
+                console.error(e);
+                alert("彈珠台失敗：" + e.message);
+            });
+        }
 
         async function settlePachinkoResult(chosenBin) {
             const prizeId = chosenBin.prizeId;
@@ -2091,8 +2387,6 @@ function dropPachinkoBall() {
                         pachinkoBall = null;
                     }
                     pachinkoBallDropped = false;
-                    const btn = document.getElementById("pachinkoDropBtn");
-                    if (btn) btn.disabled = false;
                     return;
                 }
 
@@ -2145,8 +2439,6 @@ function dropPachinkoBall() {
                     pachinkoBall = null;
                 }
                 pachinkoBallDropped = false;
-                const btn = document.getElementById("pachinkoDropBtn");
-                if (btn) btn.disabled = false;
             }
         }
 
@@ -2208,6 +2500,7 @@ function dropPachinkoBall() {
         document.addEventListener("DOMContentLoaded", () => {
             bindShopTabs();
             buildSlotReels();
+            initPachinkoLever();
         });
         onAuthStateChanged(auth, user => {
             if (user) {
