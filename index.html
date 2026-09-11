@@ -1949,7 +1949,7 @@
             ctx.beginPath();
             for (let i = 0; i <= segs; i++) {
                 const t = i / segs;
-                const y = topY + t * totalY - 1;
+                const y = topY + t * totalH - 1;
                 const angle = t * turns * Math.PI * 2;
                 const x = cx + Math.sin(angle) * radius - 0.8;
                 if (i === 0) ctx.moveTo(x, y);
