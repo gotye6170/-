@@ -2023,35 +2023,41 @@
             }
 
             // 繪製右上與左上弧形牆
-            const cornerRadius = 80;
-            const seg = 15;
+            const cornerRadius = 100;
+            const seg = 20;
             const railGrad = cctx.createLinearGradient(0, 0, renderWidth, renderHeight);
             railGrad.addColorStop(0, '#e0a866');
             railGrad.addColorStop(0.5, '#c07830');
             railGrad.addColorStop(1, '#4a2208');
             
             cctx.strokeStyle = railGrad;
-            cctx.lineWidth = 12;
+            cctx.lineWidth = 14;
             cctx.lineCap = 'round';
             
-            // 右上角弧
+            // 右上角弧 (從右側軌道頂端往左上方彎)
             cctx.beginPath();
             for (let i = 0; i <= seg; i++) {
-                const aR = Math.PI / 2 + (i / seg) * (Math.PI / 2);
+                const aR = -Math.PI / 2 + (i / seg) * (Math.PI / 2);
                 const xR = renderWidth - 20 - cornerRadius + Math.cos(aR) * cornerRadius;
-                const yR = 20 + cornerRadius - Math.sin(aR) * cornerRadius;
+                const yR = 20 + cornerRadius + Math.sin(aR) * cornerRadius;
                 if (i === 0) cctx.moveTo(xR, yR); else cctx.lineTo(xR, yR);
             }
             cctx.stroke();
 
-            // 左上角弧
+            // 左上角弧 (從左側牆壁上方往右上方彎)
             cctx.beginPath();
             for (let i = 0; i <= seg; i++) {
-                const aL = Math.PI + (i / seg) * (Math.PI / 2);
+                const aL = Math.PI - (i / seg) * (Math.PI / 2);
                 const xL = 20 + cornerRadius + Math.cos(aL) * cornerRadius;
-                const yL = 20 + cornerRadius - Math.sin(aL) * cornerRadius;
+                const yL = 20 + cornerRadius + Math.sin(aL) * cornerRadius;
                 if (i === 0) cctx.moveTo(xL, yL); else cctx.lineTo(xL, yL);
             }
+            cctx.stroke();
+
+            // 繪製頂部天花板 (連接兩個弧線)
+            cctx.beginPath();
+            cctx.moveTo(20 + cornerRadius, 20);
+            cctx.lineTo(renderWidth - 20 - cornerRadius, 20);
             cctx.stroke();
 
             // 繪製右側垂直軌道
@@ -2101,7 +2107,7 @@
                   Events = Matter.Events;
 
             pachinkoEngine = Engine.create();
-            pachinkoEngine.gravity.y = 0.8;
+            pachinkoEngine.gravity.y = 1.0;
             pachinkoEngine.positionIterations = 10;
             pachinkoEngine.velocityIterations = 10;
 
@@ -2132,24 +2138,30 @@
             ]);
 
             // 2. 建立右上與左上弧形牆 (用多個小矩形拼接出物理弧線)
-            const cornerRadius = 80;
-            const seg = 15;
+            const cornerRadius = 100;
+            const seg = 20;
             for (let i = 0; i <= seg; i++) {
                 // 右上角弧線
-                const aR = Math.PI / 2 + (i / seg) * (Math.PI / 2);
+                const aR = -Math.PI / 2 + (i / seg) * (Math.PI / 2);
                 const xR = renderWidth - 20 - cornerRadius + Math.cos(aR) * cornerRadius;
-                const yR = 20 + cornerRadius - Math.sin(aR) * cornerRadius;
-                Composite.add(pachinkoEngine.world, Bodies.rectangle(xR, yR, 14, 14, { isStatic: true, angle: aR, render: inv, restitution: 0.2 }));
+                const yR = 20 + cornerRadius + Math.sin(aR) * cornerRadius;
+                Composite.add(pachinkoEngine.world, Bodies.rectangle(xR, yR, 16, 16, { isStatic: true, angle: aR, render: inv, restitution: 0.2 }));
                 // 左上角弧線
-                const aL = Math.PI + (i / seg) * (Math.PI / 2);
+                const aL = Math.PI - (i / seg) * (Math.PI / 2);
                 const xL = 20 + cornerRadius + Math.cos(aL) * cornerRadius;
-                const yL = 20 + cornerRadius - Math.sin(aL) * cornerRadius;
-                Composite.add(pachinkoEngine.world, Bodies.rectangle(xL, yL, 14, 14, { isStatic: true, angle: aL, render: inv, restitution: 0.2 }));
+                const yL = 20 + cornerRadius + Math.sin(aL) * cornerRadius;
+                Composite.add(pachinkoEngine.world, Bodies.rectangle(xL, yL, 16, 16, { isStatic: true, angle: aL, render: inv, restitution: 0.2 }));
             }
 
-            // 3. 右側垂直軌道 (讓球從右下角發射後能沿著右側上升)
+            // 3. 頂部天花板 (連接兩個弧線)
+            Composite.add(pachinkoEngine.world, Bodies.rectangle(
+                renderWidth / 2, 20, renderWidth - 40 - cornerRadius * 2 + 20, 14,
+                { isStatic: true, render: inv, restitution: 0.2 }
+            ));
+
+            // 4. 右側垂直軌道 (讓球從右下角發射後能沿著右側上升)
             const railRightX = renderWidth - 55;
-            const railTopY = 100;
+            const railTopY = 120;
             const railBottomY = renderHeight - 100;
             Composite.add(pachinkoEngine.world, Bodies.rectangle(
                 railRightX, (railTopY + railBottomY) / 2, 12, railBottomY - railTopY, 
@@ -2159,7 +2171,7 @@
             // ---------- 釘子陣列 ----------
             const pegs = [];
             const numRows = 11;
-            const startY = 140;
+            const startY = 160;
             const lastY = 400;
             const rowSpacing = (lastY - startY) / (numRows - 1);
             const playAreaLeft = 40;
@@ -2458,8 +2470,9 @@
             }
 
             Matter.Body.setStatic(pachinkoBall, false);
-            const minSpeed = 8;
-            const maxSpeed = 26;
+            // 力道範圍：最小 10，最大 28
+            const minSpeed = 10;
+            const maxSpeed = 28;
             const speed = minSpeed + power * (maxSpeed - minSpeed);
             Matter.Body.setVelocity(pachinkoBall, { x: 0, y: -speed });
 
