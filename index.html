@@ -2502,6 +2502,36 @@
         }
 
         // ---------- 彈珠台核心 ----------
+        function drawGlassBall(ctx, x, y, r) {
+            // 球體主體（徑向漸層，模擬玻璃折射）
+            const grad = ctx.createRadialGradient(x - r * 0.35, y - r * 0.35, r * 0.05, x, y, r);
+            grad.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
+            grad.addColorStop(0.25, 'rgba(200, 240, 255, 0.55)');
+            grad.addColorStop(0.6, 'rgba(130, 200, 240, 0.45)');
+            grad.addColorStop(0.9, 'rgba(80, 150, 220, 0.55)');
+            grad.addColorStop(1, 'rgba(50, 100, 180, 0.75)');
+            ctx.beginPath();
+            ctx.arc(x, y, r, 0, Math.PI * 2);
+            ctx.fillStyle = grad;
+            ctx.fill();
+            // 邊緣反光
+            ctx.beginPath();
+            ctx.arc(x, y, r - 0.5, 0, Math.PI * 2);
+            ctx.strokeStyle = 'rgba(220, 240, 255, 0.85)';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+            // 主高光（左上大亮點）
+            ctx.beginPath();
+            ctx.arc(x - r * 0.32, y - r * 0.35, r * 0.3, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.92)';
+            ctx.fill();
+            // 次高光（右下小亮點）
+            ctx.beginPath();
+            ctx.arc(x + r * 0.25, y + r * 0.35, r * 0.12, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+            ctx.fill();
+        }
+        
         function buildPachinkoBoard() {
             if (typeof Matter === 'undefined') {
                 console.error("Matter.js 尚未載入");
@@ -2540,6 +2570,10 @@
                     wireframes: false,
                     background: '#0f0f1a',
                     pixelRatio: 1
+                            // 繪製玻璃彈珠
+            if (pachinkoBall) {
+                drawGlassBall(ctx, pachinkoBall.position.x, pachinkoBall.position.y, 8);
+             }
                 }
             });
 
@@ -2772,7 +2806,7 @@
                     friction: 0.001,
                     frictionAir: 0.001,
                     density: 0.002,
-                    render: { fillStyle: '#ff3366', strokeStyle: '#ffffff', lineWidth: 2 }
+                    render: { visible: false }
                 });
                 Matter.Composite.add(pachinkoEngine.world, pachinkoBall);
                 Matter.Body.setVelocity(pachinkoBall, { x: 0, y: -18 });
