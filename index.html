@@ -972,7 +972,6 @@
         let pachinkoBinCount = 7;
         let pachinkoBallRestX = 0;
         let pachinkoBallRestY = 0;
-        let pachinkoLaunchZone = null;
 
         let audioCtx = null;
         let soundEnabled = true;
@@ -1829,7 +1828,7 @@
             }
         }
 
-        // ---------- 彈珠台核心（全新修正：弧形軌道 + 彈珠預備在彈簧上 + 獎池無縫隙） ----------
+        // ---------- 彈珠台核心 ----------
         function drawGlassBall(ctx, x, y, r) {
             const grad = ctx.createRadialGradient(x - r * 0.35, y - r * 0.35, r * 0.05, x, y, r);
             grad.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
@@ -1901,9 +1900,7 @@
             ctx.fill();
         }
 
-        // 畫弧形軌道（平滑曲線）
         function drawCurvedRail(ctx, p0, p1, p2) {
-            // 外層陰影
             ctx.strokeStyle = 'rgba(0,0,0,0.6)';
             ctx.lineWidth = 14;
             ctx.lineCap = 'round';
@@ -1911,7 +1908,6 @@
             ctx.moveTo(p0.x, p0.y);
             ctx.quadraticCurveTo(p1.x, p1.y, p2.x, p2.y);
             ctx.stroke();
-            // 主體漸層
             const grad = ctx.createLinearGradient(p0.x, p0.y, p2.x, p2.y);
             grad.addColorStop(0, '#e0a866');
             grad.addColorStop(0.35, '#c07830');
@@ -1923,7 +1919,6 @@
             ctx.moveTo(p0.x, p0.y);
             ctx.quadraticCurveTo(p1.x, p1.y, p2.x, p2.y);
             ctx.stroke();
-            // 高光
             ctx.strokeStyle = 'rgba(255,220,160,0.7)';
             ctx.lineWidth = 3;
             ctx.beginPath();
@@ -1932,7 +1927,6 @@
             ctx.stroke();
         }
 
-        // 畫彈簧線圈
         function drawSpring(ctx, cx, topY, bottomY, radius, turns) {
             ctx.save();
             ctx.strokeStyle = '#c0c0c0';
@@ -1965,7 +1959,6 @@
             ctx.restore();
         }
 
-        // 畫紅色拉桿（金屬桿 + 金環 + 紅球）
         function drawLeverKnob(ctx, cx, cy) {
             const rodGrad = ctx.createLinearGradient(cx - 4, cy - 22, cx + 4, cy + 22);
             rodGrad.addColorStop(0, '#4a4a4a');
@@ -2006,7 +1999,7 @@
             ctx.fill();
         }
 
-        function drawPachinkoSceneStatic(cctx, renderWidth, renderHeight, playAreaRight, curveP0, curveP1, curveP2, pegs, springCenter) {
+        function drawPachinkoSceneStatic(cctx, renderWidth, renderHeight, playAreaRight, curveP0, curveP1, curveP2, pegs, springCenter, railLeftX, railTopY, railBottomY) {
             const bg = cctx.createLinearGradient(0, 0, 0, renderHeight);
             bg.addColorStop(0, '#101a35');
             bg.addColorStop(1, '#050810');
@@ -2059,10 +2052,7 @@
             // 弧形軌道
             drawCurvedRail(cctx, curveP0, curveP1, curveP2);
 
-            // 軌道左壁（垂直金屬條）
-            const railLeftX = renderWidth - 58;
-            const railTopY = 130;
-            const railBottomY = renderHeight - 25;
+            // 垂直軌道左壁
             const barGrad = cctx.createLinearGradient(railLeftX - 5, 0, railLeftX + 5, 0);
             barGrad.addColorStop(0, '#4a2208');
             barGrad.addColorStop(0.35, '#c07830');
@@ -2079,7 +2069,7 @@
             // 彈簧
             drawSpring(cctx, springCenter.x, springCenter.topY, springCenter.bottomY, 9, 4.5);
 
-            // 拉桿（紅球 + 金環 + 金屬桿）
+            // 拉桿
             drawLeverKnob(cctx, springCenter.x, springCenter.leverY);
 
             // 釘子
@@ -2136,7 +2126,6 @@
 
             const inv = { visible: false };
 
-            // 外框物理
             Composite.add(pachinkoEngine.world, [
                 Bodies.rectangle(10, renderHeight/2, 20, renderHeight, { isStatic: true, render: inv }),
                 Bodies.rectangle(renderWidth/2, 10, renderWidth, 20, { isStatic: true, render: inv }),
@@ -2144,16 +2133,15 @@
                 Bodies.rectangle(renderWidth/2, renderHeight - 5, renderWidth, 20, { isStatic: true, render: inv })
             ]);
 
-            // ---------- 弧形軌道（貝茲曲線，從軌道頂端到遊戲區左上） ----------
-            // P0: 軌道頂端，球上升後撞到這條曲線
-            // P1: 控制點，讓曲線先往上再往左
-            // P2: 終點，在遊戲區左上方
+            // ---------- 弧形軌道（起點接在垂直軌道頂端） ----------
             const railLeftX = renderWidth - 58;
             const railTopY = 130;
+            const railBottomY = renderHeight - 25;
 
-            const curveP0 = { x: railLeftX + 22, y: railTopY };              // (renderWidth - 36, 130)
-            const curveP1 = { x: railLeftX + 22, y: 40 };                     // 控制點在上方
-            const curveP2 = { x: railLeftX - 110, y: 60 };                    // 終點在左方
+            // ★ 起點接在垂直軌道左壁的頂點上（x = railLeftX, y = railTopY）
+            const curveP0 = { x: railLeftX, y: railTopY };
+            const curveP1 = { x: railLeftX - 20, y: railTopY - 95 };
+            const curveP2 = { x: railLeftX - 130, y: railTopY - 80 };
 
             const curveSegments = 24;
             for (let i = 0; i < curveSegments; i++) {
@@ -2173,11 +2161,11 @@
                 }));
             }
 
-            // ---------- 右側軌道左壁 ----------
+            // ---------- 垂直軌道左壁 ----------
             const trackWallX = railLeftX;
             const trackWallW = 10;
             const trackWallTop = railTopY;
-            const trackWallBottom = renderHeight - 25;
+            const trackWallBottom = railBottomY;
             const trackWallH = trackWallBottom - trackWallTop;
             const trackWallY = trackWallTop + trackWallH / 2;
 
@@ -2210,19 +2198,25 @@
             }
 
             // ---------- 彈簧與彈珠預備位置 ----------
-            const springX = trackWallX + 22;   // 軌道中心
+            const springX = trackWallX + 22;
             const springTopY = renderHeight - 85;
             const springBottomY = renderHeight - 55;
             const leverY = renderHeight - 38;
 
-            // 彈珠預備位置（在彈簧頂端上方）
             const ballRestX = springX;
             const ballRestY = springTopY - 10;
 
             pachinkoBallRestX = ballRestX;
             pachinkoBallRestY = ballRestY;
 
-            // 建立預備彈珠（靜態，等到發射才變動態）
+            // ★ 在彈珠下方加一個隱形小平台，讓彈珠掉回時會停在彈簧頂端
+            const springPlatform = Bodies.rectangle(ballRestX, ballRestY + 10, 30, 6, {
+                isStatic: true,
+                render: inv
+            });
+            Composite.add(pachinkoEngine.world, springPlatform);
+
+            // 預備彈珠（靜態）
             pachinkoBall = Bodies.circle(ballRestX, ballRestY, 8, {
                 isStatic: true,
                 restitution: 0.5,
@@ -2233,7 +2227,7 @@
             });
             Composite.add(pachinkoEngine.world, pachinkoBall);
 
-            // ---------- 獎池（左牆到軌道左壁，無縫隙） ----------
+            // ---------- 獎池 ----------
             pachinkoBins = [];
             pachinkoPrizeMap = {};
 
@@ -2248,8 +2242,7 @@
             }
 
             const binTopY = 385;
-            const binBottomY = renderHeight - 22;   // 貼近底框
-            // 獎池從左牆內緣到軌道左壁左緣，完全無縫隙
+            const binBottomY = renderHeight - 22;
             const binAreaLeft = 22;
             const binAreaRight = trackWallX - trackWallW / 2;
             const binAreaWidth = binAreaRight - binAreaLeft;
@@ -2307,7 +2300,7 @@
             const bctx = bgCanvas.getContext('2d');
             drawPachinkoSceneStatic(bctx, renderWidth, renderHeight, playAreaRight, curveP0, curveP1, curveP2, pegs, {
                 x: springX, topY: springTopY, bottomY: springBottomY, leverY: leverY
-            });
+            }, railLeftX, railTopY, railBottomY);
 
             // 畫獎池
             const binColors = [
@@ -2354,11 +2347,9 @@
             }
 
             if (pachinkoBins.length > 0) {
-                // 隔板
                 bctx.fillStyle = '#8b4513';
                 bctx.fillRect(binAreaLeft - 2, binTopY, 4, binBottomY - binTopY);
                 bctx.fillRect(binAreaRight - 2, binTopY, 4, binBottomY - binTopY);
-                // 底板
                 const shelfGrad = bctx.createLinearGradient(0, binBottomY, 0, renderHeight - 20);
                 shelfGrad.addColorStop(0, '#d4af37');
                 shelfGrad.addColorStop(1, '#8b6914');
@@ -2379,7 +2370,6 @@
             Runner.run(pachinkoRunner, pachinkoEngine);
         }
 
-        // ---------- 拉桿拖曳 ----------
         let leverDragging = false;
         let leverStartClientY = 0;
         let leverStartTop = 6;
@@ -2471,98 +2461,127 @@
             const limit = getMaxDrawsForPlayer(currentPlayerName);
             if (!isAdminMode && drawCount >= limit) return;
 
+            // 保險：如果真的沒有彈珠，重新建立
+            if (!pachinkoBall) {
+                const renderWidth = pachinkoRender ? pachinkoRender.options.width : pachinkoWidth;
+                const renderHeight = pachinkoRender ? pachinkoRender.options.height : pachinkoHeight;
+                const railLeftX = renderWidth - 58;
+                pachinkoBall = Matter.Bodies.circle(railLeftX + 22, renderHeight - 95, 8, {
+                    isStatic: true,
+                    restitution: 0.5,
+                    friction: 0.001,
+                    frictionAir: 0.0008,
+                    density: 0.002,
+                    render: { visible: false }
+                });
+                Matter.Composite.add(pachinkoEngine.world, pachinkoBall);
+            }
+
+            Matter.Body.setStatic(pachinkoBall, false);
+            // ★ 力道範圍拉大：最小 18，最大 58（差距 3.2 倍）
+            // power = 0.2 (20%) → speed = 18 + 0.2 * 40 = 26（太弱，無法進 Pin 區）
+            // power = 0.5 (50%) → speed = 38
+            // power = 1.0 (100%) → speed = 58
+            const minSpeed = 18;
+            const maxSpeed = 58;
+            const speed = minSpeed + power * (maxSpeed - minSpeed);
+            Matter.Body.setVelocity(pachinkoBall, { x: 0, y: -speed });
+
+            pachinkoBallDropped = true;
+            playPachinkoSound();
+
+            const renderWidth = pachinkoRender ? pachinkoRender.options.width : pachinkoWidth;
+            const renderHeight = pachinkoRender ? pachinkoRender.options.height : pachinkoHeight;
             const playedRef = ref(db, `playedUsers/${currentPlayerName}`);
-            runTransaction(playedRef, (current) => {
-                if (current && current.drawCount >= limit) return;
-                if (current === null) {
-                    return { drawCount: 1, lastDrawTime: Date.now() };
-                } else {
-                    return { ...current, drawCount: (current.drawCount || 0) + 1, lastDrawTime: Date.now() };
+
+            let checkCount = 0;
+            let enteredPlayArea = false;
+            let countDeducted = false;
+
+            const checkInterval = setInterval(async () => {
+                if (!pachinkoBall) { clearInterval(checkInterval); return; }
+                checkCount++;
+                const pos = pachinkoBall.position;
+                if (pos.x < renderWidth - 90) enteredPlayArea = true;
+
+                // 進入遊戲區時才扣次數（只扣一次）
+                if (enteredPlayArea && !countDeducted) {
+                    countDeducted = true;
+                    runTransaction(playedRef, (current) => {
+                        if (current && current.drawCount >= limit) return;
+                        if (current === null) {
+                            return { drawCount: 1, lastDrawTime: Date.now() };
+                        } else {
+                            return { ...current, drawCount: (current.drawCount || 0) + 1, lastDrawTime: Date.now() };
+                        }
+                    }).then((result) => {
+                        if (result.committed) {
+                            const newCount = (globalPlayedUsers[currentPlayerName]?.drawCount || 0) + 1;
+                            globalPlayedUsers[currentPlayerName] = {
+                                ...(globalPlayedUsers[currentPlayerName] || {}),
+                                drawCount: newCount,
+                                lastDrawTime: Date.now()
+                            };
+                            updateDrawCountDisplay();
+                        }
+                    }).catch((e) => console.error("扣次數失敗", e));
                 }
-            }).then((result) => {
-                if (!result.committed) {
-                    alert("抽獎過於頻繁，請稍後再試。");
+
+                // 進入遊戲區且到底部，正常結算
+                if (enteredPlayArea && pos.y > renderHeight - 55) {
+                    clearInterval(checkInterval);
+                    let targetBin = null;
+                    for (const bin of pachinkoBins) {
+                        if (pos.x >= bin.x - bin.width / 2 && pos.x < bin.x + bin.width / 2) {
+                            targetBin = bin;
+                            break;
+                        }
+                    }
+                    if (!targetBin) {
+                        let minDist = Infinity;
+                        for (const bin of pachinkoBins) {
+                            const d = Math.abs(bin.x - pos.x);
+                            if (d < minDist) { minDist = d; targetBin = bin; }
+                        }
+                    }
+                    if (targetBin) {
+                        await settlePachinkoResult(targetBin);
+                    } else {
+                        resetPachinkoAfterDraw();
+                    }
                     return;
                 }
 
-                globalPlayedUsers[currentPlayerName] = {
-                    ...(globalPlayedUsers[currentPlayerName] || {}),
-                    drawCount: (drawCount + 1),
-                    lastDrawTime: Date.now()
-                };
-                updateDrawCountDisplay();
-
-                if (!pachinkoBall) {
-                    // 保險：如果真的沒有彈珠，重新建立
-                    const renderWidth = pachinkoRender ? pachinkoRender.options.width : pachinkoWidth;
-                    const renderHeight = pachinkoRender ? pachinkoRender.options.height : pachinkoHeight;
-                    const railLeftX = renderWidth - 58;
-                    pachinkoBall = Matter.Bodies.circle(railLeftX + 22, renderHeight - 95, 8, {
-                        isStatic: true,
-                        restitution: 0.5,
-                        friction: 0.001,
-                        frictionAir: 0.0008,
-                        density: 0.002,
-                        render: { visible: false }
-                    });
-                    Matter.Composite.add(pachinkoEngine.world, pachinkoBall);
-                }
-
-                // 讓彈珠變成動態，並給予向上的初速度
-                Matter.Body.setStatic(pachinkoBall, false);
-                // ★ 力道差異化：最小 22，最大 42（差距約 2 倍）
-                const minSpeed = 22;
-                const maxSpeed = 42;
-                const speed = minSpeed + power * (maxSpeed - minSpeed);
-                Matter.Body.setVelocity(pachinkoBall, { x: 0, y: -speed });
-
-                pachinkoBallDropped = true;
-                playPachinkoSound();
-
-                const renderWidth = pachinkoRender ? pachinkoRender.options.width : pachinkoWidth;
-                const renderHeight = pachinkoRender ? pachinkoRender.options.height : pachinkoHeight;
-
-                let checkCount = 0;
-                let enteredPlayArea = false;
-                const checkInterval = setInterval(async () => {
-                    if (!pachinkoBall) { clearInterval(checkInterval); return; }
-                    checkCount++;
-                    const pos = pachinkoBall.position;
-                    // 判斷是否已進入遊戲區（x 明顯小於軌道位置）
-                    if (pos.x < renderWidth - 90) enteredPlayArea = true;
-                    if ((enteredPlayArea && pos.y > renderHeight - 55) || checkCount > 500) {
-                        clearInterval(checkInterval);
-
-                        let targetBin = null;
-                        for (const bin of pachinkoBins) {
-                            if (pos.x >= bin.x - bin.width / 2 && pos.x < bin.x + bin.width / 2) {
-                                targetBin = bin;
-                                break;
-                            }
-                        }
-                        if (!targetBin) {
-                            let minDist = Infinity;
-                            for (const bin of pachinkoBins) {
-                                const d = Math.abs(bin.x - pos.x);
-                                if (d < minDist) { minDist = d; targetBin = bin; }
-                            }
-                        }
-                        if (targetBin) {
-                            await settlePachinkoResult(targetBin);
-                        } else {
-                            // 極端情況：沒有獎池，重置
-                            if (pachinkoBall) {
-                                Matter.Composite.remove(pachinkoEngine.world, pachinkoBall);
-                                pachinkoBall = null;
-                            }
-                            pachinkoBallDropped = false;
+                // 超時判斷
+                if (checkCount > 500) {
+                    clearInterval(checkInterval);
+                    if (!enteredPlayArea) {
+                        // 彈珠未進入遊戲區 → 不扣次數，重置彈珠讓玩家重試
+                        resetPachinkoAfterDraw();
+                        return;
+                    }
+                    // 已進入過遊戲區（可能卡住），正常結算
+                    let targetBin = null;
+                    for (const bin of pachinkoBins) {
+                        if (pos.x >= bin.x - bin.width / 2 && pos.x < bin.x + bin.width / 2) {
+                            targetBin = bin;
+                            break;
                         }
                     }
-                }, 100);
-            }).catch((e) => {
-                console.error(e);
-                alert("彈珠台失敗：" + e.message);
-            });
+                    if (!targetBin) {
+                        let minDist = Infinity;
+                        for (const bin of pachinkoBins) {
+                            const d = Math.abs(bin.x - pos.x);
+                            if (d < minDist) { minDist = d; targetBin = bin; }
+                        }
+                    }
+                    if (targetBin) {
+                        await settlePachinkoResult(targetBin);
+                    } else {
+                        resetPachinkoAfterDraw();
+                    }
+                }
+            }, 100);
         }
 
         async function settlePachinkoResult(chosenBin) {
@@ -2627,12 +2646,10 @@
         }
 
         function resetPachinkoAfterDraw() {
-            // 移除舊彈珠
             if (pachinkoBall) {
                 Matter.Composite.remove(pachinkoEngine.world, pachinkoBall);
                 pachinkoBall = null;
             }
-            // 重新建立預備彈珠（靜態，在彈簧頂端）
             if (pachinkoEngine && pachinkoRender) {
                 const ballRestX = pachinkoBallRestX;
                 const ballRestY = pachinkoBallRestY;
