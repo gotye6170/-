@@ -2215,6 +2215,16 @@
                 { x: areaLeft + dx * 0.5, y: areaTop + dy * 5, w: 40, h: 8, speed: 0.028, dir:  1 },
                 { x: areaLeft + dx * 5.5, y: areaTop + dy * 5, w: 40, h: 8, speed: 0.028, dir: -1 }
             ];
+            // 磁鐵：對彈珠持續施加吸引力
+            const magnets = [
+                { x: areaLeft + dx * 2.5, y: areaTop + dy * 1.5, radius: 85, strength: 0.55 }
+            ];
+
+            // 齒輪：旋轉撥動彈珠
+            const gearDefs = [
+                { x: areaLeft + dx * 1.5, y: areaTop + dy * 7.5, teeth: 8, rInner: 16, rOuter: 26, speed:  0.022 },
+                { x: areaLeft + dx * 4.5, y: areaTop + dy * 7.5, teeth: 8, rInner: 16, rOuter: 26, speed: -0.022 }
+            ];
 
             function isNearObstacle(x, y) {
                 for (const b of bumpers) {
@@ -2225,6 +2235,14 @@
                     const sweep = Math.hypot(s.w / 2, s.h / 2);
                     const need = sweep + pegRadius + BALL_D + SAFETY;
                     if (Math.hypot(x - s.x, y - s.y) < need) return true;
+                }
+                for (const g of gearDefs) {
+                    const need = g.rOuter + pegRadius + BALL_D + SAFETY;
+                    if (Math.hypot(x - g.x, y - g.y) < need) return true;
+                }
+                for (const m of magnets) {
+                    // 磁鐵沒物理體，只留視覺空間
+                    if (Math.hypot(x - m.x, y - m.y) < 42) return true;
                 }
                 return false;
             }
@@ -2253,7 +2271,63 @@
                 Composite.add(pachinkoEngine.world, body);
                 pegs.push({ x: b.x, y: b.y, r: b.r, isBumper: true });
             }
+            // ---------- 加入齒輪 ----------
+            const gears = [];
+            for (const gd of gearDefs) {
+                const parts = [];
 
+                // 中心圓
+                parts.push(Bodies.circle(gd.x, gd.y, gd.rInner, {
+                    isStatic: true, restitution: 0.85, friction: 0,
+                    render: inv, label: 'gear'
+                }));
+
+                // 齒
+                const toothW = (2 * Math.PI * gd.rOuter) / gd.teeth * 0.55;
+                for (let i = 0; i < gd.teeth; i++) {
+                    const angle = (i / gd.teeth) * Math.PI * 2;
+                    const rMid = (gd.rInner + gd.rOuter) / 2;
+                    const tx = gd.x + Math.cos(angle) * rMid;
+                    const ty = gd.y + Math.sin(angle) * rMid;
+                    parts.push(Bodies.rectangle(tx, ty, toothW, gd.rOuter - gd.rInner + 6, {
+                        isStatic: true,
+                        angle: angle + Math.PI / 2,
+                        restitution: 0.9,
+                        friction: 0,
+                        render: inv,
+                        label: 'gear'
+                    }));
+                }
+
+                const composite = Composite.create();
+                Composite.add(composite, parts);
+                Composite.add(pachinkoEngine.world, composite);
+                gears.push({ composite, cx: gd.x, cy: gd.y, speed: gd.speed });
+            }
+
+            // 齒輪旋轉
+            Events.on(pachinkoEngine, 'beforeUpdate', () => {
+                for (const g of gears) {
+                    Composite.rotate(g.composite, g.speed, { x: g.cx, y: g.cy });
+                }
+            });
+
+            // ---------- 磁鐵：對彈珠施加吸引力 ----------
+            Events.on(pachinkoEngine, 'beforeUpdate', () => {
+                if (!pachinkoBall || pachinkoBall.isStatic) return;
+                for (const m of magnets) {
+                    const ddx = m.x - pachinkoBall.position.x;
+                    const ddy = m.y - pachinkoBall.position.y;
+                    const dist = Math.hypot(ddx, ddy);
+                    if (dist > m.radius || dist < 1) continue;
+                    const falloff = 1 - dist / m.radius;
+                    const f = m.strength * falloff;
+                    Matter.Body.applyForce(pachinkoBall, pachinkoBall.position, {
+                        x: (ddx / dist) * f,
+                        y: (ddy / dist) * f
+                    });
+                }
+            });
             Events.on(pachinkoEngine, 'collisionStart', (event) => {
                 if (!pachinkoBall) return;
                 for (const pair of event.pairs) {
@@ -2485,7 +2559,54 @@
                     ctx2d.stroke();
                     ctx2d.restore();
                 }
+                // 齒輪
+                for (const g of gears) {
+                    // 從第一個 body 的座標推算當前旋轉角
+                    const c = g.composite.bodies[0];
+                    const curAngle = Math.atan2(c.position.y - g.cy, c.position.x - g.cx);
 
+                    ctx2d.save();
+                    ctx2d.translate(g.cx, g.cy);
+                    ctx2d.rotate(curAngle);
+
+                    const rIn = 16, rOut = 26, toothCount = 8;
+
+                    // 齒
+                    for (let i = 0; i < toothCount; i++) {
+                        const a = (i / toothCount) * Math.PI * 2;
+                        const tx = Math.cos(a) * ((rIn + rOut) / 2);
+                        const ty = Math.sin(a) * ((rIn + rOut) / 2);
+                        ctx2d.save();
+                        ctx2d.translate(tx, ty);
+                        ctx2d.rotate(a + Math.PI / 2);
+                        ctx2d.fillStyle = '#6b7280';
+                        ctx2d.fillRect(-4, -(rOut - rIn + 6) / 2, 8, rOut - rIn + 6);
+                        ctx2d.strokeStyle = 'rgba(0,0,0,0.4)';
+                        ctx2d.lineWidth = 1;
+                        ctx2d.strokeRect(-4, -(rOut - rIn + 6) / 2, 8, rOut - rIn + 6);
+                        ctx2d.restore();
+                    }
+
+                    // 中心圓
+                    const gearGrad = ctx2d.createRadialGradient(-4, -4, 2, 0, 0, rIn);
+                    gearGrad.addColorStop(0, '#e0e0e0');
+                    gearGrad.addColorStop(0.6, '#9ca3af');
+                    gearGrad.addColorStop(1, '#4b5563');
+                    ctx2d.fillStyle = gearGrad;
+                    ctx2d.beginPath();
+                    ctx2d.arc(0, 0, rIn, 0, Math.PI * 2);
+                    ctx2d.fill();
+                    ctx2d.strokeStyle = 'rgba(0,0,0,0.5)';
+                    ctx2d.stroke();
+
+                    // 中心軸
+                    ctx2d.beginPath();
+                    ctx2d.arc(0, 0, 5, 0, Math.PI * 2);
+                    ctx2d.fillStyle = '#1f2937';
+                    ctx2d.fill();
+
+                    ctx2d.restore();
+                }
                 if (pachinkoBall) {
                     drawGlassBall(ctx2d, pachinkoBall.position.x, pachinkoBall.position.y, 8);
                 }
