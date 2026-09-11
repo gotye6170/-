@@ -1185,18 +1185,14 @@
 
         let defaultMaxDraws = 1;
 
-        // 拉霸機相關
         let slotSymbols = {};
         let isSlotSpinning = false;
         let gameMode = "both";
 
-        // 音效相關
         let soundUrls = {};
 
-        // 中獎紀錄資料
         let drawRecordsData = {};
 
-        // 彈珠台相關
         let pachinkoEngine = null;
         let pachinkoRunner = null;
         let pachinkoRender = null;
@@ -1288,7 +1284,6 @@
             return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, "0")).join("");
         }
 
-        // ---------- 獲取某玩家的抽獎上限 ----------
         function getMaxDrawsForPlayer(name) {
             if (drawLimits[name] !== undefined && Number.isInteger(drawLimits[name]) && drawLimits[name] >= 0) {
                 return drawLimits[name];
@@ -1296,7 +1291,6 @@
             return defaultMaxDraws;
         }
 
-        // ---------- 讀取全域預設與個別設定 ----------
         function loadDrawSettings() {
             onValue(ref(db, "settings/global/maxDrawsPerPlayer"), (snap) => {
                 const val = snap.val();
@@ -1353,7 +1347,6 @@
             }
         }
 
-        // ---------- 更新剩餘次數顯示 ----------
         function updateDrawCountDisplay() {
             const display = document.getElementById("drawCountDisplay");
             if (!display || !currentPlayerName) return;
@@ -1375,7 +1368,6 @@
             }
         }
 
-        // ---------- 跑馬燈、榮譽榜、禮物列表 ----------
         function buildMarqueeText(list) {
             const def = "🎉 歡迎來到呆呆幸運抽獎！快來試試手氣！ 🎟️ ";
             if (!honorUnlockedGroup) return def;
@@ -1707,7 +1699,6 @@
             }
         };
 
-        // ---------- 管理員測試模式 ----------
         function promptAdminMode() {
             const pwd = prompt("請輸入管理員測試密碼：");
             if (pwd === ADMIN_TEST_PASSWORD) {
@@ -1718,7 +1709,6 @@
             }
         }
 
-        // ---------- 上一步 ----------
         function goBack() {
             document.getElementById("contentArea").classList.add("hidden");
             document.getElementById("controlPanel").classList.remove("hidden");
@@ -1726,7 +1716,6 @@
             document.getElementById("honorBoardPanel").style.display = "";
         }
 
-        // ---------- 顯示各系統 ----------
         function showDrawSystem() {
             document.getElementById("drawSystemArea").style.display = "block";
             document.getElementById("slotSystemArea").style.display = "none";
@@ -1769,7 +1758,6 @@
             }, 100);
         }
 
-        // ---------- 選擇模式 ----------
         function showChoiceModal(playerName) {
             document.getElementById("choicePlayerName").innerText = playerName;
             document.getElementById("choiceModal").style.display = "flex";
@@ -1807,7 +1795,6 @@
             showPointsSystem();
         }
 
-        // ---------- 選擇名字 ----------
         function handleNameChange() {
             const val = document.getElementById("playerName").value;
             if (!val) return;
@@ -1852,7 +1839,6 @@
             document.getElementById("honorBoardPanel").style.display = "";
         }
 
-        // ---------- 解鎖群組 ----------
         function verifyGroupPass() {
             const inputPass = document.getElementById("secretPass").value.trim();
             const selectEl = document.getElementById("playerName");
@@ -1899,7 +1885,6 @@
             }
         }
 
-        // ---------- UI 更新 ----------
         function refreshPlayedUsersUI() {
             const sel = document.getElementById("playerName");
             for (let opt of sel.options) {
@@ -2503,7 +2488,6 @@
 
         // ---------- 彈珠台核心 ----------
         function drawGlassBall(ctx, x, y, r) {
-            // 球體主體（徑向漸層，模擬玻璃折射）
             const grad = ctx.createRadialGradient(x - r * 0.35, y - r * 0.35, r * 0.05, x, y, r);
             grad.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
             grad.addColorStop(0.25, 'rgba(200, 240, 255, 0.55)');
@@ -2514,24 +2498,21 @@
             ctx.arc(x, y, r, 0, Math.PI * 2);
             ctx.fillStyle = grad;
             ctx.fill();
-            // 邊緣反光
             ctx.beginPath();
             ctx.arc(x, y, r - 0.5, 0, Math.PI * 2);
             ctx.strokeStyle = 'rgba(220, 240, 255, 0.85)';
             ctx.lineWidth = 1;
             ctx.stroke();
-            // 主高光（左上大亮點）
             ctx.beginPath();
             ctx.arc(x - r * 0.32, y - r * 0.35, r * 0.3, 0, Math.PI * 2);
             ctx.fillStyle = 'rgba(255, 255, 255, 0.92)';
             ctx.fill();
-            // 次高光（右下小亮點）
             ctx.beginPath();
             ctx.arc(x + r * 0.25, y + r * 0.35, r * 0.12, 0, Math.PI * 2);
             ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
             ctx.fill();
         }
-        
+
         function buildPachinkoBoard() {
             if (typeof Matter === 'undefined') {
                 console.error("Matter.js 尚未載入");
@@ -2570,10 +2551,6 @@
                     wireframes: false,
                     background: '#0f0f1a',
                     pixelRatio: 1
-                            // 繪製玻璃彈珠
-            if (pachinkoBall) {
-                drawGlassBall(ctx, pachinkoBall.position.x, pachinkoBall.position.y, 8);
-             }
                 }
             });
 
@@ -2721,6 +2698,11 @@
                 ctx.fillStyle = '#ffd700';
                 ctx.font = 'bold 10px "Noto Sans TC", sans-serif';
                 ctx.fillText("發射", springX, springBottom + 40);
+
+                // 繪製玻璃彈珠
+                if (pachinkoBall) {
+                    drawGlassBall(ctx, pachinkoBall.position.x, pachinkoBall.position.y, 8);
+                }
             });
 
             Matter.Render.run(pachinkoRender);
