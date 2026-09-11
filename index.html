@@ -2139,7 +2139,7 @@
                     width: renderWidth,
                     height: renderHeight,
                     wireframes: false,
-                    background: '#050810',
+                    background: 'transparent',
                     pixelRatio: 1
                 }
             });
@@ -2395,9 +2395,22 @@
                 bctx.fillRect(20, binBottomY, renderWidth - 40, renderHeight - 20 - binBottomY);
             }
 
+            // ===== 把背景畫布設成 Matter.js 畫布的 CSS 背景 =====
+            try {
+                const bgDataURL = bgCanvas.toDataURL('image/png');
+                pachinkoRender.canvas.style.backgroundImage = `url(${bgDataURL})`;
+                pachinkoRender.canvas.style.backgroundSize = '100% 100%';
+                pachinkoRender.canvas.style.backgroundRepeat = 'no-repeat';
+                pachinkoRender.canvas.style.backgroundPosition = 'center';
+                pachinkoRender.canvas.style.backgroundColor = '#050810';
+            } catch (e) {
+                console.error("背景圖生成失敗，使用純色背景", e);
+                pachinkoRender.options.background = '#050810';
+            }
+
+            // afterRender 只需要畫彈珠（背景已經在 CSS 上）
             Events.on(pachinkoRender, 'afterRender', () => {
                 const ctx = pachinkoRender.context;
-                ctx.drawImage(bgCanvas, 0, 0);
                 if (pachinkoBall) {
                     drawGlassBall(ctx, pachinkoBall.position.x, pachinkoBall.position.y, 8);
                 }
