@@ -8,6 +8,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>呆呆幸運抽獎 🌟</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/matter-js@0.19.0/build/matter.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
@@ -454,6 +455,12 @@
             box-shadow: 0 8px 20px rgba(124, 58, 237, 0.35);
         }
 
+        .choice-btn-pachinko {
+            background: linear-gradient(135deg, #60a5fa, #2563eb);
+            color: white;
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
+        }
+
         /* ========== 拉霸機新版樣式（老虎機風格） ========== */
         .casino-slot-machine {
             width: 100%;
@@ -605,6 +612,84 @@
             text-shadow: 0 0 8px #ffd700;
             margin-top: 10px;
             text-align: center;
+        }
+
+        /* ========== 彈珠台樣式 ========== */
+        .pachinko-machine {
+            width: 100%;
+            max-width: 420px;
+            margin: 0 auto;
+            background: linear-gradient(180deg, #3a1c5a 0%, #1e0f33 100%);
+            border-radius: 30px;
+            padding: 20px;
+            border: 8px solid #d4af37;
+            box-shadow: 
+                0 25px 0 #0d0618,
+                0 35px 50px rgba(0,0,0,0.7),
+                inset 0 2px 0 #d4af37,
+                inset 0 -10px 20px rgba(0,0,0,0.6);
+            position: relative;
+            overflow: hidden;
+        }
+        .pachinko-top-lights {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 10px;
+        }
+        .pachinko-title {
+            text-align: center;
+            font-size: 28px;
+            font-weight: 900;
+            color: #ffd700;
+            text-shadow: 0 0 15px #ffd700;
+            margin-bottom: 15px;
+        }
+        .pachinko-container {
+            width: 100%;
+            background: #0f0f1a;
+            border-radius: 15px;
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.9);
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            justify-content: center;
+        }
+        .pachinko-container canvas {
+            display: block;
+            max-width: 100%;
+            height: auto !important;
+        }
+        .pachinko-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 15px;
+        }
+        .pachinko-button {
+            background: linear-gradient(180deg, #ff4444, #990000);
+            color: white;
+            font-weight: 900;
+            font-size: 18px;
+            padding: 14px 30px;
+            border-radius: 50px;
+            border: 3px solid #ffcc00;
+            box-shadow: 
+                0 10px 0 #660000,
+                0 15px 25px rgba(0,0,0,0.6),
+                inset 0 2px 0 rgba(255,255,255,0.2);
+            text-shadow: 0 2px 0 #660000;
+            transition: all 0.1s;
+            cursor: pointer;
+        }
+        .pachinko-button:active {
+            transform: translateY(8px);
+            box-shadow: 0 2px 0 #660000, 0 5px 10px rgba(0,0,0,0.5);
+        }
+        .pachinko-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: translateY(4px);
+            box-shadow: 0 4px 0 #660000;
         }
         
         .modal-overlay {
@@ -889,6 +974,27 @@
                     </div>
                 </div>
 
+                <!-- 🎱 彈珠台區塊 -->
+                <div id="pachinkoSystemArea" class="w-full hidden">
+                    <div class="pachinko-machine">
+                        <div class="pachinko-top-lights">
+                            <div class="slot-light"></div>
+                            <div class="slot-light"></div>
+                            <div class="slot-light"></div>
+                            <div class="slot-light"></div>
+                            <div class="slot-light"></div>
+                        </div>
+                        <h3 class="pachinko-title">🎱 彈珠台</h3>
+                        <div id="pachinkoContainer" class="pachinko-container"></div>
+                        <div class="pachinko-controls">
+                            <button id="pachinkoDropBtn" onclick="dropPachinkoBall()" class="pachinko-button">🎱 發射彈珠！</button>
+                        </div>
+                        <p class="slot-info">
+                            剩餘次數：<span id="pachinkoCountDisplay">0</span>
+                        </p>
+                    </div>
+                </div>
+
                 <!-- 🪙 點數兌換系統區塊 -->
                 <div id="pointsSystemArea" class="w-full hidden">
                     <div class="w-full bg-white/80 backdrop-blur-md rounded-2xl p-5 shadow-md border border-white">
@@ -942,6 +1048,10 @@
                 <button onclick="chooseSlot()" class="choice-btn choice-btn-slot w-full">
                     <span class="text-2xl">🎰</span>
                     <span>拉霸機</span>
+                </button>
+                <button onclick="choosePachinko()" class="choice-btn choice-btn-pachinko w-full">
+                    <span class="text-2xl">🎱</span>
+                    <span>彈珠台</span>
                 </button>
                 <button onclick="choosePoints()" class="choice-btn choice-btn-points w-full">
                     <span class="text-2xl">🎁</span>
@@ -1017,7 +1127,7 @@
     <!-- 🔊 音效開關 -->
     <button id="soundToggleBtn" onclick="toggleSound()" class="music-control-btn fixed bottom-5 right-5 bg-slate-900 text-cyan-400 text-sm font-bold px-4 py-2 rounded-full shadow-lg border border-cyan-500/30 z-40 transition-all active:scale-95">🔊 音效</button>
 
-    <script type="module">
+        <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
         import { getDatabase, ref, runTransaction, onValue, get, update, push, set } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
@@ -1051,6 +1161,8 @@
         window.choosePoints = choosePoints;
         window.chooseSlot = chooseSlot;
         window.startSlot = startSlot;
+        window.choosePachinko = choosePachinko;
+        window.dropPachinkoBall = dropPachinkoBall;
 
         // ---------- 全域狀態 ----------
         let isDrawing = false;
@@ -1081,8 +1193,19 @@
         // 音效相關
         let soundUrls = {};
 
-        // 新增：儲存 drawRecords 的資料
+        // 中獎紀錄資料
         let drawRecordsData = {};
+
+        // 彈珠台相關
+        let pachinkoEngine = null;
+        let pachinkoRunner = null;
+        let pachinkoRender = null;
+        let pachinkoBall = null;
+        let pachinkoBallDropped = false;
+        let pachinkoBins = [];
+        let pachinkoPrizeMap = {};
+        let pachinkoWidth = 380;
+        let pachinkoHeight = 480;
 
         // ---------- 音效 ----------
         let audioCtx = null;
@@ -1199,16 +1322,20 @@
         function updateGameModeUI() {
             const drawBtn = document.querySelector(".choice-btn-draw");
             const slotBtn = document.querySelector(".choice-btn-slot");
+            const pachinkoBtn = document.querySelector(".choice-btn-pachinko");
             if (!drawBtn || !slotBtn) return;
             if (gameMode === "gacha") {
                 drawBtn.style.display = "flex";
                 slotBtn.style.display = "none";
+                if (pachinkoBtn) pachinkoBtn.style.display = "none";
             } else if (gameMode === "slot") {
                 drawBtn.style.display = "none";
                 slotBtn.style.display = "flex";
+                if (pachinkoBtn) pachinkoBtn.style.display = "none";
             } else {
                 drawBtn.style.display = "flex";
                 slotBtn.style.display = "flex";
+                if (pachinkoBtn) pachinkoBtn.style.display = "flex";
             }
         }
 
@@ -1228,6 +1355,11 @@
             const slotDisplay = document.getElementById("slotCountDisplay");
             if (slotDisplay) {
                 slotDisplay.innerText = remaining > 0 ? `${remaining}` : "0";
+            }
+            // 更新彈珠台剩餘次數顯示
+            const pachinkoDisplay = document.getElementById("pachinkoCountDisplay");
+            if (pachinkoDisplay) {
+                pachinkoDisplay.innerText = remaining > 0 ? `${remaining}` : "0";
             }
         }
 
@@ -1587,6 +1719,7 @@
             document.getElementById("drawSystemArea").style.display = "block";
             document.getElementById("slotSystemArea").style.display = "none";
             document.getElementById("pointsSystemArea").style.display = "none";
+            document.getElementById("pachinkoSystemArea").style.display = "none";
             document.getElementById("prizeListPanel").style.display = "";
             document.getElementById("honorBoardPanel").style.display = "";
             updateDrawCountDisplay();
@@ -1596,6 +1729,7 @@
             document.getElementById("drawSystemArea").style.display = "none";
             document.getElementById("slotSystemArea").style.display = "block";
             document.getElementById("pointsSystemArea").style.display = "none";
+            document.getElementById("pachinkoSystemArea").style.display = "none";
             document.getElementById("prizeListPanel").style.display = "";
             document.getElementById("honorBoardPanel").style.display = "";
             updateDrawCountDisplay();
@@ -1604,9 +1738,23 @@
         function showPointsSystem() {
             document.getElementById("drawSystemArea").style.display = "none";
             document.getElementById("slotSystemArea").style.display = "none";
+            document.getElementById("pachinkoSystemArea").style.display = "none";
             document.getElementById("pointsSystemArea").style.display = "block";
             document.getElementById("prizeListPanel").style.display = "none";
             document.getElementById("honorBoardPanel").style.display = "none";
+        }
+
+        function showPachinkoSystem() {
+            document.getElementById("drawSystemArea").style.display = "none";
+            document.getElementById("slotSystemArea").style.display = "none";
+            document.getElementById("pointsSystemArea").style.display = "none";
+            document.getElementById("pachinkoSystemArea").style.display = "block";
+            document.getElementById("prizeListPanel").style.display = "";
+            document.getElementById("honorBoardPanel").style.display = "";
+            updateDrawCountDisplay();
+            setTimeout(() => {
+                buildPachinkoBoard();
+            }, 100);
         }
 
         // ---------- 選擇模式 ----------
@@ -1637,6 +1785,10 @@
         function chooseSlot() {
             closeChoiceModal();
             showSlotSystem();
+        }
+        function choosePachinko() {
+            closeChoiceModal();
+            showPachinkoSystem();
         }
         function choosePoints() {
             closeChoiceModal();
@@ -1734,81 +1886,79 @@
         }
 
         // ---------- UI 更新 ----------
-
-function refreshPlayedUsersUI() {
-    // 更新玩家下拉選單的狀態
-    const sel = document.getElementById("playerName");
-    for (let opt of sel.options) {
-        if (!opt.value) continue;
-        const name = opt.value;
-        const drawCount = globalPlayedUsers[name]?.drawCount || 0;
-        const limit = getMaxDrawsForPlayer(name);
-        const remaining = limit - drawCount;
-        if (disabledPlayers[name]) {
-            opt.disabled = true;
-            opt.innerText = name + " (已禁用)";
-        } else {
-            opt.disabled = false;
-            opt.innerText = name;
-        }
-    }
-
-    let list = [];
-    const seenKeys = new Set();
-
-    // 先處理 drawRecordsData 中的所有紀錄
-    for (const name in drawRecordsData) {
-        const records = drawRecordsData[name];
-        if (!records || typeof records !== 'object') continue;
-        for (const key in records) {
-            const rec = records[key];
-            if (!rec || !rec.won) continue;
-            if (rec.won.includes("銘謝惠顧") || rec.won === "未中獎" || rec.won.includes("未設定獎品")) continue;
-            const uniqueKey = `${name}_${rec.time}_${rec.won}`;
-            if (seenKeys.has(uniqueKey)) continue;
-            seenKeys.add(uniqueKey);
-            list.push({
-                user: name,
-                won: rec.won,
-                time: rec.time || 0,
-                group: getGroupKeyForName(name),
-                drawCount: globalPlayedUsers[name]?.drawCount || 0
-            });
-        }
-    }
-
-    // 再從 playedUsers 兜底，但排除時間相近且獎品相同的重複項
-    for (const name in globalPlayedUsers) {
-        const u = globalPlayedUsers[name];
-        if (!u || !u.won || u.won.includes("銘謝惠顧")) continue;
-        let isDuplicate = false;
-        for (const item of list) {
-            if (item.user === name && item.won === u.won && Math.abs(item.time - (u.time || 0)) <= 5000) {
-                isDuplicate = true;
-                break;
+        function refreshPlayedUsersUI() {
+            // 更新玩家下拉選單的狀態
+            const sel = document.getElementById("playerName");
+            for (let opt of sel.options) {
+                if (!opt.value) continue;
+                const name = opt.value;
+                const drawCount = globalPlayedUsers[name]?.drawCount || 0;
+                const limit = getMaxDrawsForPlayer(name);
+                const remaining = limit - drawCount;
+                if (disabledPlayers[name]) {
+                    opt.disabled = true;
+                    opt.innerText = name + " (已禁用)";
+                } else {
+                    opt.disabled = false;
+                    opt.innerText = name;
+                }
             }
+
+            let list = [];
+            const seenKeys = new Set();
+
+            // 先處理 drawRecordsData 中的所有紀錄
+            for (const name in drawRecordsData) {
+                const records = drawRecordsData[name];
+                if (!records || typeof records !== 'object') continue;
+                for (const key in records) {
+                    const rec = records[key];
+                    if (!rec || !rec.won) continue;
+                    if (rec.won.includes("銘謝惠顧") || rec.won === "未中獎" || rec.won.includes("未設定獎品")) continue;
+                    const uniqueKey = `${name}_${rec.time}_${rec.won}`;
+                    if (seenKeys.has(uniqueKey)) continue;
+                    seenKeys.add(uniqueKey);
+                    list.push({
+                        user: name,
+                        won: rec.won,
+                        time: rec.time || 0,
+                        group: getGroupKeyForName(name),
+                        drawCount: globalPlayedUsers[name]?.drawCount || 0
+                    });
+                }
+            }
+
+            // 再從 playedUsers 兜底，排除時間相近且獎品相同的重複項
+            for (const name in globalPlayedUsers) {
+                const u = globalPlayedUsers[name];
+                if (!u || !u.won || u.won.includes("銘謝惠顧")) continue;
+                let isDuplicate = false;
+                for (const item of list) {
+                    if (item.user === name && item.won === u.won && Math.abs(item.time - (u.time || 0)) <= 5000) {
+                        isDuplicate = true;
+                        break;
+                    }
+                }
+                if (isDuplicate) continue;
+                const uniqueKey = `${name}_${u.time}_${u.won}`;
+                if (seenKeys.has(uniqueKey)) continue;
+                seenKeys.add(uniqueKey);
+                list.push({
+                    user: name,
+                    won: u.won,
+                    time: u.time || 0,
+                    group: u.group || getGroupKeyForName(name),
+                    drawCount: u.drawCount || 0
+                });
+            }
+
+            list.sort((a, b) => (b.time || 0) - (a.time || 0));
+            lastPlayedList = list;
+
+            updateMarquee(buildMarqueeText(list));
+            renderHonorBoard(list);
+            updateDrawCountDisplay();
         }
-        if (isDuplicate) continue;
-        const uniqueKey = `${name}_${u.time}_${u.won}`;
-        if (seenKeys.has(uniqueKey)) continue;
-        seenKeys.add(uniqueKey);
-        list.push({
-            user: name,
-            won: u.won,
-            time: u.time || 0,
-            group: u.group || getGroupKeyForName(name),
-            drawCount: u.drawCount || 0
-        });
-    }
-
-    // 依時間排序（新的在前）
-    list.sort((a, b) => (b.time || 0) - (a.time || 0));
-    lastPlayedList = list;
-
-    updateMarquee(buildMarqueeText(list));
-    renderHonorBoard(list);
-    updateDrawCountDisplay();
-}
 
         function initApp() {
             onValue(ref(db, "prizes"), snap => {
@@ -1820,7 +1970,6 @@ function refreshPlayedUsersUI() {
                 refreshPlayedUsersUI();
                 if (currentPlayerName) updateDrawCountDisplay();
             });
-            // 監聽 drawRecords
             onValue(ref(db, "drawRecords"), snap => {
                 drawRecordsData = snap.val() || {};
                 refreshPlayedUsersUI();
@@ -1946,7 +2095,7 @@ function refreshPlayedUsersUI() {
                     return;
                 }
 
-                // 更新本地快取（保留原有 won/code/time/group，只更新 drawCount 和 lastDrawTime）
+                // 更新本地快取
                 globalPlayedUsers[name] = {
                     ...(globalPlayedUsers[name] || {}),
                     drawCount: (playerData?.drawCount || 0) + 1,
@@ -2323,7 +2472,6 @@ function refreshPlayedUsersUI() {
                     } catch (e) { console.error(e); }
                     alert(`🎰 三個相同符號，但「${prizeId}」尚未設定獎品`);
                 } else {
-                    // 未中獎，視為銘謝惠顧
                     try {
                         await push(ref(db, `drawRecords/${currentPlayerName}`), {
                             type: "slot",
@@ -2346,6 +2494,343 @@ function refreshPlayedUsersUI() {
             }
         }
 
+        // ---------- 彈珠台核心 ----------
+        function buildPachinkoBoard() {
+            if (typeof Matter === 'undefined') {
+                console.error("Matter.js 尚未載入");
+                return;
+            }
+            const container = document.getElementById("pachinkoContainer");
+            if (!container) return;
+            container.innerHTML = "";
+
+            if (pachinkoRunner) {
+                Matter.Runner.stop(pachinkoRunner);
+                pachinkoRunner = null;
+            }
+            if (pachinkoRender) {
+                Matter.Render.stop(pachinkoRender);
+                pachinkoRender = null;
+            }
+            if (pachinkoEngine) {
+                Matter.Engine.clear(pachinkoEngine);
+                pachinkoEngine = null;
+            }
+            pachinkoBall = null;
+            pachinkoBallDropped = false;
+
+            const Engine = Matter.Engine,
+                  Render = Matter.Render,
+                  Runner = Matter.Runner,
+                  Bodies = Matter.Bodies,
+                  Composite = Matter.Composite,
+                  Events = Matter.Events;
+
+            pachinkoEngine = Engine.create();
+            pachinkoEngine.gravity.y = 1.2;
+
+            const renderWidth = Math.min(pachinkoWidth, container.clientWidth || pachinkoWidth);
+
+            pachinkoRender = Render.create({
+                element: container,
+                engine: pachinkoEngine,
+                options: {
+                    width: renderWidth,
+                    height: pachinkoHeight,
+                    wireframes: false,
+                    background: '#0f0f1a',
+                    pixelRatio: 1
+                }
+            });
+
+            const wallThickness = 20;
+            const walls = [
+                Bodies.rectangle(renderWidth/2, -wallThickness/2, renderWidth, wallThickness, { isStatic: true, render: { fillStyle: '#d4af37' } }),
+                Bodies.rectangle(-wallThickness/2, pachinkoHeight/2, wallThickness, pachinkoHeight, { isStatic: true, render: { fillStyle: '#d4af37' } }),
+                Bodies.rectangle(renderWidth + wallThickness/2, pachinkoHeight/2, wallThickness, pachinkoHeight, { isStatic: true, render: { fillStyle: '#d4af37' } })
+            ];
+            Composite.add(pachinkoEngine.world, walls);
+
+            const pegRows = 8;
+            const pegsPerRow = 9;
+            const pegRadius = 4;
+            const startY = 60;
+            const rowSpacing = 32;
+            const colSpacing = renderWidth / (pegsPerRow + 1);
+
+            for (let row = 0; row < pegRows; row++) {
+                const y = startY + row * rowSpacing;
+                const offset = (row % 2 === 0) ? 0 : colSpacing / 2;
+                for (let col = 0; col < pegsPerRow; col++) {
+                    const x = colSpacing * (col + 1) + offset;
+                    if (x > 20 && x < renderWidth - 20) {
+                        const peg = Bodies.circle(x, y, pegRadius, {
+                            isStatic: true,
+                            restitution: 0.6,
+                            render: { fillStyle: '#ffd700' }
+                        });
+                        Composite.add(pachinkoEngine.world, peg);
+                    }
+                }
+            }
+
+            pachinkoBins = [];
+            pachinkoPrizeMap = {};
+
+            const prizes = [];
+            for (const id in lastPrizes) {
+                const p = lastPrizes[id];
+                if (!Array.isArray(p.groups) || !p.groups.includes(honorUnlockedGroup)) continue;
+                if (Number(p.quantity || 0) <= 0) continue;
+                const w = Number(p.weight || 0);
+                if (w <= 0) continue;
+                prizes.push({ id, data: p, weight: w });
+            }
+
+            if (prizes.length === 0) {
+                Matter.Render.run(pachinkoRender);
+                pachinkoRunner = Runner.create();
+                Runner.run(pachinkoRunner, pachinkoEngine);
+                return;
+            }
+
+            const maxBins = 7;
+            let binPrizes = prizes;
+            if (prizes.length > maxBins) {
+                binPrizes = prizes.slice(0, maxBins);
+            }
+
+            const binCount = binPrizes.length;
+            const binHeight = 50;
+            const binY = pachinkoHeight - binHeight / 2;
+            const binWidth = renderWidth / binCount;
+
+            for (let i = 0; i < binCount; i++) {
+                const binX = i * binWidth + binWidth / 2;
+                const prize = binPrizes[i];
+
+                const divider = Bodies.rectangle(i * binWidth, binY, 4, binHeight, {
+                    isStatic: true,
+                    render: { fillStyle: '#8b4513' }
+                });
+                Composite.add(pachinkoEngine.world, divider);
+
+                const binFloor = Bodies.rectangle(binX, pachinkoHeight, binWidth, 10, {
+                    isStatic: true,
+                    render: { fillStyle: '#d4af37' }
+                });
+                Composite.add(pachinkoEngine.world, binFloor);
+
+                const binIndex = i;
+                pachinkoBins.push({
+                    index: binIndex,
+                    x: binX,
+                    width: binWidth,
+                    y: binY,
+                    prizeId: prize.id,
+                    prizeData: prize.data
+                });
+                pachinkoPrizeMap[binIndex] = prize.id;
+            }
+
+            const lastDivider = Bodies.rectangle(renderWidth, binY, 4, binHeight, {
+                isStatic: true,
+                render: { fillStyle: '#8b4513' }
+            });
+            Composite.add(pachinkoEngine.world, lastDivider);
+
+            Events.on(pachinkoRender, 'afterRender', () => {
+                const ctx = pachinkoRender.context;
+                ctx.font = 'bold 11px "Noto Sans TC", sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillStyle = '#ffd700';
+                for (const bin of pachinkoBins) {
+                    const name = (bin.prizeData.name || bin.prizeId);
+                    const shortName = name.length > 5 ? name.slice(0, 5) + '…' : name;
+                    ctx.fillText(shortName, bin.x, bin.y - 5);
+                }
+            });
+
+            Matter.Render.run(pachinkoRender);
+            pachinkoRunner = Runner.create();
+            Runner.run(pachinkoRunner, pachinkoEngine);
+        }
+
+        function dropPachinkoBall() {
+            if (!currentPlayerName) { alert("請先選擇名字"); return; }
+            if (pachinkoBallDropped) { alert("彈珠還在滾動中，請稍後"); return; }
+            if (!pachinkoEngine || pachinkoBins.length === 0) {
+                alert("彈珠台尚未準備好");
+                return;
+            }
+
+            const playerData = globalPlayedUsers[currentPlayerName];
+            const drawCount = playerData?.drawCount || 0;
+            const limit = getMaxDrawsForPlayer(currentPlayerName);
+            if (!isAdminMode && drawCount >= limit) {
+                alert("❌ 抽獎次數已用完");
+                return;
+            }
+
+            const dropBtn = document.getElementById("pachinkoDropBtn");
+            if (dropBtn) dropBtn.disabled = true;
+
+            const playedRef = ref(db, `playedUsers/${currentPlayerName}`);
+            runTransaction(playedRef, (current) => {
+                if (current && current.drawCount >= limit) return;
+                if (current === null) {
+                    return { drawCount: 1, lastDrawTime: Date.now() };
+                } else {
+                    return { ...current, drawCount: (current.drawCount || 0) + 1, lastDrawTime: Date.now() };
+                }
+            }).then((result) => {
+                if (!result.committed) {
+                    alert("抽獎過於頻繁，請稍後再試。");
+                    if (dropBtn) dropBtn.disabled = false;
+                    return;
+                }
+
+                globalPlayedUsers[currentPlayerName] = {
+                    ...(globalPlayedUsers[currentPlayerName] || {}),
+                    drawCount: (drawCount + 1),
+                    lastDrawTime: Date.now()
+                };
+                updateDrawCountDisplay();
+
+                let pool = [];
+                let totalW = 0;
+                for (const bin of pachinkoBins) {
+                    const p = bin.prizeData;
+                    const w = Number(p.weight || 0);
+                    if (w > 0) {
+                        pool.push({ bin, weight: w });
+                        totalW += w;
+                    }
+                }
+                if (pool.length === 0) {
+                    alert("沒有可抽的獎品");
+                    if (dropBtn) dropBtn.disabled = false;
+                    return;
+                }
+                let roll = Math.random() * totalW;
+                let sum = 0;
+                let chosenBin = pool[0].bin;
+                for (const item of pool) {
+                    sum += item.weight;
+                    if (roll < sum) { chosenBin = item.bin; break; }
+                }
+
+                if (pachinkoBall) {
+                    Matter.Composite.remove(pachinkoEngine.world, pachinkoBall);
+                }
+                const targetX = chosenBin.x + (Math.random() - 0.5) * (chosenBin.width * 0.3);
+                pachinkoBall = Matter.Bodies.circle(targetX, 20, 8, {
+                    restitution: 0.7,
+                    friction: 0.001,
+                    frictionAir: 0.001,
+                    density: 0.002,
+                    render: { fillStyle: '#ff3366', strokeStyle: '#ffffff', lineWidth: 2 }
+                });
+                Matter.Composite.add(pachinkoEngine.world, pachinkoBall);
+                Matter.Body.setVelocity(pachinkoBall, {
+                    x: (Math.random() - 0.5) * 2,
+                    y: 3
+                });
+
+                pachinkoBallDropped = true;
+
+                let checkCount = 0;
+                const checkInterval = setInterval(async () => {
+                    if (!pachinkoBall) {
+                        clearInterval(checkInterval);
+                        return;
+                    }
+                    checkCount++;
+                    const pos = pachinkoBall.position;
+                    if (pos.y > pachinkoHeight - 60 || checkCount > 200) {
+                        clearInterval(checkInterval);
+                        await settlePachinkoResult(chosenBin);
+                    }
+                }, 100);
+            }).catch((e) => {
+                console.error(e);
+                alert("彈珠台失敗：" + e.message);
+                if (dropBtn) dropBtn.disabled = false;
+            });
+        }
+
+        async function settlePachinkoResult(chosenBin) {
+            const prizeId = chosenBin.prizeId;
+            const prizeData = chosenBin.prizeData;
+
+            try {
+                const qRef = ref(db, `prizes/${prizeId}/quantity`);
+                const tx = await runTransaction(qRef, cur => (cur === null || cur <= 0) ? undefined : cur - 1);
+                if (!tx.committed) {
+                    alert(`很抱歉，「${prizeData.name || prizeId}」已無庫存。`);
+                    if (pachinkoBall) {
+                        Matter.Composite.remove(pachinkoEngine.world, pachinkoBall);
+                        pachinkoBall = null;
+                    }
+                    pachinkoBallDropped = false;
+                    document.getElementById("pachinkoDropBtn").disabled = false;
+                    return;
+                }
+
+                let code = "";
+                try {
+                    const cs = await get(ref(db, `prizeCodes/${prizeId}`));
+                    if (cs.exists()) {
+                        const cObj = cs.val();
+                        const used = new Set(Object.values(globalPlayedUsers).map(u => u && u.code).filter(c => c));
+                        const av = Object.values(cObj).filter(c => c && !used.has(c));
+                        if (av.length) code = av[0];
+                    }
+                } catch (e) {}
+                let awardedPoints = 0;
+                const minP = Number(prizeData.minPoints);
+                const maxP = Number(prizeData.maxPoints);
+                if (!code && !isNaN(minP) && !isNaN(maxP) && maxP >= minP && maxP > 0) {
+                    awardedPoints = Math.floor(Math.random() * (maxP - minP + 1)) + minP;
+                    try {
+                        await runTransaction(ref(db, `pointUsers/${currentPlayerName}/points`), cur => (cur || 0) + awardedPoints);
+                        await push(ref(db, "pendingPoints"), {
+                            playerName: currentPlayerName,
+                            points: awardedPoints,
+                            prizeName: prizeData.name,
+                            timestamp: Date.now(),
+                            status: "approved",
+                            processedAt: Date.now()
+                        });
+                    } catch (e) {
+                        console.error("點數發放失敗（不影響中獎）", e);
+                    }
+                    code = "點數已自動匯入你的錢包";
+                }
+
+                await push(ref(db, `drawRecords/${currentPlayerName}`), {
+                    type: "pachinko",
+                    won: prizeData.name || prizeId,
+                    code: code,
+                    time: Date.now(),
+                    group: honorUnlockedGroup
+                });
+
+                showSlotWinModal(prizeData.name, code, awardedPoints);
+            } catch (e) {
+                console.error(e);
+                alert("中獎處理失敗，請聯繫管理員");
+            } finally {
+                if (pachinkoBall) {
+                    Matter.Composite.remove(pachinkoEngine.world, pachinkoBall);
+                    pachinkoBall = null;
+                }
+                pachinkoBallDropped = false;
+                const btn = document.getElementById("pachinkoDropBtn");
+                if (btn) btn.disabled = false;
+            }
+        }
+
         function clickTicket() {
             if (currentPrizeUrl && currentPrizeUrl.startsWith("http")) {
                 window.open(currentPrizeUrl, "_blank");
@@ -2362,8 +2847,11 @@ function refreshPlayedUsersUI() {
             document.getElementById("modalTicketCode").style.display = "block";
             document.getElementById("copyHint").style.display = "block";
             const slotVisible = document.getElementById("slotSystemArea").style.display !== "none";
+            const pachinkoVisible = document.getElementById("pachinkoSystemArea").style.display !== "none";
             if (slotVisible) {
                 showSlotSystem();
+            } else if (pachinkoVisible) {
+                showPachinkoSystem();
             } else {
                 const drawCount = globalPlayedUsers[currentPlayerName]?.drawCount || 0;
                 const limit = getMaxDrawsForPlayer(currentPlayerName);
