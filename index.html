@@ -970,6 +970,7 @@
         let pachinkoWidth = 380;
         let pachinkoHeight = 520;
         let pachinkoBinCount = 7;
+        let pachinkoBinLayout = [];
         let pachinkoBallRestX = 0;
         let pachinkoBallRestY = 0;
         let pachinkoRenderLoopId = null;
@@ -1068,6 +1069,7 @@
             onValue(ref(db, "settings/pachinko"), (snap) => {
                 const data = snap.val() || {};
                 pachinkoBinCount = data.bins || 7;
+                pachinkoBinLayout = Array.isArray(data.binLayout) ? data.binLayout.slice() : [];
                 if (document.getElementById("pachinkoSystemArea").style.display !== "none") buildPachinkoBoard();
             });
         }
@@ -2255,19 +2257,9 @@
             });
             Composite.add(pachinkoEngine.world, pachinkoBall);
 
-            // ---------- 獎池 ----------
+            // ---------- 獎池（支援格子配置） ----------
             pachinkoBins = [];
             pachinkoPrizeMap = {};
-
-            const prizes = [];
-            for (const id in lastPrizes) {
-                const p = lastPrizes[id];
-                if (!Array.isArray(p.groups) || !p.groups.includes(honorUnlockedGroup)) continue;
-                if (Number(p.quantity || 0) <= 0) continue;
-                const w = Number(p.weight || 0);
-                if (w <= 0) continue;
-                prizes.push({ id, data: p, weight: w });
-            }
 
             const binTopY = 430;
             const binBottomY = renderHeight - 35;
@@ -2275,9 +2267,33 @@
             const binAreaRight = railRightX - 6;
             const binAreaWidth = binAreaRight - binAreaLeft;
 
-            if (prizes.length > 0) {
-                let binPrizes = prizes;
+            let binPrizes = [];
+            const useBinLayout = Array.isArray(pachinkoBinLayout) && pachinkoBinLayout.length > 0;
+
+            if (useBinLayout) {
+                // 使用後台格子配置：每格依序對應一個獎品
+                for (const pid of pachinkoBinLayout) {
+                    const p = lastPrizes?.[pid];
+                    if (!p) continue;
+                    if (!Array.isArray(p.groups) || !p.groups.includes(honorUnlockedGroup)) continue;
+                    binPrizes.push({ id: pid, data: p });
+                }
+            } else {
+                // 沒設定 layout 時退回舊邏輯：依權重取前 N 個獎品
+                const prizes = [];
+                for (const id in lastPrizes) {
+                    const p = lastPrizes[id];
+                    if (!Array.isArray(p.groups) || !p.groups.includes(honorUnlockedGroup)) continue;
+                    if (Number(p.quantity || 0) <= 0) continue;
+                    const w = Number(p.weight || 0);
+                    if (w <= 0) continue;
+                    prizes.push({ id, data: p, weight: w });
+                }
+                binPrizes = prizes;
                 if (prizes.length > pachinkoBinCount) binPrizes = prizes.slice(0, pachinkoBinCount);
+            }
+
+            if (binPrizes.length > 0) {
                 const binCount = binPrizes.length;
                 const binWidth = binAreaWidth / binCount;
 
@@ -2338,13 +2354,23 @@
                 ['#74c0fc', '#1971c2']
             ];
 
+            // 同一獎品共用同一組顏色
+            const prizeColorMap = {};
+            let colorIdx = 0;
+            for (const bin of pachinkoBins) {
+                if (!prizeColorMap[bin.prizeId]) {
+                    prizeColorMap[bin.prizeId] = binColors[colorIdx % binColors.length];
+                    colorIdx++;
+                }
+            }
+
             for (let i = 0; i < pachinkoBins.length; i++) {
                 const bin = pachinkoBins[i];
                 const left = bin.x - bin.width / 2 + 3;
                 const top = bin.topY + 3;
                 const w = bin.width - 6;
                 const h = bin.bottomY - bin.topY - 6;
-                const colors = binColors[i % binColors.length];
+                const colors = prizeColorMap[bin.prizeId] || binColors[0];
 
                 const bg2 = bctx.createLinearGradient(left, top, left, top + h);
                 bg2.addColorStop(0, colors[0]);
