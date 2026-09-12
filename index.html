@@ -1589,7 +1589,15 @@
                 });
                 if (!result.committed) { alert("抽獎過於頻繁，請稍後再試。"); isDrawing = false; if (spinBtn) spinBtn.disabled = false; return; }
                 globalPlayedUsers[name] = { ...(globalPlayedUsers[name] || {}), drawCount: (playerData?.drawCount || 0) + 1, lastDrawTime: Date.now() };
-                await push(ref(db, `drawRecords/${name}`), { type: "gacha", won: chosen.name, code: code, time: Date.now(), group: myGroup });
+                const isThanksGacha = chosen.name && chosen.name.includes("銘謝惠顧");
+                await push(ref(db, `drawRecords/${name}`), {
+                    type: "gacha",
+                    won: chosen.name,
+                    code: code,
+                    time: Date.now(),
+                    group: myGroup,
+                    showOnBoard: !isThanksGacha
+                });
                 const minP = Number(chosen.minPoints);
                 const maxP = Number(chosen.maxPoints);
                 if (!isNaN(minP) && !isNaN(maxP) && maxP >= minP && maxP > 0) {
@@ -1819,7 +1827,8 @@
                                 won: prizeData.name || prizeId,
                                 code: code,
                                 time: Date.now(),
-                                group: honorUnlockedGroup
+                                group: honorUnlockedGroup,
+                                showOnBoard: true
                             });
                             showSlotWinModal(prizeData.name, code, awardedPoints);
                         }
@@ -1835,6 +1844,7 @@
                             code: "",
                             time: Date.now(),
                             group: honorUnlockedGroup
+                            showOnBoard: true
                         });
                     } catch (e) { console.error(e); }
                     alert(`🎰 三個相同符號，但「${prizeId}」尚未設定獎品`);
@@ -1846,6 +1856,7 @@
                             code: "",
                             time: Date.now(),
                             group: honorUnlockedGroup
+                            showOnBoard: false
                         });
                     } catch (e) { console.error(e); }
                     showSlotWinModal("銘謝惠顧", "", 0);
@@ -2856,6 +2867,7 @@
                     code: code,
                     time: Date.now(),
                     group: honorUnlockedGroup
+                    showOnBoard: true
                 });
 
                 showSlotWinModal(prizeData.name, code, awardedPoints);
