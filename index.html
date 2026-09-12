@@ -1381,7 +1381,7 @@
             ));
 
             // ===== 釘子、紅球、風車 =====
-            const pegRadius = Math.max(3, Math.round(renderWidth * 0.012));
+            const pegRadius = Math.max(3, Math.round(renderWidth * 0.013));
             const redPinRadius = Math.max(8, Math.round(renderWidth * 0.030));
             const BALL_RADIUS = Math.max(5, Math.round(renderWidth * 0.021));
             pachinkoBallRadius = BALL_RADIUS;
@@ -1391,31 +1391,31 @@
             const areaRight = innerRailX - wallT - Math.round(renderWidth * 0.025);
             const areaTop = arcCy + Math.round(renderHeight * 0.05);
             const areaBottom = Math.round(renderHeight * 0.77);
-            // ★ 釘子加密
-            const pegCols = 10;
-            const pegRows = 17;
+            // ★ 密度調整：垂直間距拉大，讓球有空間通過
+            const pegCols = 9;
+            const pegRows = 13;
             const dx = (areaRight - areaLeft) / (pegCols - 1);
             const dy = (areaBottom - areaTop) / (pegRows - 1);
 
-            // ★ 障礙物位置重新分佈，配合密釘
+            // ★ 障礙物位置配合新密度
             const redPins = [
-                { x: areaLeft + dx * 2.5, y: areaTop + dy * 3.5, r: redPinRadius },
-                { x: areaLeft + dx * 7.0, y: areaTop + dy * 9.5, r: redPinRadius }
+                { x: areaLeft + dx * 2.5, y: areaTop + dy * 3.0, r: redPinRadius },
+                { x: areaLeft + dx * 6.0, y: areaTop + dy * 7.5, r: redPinRadius }
             ];
             const windmills = [
-                { x: areaLeft + dx * 1.5, y: areaTop + dy * 8.0, r: Math.round(renderWidth * 0.045) },
-                { x: areaLeft + dx * 8.5, y: areaTop + dy * 4.0, r: Math.round(renderWidth * 0.045) },
-                { x: areaLeft + dx * 4.5, y: areaTop + dy * 13.0, r: Math.round(renderWidth * 0.045) }
+                { x: areaLeft + dx * 1.5, y: areaTop + dy * 6.0, r: Math.round(renderWidth * 0.045) },
+                { x: areaLeft + dx * 6.5, y: areaTop + dy * 3.0, r: Math.round(renderWidth * 0.045) },
+                { x: areaLeft + dx * 4.0, y: areaTop + dy * 9.5, r: Math.round(renderWidth * 0.045) }
             ];
 
-            // ★ 障礙物淨空略微縮小（因為釘子加密了）
+            // ★ 障礙物淨空（配合新密度）
             function isNearObstacle(x, y) {
                 for (const w of windmills) {
-                    const need = w.r * 1.6 + pegRadius + BALL_RADIUS + 4;
+                    const need = w.r * 1.7 + pegRadius + BALL_RADIUS + 6;
                     if (Math.hypot(x - w.x, y - w.y) < need) return true;
                 }
                 for (const rp of redPins) {
-                    const need = rp.r * 1.5 + pegRadius + BALL_RADIUS + 4;
+                    const need = rp.r * 1.6 + pegRadius + BALL_RADIUS + 6;
                     if (Math.hypot(x - rp.x, y - rp.y) < need) return true;
                 }
                 return false;
@@ -1727,8 +1727,8 @@
 
             Matter.Body.setStatic(pachinkoBall, false);
             // ★ 發射力度：拉大區間，讓 1% 和 100% 明顯不同
-            const minSpeed = 6;
-            const maxSpeed = 32;
+            const minSpeed = 3;
+            const maxSpeed = 25;
             const speed = minSpeed + power * (maxSpeed - minSpeed);
             Matter.Body.setVelocity(pachinkoBall, { x: 0, y: -speed });
             pachinkoBallDropped = true;
