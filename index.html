@@ -1480,16 +1480,22 @@
 
             // ★ 倉鼠初始化（只有設定 hamsterPrizeId 時才會出現）
             hamsterCaught = false;
-            hamsterArea = { left: areaLeft, right: areaRight, top: areaTop, bottom: areaBottom };
+            // 倉鼠活動區：比釘子區更寬，涵蓋拱橋下方到獎池上方
+            hamsterArea = {
+                left: leftWallX + wallT,
+                right: innerRailX - wallT,
+                top: arcCy + Math.round(renderHeight * 0.02),
+                bottom: Math.round(renderHeight * 0.78)
+            };
             if (hamsterPrizeId && lastPrizes && lastPrizes[hamsterPrizeId]) {
-                const hr = Math.max(11, Math.round(renderWidth * 0.038));
+                const hr = Math.max(11, Math.round(renderWidth * 0.06));
                 hamster = {
                     x: areaLeft + (areaRight - areaLeft) * 0.5,
                     y: areaTop + (areaBottom - areaTop) * 0.5,
                     radius: hr,
                     targetX: areaLeft + (areaRight - areaLeft) * 0.5,
                     targetY: areaTop + (areaBottom - areaTop) * 0.5,
-                    speed: Math.max(0.5, renderWidth * 0.0022),
+                    speed: Math.max(0.5, renderWidth * 0.005),
                     bobPhase: 0
                 };
                 pickHamsterTarget();
@@ -1789,9 +1795,9 @@
         // ---------- 倉鼠邏輯 ----------
         function pickHamsterTarget() {
             if (!hamster || !hamsterArea) return;
-            const pad = hamster.radius * 2;
-            const w = hamsterArea.right - hamsterArea.left - pad * 2;
-            const h = hamsterArea.bottom - hamsterArea.top - pad * 2;
+            const pad = hamster.radius * 1.2;
+            const w = Math.max(0, hamsterArea.right - hamsterArea.left - pad * 2);
+            const h = Math.max(0, hamsterArea.bottom - hamsterArea.top - pad * 2);
             hamster.targetX = hamsterArea.left + pad + Math.random() * w;
             hamster.targetY = hamsterArea.top + pad + Math.random() * h;
         }
