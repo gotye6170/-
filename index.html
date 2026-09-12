@@ -1454,9 +1454,9 @@
             pachinkoBallRadius = BALL_RADIUS;
             const pegs = [];
 
-            // ★ 左右留 0.032 讓球貼牆會被釘子擦到，不至於直溜
-            const areaLeft = leftWallX + wallT + Math.round(renderWidth * 0.032);
-            const areaRight = innerRailX - wallT - Math.round(renderWidth * 0.032);
+            // ★ 第一/最後一列釘子緊貼牆邊，球貼牆撞到釘子「外側」會被推離牆面
+            const areaLeft = leftWallX + wallT / 2 + pegRadius + 2;
+            const areaRight = innerRailX - wallT / 2 - pegRadius - 2;
             const areaTop = arcCy + Math.round(renderHeight * 0.05);
             const areaBottom = Math.round(renderHeight * 0.74);
             // ★ 密度調整：底下留空間給球滾
