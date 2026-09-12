@@ -1025,8 +1025,8 @@
         }
 
         const groupLists = {
-            "67": { label: "✨ 皮皮群", names: ["貝果", "怡蒨", "７７", "安鴻", "當家", "立涵", "皮夾", "睏寶"] },
-            "GM": { label: "✨ 龜蜜群", names: ["伶", "昀", "瑜"] }
+            "皮皮": { password: "67", label: "✨ 皮皮群", names: ["貝果", "怡蒨", "７７", "安鴻", "當家", "立涵", "皮夾", "睏寶"] },
+            "GM": { password: "GM", label: "✨ 龜蜜群", names: ["伶", "昀", "瑜"] }
         };
         const eggColors = ["egg-pink", "egg-blue", "egg-yellow", "egg-green", "egg-purple", "egg-orange"];
 
@@ -1409,8 +1409,15 @@
             const inputPass = document.getElementById("secretPass").value.trim();
             const selectEl = document.getElementById("playerName");
             selectEl.innerHTML = "";
-            if (groupLists[inputPass]) {
-                const group = groupLists[inputPass];
+
+            // 比對 password，找到對應的群組 key
+            let matchedKey = null;
+            for (const k in groupLists) {
+                if (groupLists[k].password === inputPass) { matchedKey = k; break; }
+            }
+
+            if (matchedKey) {
+                const group = groupLists[matchedKey];
                 const defOpt = document.createElement("option");
                 defOpt.value = ""; defOpt.disabled = true; defOpt.selected = true;
                 defOpt.innerText = "▼ 請選擇你的名字 ▼";
@@ -1425,7 +1432,7 @@
                     optGroup.appendChild(opt);
                 });
                 selectEl.appendChild(optGroup);
-                honorUnlockedGroup = inputPass;
+                honorUnlockedGroup = matchedKey;   // ← 用 key，不是輸入的密語
                 renderHonorBoard(lastPlayedList);
                 updateMarquee(buildMarqueeText(lastPlayedList));
                 if (lastPrizes) renderStatusBoard(lastPrizes);
