@@ -1070,7 +1070,7 @@
         }
 
 
-        // ---------- 彈珠台核心（自適應寬度） ----------
+        // ---------- 彈珠台核心（自適應寬度 + 高解析度） ----------
         function drawGlassBall(ctx, x, y, r) {
             const grad = ctx.createRadialGradient(x - r * 0.35, y - r * 0.35, r * 0.05, x, y, r);
             grad.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
@@ -1110,21 +1110,6 @@
             grad.addColorStop(0, '#ffcccc'); grad.addColorStop(0.3, '#ff4444'); grad.addColorStop(0.7, '#c00000'); grad.addColorStop(1, '#5a0000');
             ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fillStyle = grad; ctx.fill();
             ctx.beginPath(); ctx.arc(x - r * 0.4, y - r * 0.4, r * 0.3, 0, Math.PI * 2); ctx.fillStyle = 'rgba(255,255,255,0.9)'; ctx.fill();
-        }
-        function drawWindmill(ctx, x, y, r) {
-            ctx.save();
-            ctx.translate(x, y);
-            ctx.beginPath(); ctx.arc(2, 2, r * 1.5, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0,0,0,0.4)'; ctx.fill();
-            const armLen = r * 1.8;
-            const armW = r * 0.8;
-            const grad = ctx.createLinearGradient(-armLen, -armLen, armLen, armLen);
-            grad.addColorStop(0, '#fceabb'); grad.addColorStop(0.5, '#f8b500'); grad.addColorStop(1, '#b37a00');
-            ctx.fillStyle = grad;
-            ctx.beginPath(); ctx.rect(-armLen, -armW/2, armLen*2, armW); ctx.fill();
-            ctx.beginPath(); ctx.rect(-armW/2, -armLen, armW, armLen*2); ctx.fill();
-            ctx.beginPath(); ctx.arc(0, 0, armW*0.8, 0, Math.PI*2); ctx.fillStyle = '#fffbd0'; ctx.fill();
-            ctx.strokeStyle = '#8b6914'; ctx.lineWidth = 1; ctx.stroke();
-            ctx.restore();
         }
         function drawWindmillLocal(ctx, r) {
             ctx.beginPath(); ctx.arc(2, 2, r * 1.5, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0,0,0,0.4)'; ctx.fill();
@@ -1303,11 +1288,19 @@
             if (renderWidth > 420) renderWidth = 420;
             const renderHeight = Math.round(renderWidth * 1.45);
 
+            // ★ DPR 高解析度
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
             const canvas = document.createElement("canvas");
-            canvas.width = renderWidth; canvas.height = renderHeight;
-            canvas.style.display = "block"; canvas.style.maxWidth = "100%"; canvas.style.height = "auto"; canvas.style.background = "#050810";
+            canvas.width = Math.round(renderWidth * dpr);
+            canvas.height = Math.round(renderHeight * dpr);
+            canvas.style.display = "block";
+            canvas.style.maxWidth = "100%";
+            canvas.style.height = "auto";
+            canvas.style.background = "#050810";
             container.appendChild(canvas);
             const ctx2d = canvas.getContext("2d");
+            ctx2d.scale(dpr, dpr);
             pachinkoRender = { options: { width: renderWidth, height: renderHeight }, canvas: canvas };
             pachinkoRenderHeight = renderHeight;
 
@@ -1394,34 +1387,35 @@
             pachinkoBallRadius = BALL_RADIUS;
             const pegs = [];
 
-            const areaLeft = leftWallX + wallT + Math.round(renderWidth * 0.03);
-            const areaRight = innerRailX - wallT - Math.round(renderWidth * 0.03);
+            const areaLeft = leftWallX + wallT + Math.round(renderWidth * 0.025);
+            const areaRight = innerRailX - wallT - Math.round(renderWidth * 0.025);
             const areaTop = arcCy + Math.round(renderHeight * 0.05);
             const areaBottom = Math.round(renderHeight * 0.77);
-            const pegCols = 8;
-            const pegRows = 13;
+            // ★ 釘子加密
+            const pegCols = 10;
+            const pegRows = 17;
             const dx = (areaRight - areaLeft) / (pegCols - 1);
             const dy = (areaBottom - areaTop) / (pegRows - 1);
 
-            // ★ 障礙物位置重新分佈，彼此錯開
+            // ★ 障礙物位置重新分佈，配合密釘
             const redPins = [
-                { x: areaLeft + dx * 2.0, y: areaTop + dy * 2.5, r: redPinRadius },
-                { x: areaLeft + dx * 5.5, y: areaTop + dy * 6.5, r: redPinRadius }
+                { x: areaLeft + dx * 2.5, y: areaTop + dy * 3.5, r: redPinRadius },
+                { x: areaLeft + dx * 7.0, y: areaTop + dy * 9.5, r: redPinRadius }
             ];
             const windmills = [
-                { x: areaLeft + dx * 1.0, y: areaTop + dy * 7.5, r: Math.round(renderWidth * 0.045) },
-                { x: areaLeft + dx * 6.5, y: areaTop + dy * 2.5, r: Math.round(renderWidth * 0.045) },
-                { x: areaLeft + dx * 3.5, y: areaTop + dy * 10.5, r: Math.round(renderWidth * 0.045) }
+                { x: areaLeft + dx * 1.5, y: areaTop + dy * 8.0, r: Math.round(renderWidth * 0.045) },
+                { x: areaLeft + dx * 8.5, y: areaTop + dy * 4.0, r: Math.round(renderWidth * 0.045) },
+                { x: areaLeft + dx * 4.5, y: areaTop + dy * 13.0, r: Math.round(renderWidth * 0.045) }
             ];
 
-            // ★ 障礙物淨空加大
+            // ★ 障礙物淨空略微縮小（因為釘子加密了）
             function isNearObstacle(x, y) {
                 for (const w of windmills) {
-                    const need = w.r * 1.9 + pegRadius + BALL_RADIUS + 10;
+                    const need = w.r * 1.6 + pegRadius + BALL_RADIUS + 4;
                     if (Math.hypot(x - w.x, y - w.y) < need) return true;
                 }
                 for (const rp of redPins) {
-                    const need = rp.r * 1.8 + pegRadius + BALL_RADIUS + 10;
+                    const need = rp.r * 1.5 + pegRadius + BALL_RADIUS + 4;
                     if (Math.hypot(x - rp.x, y - rp.y) < need) return true;
                 }
                 return false;
@@ -1442,7 +1436,6 @@
                 }
             }
 
-            // ★ 紅球：restitution 從 1.1 → 0.95
             for (const rp of redPins) {
                 Composite.add(pachinkoEngine.world, Bodies.circle(rp.x, rp.y, rp.r, {
                     isStatic: true, restitution: 0.95, friction: 0, frictionStatic: 0, slop: 0.01, render: inv, label: 'redpin'
@@ -1450,15 +1443,16 @@
                 pegs.push({ x: rp.x, y: rp.y, r: rp.r, isWindmill: false, isRedPin: true });
             }
 
-            // ★ 風車：改成動態複合剛體 + 中心約束，會轉
+            // ★ 風車：持續旋轉
             const windmillBodies = [];
-            for (const w of windmills) {
-                const partOpts = { render: inv, label: 'windmill', restitution: 0.9, slop: 0.01, friction: 0, frictionAir: 0.012, density: 0.0008, chamfer: { radius: 2 } };
+            for (let wi = 0; wi < windmills.length; wi++) {
+                const w = windmills[wi];
+                const partOpts = { render: inv, label: 'windmill', restitution: 0.9, slop: 0.01, friction: 0, frictionAir: 0.005, density: 0.0008, chamfer: { radius: 2 } };
                 const part1 = Bodies.rectangle(w.x, w.y, w.r * 3.6, w.r * 1.6, partOpts);
                 const part2 = Bodies.rectangle(w.x, w.y, w.r * 1.6, w.r * 3.6, partOpts);
                 const windmillBody = Body.create({
                     parts: [part1, part2],
-                    frictionAir: 0.012,
+                    frictionAir: 0.005,
                     friction: 0,
                     restitution: 0.9,
                     slop: 0.01
@@ -1469,10 +1463,12 @@
                     bodyB: windmillBody,
                     length: 0,
                     stiffness: 1,
-                    damping: 0.05
+                    damping: 0.02
                 });
                 Composite.add(pachinkoEngine.world, pin);
-                windmillBodies.push({ body: windmillBody, r: w.r });
+                // 交錯方向，看起來更自然
+                const dir = (wi % 2 === 0) ? 1 : -1;
+                windmillBodies.push({ body: windmillBody, r: w.r, spinSpeed: 0.045 * dir });
                 pegs.push({ x: w.x, y: w.y, r: w.r, isWindmill: true, isRedPin: false });
             }
 
@@ -1496,7 +1492,6 @@
                         const dist = Math.hypot(rx, ry) || 1;
                         Body.setVelocity(pachinkoBall, { x: v.x + (rx / dist) * 4, y: v.y + (ry / dist) * 4 });
                     }
-                    // ★ 紅球推力調弱
                     if (other.label === 'redpin') {
                         const v = pachinkoBall.velocity; const speed = Math.hypot(v.x, v.y);
                         if (speed < 0.5) continue;
@@ -1583,10 +1578,12 @@
                 Composite.add(pachinkoEngine.world, Bodies.rectangle((binAreaLeft + binAreaRight) / 2, binBottomY + 4, binAreaWidth + 20, 12, { isStatic: true, render: inv, friction: 0.1 }));
             }
 
-            // ===== 靜態場景 =====
+            // ===== 靜態場景（DPR 高解析度） =====
             const bgCanvas = document.createElement('canvas');
-            bgCanvas.width = renderWidth; bgCanvas.height = renderHeight;
+            bgCanvas.width = Math.round(renderWidth * dpr);
+            bgCanvas.height = Math.round(renderHeight * dpr);
             const bctx = bgCanvas.getContext('2d');
+            bctx.scale(dpr, dpr);
             drawPachinkoSceneStatic(bctx, renderWidth, renderHeight, pegs,
                 { x: springX, topY: springTopY, bottomY: springBottomY, leverY: leverY },
                 innerRailX, rightWallX, innerRailTop, innerRailBottom,
@@ -1615,16 +1612,18 @@
                 hl.addColorStop(0, 'rgba(255,255,255,0.5)'); hl.addColorStop(1, 'rgba(255,255,255,0)');
                 bctx.fillStyle = hl; bctx.fillRect(left, top, w, h * 0.4);
 
+                // ★ 獎品文字：限制字數、增大最小字級
                 const nm = bin.prizeData.name || bin.prizeId;
-                const maxChars = Math.min(nm.length, 5); const sn = nm.slice(0, maxChars);
+                const maxChars = Math.min(nm.length, 4);
+                const sn = nm.slice(0, maxChars);
                 const availH = h - 10;
-                const charSpace = Math.max(9, Math.min(18, Math.floor(availH / Math.max(sn.length, 1))));
-                const fontSize = Math.max(8, Math.min(14, charSpace - 3));
-                bctx.font = `bold ${fontSize}px "Noto Sans TC", sans-serif`;
+                const charSpace = Math.max(11, Math.min(20, Math.floor(availH / Math.max(sn.length, 1))));
+                const fontSize = Math.max(10, Math.min(16, charSpace - 3));
+                bctx.font = `900 ${fontSize}px "Noto Sans TC", sans-serif`;
                 bctx.textAlign = 'center'; bctx.textBaseline = 'middle';
                 const totalTextH = sn.length * charSpace;
                 const startY = top + (h - totalTextH) / 2 + charSpace / 2;
-                bctx.shadowColor = 'rgba(0,0,0,0.85)'; bctx.shadowBlur = 4; bctx.shadowOffsetY = 1;
+                bctx.shadowColor = 'rgba(0,0,0,0.9)'; bctx.shadowBlur = 4; bctx.shadowOffsetY = 1;
                 bctx.fillStyle = '#ffffff';
                 for (let ci = 0; ci < sn.length; ci++) { bctx.fillText(sn[ci], bin.x, startY + ci * charSpace); }
                 bctx.shadowBlur = 0; bctx.shadowOffsetY = 0;
@@ -1640,10 +1639,10 @@
                 bctx.fillRect(20, binBottomY, renderWidth - 40, renderHeight - 20 - binBottomY);
             }
 
-            // ★ render loop：加入動態風車
+            // ★ render loop（DPR 縮放後，drawImage 要用邏輯尺寸）
             function renderLoop() {
                 ctx2d.clearRect(0, 0, renderWidth, renderHeight);
-                ctx2d.drawImage(bgCanvas, 0, 0);
+                ctx2d.drawImage(bgCanvas, 0, 0, renderWidth, renderHeight);
                 for (const wm of windmillBodies) {
                     ctx2d.save();
                     ctx2d.translate(wm.body.position.x, wm.body.position.y);
@@ -1656,12 +1655,18 @@
             }
             renderLoop();
 
+            // ★ 物理迴圈：每次 update 前強制設定風車角速度
             let lastPhysTime = performance.now();
             function physicsLoop(now) {
                 const dt = Math.min(now - lastPhysTime, 33);
                 lastPhysTime = now;
                 const sub = 4;
-                for (let i = 0; i < sub; i++) Engine.update(pachinkoEngine, dt / sub);
+                for (let i = 0; i < sub; i++) {
+                    for (const wm of windmillBodies) {
+                        Body.setAngularVelocity(wm.body, wm.spinSpeed);
+                    }
+                    Engine.update(pachinkoEngine, dt / sub);
+                }
                 pachinkoPhysicsLoopId = requestAnimationFrame(physicsLoop);
             }
             pachinkoPhysicsLoopId = requestAnimationFrame(physicsLoop);
@@ -1721,8 +1726,9 @@
             if (!pachinkoBall) return;
 
             Matter.Body.setStatic(pachinkoBall, false);
-            const minSpeed = 15;
-            const maxSpeed = 25;
+            // ★ 發射力度：拉大區間，讓 1% 和 100% 明顯不同
+            const minSpeed = 6;
+            const maxSpeed = 32;
             const speed = minSpeed + power * (maxSpeed - minSpeed);
             Matter.Body.setVelocity(pachinkoBall, { x: 0, y: -speed });
             pachinkoBallDropped = true;
@@ -1745,30 +1751,32 @@
                 const speed = Math.hypot(vel.x, vel.y);
 
                 const railLeftX = pachinkoRailLeftX;
-
-                // ★ 偵測球落回發射軌底部 → 不算中獎、退次數
                 const inRail = pos.x > railLeftX - 2;
                 const nearBottom = pos.y > renderHeight - 130;
-                if (!ballReturned && inRail && nearBottom && speed < 2 && countDeducted) {
+
+                // ★ 球落回發射軌底部 → 不算中獎、退次數（若有扣）
+                if (!ballReturned && inRail && nearBottom && speed < 2) {
                     ballReturned = true;
                     clearInterval(pachinkoCheckIntervalId);
                     pachinkoCheckIntervalId = null;
 
-                    try {
-                        await runTransaction(playedRef, (current) => {
-                            if (!current) return current;
-                            const c = Math.max(0, (current.drawCount || 0) - 1);
-                            return { ...current, drawCount: c };
-                        });
-                        if (globalPlayedUsers[currentPlayerName]) {
-                            const cur = globalPlayedUsers[currentPlayerName].drawCount || 0;
-                            globalPlayedUsers[currentPlayerName] = {
-                                ...globalPlayedUsers[currentPlayerName],
-                                drawCount: Math.max(0, cur - 1)
-                            };
-                        }
-                        updateDrawCountDisplay();
-                    } catch (e) { console.error("退次數失敗", e); }
+                    if (countDeducted) {
+                        try {
+                            await runTransaction(playedRef, (current) => {
+                                if (!current) return current;
+                                const c = Math.max(0, (current.drawCount || 0) - 1);
+                                return { ...current, drawCount: c };
+                            });
+                            if (globalPlayedUsers[currentPlayerName]) {
+                                const cur = globalPlayedUsers[currentPlayerName].drawCount || 0;
+                                globalPlayedUsers[currentPlayerName] = {
+                                    ...globalPlayedUsers[currentPlayerName],
+                                    drawCount: Math.max(0, cur - 1)
+                                };
+                            }
+                            updateDrawCountDisplay();
+                        } catch (e) { console.error("退次數失敗", e); }
+                    }
 
                     pachinkoBallDropped = false;
                     enteredPlayArea = false;
