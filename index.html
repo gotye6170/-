@@ -12,7 +12,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
-    
     <style>
         * { -webkit-tap-highlight-color: transparent; }
         body {
@@ -25,147 +24,55 @@
             min-height: 100dvh;
             padding-bottom: env(safe-area-inset-bottom);
         }
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
+        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
         .gacha-title {
-            font-family: 'Noto Sans TC', sans-serif;
-            font-weight: 900;
-            color: #ff3366;
-            letter-spacing: 2px;
-            -webkit-text-stroke: 10px #ffffff;
-            paint-order: stroke fill;
+            font-weight: 900; color: #ff3366; letter-spacing: 2px;
+            -webkit-text-stroke: 10px #ffffff; paint-order: stroke fill;
             filter: drop-shadow(4px 4px 0px rgba(0,0,0,0.08)) drop-shadow(0px 8px 15px rgba(244,63,94,0.2));
         }
         .gacha-machine {
-            position: relative;
-            width: 320px;
+            position: relative; width: 320px;
             background: linear-gradient(to bottom, #ef4444, #dc2626);
             border-radius: 40px 40px 20px 20px;
             box-shadow: 0 20px 0 #b91c1c, 0 30px 40px rgba(0,0,0,0.3);
-            padding: 25px;
-            margin: 24px auto 24px auto;
-            border: 6px solid #fee2e2;
+            padding: 25px; margin: 24px auto 24px auto; border: 6px solid #fee2e2;
         }
         .gacha-glass {
-            position: relative;
-            height: 240px;
+            position: relative; height: 240px;
             background: radial-gradient(circle at 50% 30%, rgba(255,255,255,0.4) 0%, rgba(243,244,246,0.8) 70%);
-            border-radius: 30px;
-            border: 6px solid #b91c1c;
-            overflow: hidden;
-            box-shadow: inset 0 10px 20px rgba(0,0,0,0.15);
-            margin-bottom: 25px;
+            border-radius: 30px; border: 6px solid #b91c1c; overflow: hidden;
+            box-shadow: inset 0 10px 20px rgba(0,0,0,0.15); margin-bottom: 25px;
         }
         .gacha-egg {
-            position: absolute;
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
+            position: absolute; width: 38px; height: 38px; border-radius: 50%;
             box-shadow: inset -4px -4px 8px rgba(0,0,0,0.2), 2px 4px 6px rgba(0,0,0,0.1);
             transition: transform 0.3s ease, opacity 0.5s ease;
         }
         .gacha-egg::after {
-            content: '';
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 50%;
-            background: rgba(255,255,255,0.35);
-            border-radius: 19px 19px 0 0;
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 50%;
+            background: rgba(255,255,255,0.35); border-radius: 19px 19px 0 0;
         }
-        .egg-pink { background: #ec4899; }
-        .egg-blue { background: #3b82f6; }
-        .egg-yellow { background: #eab308; }
-        .egg-green { background: #22c55e; }
-        .egg-purple { background: #a855f7; }
-        .egg-orange { background: #f97316; }
-        .egg-layer-a { bottom: 8px; }
-        .egg-layer-b { bottom: 25px; }
-        .egg-layer-c { bottom: 42px; }
+        .egg-pink { background: #ec4899; } .egg-blue { background: #3b82f6; }
+        .egg-yellow { background: #eab308; } .egg-green { background: #22c55e; }
+        .egg-purple { background: #a855f7; } .egg-orange { background: #f97316; }
+        .egg-layer-a { bottom: 8px; } .egg-layer-b { bottom: 25px; } .egg-layer-c { bottom: 42px; }
         .egg-falling-out { animation: eggFallOut 0.8s cubic-bezier(0.55, 0.055, 0.675, 0.19) forwards !important; }
-        @keyframes eggFallOut {
-            0% { transform: translateY(0) scale(1); opacity: 1; }
-            50% { transform: translateY(60px) scale(0.9); opacity: 0.6; }
-            100% { transform: translateY(120px) scale(0.7); opacity: 0; }
-        }
-        .eggs-drop-down .gacha-egg:not(.egg-falling-out) {
-            animation: gravitySettle 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.3s forwards;
-        }
-        @keyframes gravitySettle {
-            0% { transform: translateY(0); }
-            50% { transform: translateY(6px); }
-            75% { transform: translateY(3px); }
-            100% { transform: translateY(4px); }
-        }
-        .gacha-panel {
-            background: #991b1b;
-            border-radius: 20px;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
-            box-shadow: inset 0 4px 8px rgba(0,0,0,0.3);
-        }
+        @keyframes eggFallOut { 0% { transform: translateY(0) scale(1); opacity: 1; } 50% { transform: translateY(60px) scale(0.9); opacity: 0.6; } 100% { transform: translateY(120px) scale(0.7); opacity: 0; } }
+        .eggs-drop-down .gacha-egg:not(.egg-falling-out) { animation: gravitySettle 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.3s forwards; }
+        @keyframes gravitySettle { 0% { transform: translateY(0); } 50% { transform: translateY(6px); } 75% { transform: translateY(3px); } 100% { transform: translateY(4px); } }
+        .gacha-panel { background: #991b1b; border-radius: 20px; padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 15px; box-shadow: inset 0 4px 8px rgba(0,0,0,0.3); }
         .gacha-crank {
-            width: 70px;
-            height: 70px;
-            background: radial-gradient(circle, #f3f4f6 30%, #9ca3af 70%);
-            border-radius: 50%;
-            border: 6px solid #4b5563;
-            position: relative;
-            cursor: pointer;
+            width: 70px; height: 70px; background: radial-gradient(circle, #f3f4f6 30%, #9ca3af 70%);
+            border-radius: 50%; border: 6px solid #4b5563; position: relative; cursor: pointer;
             box-shadow: 0 4px 0 #374151, 0 6px 10px rgba(0,0,0,0.3);
         }
-        .gacha-crank::before {
-            content: '';
-            position: absolute;
-            width: 14px; height: 45px;
-            background: #4b5563;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            border-radius: 7px;
-        }
-        .gacha-crank::after {
-            content: '';
-            position: absolute;
-            width: 24px; height: 24px;
-            background: #dc2626;
-            border-radius: 50%;
-            top: -5px; left: 50%;
-            transform: translateX(-50%);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
+        .gacha-crank::before { content: ''; position: absolute; width: 14px; height: 45px; background: #4b5563; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 7px; }
+        .gacha-crank::after { content: ''; position: absolute; width: 24px; height: 24px; background: #dc2626; border-radius: 50%; top: -5px; left: 50%; transform: translateX(-50%); box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
         .rotating-crank { animation: rotateCrank 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
         @keyframes rotateCrank { 0% { transform: rotate(0deg); } 100% { transform: rotate(720deg); } }
-        .gacha-gate {
-            width: 75px; height: 75px;
-            background: #1f2937;
-            border-radius: 20px 20px 5px 5px;
-            border: 4px solid #4b5563;
-            position: relative;
-            box-shadow: inset 0 5px 10px rgba(0,0,0,0.5);
-            overflow: hidden;
-        }
-        .gacha-lucky-egg {
-            position: absolute;
-            width: 46px; height: 46px;
-            border-radius: 50%;
-            top: -60px; left: 11px;
-            opacity: 0;
-            z-index: 10;
-            box-shadow: inset -5px -5px 10px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.4);
-        }
-        .gacha-lucky-egg::after {
-            content: '';
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 50%;
-            background: rgba(255,255,255,0.35);
-            border-radius: 23px 23px 0 0;
-        }
+        .gacha-gate { width: 75px; height: 75px; background: #1f2937; border-radius: 20px 20px 5px 5px; border: 4px solid #4b5563; position: relative; box-shadow: inset 0 5px 10px rgba(0,0,0,0.5); overflow: hidden; }
+        .gacha-lucky-egg { position: absolute; width: 46px; height: 46px; border-radius: 50%; top: -60px; left: 11px; opacity: 0; z-index: 10; box-shadow: inset -5px -5px 10px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.4); }
+        .gacha-lucky-egg::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 50%; background: rgba(255,255,255,0.35); border-radius: 23px 23px 0 0; }
         .dropped-egg { animation: realGravityDrop 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.3s forwards; }
         @keyframes realGravityDrop {
             0% { top: -60px; opacity: 0; transform: scaleY(1.1) scaleX(0.9) rotate(0deg); }
@@ -176,444 +83,77 @@
             90% { top: 12px; transform: scaleY(1) scaleX(1) rotate(350deg); }
             100% { top: 12px; opacity: 1; transform: scaleY(1) scaleX(1) rotate(360deg); }
         }
-        .dashboard-panel {
-            background: rgba(255,255,255,0.85);
-            backdrop-filter: blur(10px);
-            border-radius: 24px;
-            border: 2px solid rgba(255,255,255,0.5);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-            padding: 20px;
-            height: auto;
-            display: flex;
-            flex-direction: column;
-        }
-        .board-title-text {
-            font-size: 18px;
-            font-weight: 900;
-            display: flex;
-            align-items: center;
-            padding-bottom: 10px;
-            border-bottom: 2px dashed rgba(0,0,0,0.1);
-            margin-bottom: 12px;
-            flex-shrink: 0;
-        }
-        .prize-title-text { color: #06b6d4; }
-        .honor-title-text { color: #ec4899; }
-        .scroller-content {
-            overflow-y: auto;
-            flex-grow: 1;
-            min-height: 0;
-            padding-right: 4px;
-            -webkit-overflow-scrolling: touch;
-        }
+        .dashboard-panel { background: rgba(255,255,255,0.85); backdrop-filter: blur(10px); border-radius: 24px; border: 2px solid rgba(255,255,255,0.5); box-shadow: 0 10px 30px rgba(0,0,0,0.05); padding: 20px; height: auto; display: flex; flex-direction: column; }
+        .board-title-text { font-size: 18px; font-weight: 900; display: flex; align-items: center; padding-bottom: 10px; border-bottom: 2px dashed rgba(0,0,0,0.1); margin-bottom: 12px; flex-shrink: 0; }
+        .prize-title-text { color: #06b6d4; } .honor-title-text { color: #ec4899; }
+        .scroller-content { overflow-y: auto; flex-grow: 1; min-height: 0; padding-right: 4px; -webkit-overflow-scrolling: touch; }
         .scroller-content::-webkit-scrollbar { width: 6px; }
         .scroller-content::-webkit-scrollbar-track { background: transparent; }
         .scroller-content::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
-        .prize-item-row {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            background: white;
-            padding: 8px 12px;
-            border-radius: 14px;
-            margin-bottom: 8px;
-            border: 1px solid #f3f4f6;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-        }
-        .prize-thumb {
-            width: 40px; height: 40px;
-            border-radius: 8px;
-            object-fit: cover;
-            flex-shrink: 0;
-        }
+        .prize-item-row { display: flex; align-items: center; gap: 12px; background: white; padding: 8px 12px; border-radius: 14px; margin-bottom: 8px; border: 1px solid #f3f4f6; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .prize-thumb { width: 40px; height: 40px; border-radius: 8px; object-fit: cover; flex-shrink: 0; }
         .prize-info { display: flex; flex-direction: column; gap: 1px; flex: 1; min-width: 0; }
         .prize-name-label { font-size: 14px; font-weight: bold; color: #1f2937; }
-        .honor-item-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: linear-gradient(to right, #fffdfa, #fff);
-            padding: 10px 12px;
-            border-radius: 14px;
-            margin-bottom: 8px;
-            border: 1px solid #fdf2e9;
-            box-shadow: 0 2px 4px rgba(236,72,153,0.05);
-        }
-        .honor-badge {
-            background: linear-gradient(135deg, #fbcfe8, #f472b6);
-            color: #9d174d;
-            font-size: 11px;
-            font-weight: bold;
-            padding: 2px 6px;
-            border-radius: 6px;
-            flex-shrink: 0;
-        }
+        .honor-item-row { display: flex; align-items: center; gap: 10px; background: linear-gradient(to right, #fffdfa, #fff); padding: 10px 12px; border-radius: 14px; margin-bottom: 8px; border: 1px solid #fdf2e9; box-shadow: 0 2px 4px rgba(236,72,153,0.05); }
+        .honor-badge { background: linear-gradient(135deg, #fbcfe8, #f472b6); color: #9d174d; font-size: 11px; font-weight: bold; padding: 2px 6px; border-radius: 6px; flex-shrink: 0; }
         .honor-info { font-size: 13px; color: #4b5563; }
-        .prize-progress-track {
-            width: 100%;
-            height: 6px;
-            background: #f3f4f6;
-            border-radius: 999px;
-            overflow: hidden;
-            margin-top: 4px;
-        }
+        .prize-progress-track { width: 100%; height: 6px; background: #f3f4f6; border-radius: 999px; overflow: hidden; margin-top: 4px; }
         .prize-progress-fill { height: 100%; border-radius: 999px; transition: width 0.3s ease; }
         .prize-progress-fill.is-available { background: linear-gradient(to right, #6ee7b7, #059669); }
         .prize-progress-fill.is-empty { background: linear-gradient(to right, #fca5a5, #dc2626); }
         .marquee-viewport { flex: 1 1 auto; min-width: 0; overflow: hidden; position: relative; }
-        .marquee-track {
-            display: inline-flex;
-            white-space: nowrap;
-            will-change: transform;
-            animation: marqueeScroll 20s linear infinite;
-        }
+        .marquee-track { display: inline-flex; white-space: nowrap; will-change: transform; animation: marqueeScroll 20s linear infinite; }
         .marquee-item { padding-right: 60px; }
-        @keyframes marqueeScroll {
-            from { transform: translateX(0); }
-            to { transform: translateX(-50%); }
-        }
-        .wallet-badge {
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            color: #78350f;
-            border-radius: 999px;
-            padding: 6px 18px;
-            font-weight: 900;
-            font-size: 14px;
-            box-shadow: 0 4px 10px rgba(245,158,11,0.3);
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .shop-btn {
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: white;
-            border-radius: 999px;
-            padding: 8px 20px;
-            font-weight: 900;
-            font-size: 14px;
-            box-shadow: 0 4px 10px rgba(16,185,129,0.3);
-            cursor: pointer;
-            transition: transform 0.1s;
-        }
+        @keyframes marqueeScroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+        .wallet-badge { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #78350f; border-radius: 999px; padding: 6px 18px; font-weight: 900; font-size: 14px; box-shadow: 0 4px 10px rgba(245,158,11,0.3); display: inline-flex; align-items: center; gap: 6px; }
+        .shop-btn { background: linear-gradient(135deg, #10b981, #059669); color: white; border-radius: 999px; padding: 8px 20px; font-weight: 900; font-size: 14px; box-shadow: 0 4px 10px rgba(16,185,129,0.3); cursor: pointer; transition: transform 0.1s; }
         .shop-btn:active { transform: scale(0.95); }
-        .back-btn {
-            background: rgba(255,255,255,0.7);
-            border: 1px solid #e5e7eb;
-            color: #6b7280;
-            border-radius: 999px;
-            padding: 6px 16px;
-            font-size: 12px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
+        .back-btn { background: rgba(255,255,255,0.7); border: 1px solid #e5e7eb; color: #6b7280; border-radius: 999px; padding: 6px 16px; font-size: 12px; font-weight: bold; cursor: pointer; transition: background 0.2s; }
         .back-btn:hover { background: rgba(255,255,255,0.9); }
-        .admin-test-btn {
-            color: #a0aec0;
-            font-size: 11px;
-            text-decoration: underline;
-            cursor: pointer;
-            background: none;
-            border: none;
-        }
+        .admin-test-btn { color: #a0aec0; font-size: 11px; text-decoration: underline; cursor: pointer; background: none; border: none; }
         .admin-test-btn:hover { color: #718096; }
-        .choice-btn {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 20px 16px;
-            border-radius: 20px;
-            font-weight: 900;
-            font-size: 18px;
-            cursor: pointer;
-            transition: transform 0.15s;
-            border: none;
-        }
+        .choice-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 20px 16px; border-radius: 20px; font-weight: 900; font-size: 18px; cursor: pointer; transition: transform 0.15s; border: none; }
         .choice-btn:active { transform: scale(0.96); }
         .choice-btn-draw { background: linear-gradient(135deg, #f472b6, #ec4899); color: white; box-shadow: 0 8px 20px rgba(236,72,153,0.35); }
         .choice-btn-points { background: linear-gradient(135deg, #34d399, #059669); color: white; box-shadow: 0 8px 20px rgba(16,185,129,0.35); }
         .choice-btn-slot { background: linear-gradient(135deg, #a78bfa, #7c3aed); color: white; box-shadow: 0 8px 20px rgba(124, 58, 237, 0.35); }
         .choice-btn-pachinko { background: linear-gradient(135deg, #60a5fa, #2563eb); color: white; box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35); }
-        .casino-slot-machine {
-            width: 100%;
-            max-width: 420px;
-            margin: 0 auto;
-            background: linear-gradient(180deg, #3a1c5a 0%, #1e0f33 100%);
-            border-radius: 30px;
-            padding: 20px;
-            border: 8px solid #d4af37;
-            box-shadow: 0 25px 0 #0d0618, 0 35px 50px rgba(0,0,0,0.7), inset 0 2px 0 #d4af37, inset 0 -10px 20px rgba(0,0,0,0.6);
-            position: relative;
-            overflow: hidden;
-            transform: perspective(800px) rotateX(2deg);
-        }
+        .casino-slot-machine { width: 100%; max-width: 420px; margin: 0 auto; background: linear-gradient(180deg, #3a1c5a 0%, #1e0f33 100%); border-radius: 30px; padding: 20px; border: 8px solid #d4af37; box-shadow: 0 25px 0 #0d0618, 0 35px 50px rgba(0,0,0,0.7), inset 0 2px 0 #d4af37, inset 0 -10px 20px rgba(0,0,0,0.6); position: relative; overflow: hidden; transform: perspective(800px) rotateX(2deg); }
         .slot-top-lights { display: flex; justify-content: space-around; margin-bottom: 10px; }
-        .slot-light {
-            width: 18px;
-            height: 18px;
-            background: radial-gradient(circle at 40% 40%, #fff, #ffdd00 70%, #ff9900);
-            border-radius: 50%;
-            box-shadow: 0 0 15px #ffdd00, 0 0 30px #ff9900;
-            animation: blinkLight 0.8s infinite alternate;
-        }
+        .slot-light { width: 18px; height: 18px; background: radial-gradient(circle at 40% 40%, #fff, #ffdd00 70%, #ff9900); border-radius: 50%; box-shadow: 0 0 15px #ffdd00, 0 0 30px #ff9900; animation: blinkLight 0.8s infinite alternate; }
         @keyframes blinkLight { from { opacity: 1; } to { opacity: 0.3; } }
-        .slot-title {
-            text-align: center;
-            font-size: 28px;
-            font-weight: 900;
-            color: #ffd700;
-            text-shadow: 0 0 15px #ffd700;
-            margin-bottom: 15px;
-        }
-        .slot-reels-container {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 20px;
-            background: #1a1a2e;
-            padding: 15px;
-            border-radius: 20px;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
-        }
-        .slot-reel-window {
-            width: 90px;
-            height: 140px;
-            overflow: hidden;
-            border-radius: 15px;
-            background: #f5f5f0;
-            box-shadow: 0 0 0 6px #8b4513, 0 0 0 10px #d4af37, inset 0 0 15px rgba(0,0,0,0.8), inset 0 -10px 20px rgba(0,0,0,0.5);
-            position: relative;
-        }
-        .slot-reel-window::after {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 40%;
-            background: linear-gradient(180deg, rgba(255,255,255,0.3), transparent);
-            pointer-events: none;
-            z-index: 1;
-        }
-        .slot-reel-strip {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            transition: transform 3s cubic-bezier(0.15, 0.85, 0.25, 1);
-            will-change: transform;
-        }
-        .slot-reel-symbol {
-            height: 140px;
-            width: 90px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 60px;
-            flex-shrink: 0;
-            background: #fff;
-        }
-        .slot-reel-symbol img {
-            width: 80px;
-            height: 80px;
-            object-fit: cover;
-            object-position: center;
-            background: #ffffff;
-            display: block;
-            border-radius: 8px;
-        }
+        .slot-title { text-align: center; font-size: 28px; font-weight: 900; color: #ffd700; text-shadow: 0 0 15px #ffd700; margin-bottom: 15px; }
+        .slot-reels-container { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; background: #1a1a2e; padding: 15px; border-radius: 20px; box-shadow: inset 0 0 20px rgba(0,0,0,0.8); }
+        .slot-reel-window { width: 90px; height: 140px; overflow: hidden; border-radius: 15px; background: #f5f5f0; box-shadow: 0 0 0 6px #8b4513, 0 0 0 10px #d4af37, inset 0 0 15px rgba(0,0,0,0.8), inset 0 -10px 20px rgba(0,0,0,0.5); position: relative; }
+        .slot-reel-window::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 40%; background: linear-gradient(180deg, rgba(255,255,255,0.3), transparent); pointer-events: none; z-index: 1; }
+        .slot-reel-strip { display: flex; flex-direction: column; align-items: center; transition: transform 3s cubic-bezier(0.15, 0.85, 0.25, 1); will-change: transform; }
+        .slot-reel-symbol { height: 140px; width: 90px; display: flex; align-items: center; justify-content: center; font-size: 60px; flex-shrink: 0; background: #fff; }
+        .slot-reel-symbol img { width: 80px; height: 80px; object-fit: cover; object-position: center; background: #ffffff; display: block; border-radius: 8px; }
         .slot-controls { display: flex; align-items: center; justify-content: center; gap: 20px; margin-top: 10px; }
-        .slot-lever {
-            width: 70px;
-            height: 120px;
-            position: relative;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            transition: transform 0.2s;
-        }
+        .slot-lever { width: 70px; height: 120px; position: relative; cursor: pointer; display: flex; flex-direction: column; align-items: center; transition: transform 0.2s; }
         .slot-lever:active { transform: translateY(10px); }
-        .lever-ball {
-            width: 60px;
-            height: 60px;
-            background: radial-gradient(circle at 35% 35%, #ff6666, #b30000 60%, #660000);
-            border-radius: 50%;
-            box-shadow: 0 8px 0 #4d0000, 0 12px 20px rgba(0,0,0,0.5), inset 0 -4px 8px rgba(0,0,0,0.4);
-            z-index: 2;
-        }
-        .lever-stick {
-            width: 12px;
-            flex-grow: 1;
-            background: linear-gradient(to right, #666, #ddd, #666);
-            margin-top: -5px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.4);
-            border-radius: 4px;
-            z-index: 1;
-        }
-        .slot-info {
-            color: #ffd700;
-            font-weight: bold;
-            text-shadow: 0 0 8px #ffd700;
-            margin-top: 10px;
-            text-align: center;
-        }
-
-        .pachinko-machine {
-            width: 100%;
-            max-width: 420px;
-            margin: 0 auto;
-            background: linear-gradient(180deg, #3a1c5a 0%, #1e0f33 100%);
-            border-radius: 30px;
-            padding: 20px;
-            border: 8px solid #d4af37;
-            box-shadow: 0 25px 0 #0d0618, 0 35px 50px rgba(0,0,0,0.7), inset 0 2px 0 #d4af37, inset 0 -10px 20px rgba(0,0,0,0.6);
-            position: relative;
-            overflow: hidden;
-        }
+        .lever-ball { width: 60px; height: 60px; background: radial-gradient(circle at 35% 35%, #ff6666, #b30000 60%, #660000); border-radius: 50%; box-shadow: 0 8px 0 #4d0000, 0 12px 20px rgba(0,0,0,0.5), inset 0 -4px 8px rgba(0,0,0,0.4); z-index: 2; }
+        .lever-stick { width: 12px; flex-grow: 1; background: linear-gradient(to right, #666, #ddd, #666); margin-top: -5px; box-shadow: 0 4px 6px rgba(0,0,0,0.4); border-radius: 4px; z-index: 1; }
+        .slot-info { color: #ffd700; font-weight: bold; text-shadow: 0 0 8px #ffd700; margin-top: 10px; text-align: center; }
+        .pachinko-machine { width: 100%; max-width: 420px; margin: 0 auto; background: linear-gradient(180deg, #3a1c5a 0%, #1e0f33 100%); border-radius: 30px; padding: 20px; border: 8px solid #d4af37; box-shadow: 0 25px 0 #0d0618, 0 35px 50px rgba(0,0,0,0.7), inset 0 2px 0 #d4af37, inset 0 -10px 20px rgba(0,0,0,0.6); position: relative; overflow: hidden; }
         .pachinko-top-lights { display: flex; justify-content: space-around; margin-bottom: 10px; }
-        .pachinko-title {
-            text-align: center;
-            font-size: 28px;
-            font-weight: 900;
-            color: #ffd700;
-            text-shadow: 0 0 15px #ffd700;
-            margin-bottom: 15px;
-        }
-        .pachinko-container {
-            width: 100%;
-            background: #0f0f1a;
-            border-radius: 15px;
-            box-shadow: inset 0 0 30px rgba(0,0,0,0.9);
-            overflow: hidden;
-            position: relative;
-            display: flex;
-            justify-content: center;
-        }
+        .pachinko-title { text-align: center; font-size: 28px; font-weight: 900; color: #ffd700; text-shadow: 0 0 15px #ffd700; margin-bottom: 15px; }
+        .pachinko-container { width: 100%; background: #0f0f1a; border-radius: 15px; box-shadow: inset 0 0 30px rgba(0,0,0,0.9); overflow: hidden; position: relative; display: flex; justify-content: center; }
         .pachinko-container canvas { display: block; max-width: 100%; height: auto !important; }
-        .pachinko-lever-area {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-            margin-top: 15px;
-            padding: 8px 6px 4px;
-        }
-        .pachinko-lever-track {
-            position: relative;
-            width: 60px;
-            height: 130px;
-            background: linear-gradient(180deg, #0a0612, #1a0d2e);
-            border-radius: 30px;
-            border: 3px solid #d4af37;
-            box-shadow: inset 0 4px 12px rgba(0,0,0,0.9), 0 0 15px rgba(212,175,55,0.3);
-            touch-action: none;
-            user-select: none;
-            -webkit-user-select: none;
-            flex-shrink: 0;
-            overflow: visible;
-        }
-        .pachinko-lever-knob {
-            position: absolute;
-            top: 6px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 50px;
-            height: 74px;
-            cursor: grab;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            touch-action: none;
-            user-select: none;
-            -webkit-user-select: none;
-            will-change: top;
-        }
+        .pachinko-lever-area { display: flex; align-items: center; justify-content: center; gap: 20px; margin-top: 15px; padding: 8px 6px 4px; }
+        .pachinko-lever-track { position: relative; width: 60px; height: 130px; background: linear-gradient(180deg, #0a0612, #1a0d2e); border-radius: 30px; border: 3px solid #d4af37; box-shadow: inset 0 4px 12px rgba(0,0,0,0.9), 0 0 15px rgba(212,175,55,0.3); touch-action: none; user-select: none; -webkit-user-select: none; flex-shrink: 0; overflow: visible; }
+        .pachinko-lever-knob { position: absolute; top: 6px; left: 50%; transform: translateX(-50%); width: 50px; height: 74px; cursor: grab; display: flex; flex-direction: column; align-items: center; touch-action: none; user-select: none; -webkit-user-select: none; will-change: top; }
         .pachinko-lever-knob:active { cursor: grabbing; }
-        .pachinko-lever-ball {
-            width: 46px;
-            height: 46px;
-            border-radius: 50%;
-            background:
-                radial-gradient(circle at 32% 26%, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0) 40%),
-                radial-gradient(circle at 40% 40%, #ff7a7a 0%, #cc0000 55%, #660000 100%);
-            box-shadow:
-                inset -4px -5px 10px rgba(0,0,0,0.55),
-                inset 3px 3px 6px rgba(255,255,255,0.35),
-                0 3px 0 #4d0000,
-                0 6px 12px rgba(0,0,0,0.6);
-            position: relative;
-            z-index: 2;
-            flex-shrink: 0;
-        }
-        .pachinko-lever-rod {
-            width: 12px;
-            height: 32px;
-            background: linear-gradient(to right, #5a5a5a, #cfcfcf 35%, #ffffff 50%, #a8a8a8 65%, #4a4a4a);
-            margin-top: -4px;
-            border-radius: 4px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.6), inset 0 0 3px rgba(255,255,255,0.3);
-            position: relative;
-            z-index: 1;
-        }
-        .pachinko-lever-rod::before {
-            content: '';
-            position: absolute;
-            top: 4px; left: 1px; right: 1px;
-            height: 1px;
-            background: rgba(255,255,255,0.5);
-            border-radius: 1px;
-        }
-        .pachinko-lever-rod::after {
-            content: '';
-            position: absolute;
-            bottom: 4px; left: 1px; right: 1px;
-            height: 1px;
-            background: rgba(0,0,0,0.5);
-            border-radius: 1px;
-        }
+        .pachinko-lever-ball { width: 46px; height: 46px; border-radius: 50%; background: radial-gradient(circle at 32% 26%, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0) 40%), radial-gradient(circle at 40% 40%, #ff7a7a 0%, #cc0000 55%, #660000 100%); box-shadow: inset -4px -5px 10px rgba(0,0,0,0.55), inset 3px 3px 6px rgba(255,255,255,0.35), 0 3px 0 #4d0000, 0 6px 12px rgba(0,0,0,0.6); position: relative; z-index: 2; flex-shrink: 0; }
+        .pachinko-lever-rod { width: 12px; height: 32px; background: linear-gradient(to right, #5a5a5a, #cfcfcf 35%, #ffffff 50%, #a8a8a8 65%, #4a4a4a); margin-top: -4px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.6), inset 0 0 3px rgba(255,255,255,0.3); position: relative; z-index: 1; }
+        .pachinko-lever-rod::before { content: ''; position: absolute; top: 4px; left: 1px; right: 1px; height: 1px; background: rgba(255,255,255,0.5); border-radius: 1px; }
+        .pachinko-lever-rod::after { content: ''; position: absolute; bottom: 4px; left: 1px; right: 1px; height: 1px; background: rgba(0,0,0,0.5); border-radius: 1px; }
         .pachinko-power-display { flex: 1; max-width: 180px; }
-        .pachinko-power-bar {
-            width: 100%;
-            height: 18px;
-            background: #0a0612;
-            border-radius: 9px;
-            border: 2px solid #d4af37;
-            overflow: hidden;
-            box-shadow: inset 0 2px 6px rgba(0,0,0,0.9);
-        }
-        .pachinko-power-fill {
-            width: 0%;
-            height: 100%;
-            background: linear-gradient(90deg, #22c55e, #eab308 50%, #ef4444);
-            transition: width 0.05s linear;
-            border-radius: 7px;
-        }
-        .pachinko-power-text {
-            text-align: center;
-            margin-top: 6px;
-            color: #ffd700;
-            font-weight: bold;
-            font-size: 13px;
-            text-shadow: 0 0 8px #ffd700;
-        }
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(4px);
-            z-index: 50;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        .modal-card {
-            background: white;
-            border-radius: 24px;
-            width: 100%;
-            max-width: 400px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-        }
+        .pachinko-power-bar { width: 100%; height: 18px; background: #0a0612; border-radius: 9px; border: 2px solid #d4af37; overflow: hidden; box-shadow: inset 0 2px 6px rgba(0,0,0,0.9); }
+        .pachinko-power-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #22c55e, #eab308 50%, #ef4444); transition: width 0.05s linear; border-radius: 7px; }
+        .pachinko-power-text { text-align: center; margin-top: 6px; color: #ffd700; font-weight: bold; font-size: 13px; text-shadow: 0 0 8px #ffd700; }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 50; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .modal-card { background: white; border-radius: 24px; width: 100%; max-width: 400px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
         @media (max-width: 640px) {
             .gacha-title { font-size: 1.8rem !important; -webkit-text-stroke: 4px #fff; margin-bottom: 12px; letter-spacing: 1px; }
             .gacha-machine { transform: scale(0.78); transform-origin: top center; margin: 24px auto 24px auto; height: 300px; }
@@ -640,15 +180,11 @@
             .pachinko-power-display { max-width: 150px; }
             .pachinko-power-text { font-size: 12px; }
         }
-        @media (min-width: 1024px) {
-            .gacha-title { font-size: 3rem; }
-            .gacha-machine { transform: scale(1); margin: 32px auto 32px auto; }
-        }
+        @media (min-width: 1024px) { .gacha-title { font-size: 3rem; } .gacha-machine { transform: scale(1); margin: 32px auto 32px auto; } }
     </style>
 </head>
 
 <body class="p-4 md:p-8 min-h-screen flex flex-col items-center justify-center">
-
     <div id="closedOverlay" style="display:none; position:fixed; inset:0; z-index:9999; backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); background:rgba(15,23,42,0.72); align-items:center; justify-content:center; padding:20px;">
         <div style="background:rgba(255,255,255,0.95); border-radius:28px; padding:40px 32px; max-width:360px; width:100%; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
             <div style="font-size:56px; margin-bottom:12px;">🚧</div>
@@ -656,7 +192,6 @@
             <div style="font-size:14px; color:#64748b; font-weight:600;">目前暫停抽獎，請稍後再回來試試手氣唷！</div>
         </div>
     </div>
-
     <div class="w-full max-w-5xl bg-slate-900 text-cyan-400 font-bold px-4 py-2.5 rounded-full shadow-lg overflow-hidden border-2 border-cyan-500/30 mb-4 md:mb-8 flex items-center gap-3">
         <span class="bg-cyan-500 text-slate-950 text-xs px-2.5 py-1 rounded-full flex-shrink-0 animate-pulse">📢 最新動態</span>
         <div class="marquee-viewport">
@@ -666,12 +201,9 @@
             </div>
         </div>
     </div>
-
     <div class="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 items-start">
-        
         <div class="lg:col-span-6 order-1 flex flex-col items-center mobile-main-area">
             <h1 class="gacha-title text-4xl md:text-5xl mb-4 md:mb-6">呆呆幸運抽獎</h1>
-
             <div id="controlPanel" class="w-full max-w-sm bg-white/80 backdrop-blur-md rounded-3xl p-6 shadow-xl border border-white mt-2 md:mt-4 space-y-4">
                 <div>
                     <label class="block text-xs font-bold text-gray-500 mb-1.5 ml-1">🔑 請輸入群組密語解鎖名單</label>
@@ -690,9 +222,7 @@
                     <button onclick="promptAdminMode()" class="admin-test-btn">🔧 管理員測試</button>
                 </div>
             </div>
-
             <div id="contentArea" class="hidden w-full max-w-sm flex flex-col items-center mt-3 md:mt-4">
-                
                 <div class="w-full flex items-center justify-between mb-4 md:mb-6">
                     <button onclick="goBack()" class="back-btn">← 上一步</button>
                     <span id="playerNameDisplay" class="inline-block bg-white/70 backdrop-blur-sm rounded-full px-5 py-2 text-sm font-bold text-slate-700 shadow-sm border border-white">
@@ -700,15 +230,12 @@
                     </span>
                     <div style="width:60px;"></div>
                 </div>
-
                 <div id="drawSystemArea" class="w-full">
                     <div id="drawCountDisplay" class="w-full text-center mb-2 text-sm font-bold text-gray-600"></div>
                     <div id="drawActionArea" class="w-full">
                         <button id="spinBtn" onclick="openConfirmModal()" class="w-full bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white font-black py-4 rounded-2xl shadow-lg shadow-rose-500/20 active:scale-98 transition-all tracking-wider text-base cursor-pointer">🎰 啟動幸運扭蛋</button>
                     </div>
-                    <div id="alreadyPlayedMsg" class="hidden w-full text-center py-3 text-gray-500 font-bold text-sm bg-white/50 rounded-xl mt-4">
-                        ⚠️ 你已達抽獎次數上限，無法繼續抽獎
-                    </div>
+                    <div id="alreadyPlayedMsg" class="hidden w-full text-center py-3 text-gray-500 font-bold text-sm bg-white/50 rounded-xl mt-4">⚠️ 你已達抽獎次數上限，無法繼續抽獎</div>
                     <div class="gacha-machine mt-4 md:mt-6">
                         <div class="gacha-glass" id="gachaGlass">
                             <div class="gacha-egg egg-pink egg-layer-a" style="left: 15px;"></div>
@@ -729,18 +256,13 @@
                         </div>
                         <div class="gacha-panel">
                             <div class="gacha-crank" id="gachaCrank" onclick="openConfirmModal()"></div>
-                            <div class="gacha-gate">
-                                <div class="gacha-lucky-egg" id="luckyEgg"></div>
-                            </div>
+                            <div class="gacha-gate"><div class="gacha-lucky-egg" id="luckyEgg"></div></div>
                         </div>
                     </div>
                 </div>
-
                 <div id="slotSystemArea" class="w-full hidden">
                     <div class="casino-slot-machine">
-                        <div class="slot-top-lights">
-                            <div class="slot-light"></div><div class="slot-light"></div><div class="slot-light"></div><div class="slot-light"></div><div class="slot-light"></div>
-                        </div>
+                        <div class="slot-top-lights"><div class="slot-light"></div><div class="slot-light"></div><div class="slot-light"></div><div class="slot-light"></div><div class="slot-light"></div></div>
                         <h3 class="slot-title"></h3>
                         <div class="slot-reels-container">
                             <div class="slot-reel-window"><div class="slot-reel-strip" id="reelStrip1"></div></div>
@@ -748,20 +270,14 @@
                             <div class="slot-reel-window"><div class="slot-reel-strip" id="reelStrip3"></div></div>
                         </div>
                         <div class="slot-controls">
-                            <div class="slot-lever" id="slotLever" onclick="startSlot()">
-                                <div class="lever-ball"></div>
-                                <div class="lever-stick"></div>
-                            </div>
+                            <div class="slot-lever" id="slotLever" onclick="startSlot()"><div class="lever-ball"></div><div class="lever-stick"></div></div>
                         </div>
                         <p class="slot-info">剩餘次數：<span id="slotCountDisplay">0</span></p>
                     </div>
                 </div>
-
                 <div id="pachinkoSystemArea" class="w-full hidden">
                     <div class="pachinko-machine">
-                        <div class="pachinko-top-lights">
-                            <div class="slot-light"></div><div class="slot-light"></div><div class="slot-light"></div><div class="slot-light"></div><div class="slot-light"></div>
-                        </div>
+                        <div class="pachinko-top-lights"><div class="slot-light"></div><div class="slot-light"></div><div class="slot-light"></div><div class="slot-light"></div><div class="slot-light"></div></div>
                         <h3 class="pachinko-title"></h3>
                         <div id="pachinkoContainer" class="pachinko-container"></div>
                         <div class="pachinko-lever-area">
@@ -772,45 +288,36 @@
                                 </div>
                             </div>
                             <div class="pachinko-power-display">
-                                <div class="pachinko-power-bar">
-                                    <div class="pachinko-power-fill" id="pachinkoPowerFill"></div>
-                                </div>
+                                <div class="pachinko-power-bar"><div class="pachinko-power-fill" id="pachinkoPowerFill"></div></div>
                                 <div class="pachinko-power-text">力道：<span id="pachinkoPowerText">0</span>%</div>
                             </div>
                         </div>
                         <p class="slot-info">剩餘次數：<span id="pachinkoCountDisplay">0</span></p>
                     </div>
                 </div>
-
                 <div id="pointsSystemArea" class="w-full hidden">
                     <div class="w-full bg-white/80 backdrop-blur-md rounded-2xl p-5 shadow-md border border-white">
                         <h3 class="text-center text-base font-black text-amber-600 mb-3">🎁 點數兌換系統</h3>
                         <div class="mb-3">
                             <p class="text-xs font-bold text-gray-500 text-center mb-1.5">目前可用點數</p>
-                            <div class="flex justify-center">
-                                <span class="wallet-badge text-sm" id="walletDisplay">🪙 讀取中...</span>
-                            </div>
+                            <div class="flex justify-center"><span class="wallet-badge text-sm" id="walletDisplay">🪙 讀取中...</span></div>
                             <p class="text-xs text-gray-400 text-center mt-1.5" id="walletExpiry"></p>
                         </div>
                         <hr class="my-3 border-gray-200">
                         <div>
                             <p class="text-xs font-bold text-gray-500 text-center mb-2">請點擊下方按鈕兌換商品</p>
-                            <div class="flex justify-center">
-                                <button onclick="openShop()" class="shop-btn">🎁 商品專區</button>
-                            </div>
+                            <div class="flex justify-center"><button onclick="openShop()" class="shop-btn">🎁 商品專區</button></div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
         <div class="lg:col-span-3 order-2 lg:order-1 mobile-side-panels" id="prizeListPanel">
             <div class="dashboard-panel" id="statusBoard">
                 <span class="board-title-text prize-title-text">📋 禮物列表</span>
                 <div class="scroller-content text-gray-400 text-sm italic p-2 text-center">連線中，正在加載禮品庫存...</div>
             </div>
         </div>
-
         <div class="lg:col-span-3 order-3 mobile-side-panels" id="honorBoardPanel">
             <div class="dashboard-panel" id="honorBoard">
                 <span class="board-title-text honor-title-text">👑 幸運中獎者</span>
@@ -818,7 +325,6 @@
             </div>
         </div>
     </div>
-
     <div id="choiceModal" class="modal-overlay" style="display: none;">
         <div class="modal-card p-6 text-center">
             <h2 class="text-xl font-black text-slate-800 mb-1">👋 你好，<span id="choicePlayerName" class="text-rose-500"></span>！</h2>
@@ -831,7 +337,6 @@
             </div>
         </div>
     </div>
-
     <div id="confirmModal" class="modal-overlay" style="display: none;">
         <div class="modal-card p-6 text-center border-4 border-rose-300">
             <h2 class="text-xl font-black text-slate-800 mb-2">🎯 確定要抽獎嗎？</h2>
@@ -842,7 +347,6 @@
             </div>
         </div>
     </div>
-
     <div id="winModal" class="modal-overlay" style="display: none;">
         <div class="modal-card p-6 text-center border-4 border-amber-400">
             <h2 id="modalTitle" class="text-2xl font-black text-rose-500 mb-2">🎉 恭喜中獎！</h2>
@@ -856,7 +360,6 @@
             <button onclick="closeModal()" class="w-full bg-gray-800 hover:bg-gray-700 text-white font-bold py-3 rounded-xl text-base transition-all mt-4">收下好禮</button>
         </div>
     </div>
-
     <div id="walletPassModal" class="modal-overlay" style="display: none;">
         <div class="modal-card p-6 text-center border-4 border-yellow-400">
             <h2 class="text-xl font-black text-slate-800 mb-2">🔐 解鎖點數錢包</h2>
@@ -869,7 +372,6 @@
             <p id="walletPassError" class="text-xs text-rose-500 mt-3"></p>
         </div>
     </div>
-
     <div id="shopModal" class="modal-overlay" style="display: none;">
         <div class="modal-card p-6 max-w-lg flex flex-col max-h-[85vh]">
             <div class="flex items-center justify-between mb-4">
@@ -890,7 +392,6 @@
             <div id="redeemHistoryList" class="hidden overflow-y-auto flex-grow space-y-2 pr-1"><p class="text-gray-400 text-sm text-center">尚無兌換記錄</p></div>
         </div>
     </div>
-
     <button id="soundToggleBtn" onclick="toggleSound()" class="music-control-btn fixed bottom-5 right-5 bg-slate-900 text-cyan-400 text-sm font-bold px-4 py-2 rounded-full shadow-lg border border-cyan-500/30 z-40 transition-all active:scale-95">🔊 音效</button>
 
     <script type="module">
@@ -903,31 +404,19 @@
             authDomain: "daidaikunbao.firebaseapp.com",
             databaseURL: "https://daidaikunbao-default-rtdb.firebaseio.com/"
         };
-
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const auth = getAuth(app);
 
-        window.startDraw = startDraw;
-        window.closeModal = closeModal;
-        window.clickTicket = clickTicket;
-        window.verifyGroupPass = verifyGroupPass;
-        window.handleNameChange = handleNameChange;
-        window.openConfirmModal = openConfirmModal;
-        window.closeConfirmModal = closeConfirmModal;
-        window.confirmAndDraw = confirmAndDraw;
-        window.toggleSound = toggleSound;
-        window.openShop = openShop;
-        window.closeShop = closeShop;
-        window.verifyPersonalPass = verifyPersonalPass;
-        window.closeWalletPassModal = closeWalletPassModal;
-        window.goBack = goBack;
-        window.promptAdminMode = promptAdminMode;
-        window.chooseDraw = chooseDraw;
-        window.choosePoints = choosePoints;
-        window.chooseSlot = chooseSlot;
-        window.startSlot = startSlot;
-        window.choosePachinko = choosePachinko;
+        window.startDraw = startDraw; window.closeModal = closeModal; window.clickTicket = clickTicket;
+        window.verifyGroupPass = verifyGroupPass; window.handleNameChange = handleNameChange;
+        window.openConfirmModal = openConfirmModal; window.closeConfirmModal = closeConfirmModal;
+        window.confirmAndDraw = confirmAndDraw; window.toggleSound = toggleSound;
+        window.openShop = openShop; window.closeShop = closeShop;
+        window.verifyPersonalPass = verifyPersonalPass; window.closeWalletPassModal = closeWalletPassModal;
+        window.goBack = goBack; window.promptAdminMode = promptAdminMode;
+        window.chooseDraw = chooseDraw; window.choosePoints = choosePoints;
+        window.chooseSlot = chooseSlot; window.startSlot = startSlot; window.choosePachinko = choosePachinko;
 
         let isDrawing = false;
         let currentPrizeUrl = "";
@@ -936,7 +425,6 @@
         let lastPlayedList = [];
         let lastPrizes = null;
         let deviceId = null;
-
         let currentPlayerName = null;
         let currentWalletData = null;
         let walletUnlocked = false;
@@ -946,19 +434,14 @@
         let drawLimits = {};
         let isAdminMode = false;
         const ADMIN_TEST_PASSWORD = "test123";
-
         let defaultMaxDraws = 1;
-
         let slotSymbols = {};
         let isSlotSpinning = false;
         let gameMode = "both";
-
         let soundUrls = {};
         let drawRecordsData = {};
 
-        // 彈珠台狀態
         let pachinkoEngine = null;
-        let pachinkoRunner = null;
         let pachinkoRender = null;
         let pachinkoBall = null;
         let pachinkoBallDropped = false;
@@ -977,66 +460,30 @@
         let audioCtx = null;
         let soundEnabled = true;
 
-        function getAudioCtx() {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            if (audioCtx.state === "suspended") audioCtx.resume();
-            return audioCtx;
-        }
+        function getAudioCtx() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); if (audioCtx.state === "suspended") audioCtx.resume(); return audioCtx; }
         function playTone(freq, duration, type, startDelay, gainValue) {
             try {
                 const ctx = getAudioCtx();
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                osc.type = type;
-                osc.frequency.value = freq;
-                osc.connect(gain);
-                gain.connect(ctx.destination);
+                const osc = ctx.createOscillator(); const gain = ctx.createGain();
+                osc.type = type; osc.frequency.value = freq; osc.connect(gain); gain.connect(ctx.destination);
                 const t = ctx.currentTime + startDelay;
-                gain.gain.setValueAtTime(gainValue, t);
-                gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
-                osc.start(t);
-                osc.stop(t + duration + 0.02);
+                gain.gain.setValueAtTime(gainValue, t); gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
+                osc.start(t); osc.stop(t + duration + 0.02);
             } catch (e) {}
         }
-        function playCrankSound() {
-            if (!soundEnabled) return;
-            if (soundUrls.crank) { new Audio(soundUrls.crank).play().catch(() => {}); }
-            else { for (let i = 0; i < 6; i++) playTone(300 + Math.random() * 150, 0.08, "square", i * 0.15, 0.06); }
-        }
-        function playWinSound() {
-            if (!soundEnabled) return;
-            if (soundUrls.win) { new Audio(soundUrls.win).play().catch(() => {}); }
-            else { playTone(523.25, 0.15, "triangle", 0, 0.18); playTone(659.25, 0.15, "triangle", 0.15, 0.18); playTone(783.99, 0.28, "triangle", 0.3, 0.2); }
-        }
-        function playSlotSound() {
-            if (!soundEnabled) return;
-            if (soundUrls.slot) { new Audio(soundUrls.slot).play().catch(() => {}); }
-            else { for (let i = 0; i < 10; i++) playTone(500 + Math.random() * 200, 0.06, "square", i * 0.1, 0.05); }
-        }
-        function playPachinkoSound() {
-            if (!soundEnabled) return;
-            if (soundUrls.pachinko) { new Audio(soundUrls.pachinko).play().catch(() => {}); }
-            else { for (let i = 0; i < 12; i++) playTone(600 + Math.random() * 300, 0.05, "square", i * 0.08, 0.04); }
-        }
+        function playCrankSound() { if (!soundEnabled) return; if (soundUrls.crank) { new Audio(soundUrls.crank).play().catch(() => {}); } else { for (let i = 0; i < 6; i++) playTone(300 + Math.random() * 150, 0.08, "square", i * 0.15, 0.06); } }
+        function playWinSound() { if (!soundEnabled) return; if (soundUrls.win) { new Audio(soundUrls.win).play().catch(() => {}); } else { playTone(523.25, 0.15, "triangle", 0, 0.18); playTone(659.25, 0.15, "triangle", 0.15, 0.18); playTone(783.99, 0.28, "triangle", 0.3, 0.2); } }
+        function playSlotSound() { if (!soundEnabled) return; if (soundUrls.slot) { new Audio(soundUrls.slot).play().catch(() => {}); } else { for (let i = 0; i < 10; i++) playTone(500 + Math.random() * 200, 0.06, "square", i * 0.1, 0.05); } }
+        function playPachinkoSound() { if (!soundEnabled) return; if (soundUrls.pachinko) { new Audio(soundUrls.pachinko).play().catch(() => {}); } else { for (let i = 0; i < 12; i++) playTone(600 + Math.random() * 300, 0.05, "square", i * 0.08, 0.04); } }
         function playPegDing(speed) {
             if (!soundEnabled) return;
-            if (soundUrls.peg) {
-                try {
-                    const audio = new Audio(soundUrls.peg);
-                    audio.volume = Math.min(0.6, 0.15 + speed * 0.02);
-                    audio.play().catch(() => {});
-                } catch (e) {}
-                return;
-            }
+            if (soundUrls.peg) { try { const audio = new Audio(soundUrls.peg); audio.volume = Math.min(0.6, 0.15 + speed * 0.02); audio.play().catch(() => {}); } catch (e) {} return; }
             const baseFreq = 1800 + Math.random() * 600;
             const vol = Math.min(0.22, 0.06 + speed * 0.012);
             playTone(baseFreq, 0.06, "sine", 0, vol);
             playTone(baseFreq * 1.5, 0.04, "sine", 0, vol * 0.5);
         }
-        function toggleSound() {
-            soundEnabled = !soundEnabled;
-            document.getElementById("soundToggleBtn").textContent = soundEnabled ? "🔊 音效" : "🔇 靜音";
-        }
+        function toggleSound() { soundEnabled = !soundEnabled; document.getElementById("soundToggleBtn").textContent = soundEnabled ? "🔊 音效" : "🔇 靜音"; }
 
         const groupLists = {
             "皮皮": { password: "67", label: "✨ 皮皮群", names: ["貝果", "怡蒨", "７７", "安鴻", "當家", "立涵", "皮夾", "睏寶"] },
@@ -1044,43 +491,19 @@
         };
         const eggColors = ["egg-pink", "egg-blue", "egg-yellow", "egg-green", "egg-purple", "egg-orange"];
 
-        function getGroupKeyForName(name) {
-            for (const k in groupLists) if (groupLists[k].names.includes(name)) return k;
-            return null;
-        }
-        async function sha256(message) {
-            const buf = new TextEncoder().encode(message);
-            const hash = await crypto.subtle.digest("SHA-256", buf);
-            return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, "0")).join("");
-        }
-        function getMaxDrawsForPlayer(name) {
-            if (drawLimits[name] !== undefined && Number.isInteger(drawLimits[name]) && drawLimits[name] >= 0) return drawLimits[name];
-            return defaultMaxDraws;
-        }
+        function getGroupKeyForName(name) { for (const k in groupLists) if (groupLists[k].names.includes(name)) return k; return null; }
+        async function sha256(message) { const buf = new TextEncoder().encode(message); const hash = await crypto.subtle.digest("SHA-256", buf); return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, "0")).join(""); }
+        function getMaxDrawsForPlayer(name) { if (drawLimits[name] !== undefined && Number.isInteger(drawLimits[name]) && drawLimits[name] >= 0) return drawLimits[name]; return defaultMaxDraws; }
 
         function loadDrawSettings() {
             onValue(ref(db, "settings/global/maxDrawsPerPlayer"), (snap) => {
-                const val = snap.val();
-                defaultMaxDraws = (val && Number.isInteger(val) && val > 0) ? val : 1;
-                if (honorUnlockedGroup) verifyGroupPass();
-                if (currentPlayerName) updateDrawCountDisplay();
+                const val = snap.val(); defaultMaxDraws = (val && Number.isInteger(val) && val > 0) ? val : 1;
+                if (honorUnlockedGroup) verifyGroupPass(); if (currentPlayerName) updateDrawCountDisplay();
             });
-            onValue(ref(db, "drawLimits"), (snap) => {
-                drawLimits = snap.val() || {};
-                if (honorUnlockedGroup) verifyGroupPass();
-                if (currentPlayerName) updateDrawCountDisplay();
-            });
-            onValue(ref(db, "settings/global/gameMode"), (snap) => {
-                gameMode = snap.val() || "both";
-                updateGameModeUI();
-            });
-            onValue(ref(db, "slotSymbols"), (snap) => {
-                slotSymbols = snap.val() || {};
-                buildSlotReels();
-            });
-            onValue(ref(db, "settings/sounds"), (snap) => {
-                soundUrls = snap.val() || {};
-            });
+            onValue(ref(db, "drawLimits"), (snap) => { drawLimits = snap.val() || {}; if (honorUnlockedGroup) verifyGroupPass(); if (currentPlayerName) updateDrawCountDisplay(); });
+            onValue(ref(db, "settings/global/gameMode"), (snap) => { gameMode = snap.val() || "both"; updateGameModeUI(); });
+            onValue(ref(db, "slotSymbols"), (snap) => { slotSymbols = snap.val() || {}; buildSlotReels(); });
+            onValue(ref(db, "settings/sounds"), (snap) => { soundUrls = snap.val() || {}; });
             onValue(ref(db, "settings/pachinko"), (snap) => {
                 const data = snap.val() || {};
                 pachinkoBinCount = data.bins || 7;
@@ -1108,12 +531,9 @@
             const drawCount = globalPlayedUsers[currentPlayerName]?.drawCount || 0;
             const limit = getMaxDrawsForPlayer(currentPlayerName);
             const remaining = limit - drawCount;
-            if (remaining > 0) display.innerText = `剩餘抽獎次數：${remaining} 次（上限 ${limit} 次）`;
-            else display.innerText = "抽獎次數已用完";
-            const slotDisplay = document.getElementById("slotCountDisplay");
-            if (slotDisplay) slotDisplay.innerText = remaining > 0 ? `${remaining}` : "0";
-            const pachinkoDisplay = document.getElementById("pachinkoCountDisplay");
-            if (pachinkoDisplay) pachinkoDisplay.innerText = remaining > 0 ? `${remaining}` : "0";
+            if (remaining > 0) display.innerText = `剩餘抽獎次數：${remaining} 次（上限 ${limit} 次）`; else display.innerText = "抽獎次數已用完";
+            const slotDisplay = document.getElementById("slotCountDisplay"); if (slotDisplay) slotDisplay.innerText = remaining > 0 ? `${remaining}` : "0";
+            const pachinkoDisplay = document.getElementById("pachinkoCountDisplay"); if (pachinkoDisplay) pachinkoDisplay.innerText = remaining > 0 ? `${remaining}` : "0";
         }
 
         function buildMarqueeText(list) {
@@ -1124,33 +544,22 @@
             return "🔥 中獎快報 🔥 " + f.map(i => `【${i.user}】喜獲大獎：${i.won}！`).join(" 🌟 ") + " 歡慶連連，好運不斷！";
         }
         function renderHonorBoard(list) {
-            const b = document.getElementById("honorBoard");
-            if (!b) return;
+            const b = document.getElementById("honorBoard"); if (!b) return;
             let h = '<span class="board-title-text honor-title-text">👑 幸運中獎者</span>';
             if (!honorUnlockedGroup) { b.innerHTML = h + '<div class="flex-grow flex flex-col items-center justify-center text-center gap-2 px-4"><span class="text-2xl">🔒</span><p class="text-xs text-gray-400">請先解鎖群組</p></div>'; return; }
             const f = list.filter(i => i.group === honorUnlockedGroup);
             h += '<div class="scroller-content">';
             if (f.length) { f.forEach(i => { h += `<div class="honor-item-row"><span class="honor-badge">已得獎</span><div class="honor-info"><span>恭喜 <b style="color:#ec4899;">${i.user}</b> 抽中 🎁 <b style="color:#7c3aed;">${i.won}</b></span></div></div>`; }); }
             else { h += '<div style="color:#9ca3af;font-size:13px;text-align:center;padding:20px;">目前還沒有人中獎哦！</div>'; }
-            h += '</div>';
-            b.innerHTML = h;
+            h += '</div>'; b.innerHTML = h;
         }
         function updateMarquee(t) {
-            const i1 = document.getElementById("marqueeItem1");
-            const i2 = document.getElementById("marqueeItem2");
-            const tr = document.getElementById("marqueeTrack");
+            const i1 = document.getElementById("marqueeItem1"); const i2 = document.getElementById("marqueeItem2"); const tr = document.getElementById("marqueeTrack");
             i1.textContent = t; i2.textContent = t;
-            requestAnimationFrame(() => {
-                const w = i1.offsetWidth;
-                const d = Math.max(w / 70, 8);
-                tr.style.animation = "none";
-                void tr.offsetWidth;
-                tr.style.animation = `marqueeScroll ${d}s linear infinite`;
-            });
+            requestAnimationFrame(() => { const w = i1.offsetWidth; const d = Math.max(w / 70, 8); tr.style.animation = "none"; void tr.offsetWidth; tr.style.animation = `marqueeScroll ${d}s linear infinite`; });
         }
         function renderStatusBoard(pz) {
-            const b = document.getElementById("statusBoard");
-            if (!b || !pz) return;
+            const b = document.getElementById("statusBoard"); if (!b || !pz) return;
             let h = '<span class="board-title-text prize-title-text">📋 禮物列表</span>';
             if (!honorUnlockedGroup) { b.innerHTML = h + '<div class="flex-grow flex flex-col items-center justify-center text-center gap-2 px-4"><span class="text-2xl">🔒</span><p class="text-xs text-gray-400">請先解鎖群組</p></div>'; return; }
             let has = false;
@@ -1161,9 +570,7 @@
                 if (!g.includes(honorUnlockedGroup)) continue;
                 has = true;
                 const img = p.image ? `<img class="prize-thumb" src="${p.image}" alt="${p.name}">` : '<div class="prize-thumb" style="background:#f3f4f6;"></div>';
-                const rem = Number(p.quantity || 0);
-                const total = Number(p.totalQuantity || 0);
-                const st = total > 1;
+                const rem = Number(p.quantity || 0); const total = Number(p.totalQuantity || 0); const st = total > 1;
                 if (rem > 0) {
                     const ql = st ? `🟢 剩餘 <b>${rem}</b> 份 / 共 <b>${total}</b> 份` : `🟢 剩餘 <b>${rem}</b> 份`;
                     const pb = st ? `<div class="prize-progress-track"><div class="prize-progress-fill is-available" style="width:${Math.round(rem / total * 100)}%;"></div></div>` : '';
@@ -1195,9 +602,7 @@
         }
         function updateWalletDisplay() {
             if (!currentWalletData || !walletUnlocked) return;
-            const pts = currentWalletData.points || 0;
-            const exp = currentWalletData.expiry || 0;
-            const now = Date.now();
+            const pts = currentWalletData.points || 0; const exp = currentWalletData.expiry || 0; const now = Date.now();
             let txt = "";
             if (exp && exp !== 0 && exp < now) { txt = "（已過期）"; document.getElementById("walletDisplay").innerText = `🪙 ${pts} 點 (已過期)`; }
             else if (exp && exp !== 0) { const d = new Date(exp); txt = `有效至 ${d.toLocaleDateString("zh-TW")}`; document.getElementById("walletDisplay").innerText = `🪙 ${pts} 點`; }
@@ -1219,24 +624,18 @@
             if (await sha256(inp) === personalPassHash) {
                 walletUnlocked = true;
                 if (!currentWalletData || currentWalletData.boundUid !== deviceId) { try { await update(ref(db, `pointUsers/${currentPlayerName}`), { boundUid: deviceId }); } catch (e) {} }
-                closeWalletPassModal();
-                updateWalletDisplay();
+                closeWalletPassModal(); updateWalletDisplay();
                 if (document.getElementById("shopModal").style.display === "flex") renderShopItems();
             } else { document.getElementById("walletPassError").innerText = "密語錯誤"; }
         }
-
         function openShop() {
             if (!currentPlayerName) return;
             if (!walletUnlocked) { promptWalletPass(); return; }
             document.getElementById("shopModal").style.display = "flex";
             document.getElementById("shopWalletDisplay").innerText = `🪙 ${currentWalletData ? currentWalletData.points || 0 : 0} 點`;
-            switchShopTab('shop');
-            renderShopItems();
-            loadPlayerPointsHistory();
-            loadPlayerRedeemHistory();
+            switchShopTab('shop'); renderShopItems(); loadPlayerPointsHistory(); loadPlayerRedeemHistory();
         }
         function closeShop() { document.getElementById("shopModal").style.display = "none"; }
-
         function switchShopTab(tab) {
             const tabs = { shop: document.getElementById('tabShopItems'), points: document.getElementById('tabPointsHistory'), redeem: document.getElementById('tabRedeemHistory') };
             Object.values(tabs).forEach(b => { b.classList.remove('bg-emerald-100', 'text-emerald-700'); b.classList.add('bg-gray-100', 'text-gray-500'); });
@@ -1301,12 +700,10 @@
         }
         window.redeemItem = async function(itemId) {
             if (!currentPlayerName || !walletUnlocked) return;
-            const it = shopItems[itemId];
-            if (!it) return;
+            const it = shopItems[itemId]; if (!it) return;
             if (!confirm(`確定要用 ${it.cost} 點兌換「${it.name}」嗎？`)) return;
             try {
-                const sr = ref(db, `shopItems/${itemId}/stock`);
-                const pr = ref(db, `pointUsers/${currentPlayerName}/points`);
+                const sr = ref(db, `shopItems/${itemId}/stock`); const pr = ref(db, `pointUsers/${currentPlayerName}/points`);
                 const srRes = await runTransaction(sr, cur => (cur === null || cur <= 0) ? undefined : cur - 1);
                 if (!srRes.committed) { alert("❌ 庫存不足"); return; }
                 const prRes = await runTransaction(pr, cur => (cur === null || cur < it.cost) ? undefined : cur - it.cost);
@@ -1314,68 +711,25 @@
                 alert(`✅ 兌換成功！獲得「${it.name}」`);
                 await push(ref(db, "redeemRequests"), { playerName: currentPlayerName, itemId: itemId, itemName: it.name, cost: it.cost, timestamp: Date.now(), status: "approved", processedAt: Date.now(), prizeDelivered: false });
                 await push(ref(db, "pendingPoints"), { playerName: currentPlayerName, points: -it.cost, prizeName: `🛍️ 兌換：${it.name}`, timestamp: Date.now(), status: "approved", processedAt: Date.now() });
-                loadPlayerPointsHistory();
-                loadPlayerRedeemHistory();
+                loadPlayerPointsHistory(); loadPlayerRedeemHistory();
             } catch (e) { console.error(e); alert("兌換失敗"); }
         };
-
-        function promptAdminMode() {
-            const pwd = prompt("請輸入管理員測試密碼：");
-            if (pwd === ADMIN_TEST_PASSWORD) { isAdminMode = true; alert("✅ 管理員模式已開啟，抽獎無限制。"); }
-            else if (pwd !== null) { alert("❌ 密碼錯誤"); }
-        }
-        function goBack() {
-            document.getElementById("contentArea").classList.add("hidden");
-            document.getElementById("controlPanel").classList.remove("hidden");
-            document.getElementById("prizeListPanel").style.display = "";
-            document.getElementById("honorBoardPanel").style.display = "";
-        }
-        function showDrawSystem() {
-            document.getElementById("drawSystemArea").style.display = "block";
-            document.getElementById("slotSystemArea").style.display = "none";
-            document.getElementById("pointsSystemArea").style.display = "none";
-            document.getElementById("pachinkoSystemArea").style.display = "none";
-            document.getElementById("prizeListPanel").style.display = "";
-            document.getElementById("honorBoardPanel").style.display = "";
-            updateDrawCountDisplay();
-        }
-        function showSlotSystem() {
-            document.getElementById("drawSystemArea").style.display = "none";
-            document.getElementById("slotSystemArea").style.display = "block";
-            document.getElementById("pointsSystemArea").style.display = "none";
-            document.getElementById("pachinkoSystemArea").style.display = "none";
-            document.getElementById("prizeListPanel").style.display = "";
-            document.getElementById("honorBoardPanel").style.display = "";
-            updateDrawCountDisplay();
-        }
-        function showPointsSystem() {
-            document.getElementById("drawSystemArea").style.display = "none";
-            document.getElementById("slotSystemArea").style.display = "none";
-            document.getElementById("pachinkoSystemArea").style.display = "none";
-            document.getElementById("pointsSystemArea").style.display = "block";
-            document.getElementById("prizeListPanel").style.display = "none";
-            document.getElementById("honorBoardPanel").style.display = "none";
-        }
+        function promptAdminMode() { const pwd = prompt("請輸入管理員測試密碼："); if (pwd === ADMIN_TEST_PASSWORD) { isAdminMode = true; alert("✅ 管理員模式已開啟，抽獎無限制。"); } else if (pwd !== null) { alert("❌ 密碼錯誤"); } }
+        function goBack() { document.getElementById("contentArea").classList.add("hidden"); document.getElementById("controlPanel").classList.remove("hidden"); document.getElementById("prizeListPanel").style.display = ""; document.getElementById("honorBoardPanel").style.display = ""; }
+        function showDrawSystem() { document.getElementById("drawSystemArea").style.display = "block"; document.getElementById("slotSystemArea").style.display = "none"; document.getElementById("pointsSystemArea").style.display = "none"; document.getElementById("pachinkoSystemArea").style.display = "none"; document.getElementById("prizeListPanel").style.display = ""; document.getElementById("honorBoardPanel").style.display = ""; updateDrawCountDisplay(); }
+        function showSlotSystem() { document.getElementById("drawSystemArea").style.display = "none"; document.getElementById("slotSystemArea").style.display = "block"; document.getElementById("pointsSystemArea").style.display = "none"; document.getElementById("pachinkoSystemArea").style.display = "none"; document.getElementById("prizeListPanel").style.display = ""; document.getElementById("honorBoardPanel").style.display = ""; updateDrawCountDisplay(); }
+        function showPointsSystem() { document.getElementById("drawSystemArea").style.display = "none"; document.getElementById("slotSystemArea").style.display = "none"; document.getElementById("pachinkoSystemArea").style.display = "none"; document.getElementById("pointsSystemArea").style.display = "block"; document.getElementById("prizeListPanel").style.display = "none"; document.getElementById("honorBoardPanel").style.display = "none"; }
         function showPachinkoSystem() {
-            document.getElementById("drawSystemArea").style.display = "none";
-            document.getElementById("slotSystemArea").style.display = "none";
-            document.getElementById("pointsSystemArea").style.display = "none";
-            document.getElementById("pachinkoSystemArea").style.display = "block";
-            document.getElementById("prizeListPanel").style.display = "";
-            document.getElementById("honorBoardPanel").style.display = "";
+            document.getElementById("drawSystemArea").style.display = "none"; document.getElementById("slotSystemArea").style.display = "none";
+            document.getElementById("pointsSystemArea").style.display = "none"; document.getElementById("pachinkoSystemArea").style.display = "block";
+            document.getElementById("prizeListPanel").style.display = ""; document.getElementById("honorBoardPanel").style.display = "";
             updateDrawCountDisplay();
             setTimeout(() => { buildPachinkoBoard(); }, 100);
         }
-
-        function showChoiceModal(playerName) {
-            document.getElementById("choicePlayerName").innerText = playerName;
-            document.getElementById("choiceModal").style.display = "flex";
-            updateGameModeUI();
-        }
+        function showChoiceModal(playerName) { document.getElementById("choicePlayerName").innerText = playerName; document.getElementById("choiceModal").style.display = "flex"; updateGameModeUI(); }
         function closeChoiceModal() { document.getElementById("choiceModal").style.display = "none"; }
         function chooseDraw() {
-            closeChoiceModal();
-            showDrawSystem();
+            closeChoiceModal(); showDrawSystem();
             if (!currentPlayerName) return;
             const drawCount = globalPlayedUsers[currentPlayerName]?.drawCount || 0;
             const limit = getMaxDrawsForPlayer(currentPlayerName);
@@ -1387,7 +741,6 @@
         function chooseSlot() { closeChoiceModal(); showSlotSystem(); }
         function choosePachinko() { closeChoiceModal(); showPachinkoSystem(); }
         function choosePoints() { closeChoiceModal(); showPointsSystem(); }
-
         function handleNameChange() {
             const val = document.getElementById("playerName").value;
             if (!val) return;
@@ -1396,10 +749,8 @@
             document.getElementById("currentPlayerNameLabel").innerText = val;
             document.getElementById("playerNameDisplay").classList.remove("hidden");
             document.getElementById("controlPanel").classList.add("hidden");
-            const content = document.getElementById("contentArea");
-            content.classList.remove("hidden");
-            listenToWallet(val);
-            showChoiceModal(val);
+            document.getElementById("contentArea").classList.remove("hidden");
+            listenToWallet(val); showChoiceModal(val);
             if (gameMode === "slot") { showSlotSystem(); }
             else if (gameMode === "pachinko") { showPachinkoSystem(); }
             else {
@@ -1412,76 +763,45 @@
                 updateDrawCountDisplay();
             }
         }
-        function showControlPanel() {
-            document.getElementById("contentArea").classList.add("hidden");
-            document.getElementById("controlPanel").classList.remove("hidden");
-            document.getElementById("prizeListPanel").style.display = "";
-            document.getElementById("honorBoardPanel").style.display = "";
-        }
-
+        function showControlPanel() { document.getElementById("contentArea").classList.add("hidden"); document.getElementById("controlPanel").classList.remove("hidden"); document.getElementById("prizeListPanel").style.display = ""; document.getElementById("honorBoardPanel").style.display = ""; }
         function verifyGroupPass() {
             const inputPass = document.getElementById("secretPass").value.trim();
-            const selectEl = document.getElementById("playerName");
-            selectEl.innerHTML = "";
+            const selectEl = document.getElementById("playerName"); selectEl.innerHTML = "";
             let matchedKey = null;
-            for (const k in groupLists) {
-                if (groupLists[k].password === inputPass) { matchedKey = k; break; }
-            }
+            for (const k in groupLists) { if (groupLists[k].password === inputPass) { matchedKey = k; break; } }
             if (matchedKey) {
                 const group = groupLists[matchedKey];
-                const defOpt = document.createElement("option");
-                defOpt.value = ""; defOpt.disabled = true; defOpt.selected = true;
-                defOpt.innerText = "▼ 請選擇你的名字 ▼";
-                selectEl.appendChild(defOpt);
-                const optGroup = document.createElement("optgroup");
-                optGroup.label = group.label;
+                const defOpt = document.createElement("option"); defOpt.value = ""; defOpt.disabled = true; defOpt.selected = true; defOpt.innerText = "▼ 請選擇你的名字 ▼"; selectEl.appendChild(defOpt);
+                const optGroup = document.createElement("optgroup"); optGroup.label = group.label;
                 group.names.forEach(name => {
-                    const opt = document.createElement("option");
-                    opt.value = name;
-                    if (disabledPlayers[name]) { opt.disabled = true; opt.innerText = `${name} (已禁用)`; }
-                    else { opt.disabled = false; opt.innerText = name; }
+                    const opt = document.createElement("option"); opt.value = name;
+                    if (disabledPlayers[name]) { opt.disabled = true; opt.innerText = `${name} (已禁用)`; } else { opt.disabled = false; opt.innerText = name; }
                     optGroup.appendChild(opt);
                 });
                 selectEl.appendChild(optGroup);
                 honorUnlockedGroup = matchedKey;
-                renderHonorBoard(lastPlayedList);
-                updateMarquee(buildMarqueeText(lastPlayedList));
+                renderHonorBoard(lastPlayedList); updateMarquee(buildMarqueeText(lastPlayedList));
                 if (lastPrizes) renderStatusBoard(lastPrizes);
                 alert(`🔓 【${inputPass}】名單已成功解鎖！`);
             } else {
-                const lockOpt = document.createElement("option");
-                lockOpt.value = ""; lockOpt.disabled = true; lockOpt.selected = true;
-                lockOpt.innerText = "🔒 請先解鎖群組名單 🔒";
-                selectEl.appendChild(lockOpt);
+                const lockOpt = document.createElement("option"); lockOpt.value = ""; lockOpt.disabled = true; lockOpt.selected = true; lockOpt.innerText = "🔒 請先解鎖群組名單 🔒"; selectEl.appendChild(lockOpt);
                 alert("❌ 密碼錯誤");
             }
         }
-
         function refreshPlayedUsersUI() {
             const sel = document.getElementById("playerName");
-            for (let opt of sel.options) {
-                if (!opt.value) continue;
-                const name = opt.value;
-                if (disabledPlayers[name]) { opt.disabled = true; opt.innerText = name + " (已禁用)"; }
-                else { opt.disabled = false; opt.innerText = name; }
-            }
-            let list = [];
-            const seenKeys = new Set();
+            for (let opt of sel.options) { if (!opt.value) continue; const name = opt.value; if (disabledPlayers[name]) { opt.disabled = true; opt.innerText = name + " (已禁用)"; } else { opt.disabled = false; opt.innerText = name; } }
+            let list = []; const seenKeys = new Set();
             let hasAnyMarked = false;
             for (const name in drawRecordsData) {
-                const records = drawRecordsData[name];
-                if (!records || typeof records !== 'object') continue;
-                for (const key in records) {
-                    if (records[key] && records[key].showOnBoard === true) { hasAnyMarked = true; break; }
-                }
+                const records = drawRecordsData[name]; if (!records || typeof records !== 'object') continue;
+                for (const key in records) { if (records[key] && records[key].showOnBoard === true) { hasAnyMarked = true; break; } }
                 if (hasAnyMarked) break;
             }
             for (const name in drawRecordsData) {
-                const records = drawRecordsData[name];
-                if (!records || typeof records !== 'object') continue;
+                const records = drawRecordsData[name]; if (!records || typeof records !== 'object') continue;
                 for (const key in records) {
-                    const rec = records[key];
-                    if (!rec || !rec.won) continue;
+                    const rec = records[key]; if (!rec || !rec.won) continue;
                     if (rec.won.includes("銘謝惠顧") || rec.won === "未中獎" || rec.won.includes("未設定獎品")) continue;
                     if (hasAnyMarked && rec.showOnBoard !== true) continue;
                     const uniqueKey = `${name}_${rec.time}_${rec.won}`;
@@ -1492,45 +812,28 @@
             }
             if (!hasAnyMarked) {
                 for (const name in globalPlayedUsers) {
-                    const u = globalPlayedUsers[name];
-                    if (!u || !u.won || u.won.includes("銘謝惠顧")) continue;
+                    const u = globalPlayedUsers[name]; if (!u || !u.won || u.won.includes("銘謝惠顧")) continue;
                     let isDuplicate = false;
-                    for (const item of list) {
-                        if (item.user === name && item.won === u.won && Math.abs(item.time - (u.time || 0)) <= 5000) { isDuplicate = true; break; }
-                    }
+                    for (const item of list) { if (item.user === name && item.won === u.won && Math.abs(item.time - (u.time || 0)) <= 5000) { isDuplicate = true; break; } }
                     if (isDuplicate) continue;
-                    const uniqueKey = `${name}_${u.time}_${u.won}`;
-                    if (seenKeys.has(uniqueKey)) continue;
+                    const uniqueKey = `${name}_${u.time}_${u.won}`; if (seenKeys.has(uniqueKey)) continue;
                     seenKeys.add(uniqueKey);
                     list.push({ user: name, won: u.won, time: u.time || 0, group: u.group || getGroupKeyForName(name), drawCount: u.drawCount || 0 });
                 }
             }
             list.sort((a, b) => (b.time || 0) - (a.time || 0));
             lastPlayedList = list;
-            updateMarquee(buildMarqueeText(list));
-            renderHonorBoard(list);
-            updateDrawCountDisplay();
+            updateMarquee(buildMarqueeText(list)); renderHonorBoard(list); updateDrawCountDisplay();
         }
-
         function initApp() {
             onValue(ref(db, "prizes"), snap => { lastPrizes = snap.val() || {}; renderStatusBoard(lastPrizes); });
-            onValue(ref(db, "playedUsers"), snap => {
-                globalPlayedUsers = snap.val() || {};
-                refreshPlayedUsersUI();
-                if (currentPlayerName) updateDrawCountDisplay();
-            });
+            onValue(ref(db, "playedUsers"), snap => { globalPlayedUsers = snap.val() || {}; refreshPlayedUsersUI(); if (currentPlayerName) updateDrawCountDisplay(); });
             onValue(ref(db, "drawRecords"), snap => { drawRecordsData = snap.val() || {}; refreshPlayedUsersUI(); });
-            onValue(ref(db, "shopItems"), snap => {
-                shopItems = snap.val() || {};
-                if (document.getElementById("shopModal").style.display === "flex") renderShopItems();
-            });
+            onValue(ref(db, "shopItems"), snap => { shopItems = snap.val() || {}; if (document.getElementById("shopModal").style.display === "flex") renderShopItems(); });
             onValue(ref(db, "disabledPlayers"), snap => { disabledPlayers = snap.val() || {}; if (honorUnlockedGroup) refreshPlayedUsersUI(); });
             loadDrawSettings();
         }
-        function getYearEndTimestamp() {
-            const now = new Date();
-            return new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999).getTime();
-        }
+        function getYearEndTimestamp() { const now = new Date(); return new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999).getTime(); }
 
         async function startDraw() {
             const name = document.getElementById("playerName").value;
@@ -1538,34 +841,24 @@
             if (disabledPlayers[name]) { alert("此玩家已被禁止抽獎"); return; }
             if (isDrawing) return;
             isDrawing = true;
-            const spinBtn = document.getElementById("spinBtn");
-            if (spinBtn) spinBtn.disabled = true;
+            const spinBtn = document.getElementById("spinBtn"); if (spinBtn) spinBtn.disabled = true;
             try {
                 const playerData = globalPlayedUsers[name];
-                if (playerData && playerData.lastDrawTime && (Date.now() - playerData.lastDrawTime < 3000)) {
-                    alert("抽獎過於頻繁，請稍後再試。");
-                    isDrawing = false;
-                    if (spinBtn) spinBtn.disabled = false;
-                    return;
-                }
+                if (playerData && playerData.lastDrawTime && (Date.now() - playerData.lastDrawTime < 3000)) { alert("抽獎過於頻繁，請稍後再試。"); isDrawing = false; if (spinBtn) spinBtn.disabled = false; return; }
                 const drawCount = playerData?.drawCount || 0;
                 const limit = getMaxDrawsForPlayer(name);
                 if (!isAdminMode && drawCount >= limit) { alert("抽獎次數已用完"); isDrawing = false; if (spinBtn) spinBtn.disabled = false; return; }
                 let awardedPoints = 0;
                 const myGroup = getGroupKeyForName(name);
-                let pool = [];
-                let totalW = 0;
+                let pool = []; let totalW = 0;
                 for (let id in lastPrizes) {
                     const p = lastPrizes[id];
                     if (!Array.isArray(p.groups) || !p.groups.includes(myGroup)) continue;
-                    const q = Number(p.quantity || 0);
-                    const w = Number(p.weight || 0);
+                    const q = Number(p.quantity || 0); const w = Number(p.weight || 0);
                     if (q > 0 && w > 0) { pool.push({ id, prizeData: p, weight: w }); totalW += w; }
                 }
                 if (!pool.length) { alert("庫存已空"); isDrawing = false; if (spinBtn) spinBtn.disabled = false; return; }
-                let roll = Math.floor(Math.random() * totalW);
-                let sum = 0;
-                let chosenId = pool[0].id;
+                let roll = Math.floor(Math.random() * totalW); let sum = 0; let chosenId = pool[0].id;
                 for (let i = 0; i < pool.length; i++) { sum += pool[i].weight; if (roll < sum) { chosenId = pool[i].id; break; } }
                 const chosen = pool.find(p => p.id === chosenId).prizeData;
                 const qRef = ref(db, `prizes/${chosenId}/quantity`);
@@ -1574,12 +867,7 @@
                 let code = "";
                 try {
                     const cs = await get(ref(db, `prizeCodes/${chosenId}`));
-                    if (cs.exists()) {
-                        const cObj = cs.val();
-                        const used = new Set(Object.values(globalPlayedUsers).map(u => u && u.code).filter(c => c));
-                        const av = Object.values(cObj).filter(c => c && !used.has(c));
-                        if (av.length) code = av[0];
-                    }
+                    if (cs.exists()) { const cObj = cs.val(); const used = new Set(Object.values(globalPlayedUsers).map(u => u && u.code).filter(c => c)); const av = Object.values(cObj).filter(c => c && !used.has(c)); if (av.length) code = av[0]; }
                 } catch (e) {}
                 if (!code && !isNaN(Number(chosen.minPoints)) && !isNaN(Number(chosen.maxPoints)) && Number(chosen.maxPoints) > 0) { code = "點數已自動匯入你的錢包"; }
                 const playedRef = ref(db, `playedUsers/${name}`);
@@ -1591,19 +879,9 @@
                 });
                 if (!result.committed) { alert("抽獎過於頻繁，請稍後再試。"); isDrawing = false; if (spinBtn) spinBtn.disabled = false; return; }
                 globalPlayedUsers[name] = { ...(globalPlayedUsers[name] || {}), drawCount: (playerData?.drawCount || 0) + 1, lastDrawTime: Date.now() };
-
                 const isThanksGacha = chosen.name && chosen.name.includes("銘謝惠顧");
-                await push(ref(db, `drawRecords/${name}`), {
-                    type: "gacha",
-                    won: chosen.name,
-                    code: code,
-                    time: Date.now(),
-                    group: myGroup,
-                    showOnBoard: !isThanksGacha
-                });
-
-                const minP = Number(chosen.minPoints);
-                const maxP = Number(chosen.maxPoints);
+                await push(ref(db, `drawRecords/${name}`), { type: "gacha", won: chosen.name, code: code, time: Date.now(), group: myGroup, showOnBoard: !isThanksGacha });
+                const minP = Number(chosen.minPoints); const maxP = Number(chosen.maxPoints);
                 if (!isNaN(minP) && !isNaN(maxP) && maxP >= minP && maxP > 0) {
                     awardedPoints = Math.floor(Math.random() * (maxP - minP + 1)) + minP;
                     try {
@@ -1611,32 +889,23 @@
                         await push(ref(db, "pendingPoints"), { playerName: name, points: awardedPoints, prizeName: chosen.name, timestamp: Date.now(), status: "approved", processedAt: Date.now() });
                     } catch (e) { console.error("點數發放失敗（不影響抽獎）", e); }
                 }
-                const container = document.getElementById("gachaGlass");
-                const lucky = document.getElementById("luckyEgg");
-                const crank = document.getElementById("gachaCrank");
+                const container = document.getElementById("gachaGlass"); const lucky = document.getElementById("luckyEgg"); const crank = document.getElementById("gachaCrank");
                 if (container && lucky && crank) {
                     const color = eggColors[Math.floor(Math.random() * eggColors.length)];
                     const matches = container.querySelectorAll(`.gacha-egg.${color}:not(.egg-falling-out)`);
-                    crank.classList.add("rotating-crank");
-                    playCrankSound();
+                    crank.classList.add("rotating-crank"); playCrankSound();
                     if (matches.length) matches[Math.floor(Math.random() * matches.length)].classList.add("egg-falling-out");
                     container.classList.add("eggs-drop-down");
-                    lucky.className = "gacha-lucky-egg";
-                    lucky.style.opacity = "0";
-                    lucky.classList.add(color);
+                    lucky.className = "gacha-lucky-egg"; lucky.style.opacity = "0"; lucky.classList.add(color);
                     setTimeout(() => lucky.classList.add("dropped-egg"), 1000);
                     setTimeout(() => {
                         try {
                             document.getElementById("modalPrizeName").innerText = chosen.name;
                             currentPrizeUrl = code;
                             const ticketEl = document.getElementById("modalTicketCode");
-                            if (code && code.startsWith("http")) { ticketEl.innerText = "🎁 點我領取獎品"; }
-                            else { ticketEl.innerText = code || "點我打開獎品連結"; }
+                            if (code && code.startsWith("http")) { ticketEl.innerText = "🎁 點我領取獎品"; } else { ticketEl.innerText = code || "點我打開獎品連結"; }
                             const pointsInfo = document.getElementById("modalPointsInfo");
-                            if (pointsInfo) {
-                                if (awardedPoints > 0) { pointsInfo.innerText = `🪙 獲得 ${awardedPoints} 點`; pointsInfo.classList.remove("hidden"); }
-                                else pointsInfo.classList.add("hidden");
-                            }
+                            if (pointsInfo) { if (awardedPoints > 0) { pointsInfo.innerText = `🪙 獲得 ${awardedPoints} 點`; pointsInfo.classList.remove("hidden"); } else pointsInfo.classList.add("hidden"); }
                             const isThanks = chosen.name && chosen.name.includes("銘謝惠顧");
                             document.getElementById("modalTitle").innerText = isThanks ? "😢 差一點點！" : "🎉 恭喜中獎！";
                             document.getElementById("modalTitle").className = `text-2xl font-black mb-2 ${isThanks ? 'text-gray-500' : 'text-rose-500'}`;
@@ -1647,16 +916,13 @@
                             playWinSound();
                         } catch (err) { console.error(err); }
                         finally {
-                            crank.classList.remove("rotating-crank");
-                            container.classList.remove("eggs-drop-down");
-                            isDrawing = false;
-                            if (spinBtn) spinBtn.disabled = false;
+                            crank.classList.remove("rotating-crank"); container.classList.remove("eggs-drop-down");
+                            isDrawing = false; if (spinBtn) spinBtn.disabled = false;
                         }
                     }, 2500);
                 } else {
                     alert(`抽獎完成！獲得：${chosen.name}`);
-                    isDrawing = false;
-                    if (spinBtn) spinBtn.disabled = false;
+                    isDrawing = false; if (spinBtn) spinBtn.disabled = false;
                 }
             } catch (e) { console.error(e); alert("抽獎失敗，請稍後再試"); isDrawing = false; if (spinBtn) spinBtn.disabled = false; }
         }
@@ -1670,8 +936,7 @@
                 for (let i = 0; i < 20; i++) {
                     const key = symbolKeys[Math.floor(Math.random() * symbolKeys.length)];
                     const sym = slotSymbols[key] || {};
-                    const div = document.createElement('div');
-                    div.className = 'slot-reel-symbol';
+                    const div = document.createElement('div'); div.className = 'slot-reel-symbol';
                     if (sym.image) { div.innerHTML = `<img src="${sym.image}" alt="${sym.name || key}">`; }
                     else if (sym.emoji) { div.textContent = sym.emoji; }
                     else { div.textContent = key; }
@@ -1685,8 +950,7 @@
             strips.forEach(strip => { if (strip) { strip.style.transition = 'none'; strip.style.transform = 'translateY(0)'; } });
         }
         function pickWeightedSymbol() {
-            const keys = Object.keys(slotSymbols);
-            if (keys.length === 0) return null;
+            const keys = Object.keys(slotSymbols); if (keys.length === 0) return null;
             const totalWeight = keys.reduce((sum, key) => { const w = Number(slotSymbols[key].weight); return sum + (isNaN(w) ? 0 : w); }, 0);
             if (totalWeight <= 0) return null;
             let rand = Math.random() * totalWeight;
@@ -1699,22 +963,13 @@
             document.getElementById("modalTitle").className = `text-2xl font-black mb-2 ${isThanks ? 'text-gray-500' : 'text-rose-500'}`;
             document.getElementById("modalPrizeName").innerText = prizeName || "未知獎品";
             const pointsInfo = document.getElementById("modalPointsInfo");
-            if (pointsInfo) {
-                if (awardedPoints > 0) { pointsInfo.innerText = `🪙 獲得 ${awardedPoints} 點`; pointsInfo.classList.remove("hidden"); }
-                else pointsInfo.classList.add("hidden");
-            }
+            if (pointsInfo) { if (awardedPoints > 0) { pointsInfo.innerText = `🪙 獲得 ${awardedPoints} 點`; pointsInfo.classList.remove("hidden"); } else pointsInfo.classList.add("hidden"); }
             currentPrizeUrl = code;
-            const ticketEl = document.getElementById("modalTicketCode");
-            const copyHint = document.getElementById("copyHint");
+            const ticketEl = document.getElementById("modalTicketCode"); const copyHint = document.getElementById("copyHint");
             if (code && code !== "點數已自動匯入你的錢包") {
-                ticketEl.style.display = "block";
-                copyHint.style.display = "block";
-                if (code.startsWith("http")) { ticketEl.innerText = "🎁 點我領取獎品"; }
-                else { ticketEl.innerText = code; }
-            } else {
-                ticketEl.style.display = "none";
-                copyHint.style.display = "none";
-            }
+                ticketEl.style.display = "block"; copyHint.style.display = "block";
+                if (code.startsWith("http")) { ticketEl.innerText = "🎁 點我領取獎品"; } else { ticketEl.innerText = code; }
+            } else { ticketEl.style.display = "none"; copyHint.style.display = "none"; }
             document.querySelector("#winModal button:last-child").innerText = isThanks ? "再接再厲" : "收下好禮";
             document.getElementById("winModal").style.display = "flex";
             playWinSound();
@@ -1724,8 +979,7 @@
             if (!currentPlayerName) { alert("請先選擇名字"); return; }
             if (isSlotSpinning) return;
             isSlotSpinning = true;
-            const lever = document.getElementById("slotLever");
-            if (lever) lever.style.pointerEvents = 'none';
+            const lever = document.getElementById("slotLever"); if (lever) lever.style.pointerEvents = 'none';
             try {
                 if (!slotSymbols || Object.keys(slotSymbols).length < 2) { alert("拉霸機尚未設定足夠的符號，請聯繫管理員。"); isSlotSpinning = false; if (lever) lever.style.pointerEvents = 'auto'; return; }
                 const playerData = globalPlayedUsers[currentPlayerName];
@@ -1741,28 +995,23 @@
                 if (!result.committed) { alert("拉霸過於頻繁，請稍後再試。"); isSlotSpinning = false; if (lever) lever.style.pointerEvents = 'auto'; return; }
                 globalPlayedUsers[currentPlayerName] = { ...(globalPlayedUsers[currentPlayerName] || {}), drawCount: (drawCount + 1), lastDrawTime: Date.now() };
                 updateDrawCountDisplay();
-                const reel1 = pickWeightedSymbol();
-                const reel2 = pickWeightedSymbol();
-                const reel3 = pickWeightedSymbol();
+                const reel1 = pickWeightedSymbol(); const reel2 = pickWeightedSymbol(); const reel3 = pickWeightedSymbol();
                 if (!reel1 || !reel2 || !reel3) { alert("拉霸機符號權重設定錯誤，請聯繫管理員。"); isSlotSpinning = false; if (lever) lever.style.pointerEvents = 'auto'; return; }
                 playSlotSound();
                 function prepareReel(strip, targetKey) {
-                    const symbolKeys = Object.keys(slotSymbols);
-                    strip.innerHTML = '';
+                    const symbolKeys = Object.keys(slotSymbols); strip.innerHTML = '';
                     const totalSymbols = 20;
                     for (let i = 0; i < totalSymbols - 1; i++) {
                         const key = symbolKeys[Math.floor(Math.random() * symbolKeys.length)];
                         const sym = slotSymbols[key] || {};
-                        const div = document.createElement('div');
-                        div.className = 'slot-reel-symbol';
+                        const div = document.createElement('div'); div.className = 'slot-reel-symbol';
                         if (sym.image) { div.innerHTML = `<img src="${sym.image}" alt="${sym.name || key}">`; }
                         else if (sym.emoji) { div.textContent = sym.emoji; }
                         else { div.textContent = key; }
                         strip.appendChild(div);
                     }
                     const sym = slotSymbols[targetKey] || {};
-                    const div = document.createElement('div');
-                    div.className = 'slot-reel-symbol';
+                    const div = document.createElement('div'); div.className = 'slot-reel-symbol';
                     if (sym.image) { div.innerHTML = `<img src="${sym.image}" alt="${sym.name || targetKey}">`; }
                     else if (sym.emoji) { div.textContent = sym.emoji; }
                     else { div.textContent = targetKey; }
@@ -1770,20 +1019,14 @@
                     const symbolHeight = div.offsetHeight || 140;
                     return `translateY(-${(totalSymbols - 1) * symbolHeight}px)`;
                 }
-                const strip1 = document.getElementById('reelStrip1');
-                const strip2 = document.getElementById('reelStrip2');
-                const strip3 = document.getElementById('reelStrip3');
+                const strip1 = document.getElementById('reelStrip1'); const strip2 = document.getElementById('reelStrip2'); const strip3 = document.getElementById('reelStrip3');
                 [strip1, strip2, strip3].forEach(strip => { strip.style.transition = 'none'; strip.style.transform = 'translateY(0)'; });
                 void strip1.offsetHeight; void strip2.offsetHeight; void strip3.offsetHeight;
-                const targetTransform1 = prepareReel(strip1, reel1);
-                const targetTransform2 = prepareReel(strip2, reel2);
-                const targetTransform3 = prepareReel(strip3, reel3);
+                const targetTransform1 = prepareReel(strip1, reel1); const targetTransform2 = prepareReel(strip2, reel2); const targetTransform3 = prepareReel(strip3, reel3);
                 strip1.style.transition = 'transform 3s cubic-bezier(0.15, 0.85, 0.25, 1)';
                 strip2.style.transition = 'transform 3s cubic-bezier(0.15, 0.85, 0.25, 1)';
                 strip3.style.transition = 'transform 3s cubic-bezier(0.15, 0.85, 0.25, 1)';
-                strip1.style.transform = targetTransform1;
-                strip2.style.transform = targetTransform2;
-                strip3.style.transform = targetTransform3;
+                strip1.style.transform = targetTransform1; strip2.style.transform = targetTransform2; strip3.style.transform = targetTransform3;
                 await new Promise(resolve => setTimeout(resolve, 3000));
                 const isWin = (reel1 === reel2 && reel2 === reel3);
                 const symbolData = slotSymbols[reel1] || {};
@@ -1793,89 +1036,36 @@
                     try {
                         const qRef = ref(db, `prizes/${prizeId}/quantity`);
                         const tx = await runTransaction(qRef, cur => (cur === null || cur <= 0) ? undefined : cur - 1);
-                        if (!tx.committed) {
-                            alert(`很抱歉，「${prizeData.name || prizeId}」已無庫存。`);
-                        } else {
+                        if (!tx.committed) { alert(`很抱歉，「${prizeData.name || prizeId}」已無庫存。`); }
+                        else {
                             let code = "";
-                            try {
-                                const cs = await get(ref(db, `prizeCodes/${prizeId}`));
-                                if (cs.exists()) {
-                                    const cObj = cs.val();
-                                    const used = new Set(Object.values(globalPlayedUsers).map(u => u && u.code).filter(c => c));
-                                    const av = Object.values(cObj).filter(c => c && !used.has(c));
-                                    if (av.length) code = av[0];
-                                }
-                            } catch (e) {}
+                            try { const cs = await get(ref(db, `prizeCodes/${prizeId}`)); if (cs.exists()) { const cObj = cs.val(); const used = new Set(Object.values(globalPlayedUsers).map(u => u && u.code).filter(c => c)); const av = Object.values(cObj).filter(c => c && !used.has(c)); if (av.length) code = av[0]; } } catch (e) {}
                             let awardedPoints = 0;
-                            const minP = Number(prizeData.minPoints);
-                            const maxP = Number(prizeData.maxPoints);
+                            const minP = Number(prizeData.minPoints); const maxP = Number(prizeData.maxPoints);
                             if (!code && !isNaN(minP) && !isNaN(maxP) && maxP >= minP && maxP > 0) {
                                 awardedPoints = Math.floor(Math.random() * (maxP - minP + 1)) + minP;
                                 try {
                                     await runTransaction(ref(db, `pointUsers/${currentPlayerName}/points`), cur => (cur || 0) + awardedPoints);
-                                    await push(ref(db, "pendingPoints"), {
-                                        playerName: currentPlayerName,
-                                        points: awardedPoints,
-                                        prizeName: prizeData.name,
-                                        timestamp: Date.now(),
-                                        status: "approved",
-                                        processedAt: Date.now()
-                                    });
-                                } catch (e) {
-                                    console.error("點數發放失敗（不影響中獎）", e);
-                                }
+                                    await push(ref(db, "pendingPoints"), { playerName: currentPlayerName, points: awardedPoints, prizeName: prizeData.name, timestamp: Date.now(), status: "approved", processedAt: Date.now() });
+                                } catch (e) { console.error("點數發放失敗（不影響中獎）", e); }
                                 code = "點數已自動匯入你的錢包";
                             }
-                            await push(ref(db, `drawRecords/${currentPlayerName}`), {
-                                type: "slot",
-                                won: prizeData.name || prizeId,
-                                code: code,
-                                time: Date.now(),
-                                group: honorUnlockedGroup,
-                                showOnBoard: true
-                            });
+                            await push(ref(db, `drawRecords/${currentPlayerName}`), { type: "slot", won: prizeData.name || prizeId, code: code, time: Date.now(), group: honorUnlockedGroup, showOnBoard: true });
                             showSlotWinModal(prizeData.name, code, awardedPoints);
                         }
-                    } catch (e) {
-                        console.error(e);
-                        alert("中獎處理失敗，請聯繫管理員");
-                    }
+                    } catch (e) { console.error(e); alert("中獎處理失敗，請聯繫管理員"); }
                 } else if (isWin && !prizeData) {
-                    try {
-                        await push(ref(db, `drawRecords/${currentPlayerName}`), {
-                            type: "slot",
-                            won: `符號 ${prizeId} 未設定獎品`,
-                            code: "",
-                            time: Date.now(),
-                            group: honorUnlockedGroup,
-                            showOnBoard: false
-                        });
-                    } catch (e) { console.error(e); }
+                    try { await push(ref(db, `drawRecords/${currentPlayerName}`), { type: "slot", won: `符號 ${prizeId} 未設定獎品`, code: "", time: Date.now(), group: honorUnlockedGroup, showOnBoard: false }); } catch (e) { console.error(e); }
                     alert(`🎰 三個相同符號，但「${prizeId}」尚未設定獎品`);
                 } else {
-                    try {
-                        await push(ref(db, `drawRecords/${currentPlayerName}`), {
-                            type: "slot",
-                            won: "銘謝惠顧",
-                            code: "",
-                            time: Date.now(),
-                            group: honorUnlockedGroup,
-                            showOnBoard: false
-                        });
-                    } catch (e) { console.error(e); }
+                    try { await push(ref(db, `drawRecords/${currentPlayerName}`), { type: "slot", won: "銘謝惠顧", code: "", time: Date.now(), group: honorUnlockedGroup, showOnBoard: false }); } catch (e) { console.error(e); }
                     showSlotWinModal("銘謝惠顧", "", 0);
                 }
-            } catch (e) {
-                console.error("拉霸錯誤:", e);
-                alert("拉霸失敗，請稍後再試。錯誤：" + e.message);
-            } finally {
-                isSlotSpinning = false;
-                const lever = document.getElementById("slotLever");
-                if (lever) lever.style.pointerEvents = 'auto';
-            }
+            } catch (e) { console.error("拉霸錯誤:", e); alert("拉霸失敗，請稍後再試。錯誤：" + e.message); }
+            finally { isSlotSpinning = false; const lever = document.getElementById("slotLever"); if (lever) lever.style.pointerEvents = 'auto'; }
         }
 
-        // ---------- 彈珠台核心（全新設計） ----------
+        // ---------- 彈珠台核心（全新設計：真正圓弧軌道） ----------
         function drawGlassBall(ctx, x, y, r) {
             const grad = ctx.createRadialGradient(x - r * 0.35, y - r * 0.35, r * 0.05, x, y, r);
             grad.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
@@ -1883,215 +1073,101 @@
             grad.addColorStop(0.6, 'rgba(130, 200, 240, 0.45)');
             grad.addColorStop(0.9, 'rgba(80, 150, 220, 0.55)');
             grad.addColorStop(1, 'rgba(50, 100, 180, 0.75)');
-            ctx.beginPath();
-            ctx.arc(x, y, r, 0, Math.PI * 2);
-            ctx.fillStyle = grad;
-            ctx.fill();
-            ctx.beginPath();
-            ctx.arc(x, y, r - 0.5, 0, Math.PI * 2);
-            ctx.strokeStyle = 'rgba(220, 240, 255, 0.85)';
-            ctx.lineWidth = 1;
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.arc(x - r * 0.32, y - r * 0.35, r * 0.3, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.92)';
-            ctx.fill();
-            ctx.beginPath();
-            ctx.arc(x + r * 0.25, y + r * 0.35, r * 0.12, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
-            ctx.fill();
+            ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fillStyle = grad; ctx.fill();
+            ctx.beginPath(); ctx.arc(x, y, r - 0.5, 0, Math.PI * 2); ctx.strokeStyle = 'rgba(220, 240, 255, 0.85)'; ctx.lineWidth = 1; ctx.stroke();
+            ctx.beginPath(); ctx.arc(x - r * 0.32, y - r * 0.35, r * 0.3, 0, Math.PI * 2); ctx.fillStyle = 'rgba(255, 255, 255, 0.92)'; ctx.fill();
+            ctx.beginPath(); ctx.arc(x + r * 0.25, y + r * 0.35, r * 0.12, 0, Math.PI * 2); ctx.fillStyle = 'rgba(255, 255, 255, 0.45)'; ctx.fill();
         }
-
         function drawBulb(ctx, x, y, r) {
             const glow = ctx.createRadialGradient(x, y, 0, x, y, r * 3.5);
-            glow.addColorStop(0, 'rgba(255,240,150,0.7)');
-            glow.addColorStop(1, 'rgba(255,240,150,0)');
-            ctx.fillStyle = glow;
-            ctx.beginPath();
-            ctx.arc(x, y, r * 3.5, 0, Math.PI * 2);
-            ctx.fill();
+            glow.addColorStop(0, 'rgba(255,240,150,0.7)'); glow.addColorStop(1, 'rgba(255,240,150,0)');
+            ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(x, y, r * 3.5, 0, Math.PI * 2); ctx.fill();
             const bulb = ctx.createRadialGradient(x - r*0.3, y - r*0.3, 0, x, y, r);
-            bulb.addColorStop(0, '#ffffff');
-            bulb.addColorStop(0.55, '#ffe066');
-            bulb.addColorStop(1, '#f59f00');
-            ctx.fillStyle = bulb;
-            ctx.beginPath();
-            ctx.arc(x, y, r, 0, Math.PI * 2);
-            ctx.fill();
+            bulb.addColorStop(0, '#ffffff'); bulb.addColorStop(0.55, '#ffe066'); bulb.addColorStop(1, '#f59f00');
+            ctx.fillStyle = bulb; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
         }
-
         function drawPeg(ctx, x, y, r) {
-            ctx.beginPath();
-            ctx.arc(x + 1.2, y + 1.8, r * 1.05, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(0,0,0,0.55)';
-            ctx.fill();
+            ctx.beginPath(); ctx.arc(x + 1.2, y + 1.8, r * 1.05, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0,0,0,0.55)'; ctx.fill();
             const glow = ctx.createRadialGradient(x, y, r * 0.6, x, y, r * 2.2);
-            glow.addColorStop(0, 'rgba(255,220,80,0.45)');
-            glow.addColorStop(1, 'rgba(255,220,80,0)');
-            ctx.fillStyle = glow;
-            ctx.beginPath();
-            ctx.arc(x, y, r * 2.2, 0, Math.PI * 2);
-            ctx.fill();
+            glow.addColorStop(0, 'rgba(255,220,80,0.45)'); glow.addColorStop(1, 'rgba(255,220,80,0)');
+            ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(x, y, r * 2.2, 0, Math.PI * 2); ctx.fill();
             const grad = ctx.createRadialGradient(x - r * 0.35, y - r * 0.35, 0, x, y, r);
-            grad.addColorStop(0, '#fffbd0');
-            grad.addColorStop(0.5, '#ffd700');
-            grad.addColorStop(0.85, '#e0a800');
-            grad.addColorStop(1, '#8b6914');
-            ctx.beginPath();
-            ctx.arc(x, y, r, 0, Math.PI * 2);
-            ctx.fillStyle = grad;
-            ctx.fill();
-            ctx.beginPath();
-            ctx.arc(x - r * 0.35, y - r * 0.35, r * 0.3, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(255,255,255,0.95)';
-            ctx.fill();
+            grad.addColorStop(0, '#fffbd0'); grad.addColorStop(0.5, '#ffd700'); grad.addColorStop(0.85, '#e0a800'); grad.addColorStop(1, '#8b6914');
+            ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fillStyle = grad; ctx.fill();
+            ctx.beginPath(); ctx.arc(x - r * 0.35, y - r * 0.35, r * 0.3, 0, Math.PI * 2); ctx.fillStyle = 'rgba(255,255,255,0.95)'; ctx.fill();
         }
-
         function drawBumper(ctx, x, y, r) {
             const glow = ctx.createRadialGradient(x, y, r * 0.8, x, y, r * 1.5);
-            glow.addColorStop(0, 'rgba(255, 100, 100, 0.6)');
-            glow.addColorStop(1, 'rgba(255, 100, 100, 0)');
-            ctx.fillStyle = glow;
-            ctx.beginPath();
-            ctx.arc(x, y, r * 1.5, 0, Math.PI * 2);
-            ctx.fill();
+            glow.addColorStop(0, 'rgba(255, 100, 100, 0.6)'); glow.addColorStop(1, 'rgba(255, 100, 100, 0)');
+            ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(x, y, r * 1.5, 0, Math.PI * 2); ctx.fill();
             const grad = ctx.createRadialGradient(x - r * 0.3, y - r * 0.3, r * 0.2, x, y, r);
-            grad.addColorStop(0, '#ff6b6b');
-            grad.addColorStop(0.6, '#c92a2a');
-            grad.addColorStop(1, '#6e0000');
-            ctx.beginPath();
-            ctx.arc(x, y, r, 0, Math.PI * 2);
-            ctx.fillStyle = grad;
-            ctx.fill();
-            ctx.strokeStyle = 'rgba(255,255,255,0.5)';
-            ctx.lineWidth = 2;
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.arc(x - r * 0.3, y - r * 0.3, r * 0.3, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-            ctx.fill();
+            grad.addColorStop(0, '#ff6b6b'); grad.addColorStop(0.6, '#c92a2a'); grad.addColorStop(1, '#6e0000');
+            ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fillStyle = grad; ctx.fill();
+            ctx.strokeStyle = 'rgba(255,255,255,0.5)'; ctx.lineWidth = 2; ctx.stroke();
+            ctx.beginPath(); ctx.arc(x - r * 0.3, y - r * 0.3, r * 0.3, 0, Math.PI * 2); ctx.fillStyle = 'rgba(255, 255, 255, 0.8)'; ctx.fill();
         }
-
         function drawSpring(ctx, cx, topY, bottomY, radius, turns) {
-            ctx.save();
-            ctx.strokeStyle = '#c0c0c0';
-            ctx.lineWidth = 2.5;
-            ctx.lineCap = 'round';
+            ctx.save(); ctx.strokeStyle = '#c0c0c0'; ctx.lineWidth = 2.5; ctx.lineCap = 'round';
+            const totalH = bottomY - topY; const segs = turns * 24;
             ctx.beginPath();
-            const totalH = bottomY - topY;
-            const segs = turns * 24;
             for (let i = 0; i <= segs; i++) {
-                const t = i / segs;
-                const y = topY + t * totalH;
-                const angle = t * turns * Math.PI * 2;
+                const t = i / segs; const y = topY + t * totalH; const angle = t * turns * Math.PI * 2;
                 const x = cx + Math.sin(angle) * radius;
-                if (i === 0) ctx.moveTo(x, y);
-                else ctx.lineTo(x, y);
+                if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
             }
             ctx.stroke();
-            ctx.strokeStyle = 'rgba(255,255,255,0.7)';
-            ctx.lineWidth = 0.8;
+            ctx.strokeStyle = 'rgba(255,255,255,0.7)'; ctx.lineWidth = 0.8;
             ctx.beginPath();
             for (let i = 0; i <= segs; i++) {
-                const t = i / segs;
-                const y = topY + t * totalH - 1;
-                const angle = t * turns * Math.PI * 2;
+                const t = i / segs; const y = topY + t * totalH - 1; const angle = t * turns * Math.PI * 2;
                 const x = cx + Math.sin(angle) * radius - 0.8;
-                if (i === 0) ctx.moveTo(x, y);
-                else ctx.lineTo(x, y);
+                if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
             }
-            ctx.stroke();
-            ctx.restore();
+            ctx.stroke(); ctx.restore();
         }
-
         function drawLeverKnob(ctx, cx, cy) {
             const rodGrad = ctx.createLinearGradient(cx - 4, cy - 22, cx + 4, cy + 22);
-            rodGrad.addColorStop(0, '#4a4a4a');
-            rodGrad.addColorStop(0.35, '#cfcfcf');
-            rodGrad.addColorStop(0.5, '#ffffff');
-            rodGrad.addColorStop(0.65, '#a8a8a8');
-            rodGrad.addColorStop(1, '#3a3a3a');
-            ctx.fillStyle = rodGrad;
-            ctx.fillRect(cx - 4, cy - 22, 8, 22);
-            ctx.beginPath();
-            ctx.arc(cx, cy, 13, 0, Math.PI * 2);
+            rodGrad.addColorStop(0, '#4a4a4a'); rodGrad.addColorStop(0.35, '#cfcfcf'); rodGrad.addColorStop(0.5, '#ffffff'); rodGrad.addColorStop(0.65, '#a8a8a8'); rodGrad.addColorStop(1, '#3a3a3a');
+            ctx.fillStyle = rodGrad; ctx.fillRect(cx - 4, cy - 22, 8, 22);
+            ctx.beginPath(); ctx.arc(cx, cy, 13, 0, Math.PI * 2);
             const ringGrad = ctx.createRadialGradient(cx - 3, cy - 3, 3, cx, cy, 13);
-            ringGrad.addColorStop(0, '#fff4c2');
-            ringGrad.addColorStop(0.6, '#d4af37');
-            ringGrad.addColorStop(1, '#8b6914');
-            ctx.fillStyle = ringGrad;
-            ctx.fill();
-            ctx.strokeStyle = 'rgba(0,0,0,0.6)';
-            ctx.lineWidth = 1.5;
-            ctx.stroke();
+            ringGrad.addColorStop(0, '#fff4c2'); ringGrad.addColorStop(0.6, '#d4af37'); ringGrad.addColorStop(1, '#8b6914');
+            ctx.fillStyle = ringGrad; ctx.fill();
+            ctx.strokeStyle = 'rgba(0,0,0,0.6)'; ctx.lineWidth = 1.5; ctx.stroke();
             const ballGrad = ctx.createRadialGradient(cx - 4, cy - 4, 2, cx, cy, 11);
-            ballGrad.addColorStop(0, '#ff9a9a');
-            ballGrad.addColorStop(0.45, '#e02020');
-            ballGrad.addColorStop(1, '#7a0000');
-            ctx.beginPath();
-            ctx.arc(cx, cy, 11, 0, Math.PI * 2);
-            ctx.fillStyle = ballGrad;
-            ctx.fill();
-            ctx.strokeStyle = 'rgba(0,0,0,0.55)';
-            ctx.lineWidth = 1.2;
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.arc(cx - 4, cy - 4, 3, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(255,255,255,0.9)';
-            ctx.fill();
+            ballGrad.addColorStop(0, '#ff9a9a'); ballGrad.addColorStop(0.45, '#e02020'); ballGrad.addColorStop(1, '#7a0000');
+            ctx.beginPath(); ctx.arc(cx, cy, 11, 0, Math.PI * 2); ctx.fillStyle = ballGrad; ctx.fill();
+            ctx.strokeStyle = 'rgba(0,0,0,0.55)'; ctx.lineWidth = 1.2; ctx.stroke();
+            ctx.beginPath(); ctx.arc(cx - 4, cy - 4, 3, 0, Math.PI * 2); ctx.fillStyle = 'rgba(255,255,255,0.9)'; ctx.fill();
         }
 
-        // 二次貝茲插值
-        function quadBezier(t, p0, p1, p2) {
-            const mt = 1 - t;
-            return {
-                x: mt * mt * p0.x + 2 * mt * t * p1.x + t * t * p2.x,
-                y: mt * mt * p0.y + 2 * mt * t * p1.y + t * t * p2.y
-            };
-        }
-
-        // 沿著貝茲曲線建立弧形實心牆（每段帶重疊）
-        function buildArcWall(engine, P0, P1, P2, thickness, segments) {
-            const Bodies = Matter.Bodies;
-            const Composite = Matter.Composite;
-            const bodyList = [];
+        // 沿圓弧建立物理牆（真正的 1/4 圓弧）
+        function buildArcWallByCircle(engine, cx, cy, R, startAngle, endAngle, thickness, segments) {
+            const Bodies = Matter.Bodies; const Composite = Matter.Composite;
             for (let i = 0; i < segments; i++) {
-                const t1 = i / segments;
-                const t2 = (i + 1) / segments;
-                const p1 = quadBezier(t1, P0, P1, P2);
-                const p2 = quadBezier(t2, P0, P1, P2);
+                const a1 = startAngle + (endAngle - startAngle) * (i / segments);
+                const a2 = startAngle + (endAngle - startAngle) * ((i + 1) / segments);
+                const p1 = { x: cx + R * Math.cos(a1), y: cy + R * Math.sin(a1) };
+                const p2 = { x: cx + R * Math.cos(a2), y: cy + R * Math.sin(a2) };
                 const mid = { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 };
                 const len = Math.hypot(p2.x - p1.x, p2.y - p1.y) + thickness * 0.9;
                 const angle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
-                const body = Bodies.rectangle(mid.x, mid.y, len, thickness, {
-                    isStatic: true,
-                    angle: angle,
-                    friction: 0,
-                    frictionStatic: 0,
-                    restitution: 0.2,
-                    slop: 0.02,
-                    render: { visible: false }
-                });
-                Composite.add(engine.world, body);
-                bodyList.push(body);
+                Composite.add(engine.world, Bodies.rectangle(mid.x, mid.y, len, thickness, {
+                    isStatic: true, angle: angle, friction: 0, frictionStatic: 0, restitution: 0.2, slop: 0.02, render: { visible: false }
+                }));
             }
-            return bodyList;
         }
 
-        function drawPachinkoSceneStatic(cctx, renderWidth, renderHeight, pegs, springCenter, railLeftX, railRightX, railTopY, railBottomY, arcP0, arcP1, arcP2, binTopY, binBottomY) {
+        function drawPachinkoSceneStatic(cctx, renderWidth, renderHeight, pegs, springCenter, railLeft, railRight, railTop, railBottom, arcCx, arcCy, arcR) {
             // 背景
             const bg = cctx.createLinearGradient(0, 0, 0, renderHeight);
-            bg.addColorStop(0, '#101a35');
-            bg.addColorStop(1, '#050810');
-            cctx.fillStyle = bg;
-            cctx.fillRect(0, 0, renderWidth, renderHeight);
+            bg.addColorStop(0, '#101a35'); bg.addColorStop(1, '#050810');
+            cctx.fillStyle = bg; cctx.fillRect(0, 0, renderWidth, renderHeight);
 
             // 遊戲區淡藍光暈
             const playBg = cctx.createRadialGradient(renderWidth * 0.4, renderHeight * 0.4, 30, renderWidth * 0.4, renderHeight * 0.4, renderHeight * 0.75);
-            playBg.addColorStop(0, 'rgba(40,80,160,0.35)');
-            playBg.addColorStop(1, 'rgba(0,0,0,0)');
-            cctx.fillStyle = playBg;
-            cctx.fillRect(20, 20, renderWidth - 40, renderHeight - 40);
+            playBg.addColorStop(0, 'rgba(40,80,160,0.35)'); playBg.addColorStop(1, 'rgba(0,0,0,0)');
+            cctx.fillStyle = playBg; cctx.fillRect(20, 20, renderWidth - 40, renderHeight - 40);
 
             // 星點
             cctx.fillStyle = 'rgba(200,220,255,0.4)';
@@ -2099,107 +1175,63 @@
                 const x = 25 + Math.random() * (renderWidth - 50);
                 const y = 25 + Math.random() * (renderHeight - 50);
                 const rr = Math.random() * 1.4 + 0.2;
-                cctx.beginPath();
-                cctx.arc(x, y, rr, 0, Math.PI * 2);
-                cctx.fill();
+                cctx.beginPath(); cctx.arc(x, y, rr, 0, Math.PI * 2); cctx.fill();
             }
 
             // 金色外框
             const goldGrad = cctx.createLinearGradient(0, 0, renderWidth, renderHeight);
-            goldGrad.addColorStop(0, '#f6e27a');
-            goldGrad.addColorStop(0.4, '#d4af37');
-            goldGrad.addColorStop(0.7, '#b8860b');
-            goldGrad.addColorStop(1, '#8b6914');
+            goldGrad.addColorStop(0, '#f6e27a'); goldGrad.addColorStop(0.4, '#d4af37'); goldGrad.addColorStop(0.7, '#b8860b'); goldGrad.addColorStop(1, '#8b6914');
             cctx.fillStyle = goldGrad;
-            cctx.fillRect(0, 0, renderWidth, 20);
-            cctx.fillRect(0, renderHeight - 20, renderWidth, 20);
-            cctx.fillRect(0, 0, 20, renderHeight);
-            cctx.fillRect(renderWidth - 20, 0, 20, renderHeight);
-
-            // 內框線
-            cctx.strokeStyle = 'rgba(0,0,0,0.7)';
-            cctx.lineWidth = 3;
-            cctx.strokeRect(21.5, 21.5, renderWidth - 43, renderHeight - 43);
-            cctx.strokeStyle = 'rgba(255,255,255,0.35)';
-            cctx.lineWidth = 1;
-            cctx.strokeRect(20.5, 20.5, renderWidth - 41, renderHeight - 41);
+            cctx.fillRect(0, 0, renderWidth, 20); cctx.fillRect(0, renderHeight - 20, renderWidth, 20);
+            cctx.fillRect(0, 0, 20, renderHeight); cctx.fillRect(renderWidth - 20, 0, 20, renderHeight);
+            cctx.strokeStyle = 'rgba(0,0,0,0.7)'; cctx.lineWidth = 3; cctx.strokeRect(21.5, 21.5, renderWidth - 43, renderHeight - 43);
+            cctx.strokeStyle = 'rgba(255,255,255,0.35)'; cctx.lineWidth = 1; cctx.strokeRect(20.5, 20.5, renderWidth - 41, renderHeight - 41);
 
             // 燈泡
-            for (let x = 40; x < renderWidth - 30; x += 42) {
-                drawBulb(cctx, x, 10, 3.5);
-                drawBulb(cctx, x, renderHeight - 10, 3.5);
-            }
-            for (let y = 42; y < renderHeight - 30; y += 42) {
-                drawBulb(cctx, 10, y, 3.5);
-                drawBulb(cctx, renderWidth - 10, y, 3.5);
-            }
+            for (let x = 40; x < renderWidth - 30; x += 42) { drawBulb(cctx, x, 10, 3.5); drawBulb(cctx, x, renderHeight - 10, 3.5); }
+            for (let y = 42; y < renderHeight - 30; y += 42) { drawBulb(cctx, 10, y, 3.5); drawBulb(cctx, renderWidth - 10, y, 3.5); }
 
-            // 木紋漸層
             const woodGrad = cctx.createLinearGradient(0, 0, renderWidth, renderHeight);
-            woodGrad.addColorStop(0, '#e0a866');
-            woodGrad.addColorStop(0.5, '#c07830');
-            woodGrad.addColorStop(1, '#8b4513');
+            woodGrad.addColorStop(0, '#e0a866'); woodGrad.addColorStop(0.5, '#c07830'); woodGrad.addColorStop(1, '#8b4513');
 
-            // 弧形軌道（畫貝茲曲線）
+            // 弧形軌道（真正的 1/4 圓弧，從 180° 掃到 270°）
+            // 圓心在 (arcCx, arcCy)，從角度 180°（正左）到 270°（正上）
             cctx.save();
-            cctx.lineCap = 'round';
-            cctx.lineJoin = 'round';
+            cctx.lineCap = 'round'; cctx.lineJoin = 'round';
             // 外陰影
-            cctx.strokeStyle = 'rgba(0,0,0,0.6)';
-            cctx.lineWidth = 26;
-            cctx.beginPath();
-            cctx.moveTo(arcP0.x, arcP0.y);
-            cctx.quadraticCurveTo(arcP1.x, arcP1.y, arcP2.x, arcP2.y);
-            cctx.stroke();
+            cctx.strokeStyle = 'rgba(0,0,0,0.6)'; cctx.lineWidth = 26;
+            cctx.beginPath(); cctx.arc(arcCx, arcCy, arcR, Math.PI, Math.PI * 1.5); cctx.stroke();
             // 主體
-            cctx.strokeStyle = woodGrad;
-            cctx.lineWidth = 22;
-            cctx.beginPath();
-            cctx.moveTo(arcP0.x, arcP0.y);
-            cctx.quadraticCurveTo(arcP1.x, arcP1.y, arcP2.x, arcP2.y);
-            cctx.stroke();
-            // 高光
-            cctx.strokeStyle = 'rgba(255,220,160,0.7)';
-            cctx.lineWidth = 6;
-            cctx.beginPath();
-            cctx.moveTo(arcP0.x, arcP0.y - 3);
-            cctx.quadraticCurveTo(arcP1.x, arcP1.y - 3, arcP2.x, arcP2.y - 3);
-            cctx.stroke();
+            cctx.strokeStyle = woodGrad; cctx.lineWidth = 22;
+            cctx.beginPath(); cctx.arc(arcCx, arcCy, arcR, Math.PI, Math.PI * 1.5); cctx.stroke();
+            // 內高光
+            cctx.strokeStyle = 'rgba(255,220,160,0.6)'; cctx.lineWidth = 4;
+            cctx.beginPath(); cctx.arc(arcCx, arcCy, arcR - 5, Math.PI + 0.1, Math.PI * 1.5 - 0.1); cctx.stroke();
             cctx.restore();
 
-            // 垂直軌道左牆
+            // 垂直軌道左牆（畫木條，從 railTop 到 railBottom）
             cctx.fillStyle = woodGrad;
-            cctx.fillRect(railLeftX - 12, railTopY, 24, railBottomY - railTopY);
-            cctx.fillStyle = 'rgba(255,220,160,0.5)';
-            cctx.fillRect(railLeftX - 11, railTopY, 3, railBottomY - railTopY);
-            cctx.fillStyle = 'rgba(0,0,0,0.4)';
-            cctx.fillRect(railLeftX + 8, railTopY, 3, railBottomY - railTopY);
+            cctx.fillRect(railLeft - 12, railTop, 24, railBottom - railTop);
+            cctx.fillStyle = 'rgba(255,220,160,0.5)'; cctx.fillRect(railLeft - 11, railTop, 3, railBottom - railTop);
+            cctx.fillStyle = 'rgba(0,0,0,0.4)'; cctx.fillRect(railLeft + 8, railTop, 3, railBottom - railTop);
 
             // 彈簧 + 拉桿
             drawSpring(cctx, springCenter.x, springCenter.topY, springCenter.bottomY, 9, 4.5);
             drawLeverKnob(cctx, springCenter.x, springCenter.leverY);
 
             // 釘子
-            for (const p of pegs) {
-                if (p.isBumper) drawBumper(cctx, p.x, p.y, p.r);
-                else drawPeg(cctx, p.x, p.y, p.r);
-            }
+            for (const p of pegs) { if (p.isBumper) drawBumper(cctx, p.x, p.y, p.r); else drawPeg(cctx, p.x, p.y, p.r); }
 
-            // 預備彈珠位置（在彈簧頂端上方）
+            // 預備彈珠
             drawGlassBall(cctx, springCenter.x, springCenter.topY - 12, 7);
         }
 
         function buildPachinkoBoard() {
-            if (typeof Matter === 'undefined') {
-                console.error("Matter.js 尚未載入");
-                return;
-            }
-            const container = document.getElementById("pachinkoContainer");
-            if (!container) return;
+            if (typeof Matter === 'undefined') { console.error("Matter.js 尚未載入"); return; }
+            const container = document.getElementById("pachinkoContainer"); if (!container) return;
             container.innerHTML = "";
 
-            // 清理舊的執行個體
-            if (pachinkoRunner) { Matter.Runner.stop(pachinkoRunner); pachinkoRunner = null; }
+            // 清理舊實例
             if (pachinkoRenderLoopId) { cancelAnimationFrame(pachinkoRenderLoopId); pachinkoRenderLoopId = null; }
             if (pachinkoPhysicsLoopId) { cancelAnimationFrame(pachinkoPhysicsLoopId); pachinkoPhysicsLoopId = null; }
             if (pachinkoCheckIntervalId) { clearInterval(pachinkoCheckIntervalId); pachinkoCheckIntervalId = null; }
@@ -2207,11 +1239,7 @@
             pachinkoBall = null;
             pachinkoBallDropped = false;
 
-            const Engine = Matter.Engine,
-                  Bodies = Matter.Bodies,
-                  Composite = Matter.Composite,
-                  Events = Matter.Events,
-                  Body = Matter.Body;
+            const Engine = Matter.Engine, Bodies = Matter.Bodies, Composite = Matter.Composite, Events = Matter.Events, Body = Matter.Body;
 
             pachinkoEngine = Engine.create();
             pachinkoEngine.gravity.y = 0.55;
@@ -2223,41 +1251,23 @@
             if (!renderWidth || renderWidth < 200) renderWidth = pachinkoWidth;
             const renderHeight = pachinkoHeight;
 
-            // Canvas
             const canvas = document.createElement("canvas");
-            canvas.width = renderWidth;
-            canvas.height = renderHeight;
-            canvas.style.display = "block";
-            canvas.style.maxWidth = "100%";
-            canvas.style.height = "auto";
-            canvas.style.background = "#050810";
+            canvas.width = renderWidth; canvas.height = renderHeight;
+            canvas.style.display = "block"; canvas.style.maxWidth = "100%"; canvas.style.height = "auto"; canvas.style.background = "#050810";
             container.appendChild(canvas);
             const ctx2d = canvas.getContext("2d");
             pachinkoRender = { options: { width: renderWidth, height: renderHeight }, canvas: canvas };
 
             const inv = { visible: false };
-
-            // ===== 座標配置 =====
             const FRAME = 20;
-            const WALL_T = 30;  // 物理牆厚
+            const WALL_T = 30;
+
             const playLeft = FRAME;
             const playRight = renderWidth - FRAME;
             const playTop = FRAME;
             const playBottom = renderHeight - FRAME;
 
-            // 發射軌道（右側）
-            const railRight = playRight - 4;  // 外框內側
-            const railLeft = railRight - 44;  // 軌道左牆
-            const railTop = 130;              // 軌道頂端（弧線起點）
-            const railBottom = renderHeight - 100;
-            const railWidth = railRight - railLeft;
-
-            // 弧形軌道：從軌道頂端 (railLeft, railTop) 彎到左上方
-            const arcP0 = { x: railLeft, y: railTop };
-            const arcP1 = { x: railLeft - 40, y: railTop - 100 };
-            const arcP2 = { x: playLeft + 30, y: railTop - 20 };
-
-            // ===== 外框牆（超厚防穿牆） =====
+            // ===== 外框牆（超厚） =====
             Composite.add(pachinkoEngine.world, [
                 Bodies.rectangle(playLeft - WALL_T, renderHeight/2, WALL_T*2, renderHeight*3, { isStatic: true, render: inv, restitution: 0.2, friction: 0 }),
                 Bodies.rectangle(playRight + WALL_T, renderHeight/2, WALL_T*2, renderHeight*3, { isStatic: true, render: inv, restitution: 0.2, friction: 0 }),
@@ -2265,12 +1275,33 @@
                 Bodies.rectangle(renderWidth/2, playBottom + WALL_T, renderWidth*3, WALL_T*2, { isStatic: true, render: inv, restitution: 0.2, friction: 0 })
             ]);
 
-            // ===== 弧形軌道（實心分段牆） =====
-            buildArcWall(pachinkoEngine, arcP0, arcP1, arcP2, 22, 20);
+            // ===== 座標配置 =====
+            // 垂直軌道：靠右側，寬 30px
+            const railRight = playRight - 4;
+            const railLeft = railRight - 34;
+            const railTop = 140;
+            const railBottom = renderHeight - 120;
 
-            // ===== 垂直軌道左牆 =====
+            // 弧形軌道：圓心在 (railRight, railTop)，半徑 60
+            // 從 180°（正左）掃到 270°（正上）
+            // 180° 位置：(railRight - R, railTop)
+            // 270° 位置：(railRight, railTop - R)
+            const arcCx = railRight;
+            const arcCy = railTop;
+            const arcR = 60;
+
+            // 建立弧形物理牆
+            buildArcWallByCircle(pachinkoEngine, arcCx, arcCy, arcR, Math.PI, Math.PI * 1.5, 22, 20);
+
+            // 弧形頂端擋片（防止球從上方飛出）
             Composite.add(pachinkoEngine.world, Bodies.rectangle(
-                railLeft, (railTop + railBottom) / 2, 24, railBottom - railTop,
+                arcCx, arcCy - arcR - 10, 30, 20,
+                { isStatic: true, render: inv, restitution: 0.2 }
+            ));
+
+            // 垂直軌道左牆（從 railTop 到 railBottom）
+            Composite.add(pachinkoEngine.world, Bodies.rectangle(
+                railLeft, (railTop + railBottom) / 2, 20, railBottom - railTop,
                 { isStatic: true, render: inv, restitution: 0.2, friction: 0, slop: 0.02 }
             ));
 
@@ -2278,12 +1309,12 @@
             const pegRadius = 4;
             const BALL_RADIUS = 7;
             const pegs = [];
-            const areaLeft = playLeft + 25;
-            const areaRight = railLeft - 20;
-            const areaTop = 170;
+            const areaLeft = playLeft + 30;
+            const areaRight = railLeft - 25;
+            const areaTop = 190;
             const areaBottom = 400;
-            const pegCols = 9;
-            const pegRows = 13;
+            const pegCols = 8;
+            const pegRows = 11;
             const dx = (areaRight - areaLeft) / (pegCols - 1);
             const dy = (areaBottom - areaTop) / (pegRows - 1);
 
@@ -2294,10 +1325,7 @@
             ];
 
             function isNearObstacle(x, y) {
-                for (const b of bumpers) {
-                    const need = b.r + pegRadius + BALL_RADIUS + 3;
-                    if (Math.hypot(x - b.x, y - b.y) < need) return true;
-                }
+                for (const b of bumpers) { const need = b.r + pegRadius + BALL_RADIUS + 3; if (Math.hypot(x - b.x, y - b.y) < need) return true; }
                 return false;
             }
 
@@ -2310,16 +1338,14 @@
                     if (x > areaRight + 0.5) continue;
                     if (isNearObstacle(x, y)) continue;
                     Composite.add(pachinkoEngine.world, Bodies.circle(x, y, pegRadius, {
-                        isStatic: true, restitution: 0.92, friction: 0, frictionStatic: 0,
-                        slop: 0.01, render: inv, label: 'peg'
+                        isStatic: true, restitution: 0.92, friction: 0, frictionStatic: 0, slop: 0.01, render: inv, label: 'peg'
                     }));
                     pegs.push({ x, y, r: pegRadius, isBumper: false });
                 }
             }
             for (const b of bumpers) {
                 Composite.add(pachinkoEngine.world, Bodies.circle(b.x, b.y, b.r, {
-                    isStatic: true, restitution: 0.95, friction: 0, frictionStatic: 0,
-                    slop: 0.01, render: inv, label: 'bumper'
+                    isStatic: true, restitution: 0.95, friction: 0, frictionStatic: 0, slop: 0.01, render: inv, label: 'bumper'
                 }));
                 pegs.push({ x: b.x, y: b.y, r: b.r, isBumper: true });
             }
@@ -2336,34 +1362,26 @@
                     else if (bodyB === pachinkoBall) other = bodyA;
                     else continue;
                     if (other.label === 'bumper') {
-                        const v = pachinkoBall.velocity;
-                        const speed = Math.hypot(v.x, v.y);
+                        const v = pachinkoBall.velocity; const speed = Math.hypot(v.x, v.y);
                         if (speed < 1.5) continue;
                         const rx = pachinkoBall.position.x - other.position.x;
                         const ry = pachinkoBall.position.y - other.position.y;
                         const dist = Math.hypot(rx, ry) || 1;
-                        const pulse = 5;
-                        Body.setVelocity(pachinkoBall, {
-                            x: v.x + (rx / dist) * pulse,
-                            y: v.y + (ry / dist) * pulse
-                        });
+                        Body.setVelocity(pachinkoBall, { x: v.x + (rx / dist) * 5, y: v.y + (ry / dist) * 5 });
                     }
                     if (other.label === 'peg' || other.label === 'bumper') {
                         if (now - lastPegSoundTime < 45) continue;
-                        const v = pachinkoBall.velocity;
-                        const speed = Math.hypot(v.x, v.y);
+                        const v = pachinkoBall.velocity; const speed = Math.hypot(v.x, v.y);
                         if (speed < 1.2) continue;
-                        playPegDing(speed);
-                        lastPegSoundTime = now;
+                        playPegDing(speed); lastPegSoundTime = now;
                     }
                 }
             });
 
-            // ===== 彈珠位置軟約束：每幀檢查 =====
+            // ===== 彈珠位置軟約束 =====
             Events.on(pachinkoEngine, 'beforeUpdate', () => {
                 if (!pachinkoBall || pachinkoBall.isStatic) return;
-                const pos = pachinkoBall.position;
-                const r = BALL_RADIUS;
+                const pos = pachinkoBall.position; const r = BALL_RADIUS;
                 const leftBound = playLeft + 2 + r;
                 const rightBound = playRight - 2 - r;
                 const topBound = playTop + 2 + r;
@@ -2390,21 +1408,18 @@
             pachinkoBallRestX = ballRestX;
             pachinkoBallRestY = ballRestY;
 
-            // 彈簧頂端隱形平台
+            // 隱形平台
             Composite.add(pachinkoEngine.world, Bodies.rectangle(ballRestX, ballRestY + 12, 32, 8, { isStatic: true, render: inv }));
 
-            // 預備彈珠（靜態）
+            // 預備彈珠
             pachinkoBall = Bodies.circle(ballRestX, ballRestY, BALL_RADIUS, {
-                isStatic: true, restitution: 0.5, friction: 0.001, frictionAir: 0.0018,
-                density: 0.002, slop: 0.01, render: inv
+                isStatic: true, restitution: 0.5, friction: 0.001, frictionAir: 0.0018, density: 0.002, slop: 0.01, render: inv
             });
             Composite.add(pachinkoEngine.world, pachinkoBall);
 
             // ===== 獎池 =====
-            pachinkoBins = [];
-            pachinkoPrizeMap = {};
-
-            const binTopY = 415;
+            pachinkoBins = []; pachinkoPrizeMap = {};
+            const binTopY = 425;
             const binBottomY = renderHeight - FRAME;
             const binAreaLeft = playLeft + 4;
             const binAreaRight = railLeft - 4;
@@ -2414,8 +1429,7 @@
             const useBinLayout = Array.isArray(pachinkoBinLayout) && pachinkoBinLayout.length > 0;
             if (useBinLayout) {
                 for (const pid of pachinkoBinLayout) {
-                    const p = lastPrizes?.[pid];
-                    if (!p) continue;
+                    const p = lastPrizes?.[pid]; if (!p) continue;
                     if (!Array.isArray(p.groups) || !p.groups.includes(honorUnlockedGroup)) continue;
                     binPrizes.push({ id: pid, data: p });
                 }
@@ -2425,8 +1439,7 @@
                     const p = lastPrizes[id];
                     if (!Array.isArray(p.groups) || !p.groups.includes(honorUnlockedGroup)) continue;
                     if (Number(p.quantity || 0) <= 0) continue;
-                    const w = Number(p.weight || 0);
-                    if (w <= 0) continue;
+                    const w = Number(p.weight || 0); if (w <= 0) continue;
                     prizes.push({ id, data: p, weight: w });
                 }
                 binPrizes = prizes;
@@ -2439,66 +1452,27 @@
                 for (let i = 0; i < binCount; i++) {
                     const binX = binAreaLeft + i * binWidth + binWidth / 2;
                     const prize = binPrizes[i];
-                    // 每個格子的隔板（厚牆）
-                    Composite.add(pachinkoEngine.world, Bodies.rectangle(
-                        binAreaLeft + i * binWidth,
-                        binTopY + (binBottomY - binTopY) / 2,
-                        8, binBottomY - binTopY,
-                        { isStatic: true, render: inv, friction: 0.1 }
-                    ));
-                    pachinkoBins.push({
-                        index: i, x: binX, width: binWidth,
-                        y: (binTopY + binBottomY) / 2,
-                        topY: binTopY, bottomY: binBottomY,
-                        prizeId: prize.id, prizeData: prize.data
-                    });
+                    Composite.add(pachinkoEngine.world, Bodies.rectangle(binAreaLeft + i * binWidth, binTopY + (binBottomY - binTopY) / 2, 8, binBottomY - binTopY, { isStatic: true, render: inv, friction: 0.1 }));
+                    pachinkoBins.push({ index: i, x: binX, width: binWidth, y: (binTopY + binBottomY) / 2, topY: binTopY, bottomY: binBottomY, prizeId: prize.id, prizeData: prize.data });
                     pachinkoPrizeMap[i] = prize.id;
                 }
-                // 最右隔板
-                Composite.add(pachinkoEngine.world, Bodies.rectangle(
-                    binAreaRight, binTopY + (binBottomY - binTopY) / 2,
-                    8, binBottomY - binTopY,
-                    { isStatic: true, render: inv, friction: 0.1 }
-                ));
-                // 底板（貼合底部外框）
-                Composite.add(pachinkoEngine.world, Bodies.rectangle(
-                    (binAreaLeft + binAreaRight) / 2,
-                    binBottomY + 4,
-                    binAreaWidth + 20, 12,
-                    { isStatic: true, render: inv, friction: 0.1 }
-                ));
+                Composite.add(pachinkoEngine.world, Bodies.rectangle(binAreaRight, binTopY + (binBottomY - binTopY) / 2, 8, binBottomY - binTopY, { isStatic: true, render: inv, friction: 0.1 }));
+                Composite.add(pachinkoEngine.world, Bodies.rectangle((binAreaLeft + binAreaRight) / 2, binBottomY + 4, binAreaWidth + 20, 12, { isStatic: true, render: inv, friction: 0.1 }));
             }
 
             // ===== 靜態場景繪製 =====
             const bgCanvas = document.createElement('canvas');
-            bgCanvas.width = renderWidth;
-            bgCanvas.height = renderHeight;
+            bgCanvas.width = renderWidth; bgCanvas.height = renderHeight;
             const bctx = bgCanvas.getContext('2d');
-            drawPachinkoSceneStatic(bctx, renderWidth, renderHeight, pegs, {
-                x: springX, topY: springTopY, bottomY: springBottomY, leverY: leverY
-            }, railLeft, railRight, railTop, railBottom, arcP0, arcP1, arcP2, binTopY, binBottomY);
+            drawPachinkoSceneStatic(bctx, renderWidth, renderHeight, pegs, { x: springX, topY: springTopY, bottomY: springBottomY, leverY: leverY }, railLeft, railRight, railTop, railBottom, arcCx, arcCy, arcR);
 
             // 畫獎池
             const binColors = [
-                ['#ff7aa2', '#c9184a'],
-                ['#f9c74f', '#e07a1f'],
-                ['#90be6d', '#2d6a4f'],
-                ['#4dabf7', '#1864ab'],
-                ['#b197fc', '#5f3dc4'],
-                ['#ffa94d', '#d9480f'],
-                ['#63e6be', '#087f5b'],
-                ['#ff8787', '#c92a2a'],
-                ['#74c0fc', '#1971c2']
+                ['#ff7aa2', '#c9184a'], ['#f9c74f', '#e07a1f'], ['#90be6d', '#2d6a4f'], ['#4dabf7', '#1864ab'], ['#b197fc', '#5f3dc4'],
+                ['#ffa94d', '#d9480f'], ['#63e6be', '#087f5b'], ['#ff8787', '#c92a2a'], ['#74c0fc', '#1971c2']
             ];
-
-            const prizeColorMap = {};
-            let colorIdx = 0;
-            for (const bin of pachinkoBins) {
-                if (!prizeColorMap[bin.prizeId]) {
-                    prizeColorMap[bin.prizeId] = binColors[colorIdx % binColors.length];
-                    colorIdx++;
-                }
-            }
+            const prizeColorMap = {}; let colorIdx = 0;
+            for (const bin of pachinkoBins) { if (!prizeColorMap[bin.prizeId]) { prizeColorMap[bin.prizeId] = binColors[colorIdx % binColors.length]; colorIdx++; } }
 
             for (let i = 0; i < pachinkoBins.length; i++) {
                 const bin = pachinkoBins[i];
@@ -2507,146 +1481,93 @@
                 const w = bin.width - 8;
                 const h = bin.bottomY - bin.topY - 6;
                 const colors = prizeColorMap[bin.prizeId] || binColors[0];
-
                 const bg2 = bctx.createLinearGradient(left, top, left, top + h);
-                bg2.addColorStop(0, colors[0]);
-                bg2.addColorStop(1, colors[1]);
-                bctx.fillStyle = bg2;
-                bctx.fillRect(left, top, w, h);
-
+                bg2.addColorStop(0, colors[0]); bg2.addColorStop(1, colors[1]);
+                bctx.fillStyle = bg2; bctx.fillRect(left, top, w, h);
                 const hl = bctx.createLinearGradient(left, top, left, top + h * 0.4);
-                hl.addColorStop(0, 'rgba(255,255,255,0.5)');
-                hl.addColorStop(1, 'rgba(255,255,255,0)');
-                bctx.fillStyle = hl;
-                bctx.fillRect(left, top, w, h * 0.4);
+                hl.addColorStop(0, 'rgba(255,255,255,0.5)'); hl.addColorStop(1, 'rgba(255,255,255,0)');
+                bctx.fillStyle = hl; bctx.fillRect(left, top, w, h * 0.4);
 
-                // 直排文字
                 const nm = bin.prizeData.name || bin.prizeId;
-                const maxChars = Math.min(nm.length, 5);
-                const sn = nm.slice(0, maxChars);
+                const maxChars = Math.min(nm.length, 5); const sn = nm.slice(0, maxChars);
                 const availH = h - 10;
                 const charSpace = Math.max(10, Math.min(20, Math.floor(availH / Math.max(sn.length, 1))));
                 const fontSize = Math.max(9, Math.min(15, charSpace - 3));
                 bctx.font = `bold ${fontSize}px "Noto Sans TC", sans-serif`;
-                bctx.textAlign = 'center';
-                bctx.textBaseline = 'middle';
+                bctx.textAlign = 'center'; bctx.textBaseline = 'middle';
                 const totalTextH = sn.length * charSpace;
                 const startY = top + (h - totalTextH) / 2 + charSpace / 2;
-                bctx.shadowColor = 'rgba(0,0,0,0.85)';
-                bctx.shadowBlur = 4;
-                bctx.shadowOffsetY = 1;
+                bctx.shadowColor = 'rgba(0,0,0,0.85)'; bctx.shadowBlur = 4; bctx.shadowOffsetY = 1;
                 bctx.fillStyle = '#ffffff';
-                for (let ci = 0; ci < sn.length; ci++) {
-                    bctx.fillText(sn[ci], bin.x, startY + ci * charSpace);
-                }
-                bctx.shadowBlur = 0;
-                bctx.shadowOffsetY = 0;
+                for (let ci = 0; ci < sn.length; ci++) { bctx.fillText(sn[ci], bin.x, startY + ci * charSpace); }
+                bctx.shadowBlur = 0; bctx.shadowOffsetY = 0;
             }
 
-            // 獎池隔板視覺
             if (pachinkoBins.length > 0) {
                 bctx.fillStyle = '#8b4513';
                 bctx.fillRect(binAreaLeft - 3, binTopY, 6, binBottomY - binTopY);
                 bctx.fillRect(binAreaRight - 3, binTopY, 6, binBottomY - binTopY);
                 const shelfGrad = bctx.createLinearGradient(0, binBottomY, 0, renderHeight - 20);
-                shelfGrad.addColorStop(0, '#d4af37');
-                shelfGrad.addColorStop(1, '#8b6914');
+                shelfGrad.addColorStop(0, '#d4af37'); shelfGrad.addColorStop(1, '#8b6914');
                 bctx.fillStyle = shelfGrad;
                 bctx.fillRect(20, binBottomY, renderWidth - 40, renderHeight - 20 - binBottomY);
             }
 
-            // ===== 渲染迴圈 =====
+            // ===== 渲染 + 物理迴圈 =====
             function renderLoop() {
                 ctx2d.clearRect(0, 0, renderWidth, renderHeight);
                 ctx2d.drawImage(bgCanvas, 0, 0);
-                if (pachinkoBall) {
-                    drawGlassBall(ctx2d, pachinkoBall.position.x, pachinkoBall.position.y, BALL_RADIUS);
-                }
+                if (pachinkoBall) drawGlassBall(ctx2d, pachinkoBall.position.x, pachinkoBall.position.y, BALL_RADIUS);
                 pachinkoRenderLoopId = requestAnimationFrame(renderLoop);
             }
             renderLoop();
 
-            // ===== 物理迴圈（每幀 2 次 update，降低每步位移） =====
             let lastPhysTime = performance.now();
             function physicsLoop(now) {
                 const dt = Math.min(now - lastPhysTime, 33);
                 lastPhysTime = now;
                 const sub = 4;
-                for (let i = 0; i < sub; i++) {
-                    Engine.update(pachinkoEngine, dt / sub);
-                }
+                for (let i = 0; i < sub; i++) Engine.update(pachinkoEngine, dt / sub);
                 pachinkoPhysicsLoopId = requestAnimationFrame(physicsLoop);
             }
             pachinkoPhysicsLoopId = requestAnimationFrame(physicsLoop);
         }
 
         // ---------- 拉桿 ----------
-        let leverDragging = false;
-        let leverStartClientY = 0;
-        let leverStartTop = 6;
-        let leverCurrentOffset = 0;
-
-        function getPointerClientY(e) {
-            if (e.touches && e.touches.length) return e.touches[0].clientY;
-            if (e.changedTouches && e.changedTouches.length) return e.changedTouches[0].clientY;
-            return e.clientY;
-        }
-
-        function updatePowerDisplay(percent) {
-            const fill = document.getElementById("pachinkoPowerFill");
-            const text = document.getElementById("pachinkoPowerText");
-            if (fill) fill.style.width = percent + '%';
-            if (text) text.textContent = percent;
-        }
-
+        let leverDragging = false, leverStartClientY = 0, leverStartTop = 6, leverCurrentOffset = 0;
+        function getPointerClientY(e) { if (e.touches && e.touches.length) return e.touches[0].clientY; if (e.changedTouches && e.changedTouches.length) return e.changedTouches[0].clientY; return e.clientY; }
+        function updatePowerDisplay(percent) { const fill = document.getElementById("pachinkoPowerFill"); const text = document.getElementById("pachinkoPowerText"); if (fill) fill.style.width = percent + '%'; if (text) text.textContent = percent; }
         function initPachinkoLever() {
-            const track = document.getElementById('pachinkoLeverTrack');
-            const knob = document.getElementById('pachinkoLeverKnob');
+            const track = document.getElementById('pachinkoLeverTrack'); const knob = document.getElementById('pachinkoLeverKnob');
             if (!track || !knob || track.dataset.bound === '1') return;
             track.dataset.bound = '1';
-
             function startDrag(e) {
-                if (pachinkoBallDropped) return;
-                if (!currentPlayerName) return;
-                const playerData = globalPlayedUsers[currentPlayerName];
-                const drawCount = playerData?.drawCount || 0;
+                if (pachinkoBallDropped) return; if (!currentPlayerName) return;
+                const playerData = globalPlayedUsers[currentPlayerName]; const drawCount = playerData?.drawCount || 0;
                 const limit = getMaxDrawsForPlayer(currentPlayerName);
                 if (!isAdminMode && drawCount >= limit) return;
-                leverDragging = true;
-                leverStartClientY = getPointerClientY(e);
-                leverStartTop = knob.offsetTop;
-                knob.style.transition = 'none';
-                e.preventDefault();
+                leverDragging = true; leverStartClientY = getPointerClientY(e); leverStartTop = knob.offsetTop;
+                knob.style.transition = 'none'; e.preventDefault();
             }
-
             function moveDrag(e) {
                 if (!leverDragging) return;
-                const clientY = getPointerClientY(e);
-                const dy = clientY - leverStartClientY;
+                const clientY = getPointerClientY(e); const dy = clientY - leverStartClientY;
                 let newTop = leverStartTop + dy;
                 const maxTop = track.clientHeight - knob.offsetHeight - 6;
                 newTop = Math.max(6, Math.min(maxTop, newTop));
-                knob.style.top = newTop + 'px';
-                leverCurrentOffset = newTop - 6;
+                knob.style.top = newTop + 'px'; leverCurrentOffset = newTop - 6;
                 const powerPercent = Math.round((leverCurrentOffset / (maxTop - 6)) * 100);
-                updatePowerDisplay(powerPercent);
-                e.preventDefault();
+                updatePowerDisplay(powerPercent); e.preventDefault();
             }
-
             function endDrag(e) {
                 if (!leverDragging) return;
                 leverDragging = false;
                 const maxTop = track.clientHeight - knob.offsetHeight - 6;
                 const power = Math.max(0, Math.min(1, leverCurrentOffset / (maxTop - 6)));
                 knob.style.transition = 'top 0.25s cubic-bezier(0.4, 0, 0.6, 1)';
-                knob.style.top = '6px';
-                leverCurrentOffset = 0;
-                updatePowerDisplay(0);
-                if (power > 0.02) {
-                    launchBall(power);
-                }
+                knob.style.top = '6px'; leverCurrentOffset = 0; updatePowerDisplay(0);
+                if (power > 0.02) launchBall(power);
             }
-
             track.addEventListener('mousedown', startDrag);
             track.addEventListener('touchstart', startDrag, { passive: false });
             document.addEventListener('mousemove', moveDrag);
@@ -2659,38 +1580,25 @@
         function launchBall(power) {
             if (!currentPlayerName) { alert("請先選擇名字"); return; }
             if (pachinkoBallDropped) return;
-            if (!pachinkoEngine || pachinkoBins.length === 0) {
-                alert("彈珠台尚未準備好");
-                return;
-            }
-            const playerData = globalPlayedUsers[currentPlayerName];
-            const drawCount = playerData?.drawCount || 0;
+            if (!pachinkoEngine || pachinkoBins.length === 0) { alert("彈珠台尚未準備好"); return; }
+            const playerData = globalPlayedUsers[currentPlayerName]; const drawCount = playerData?.drawCount || 0;
             const limit = getMaxDrawsForPlayer(currentPlayerName);
             if (!isAdminMode && drawCount >= limit) return;
-
             if (!pachinkoBall) {
                 const renderWidth = pachinkoRender ? pachinkoRender.options.width : pachinkoWidth;
                 const renderHeight = pachinkoRender ? pachinkoRender.options.height : pachinkoHeight;
-                const FRAME = 20;
-                const railRight = renderWidth - FRAME - 4;
-                const railLeft = railRight - 44;
-                pachinkoBall = Matter.Bodies.circle((railLeft + railRight) / 2, renderHeight - 120, 7, {
-                    isStatic: true, restitution: 0.5, friction: 0.001, frictionAir: 0.0018,
-                    density: 0.002, render: { visible: false }
+                const FRAME = 20; const railRight = renderWidth - FRAME - 4; const railLeft = railRight - 34;
+                pachinkoBall = Matter.Bodies.circle((railLeft + railRight) / 2, renderHeight - 140, 7, {
+                    isStatic: true, restitution: 0.5, friction: 0.001, frictionAir: 0.0018, density: 0.002, render: { visible: false }
                 });
                 Matter.Composite.add(pachinkoEngine.world, pachinkoBall);
             }
-
             Matter.Body.setStatic(pachinkoBall, false);
-            // 力道範圍：10 ~ 28
-            // 20% 力道 → speed = 13.6（上升約 168px，可能到不了弧形）
-            // 50% 力道 → speed = 19
-            // 100% 力道 → speed = 28
-            const minSpeed = 10;
-            const maxSpeed = 28;
+            // 力道 20% 以下無法到弧形，100% 剛好到頂
+            const minSpeed = 11;
+            const maxSpeed = 26;
             const speed = minSpeed + power * (maxSpeed - minSpeed);
             Matter.Body.setVelocity(pachinkoBall, { x: 0, y: -speed });
-
             pachinkoBallDropped = true;
             playPachinkoSound();
 
@@ -2698,13 +1606,8 @@
             const renderHeight = pachinkoRender ? pachinkoRender.options.height : pachinkoHeight;
             const playedRef = ref(db, `playedUsers/${currentPlayerName}`);
 
-            let checkCount = 0;
-            let enteredPlayArea = false;
-            let countDeducted = false;
-            let stuckTime = 0;
-            let lastPosX = -1;
-            let lastPosY = -1;
-            let unstuckCount = 0;
+            let checkCount = 0, enteredPlayArea = false, countDeducted = false;
+            let stuckTime = 0, lastPosX = -1, lastPosY = -1, unstuckCount = 0;
 
             if (pachinkoCheckIntervalId) clearInterval(pachinkoCheckIntervalId);
             pachinkoCheckIntervalId = setInterval(async () => {
@@ -2712,209 +1615,97 @@
                 checkCount++;
                 const pos = pachinkoBall.position;
 
-                // 卡住判定
                 if (enteredPlayArea && pos.y < renderHeight - 90) {
                     const moved = Math.hypot(pos.x - lastPosX, pos.y - lastPosY);
-                    if (lastPosX >= 0 && moved < 2.5) {
-                        stuckTime += 100;
-                    } else {
-                        stuckTime = 0;
-                    }
+                    if (lastPosX >= 0 && moved < 2.5) stuckTime += 100; else stuckTime = 0;
                     if (stuckTime >= 250) {
                         unstuckCount++;
                         const angle = Math.random() * Math.PI * 2;
                         let force = 5 + Math.random() * 3;
-                        if (unstuckCount >= 3) {
-                            force = 9 + Math.random() * 3;
-                            unstuckCount = 0;
-                        }
-                        Matter.Body.setVelocity(pachinkoBall, {
-                            x: Math.cos(angle) * force,
-                            y: Math.sin(angle) * force
-                        });
+                        if (unstuckCount >= 3) { force = 9 + Math.random() * 3; unstuckCount = 0; }
+                        Matter.Body.setVelocity(pachinkoBall, { x: Math.cos(angle) * force, y: Math.sin(angle) * force });
                         stuckTime = 0;
                     }
                 }
-                lastPosX = pos.x;
-                lastPosY = pos.y;
+                lastPosX = pos.x; lastPosY = pos.y;
 
-                // 出界重置
                 if (pos.x < -50 || pos.x > renderWidth + 50 || pos.y < -50 || pos.y > renderHeight + 50) {
-                    clearInterval(pachinkoCheckIntervalId);
-                    pachinkoCheckIntervalId = null;
-                    resetPachinkoAfterDraw();
-                    return;
+                    clearInterval(pachinkoCheckIntervalId); pachinkoCheckIntervalId = null; resetPachinkoAfterDraw(); return;
                 }
 
-                // 判斷是否已進入遊戲區
-                if (pos.x < renderWidth - 90) {
-                    enteredPlayArea = true;
-                }
+                if (pos.x < renderWidth - 90) enteredPlayArea = true;
 
-                // 扣次數（進入遊戲區才扣）
                 if (enteredPlayArea && !countDeducted) {
                     countDeducted = true;
                     runTransaction(playedRef, (current) => {
                         if (current && current.drawCount >= limit) return;
-                        if (current === null) {
-                            return { drawCount: 1, lastDrawTime: Date.now() };
-                        } else {
-                            return { ...current, drawCount: (current.drawCount || 0) + 1, lastDrawTime: Date.now() };
-                        }
+                        if (current === null) return { drawCount: 1, lastDrawTime: Date.now() };
+                        return { ...current, drawCount: (current.drawCount || 0) + 1, lastDrawTime: Date.now() };
                     }).then((result) => {
                         if (result.committed) {
                             const newCount = (globalPlayedUsers[currentPlayerName]?.drawCount || 0) + 1;
-                            globalPlayedUsers[currentPlayerName] = {
-                                ...(globalPlayedUsers[currentPlayerName] || {}),
-                                drawCount: newCount,
-                                lastDrawTime: Date.now()
-                            };
+                            globalPlayedUsers[currentPlayerName] = { ...(globalPlayedUsers[currentPlayerName] || {}), drawCount: newCount, lastDrawTime: Date.now() };
                             updateDrawCountDisplay();
                         }
                     }).catch((e) => console.error("扣次數失敗", e));
                 }
 
-                // 落入獎池
                 if (enteredPlayArea && pos.y > renderHeight - 65) {
-                    clearInterval(pachinkoCheckIntervalId);
-                    pachinkoCheckIntervalId = null;
+                    clearInterval(pachinkoCheckIntervalId); pachinkoCheckIntervalId = null;
                     let targetBin = null;
-                    for (const bin of pachinkoBins) {
-                        if (pos.x >= bin.x - bin.width / 2 && pos.x < bin.x + bin.width / 2) {
-                            targetBin = bin;
-                            break;
-                        }
-                    }
-                    if (!targetBin) {
-                        let minDist = Infinity;
-                        for (const bin of pachinkoBins) {
-                            const d = Math.abs(bin.x - pos.x);
-                            if (d < minDist) { minDist = d; targetBin = bin; }
-                        }
-                    }
-                    if (targetBin) {
-                        await settlePachinkoResult(targetBin);
-                    } else {
-                        resetPachinkoAfterDraw();
-                    }
+                    for (const bin of pachinkoBins) { if (pos.x >= bin.x - bin.width / 2 && pos.x < bin.x + bin.width / 2) { targetBin = bin; break; } }
+                    if (!targetBin) { let minDist = Infinity; for (const bin of pachinkoBins) { const d = Math.abs(bin.x - pos.x); if (d < minDist) { minDist = d; targetBin = bin; } } }
+                    if (targetBin) await settlePachinkoResult(targetBin); else resetPachinkoAfterDraw();
                     return;
                 }
 
-                // 超時
                 if (checkCount > 600) {
-                    clearInterval(pachinkoCheckIntervalId);
-                    pachinkoCheckIntervalId = null;
-                    if (!enteredPlayArea) {
-                        resetPachinkoAfterDraw();
-                        return;
-                    }
+                    clearInterval(pachinkoCheckIntervalId); pachinkoCheckIntervalId = null;
+                    if (!enteredPlayArea) { resetPachinkoAfterDraw(); return; }
                     let targetBin = null;
-                    for (const bin of pachinkoBins) {
-                        if (pos.x >= bin.x - bin.width / 2 && pos.x < bin.x + bin.width / 2) {
-                            targetBin = bin;
-                            break;
-                        }
-                    }
-                    if (!targetBin) {
-                        let minDist = Infinity;
-                        for (const bin of pachinkoBins) {
-                            const d = Math.abs(bin.x - pos.x);
-                            if (d < minDist) { minDist = d; targetBin = bin; }
-                        }
-                    }
-                    if (targetBin) {
-                        await settlePachinkoResult(targetBin);
-                    } else {
-                        resetPachinkoAfterDraw();
-                    }
+                    for (const bin of pachinkoBins) { if (pos.x >= bin.x - bin.width / 2 && pos.x < bin.x + bin.width / 2) { targetBin = bin; break; } }
+                    if (!targetBin) { let minDist = Infinity; for (const bin of pachinkoBins) { const d = Math.abs(bin.x - pos.x); if (d < minDist) { minDist = d; targetBin = bin; } } }
+                    if (targetBin) await settlePachinkoResult(targetBin); else resetPachinkoAfterDraw();
                 }
             }, 100);
         }
 
         async function settlePachinkoResult(chosenBin) {
-            const prizeId = chosenBin.prizeId;
-            const prizeData = chosenBin.prizeData;
+            const prizeId = chosenBin.prizeId; const prizeData = chosenBin.prizeData;
             try {
                 const qRef = ref(db, `prizes/${prizeId}/quantity`);
                 const tx = await runTransaction(qRef, cur => (cur === null || cur <= 0) ? undefined : cur - 1);
-                if (!tx.committed) {
-                    alert(`很抱歉，「${prizeData.name || prizeId}」已無庫存。`);
-                    resetPachinkoAfterDraw();
-                    return;
-                }
+                if (!tx.committed) { alert(`很抱歉，「${prizeData.name || prizeId}」已無庫存。`); resetPachinkoAfterDraw(); return; }
                 let code = "";
-                try {
-                    const cs = await get(ref(db, `prizeCodes/${prizeId}`));
-                    if (cs.exists()) {
-                        const cObj = cs.val();
-                        const used = new Set(Object.values(globalPlayedUsers).map(u => u && u.code).filter(c => c));
-                        const av = Object.values(cObj).filter(c => c && !used.has(c));
-                        if (av.length) code = av[0];
-                    }
-                } catch (e) {}
+                try { const cs = await get(ref(db, `prizeCodes/${prizeId}`)); if (cs.exists()) { const cObj = cs.val(); const used = new Set(Object.values(globalPlayedUsers).map(u => u && u.code).filter(c => c)); const av = Object.values(cObj).filter(c => c && !used.has(c)); if (av.length) code = av[0]; } } catch (e) {}
                 let awardedPoints = 0;
-                const minP = Number(prizeData.minPoints);
-                const maxP = Number(prizeData.maxPoints);
+                const minP = Number(prizeData.minPoints); const maxP = Number(prizeData.maxPoints);
                 if (!code && !isNaN(minP) && !isNaN(maxP) && maxP >= minP && maxP > 0) {
                     awardedPoints = Math.floor(Math.random() * (maxP - minP + 1)) + minP;
                     try {
                         await runTransaction(ref(db, `pointUsers/${currentPlayerName}/points`), cur => (cur || 0) + awardedPoints);
-                        await push(ref(db, "pendingPoints"), {
-                            playerName: currentPlayerName,
-                            points: awardedPoints,
-                            prizeName: prizeData.name,
-                            timestamp: Date.now(),
-                            status: "approved",
-                            processedAt: Date.now()
-                        });
-                    } catch (e) {
-                        console.error("點數發放失敗（不影響中獎）", e);
-                    }
+                        await push(ref(db, "pendingPoints"), { playerName: currentPlayerName, points: awardedPoints, prizeName: prizeData.name, timestamp: Date.now(), status: "approved", processedAt: Date.now() });
+                    } catch (e) { console.error("點數發放失敗（不影響中獎）", e); }
                     code = "點數已自動匯入你的錢包";
                 }
-                await push(ref(db, `drawRecords/${currentPlayerName}`), {
-                    type: "pachinko",
-                    won: prizeData.name || prizeId,
-                    code: code,
-                    time: Date.now(),
-                    group: honorUnlockedGroup,
-                    showOnBoard: true
-                });
+                await push(ref(db, `drawRecords/${currentPlayerName}`), { type: "pachinko", won: prizeData.name || prizeId, code: code, time: Date.now(), group: honorUnlockedGroup, showOnBoard: true });
                 showSlotWinModal(prizeData.name, code, awardedPoints);
-            } catch (e) {
-                console.error(e);
-                alert("中獎處理失敗，請聯繫管理員");
-            } finally {
-                resetPachinkoAfterDraw();
-            }
+            } catch (e) { console.error(e); alert("中獎處理失敗，請聯繫管理員"); }
+            finally { resetPachinkoAfterDraw(); }
         }
 
         function resetPachinkoAfterDraw() {
-            if (pachinkoBall) {
-                Matter.Composite.remove(pachinkoEngine.world, pachinkoBall);
-                pachinkoBall = null;
-            }
+            if (pachinkoBall) { Matter.Composite.remove(pachinkoEngine.world, pachinkoBall); pachinkoBall = null; }
             if (pachinkoEngine && pachinkoRender) {
-                const ballRestX = pachinkoBallRestX;
-                const ballRestY = pachinkoBallRestY;
-                pachinkoBall = Matter.Bodies.circle(ballRestX, ballRestY, 7, {
-                    isStatic: true, restitution: 0.5, friction: 0.001, frictionAir: 0.0018,
-                    density: 0.002, render: { visible: false }
+                pachinkoBall = Matter.Bodies.circle(pachinkoBallRestX, pachinkoBallRestY, 7, {
+                    isStatic: true, restitution: 0.5, friction: 0.001, frictionAir: 0.0018, density: 0.002, render: { visible: false }
                 });
                 Matter.Composite.add(pachinkoEngine.world, pachinkoBall);
             }
             pachinkoBallDropped = false;
         }
 
-        function clickTicket() {
-            if (currentPrizeUrl && currentPrizeUrl.startsWith("http")) {
-                window.open(currentPrizeUrl, "_blank");
-            } else if (currentPrizeUrl) {
-                alert(currentPrizeUrl);
-            } else {
-                alert("無連結");
-            }
-        }
+        function clickTicket() { if (currentPrizeUrl && currentPrizeUrl.startsWith("http")) { window.open(currentPrizeUrl, "_blank"); } else if (currentPrizeUrl) { alert(currentPrizeUrl); } else { alert("無連結"); } }
 
         function closeModal() {
             document.getElementById("winModal").style.display = "none";
@@ -2923,26 +1714,17 @@
             document.getElementById("copyHint").style.display = "block";
             const slotVisible = document.getElementById("slotSystemArea").style.display !== "none";
             const pachinkoVisible = document.getElementById("pachinkoSystemArea").style.display !== "none";
-            if (slotVisible) {
-                showSlotSystem();
-            } else if (pachinkoVisible) {
-                showPachinkoSystem();
-            } else {
+            if (slotVisible) { showSlotSystem(); }
+            else if (pachinkoVisible) { showPachinkoSystem(); }
+            else {
                 const drawCount = globalPlayedUsers[currentPlayerName]?.drawCount || 0;
                 const limit = getMaxDrawsForPlayer(currentPlayerName);
                 const remaining = limit - drawCount;
-                if (remaining > 0 && !isAdminMode) {
-                    showDrawSystem();
-                    updateDrawCountDisplay();
-                } else {
-                    showPointsSystem();
-                    document.getElementById("drawActionArea").classList.add("hidden");
-                    document.getElementById("alreadyPlayedMsg").classList.remove("hidden");
-                }
+                if (remaining > 0 && !isAdminMode) { showDrawSystem(); updateDrawCountDisplay(); }
+                else { showPointsSystem(); document.getElementById("drawActionArea").classList.add("hidden"); document.getElementById("alreadyPlayedMsg").classList.remove("hidden"); }
                 isAdminMode = false;
             }
         }
-
         function openConfirmModal() {
             if (isDrawing) return;
             const name = document.getElementById("playerName").value;
@@ -2953,25 +1735,14 @@
             if (disabledPlayers[name]) { alert("此玩家已被禁止抽獎"); return; }
             document.getElementById("confirmModal").style.display = "flex";
         }
-        function closeConfirmModal() {
-            document.getElementById("confirmModal").style.display = "none";
-        }
-        function confirmAndDraw() {
-            closeConfirmModal();
-            startDraw();
-        }
+        function closeConfirmModal() { document.getElementById("confirmModal").style.display = "none"; }
+        function confirmAndDraw() { closeConfirmModal(); startDraw(); }
 
-        document.addEventListener("DOMContentLoaded", () => {
-            bindShopTabs();
-            buildSlotReels();
-            initPachinkoLever();
-        });
+        document.addEventListener("DOMContentLoaded", () => { bindShopTabs(); buildSlotReels(); initPachinkoLever(); });
         onAuthStateChanged(auth, user => {
             if (user) {
                 deviceId = user.uid;
-                onValue(ref(db, "settings/closed"), snap => {
-                    document.getElementById("closedOverlay").style.display = snap.val() === true ? "flex" : "none";
-                });
+                onValue(ref(db, "settings/closed"), snap => { document.getElementById("closedOverlay").style.display = snap.val() === true ? "flex" : "none"; });
                 initApp();
             }
         });
