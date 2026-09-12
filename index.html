@@ -465,6 +465,9 @@
         let hamsterCaught = false;
         let hamsterImageUrl = null;
         let hamsterImage = null;
+        let portals = [];
+        let portalCooldownUntil = 0;
+        let portalFlashes = [];
 
         let audioCtx = null;
         let soundEnabled = true;
@@ -1193,6 +1196,73 @@
 
             ctx.restore();
         }
+        function drawPortalLocal(ctx, r, phase) {
+            const t = performance.now() * 0.004 + phase;
+
+            // 外光暈
+            const glow = ctx.createRadialGradient(0, 0, 0, 0, 0, r * 1.6);
+            glow.addColorStop(0, 'rgba(200,130,255,0.85)');
+            glow.addColorStop(0.4, 'rgba(140,80,230,0.55)');
+            glow.addColorStop(1, 'rgba(120,60,220,0)');
+            ctx.fillStyle = glow;
+            ctx.beginPath(); ctx.arc(0, 0, r * 1.6, 0, Math.PI * 2); ctx.fill();
+
+            // 底盤
+            const base = ctx.createRadialGradient(-r * 0.3, -r * 0.3, r * 0.1, 0, 0, r);
+            base.addColorStop(0, '#e0c0ff');
+            base.addColorStop(0.5, '#9b5de5');
+            base.addColorStop(1, '#3a1a6a');
+            ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2);
+            ctx.fillStyle = base; ctx.fill();
+            ctx.strokeStyle = 'rgba(255,255,255,0.7)'; ctx.lineWidth = 2; ctx.stroke();
+
+            // 漩渦環
+            for (let i = 0; i < 3; i++) {
+                const rr = r * (0.35 + i * 0.22);
+                const alpha = 0.85 - i * 0.2;
+                ctx.beginPath();
+                ctx.arc(0, 0, rr, t + i * 1.2, t + i * 1.2 + Math.PI * 1.4);
+                ctx.strokeStyle = `rgba(240,220,255,${alpha})`;
+                ctx.lineWidth = 2.5;
+                ctx.stroke();
+            }
+
+            // 中心亮點
+            const cg = ctx.createRadialGradient(0, 0, 0, 0, 0, r * 0.3);
+            cg.addColorStop(0, '#ffffff');
+            cg.addColorStop(1, 'rgba(180,100,255,0.6)');
+            ctx.beginPath(); ctx.arc(0, 0, r * 0.3, 0, Math.PI * 2);
+            ctx.fillStyle = cg; ctx.fill();
+        }
+
+        function updatePortals() {
+            if (!pachinkoBall || pachinkoBall.isStatic) return;
+            if (Date.now() < portalCooldownUntil) return;
+            const pos = pachinkoBall.position;
+            for (const p of portals) {
+                const da = Math.hypot(pos.x - p.ax, pos.y - p.ay);
+                if (da < p.radius * 0.7) {
+                    teleportBall(p.bx, p.by);
+                    return;
+                }
+                const db = Math.hypot(pos.x - p.bx, pos.y - p.by);
+                if (db < p.radius * 0.7) {
+                    teleportBall(p.ax, p.ay);
+                    return;
+                }
+            }
+        }
+
+        function teleportBall(tx, ty) {
+            portalCooldownUntil = Date.now() + 500;
+            const oldPos = { x: pachinkoBall.position.x, y: pachinkoBall.position.y };
+            const nowMs = performance.now();
+            portalFlashes.push({ x: oldPos.x, y: oldPos.y, startTime: nowMs, maxAge: 500 });
+            portalFlashes.push({ x: tx, y: ty, startTime: nowMs, maxAge: 500 });
+            Matter.Body.setPosition(pachinkoBall, { x: tx, y: ty });
+            Matter.Body.setVelocity(pachinkoBall, { x: (Math.random() - 0.5) * 3, y: 2 + Math.random() * 2 });
+            playPachinkoSound();
+        }
         function drawSpring(ctx, cx, topY, bottomY, radius, turns) {
             ctx.save(); ctx.strokeStyle = '#c0c0c0'; ctx.lineWidth = 2.5; ctx.lineCap = 'round';
             const totalH = bottomY - topY; const segs = turns * 24;
@@ -1467,6 +1537,27 @@
             const pegRows = 12;
             const dx = (areaRight - areaLeft) / (pegCols - 1);
             const dy = (areaBottom - areaTop) / (pegRows - 1);
+            // ★ 傳送門初始化（固定位置，兩兩成對）
+            portals = [];
+            portalFlashes = [];
+            portalCooldownUntil = 0;
+            {
+                const pr = Math.round(renderWidth * 0.055);
+                portals = [
+                    // 對 1：中左 ↔ 中右（水平傳送）
+                    {
+                        ax: areaLeft + dx * 0.5, ay: areaTop + dy * 4.0,
+                        bx: areaLeft + dx * 6.5, by: areaTop + dy * 4.0,
+                        radius: pr, phase: 0
+                    },
+                    // 對 2：中右 ↔ 中左（斜對角傳送）
+                    {
+                        ax: areaLeft + dx * 6.5, ay: areaTop + dy * 6.5,
+                        bx: areaLeft + dx * 0.5, by: areaTop + dy * 9.0,
+                        radius: pr, phase: Math.PI
+                    }
+                ];
+            }
 
             // ★ 載入自訂倉鼠圖片（沒設定則用預設繪圖）
             hamsterImage = null;
@@ -1523,6 +1614,11 @@
                 for (const rp of redPins) {
                     const need = rp.r * 1.6 + pegRadius + BALL_RADIUS + 6;
                     if (Math.hypot(x - rp.x, y - rp.y) < need) return true;
+                }
+                for (const p of portals) {
+                    const need = p.radius + pegRadius + BALL_RADIUS + 4;
+                    if (Math.hypot(x - p.ax, y - p.ay) < need) return true;
+                    if (Math.hypot(x - p.bx, y - p.by) < need) return true;
                 }
                 return false;
             }
@@ -1747,6 +1843,39 @@
             function renderLoop() {
                 ctx2d.clearRect(0, 0, renderWidth, renderHeight);
                 ctx2d.drawImage(bgCanvas, 0, 0, renderWidth, renderHeight);
+
+                // ★ 傳送門
+                for (const p of portals) {
+                    ctx2d.save();
+                    ctx2d.translate(p.ax, p.ay);
+                    drawPortalLocal(ctx2d, p.radius, p.phase);
+                    ctx2d.restore();
+                    ctx2d.save();
+                    ctx2d.translate(p.bx, p.by);
+                    drawPortalLocal(ctx2d, p.radius, p.phase + Math.PI);
+                    ctx2d.restore();
+                }
+
+                // ★ 傳送門閃光
+                const nowMs = performance.now();
+                for (let i = portalFlashes.length - 1; i >= 0; i--) {
+                    const fl = portalFlashes[i];
+                    const age = nowMs - fl.startTime;
+                    if (age > fl.maxAge) { portalFlashes.splice(i, 1); continue; }
+                    const t = age / fl.maxAge;
+                    const alpha = 1 - t;
+                    const r = 26 + t * 30;
+                    ctx2d.save();
+                    ctx2d.globalAlpha = alpha;
+                    const fg = ctx2d.createRadialGradient(fl.x, fl.y, 0, fl.x, fl.y, r);
+                    fg.addColorStop(0, 'rgba(255,255,255,1)');
+                    fg.addColorStop(0.4, 'rgba(200,150,255,0.8)');
+                    fg.addColorStop(1, 'rgba(150,80,220,0)');
+                    ctx2d.fillStyle = fg;
+                    ctx2d.beginPath(); ctx2d.arc(fl.x, fl.y, r, 0, Math.PI * 2); ctx2d.fill();
+                    ctx2d.restore();
+                }
+
                 for (const wm of windmillBodies) {
                     ctx2d.save();
                     ctx2d.translate(wm.body.position.x, wm.body.position.y);
@@ -1787,6 +1916,8 @@
                 }
                 // ★ 更新倉鼠
                 updateHamster();
+                // ★ 更新傳送門
+                updatePortals();
                 pachinkoPhysicsLoopId = requestAnimationFrame(physicsLoop);
             }
             pachinkoPhysicsLoopId = requestAnimationFrame(physicsLoop);
