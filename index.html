@@ -1213,17 +1213,37 @@
             const woodGrad = cctx.createLinearGradient(0, 0, renderWidth, renderHeight);
             woodGrad.addColorStop(0, '#e0a866'); woodGrad.addColorStop(0.5, '#c07830'); woodGrad.addColorStop(1, '#8b4513');
 
-            // ===== 拱橋（跟左右牆同粗細） =====
+            // ===== 頂部邊框（圓角矩形：1/4圓 + 直線 + 1/4圓） =====
+            const topY = arcCy - arcR;
+            const topLeftCornerCx = leftWallX + arcR;
+            const topRightCornerCx = railRight - arcR;
+
             cctx.save();
             cctx.lineCap = 'butt'; cctx.lineJoin = 'round';
-            cctx.strokeStyle = 'rgba(0,0,0,0.6)'; cctx.lineWidth = wallT + 4;
-            cctx.beginPath(); cctx.arc(arcCx, arcCy, arcR, Math.PI, Math.PI * 2); cctx.stroke();
-            cctx.strokeStyle = 'rgba(255, 220, 100, 0.25)'; cctx.lineWidth = wallT + 10;
-            cctx.beginPath(); cctx.arc(arcCx, arcCy, arcR, Math.PI, Math.PI * 2); cctx.stroke();
-            cctx.strokeStyle = woodGrad; cctx.lineWidth = wallT;
-            cctx.beginPath(); cctx.arc(arcCx, arcCy, arcR, Math.PI, Math.PI * 2); cctx.stroke();
-            cctx.strokeStyle = 'rgba(255,220,160,0.85)'; cctx.lineWidth = 3;
-            cctx.beginPath(); cctx.arc(arcCx, arcCy, arcR - 4, Math.PI + 0.05, Math.PI * 2 - 0.05); cctx.stroke();
+
+            function drawTopFrame(style, lineWidth) {
+                cctx.strokeStyle = style;
+                cctx.lineWidth = lineWidth;
+                cctx.beginPath();
+                cctx.moveTo(leftWallX, arcCy);
+                cctx.arc(topLeftCornerCx, arcCy, arcR, Math.PI, Math.PI * 1.5);
+                cctx.lineTo(topRightCornerCx, topY);
+                cctx.arc(topRightCornerCx, arcCy, arcR, Math.PI * 1.5, Math.PI * 2);
+                cctx.stroke();
+            }
+
+            drawTopFrame('rgba(0,0,0,0.6)', wallT + 4);
+            drawTopFrame('rgba(255, 220, 100, 0.25)', wallT + 10);
+            drawTopFrame(woodGrad, wallT);
+
+            // 高光
+            cctx.strokeStyle = 'rgba(255,220,160,0.5)'; cctx.lineWidth = 2;
+            cctx.beginPath();
+            cctx.moveTo(leftWallX, arcCy);
+            cctx.arc(topLeftCornerCx, arcCy, arcR - 3, Math.PI, Math.PI * 1.5);
+            cctx.lineTo(topRightCornerCx, topY + 3);
+            cctx.arc(topRightCornerCx, arcCy, arcR - 3, Math.PI * 1.5, Math.PI * 2);
+            cctx.stroke();
             cctx.restore();
 
             // ===== 左牆 =====
@@ -1310,11 +1330,12 @@
             const wallT = Math.max(10, Math.round(renderWidth * 0.042));
 
             // 拱橋：左端貼左牆、右端接右牆
-            const arcLeftEndX = playLeft + Math.round(renderWidth * 0.03);
-            const arcRightEndX = playRight - Math.round(renderWidth * 0.03);
+            const arcLeftEndX = playLeft + 4;
+            const arcRightEndX = playRight - 4;
             const arcCx = (arcLeftEndX + arcRightEndX) / 2;
-            const arcR = (arcRightEndX - arcLeftEndX) / 2;
-            const arcCy = Math.round(renderHeight * 0.37);
+            const cornerRadius = Math.round(renderWidth * 0.14);   // 圓角半徑（1/4 圓）
+            const arcR = cornerRadius;
+            const arcCy = playTop + wallT / 2 + cornerRadius;      // 圓角圓心 y
 
             // 左牆
             const leftWallX = arcLeftEndX;
@@ -1342,7 +1363,19 @@
             pachinkoBallRestY = ballRestY;
 
             // 拱橋物理牆
-            buildArcWallByCircle(pachinkoEngine, arcCx, arcCy, arcR, Math.PI, Math.PI * 2, wallT + 6, 40);
+            // 頂部邊框物理牆（1/4圓 + 直線 + 1/4圓）
+            const topLeftCornerCx = arcLeftEndX + cornerRadius;
+            const topRightCornerCx = arcRightEndX - cornerRadius;
+            // 左上角 1/4 圓
+            buildArcWallByCircle(pachinkoEngine, topLeftCornerCx, arcCy, cornerRadius, Math.PI, Math.PI * 1.5, wallT + 4, 16);
+            // 右上角 1/4 圓
+            buildArcWallByCircle(pachinkoEngine, topRightCornerCx, arcCy, cornerRadius, Math.PI * 1.5, Math.PI * 2, wallT + 4, 16);
+            // 頂部水平線
+            Composite.add(pachinkoEngine.world, Bodies.rectangle(
+                (arcLeftEndX + arcRightEndX) / 2, playTop + wallT / 2,
+                arcRightEndX - arcLeftEndX - cornerRadius * 2, wallT + 4,
+                { isStatic: true, render: inv, restitution: 0.1, friction: 0 }
+            ));
 
             // 左牆物理
             Composite.add(pachinkoEngine.world, Bodies.rectangle(
