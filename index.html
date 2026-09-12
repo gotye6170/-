@@ -1069,6 +1069,7 @@
             });
             onValue(ref(db, "settings/global/gameMode"), (snap) => {
                 gameMode = snap.val() || "both";
+                console.log("🎮 gameMode 更新為：", gameMode);
                 updateGameModeUI();
             });
             onValue(ref(db, "slotSymbols"), (snap) => {
@@ -2165,8 +2166,8 @@
 
             pachinkoEngine = Engine.create();
             pachinkoEngine.gravity.y = 0.55;
-            pachinkoEngine.positionIterations = 18;
-            pachinkoEngine.velocityIterations = 18;
+            pachinkoEngine.positionIterations = 20;
+            pachinkoEngine.velocityIterations = 20;
             pachinkoEngine.constraintIterations = 4;
 
             let renderWidth = Math.min(pachinkoWidth, container.clientWidth || pachinkoWidth);
@@ -2186,43 +2187,43 @@
             pachinkoRender = { options: { width: renderWidth, height: renderHeight }, canvas: canvas };
 
             const inv = { visible: false };
-            const wallThickness = 20;
+            const wallThickness = 60;
 
+            // ===== 外框直牆（超厚，防穿牆） =====
             Composite.add(pachinkoEngine.world, [
-                Bodies.rectangle(-wallThickness, renderHeight/2, wallThickness*2, renderHeight*3, { isStatic: true, render: inv, restitution: 0.2 }),
-                Bodies.rectangle(renderWidth + wallThickness, renderHeight/2, wallThickness*2, renderHeight*3, { isStatic: true, render: inv, restitution: 0.2 }),
-                Bodies.rectangle(renderWidth/2, -wallThickness, renderWidth*3, wallThickness*2, { isStatic: true, render: inv, restitution: 0.2 }),
-                Bodies.rectangle(renderWidth/2, renderHeight + wallThickness, renderWidth*3, wallThickness*2, { isStatic: true, render: inv, restitution: 0.2 })
+                Bodies.rectangle(0, renderHeight/2, wallThickness*2, renderHeight*3, { isStatic: true, render: inv, restitution: 0.2 }),
+                Bodies.rectangle(renderWidth, renderHeight/2, wallThickness*2, renderHeight*3, { isStatic: true, render: inv, restitution: 0.2 }),
+                Bodies.rectangle(renderWidth/2, 0, renderWidth*3, wallThickness*2, { isStatic: true, render: inv, restitution: 0.2 }),
+                Bodies.rectangle(renderWidth/2, renderHeight, renderWidth*3, wallThickness*2, { isStatic: true, render: inv, restitution: 0.2 })
             ]);
 
+            // 內緣裝飾牆（保留視覺，實際碰撞交給上面超厚牆）
             Composite.add(pachinkoEngine.world, [
-                Bodies.rectangle(0, renderHeight/2, 60, renderHeight, { isStatic: true, render: inv, restitution: 0.2 }),
-                Bodies.rectangle(renderWidth, renderHeight/2, 60, renderHeight, { isStatic: true, render: inv, restitution: 0.2 }),
-                Bodies.rectangle(renderWidth/2, 0, renderWidth*3, 60, { isStatic: true, render: inv, restitution: 0.2 }),
-                Bodies.rectangle(renderWidth/2, renderHeight, renderWidth*3, 60, { isStatic: true, render: inv, restitution: 0.2 })
+                Bodies.rectangle(20, renderHeight/2, 20, renderHeight, { isStatic: true, render: inv, restitution: 0.2 }),
+                Bodies.rectangle(renderWidth - 20, renderHeight/2, 20, renderHeight, { isStatic: true, render: inv, restitution: 0.2 }),
+                Bodies.rectangle(renderWidth/2, 20, renderWidth, 20, { isStatic: true, render: inv, restitution: 0.2 }),
+                Bodies.rectangle(renderWidth/2, renderHeight - 10, renderWidth, 20, { isStatic: true, render: inv, restitution: 0.2 })
             ]);
 
+            // ===== 圓弧牆（20 段旋轉矩形拼接，回到原本的方式） =====
             const R = 60;
             const cxL = 20 + R, cyL = 20 + R;
             const cxR = renderWidth - 20 - R, cyR = 20 + R;
-            // 用一圈小圓球拼牆，球球互相重疊，絕不會有縫隙
-            const wallBallR = 14;
-            const numWallBalls = 50;
-            for (let i = 0; i <= numWallBalls; i++) {
-                // 左上角弧線（180° → 270°）
-                const angleL = Math.PI + (i / numWallBalls) * (Math.PI / 2);
-                Composite.add(pachinkoEngine.world, Bodies.circle(
-                    cxL + R * Math.cos(angleL), cyL + R * Math.sin(angleL), wallBallR,
-                    { isStatic: true, render: inv, restitution: 0.2 }
+            const seg = 24;
+            for (let i = 0; i <= seg; i++) {
+                const angleL = Math.PI + (i / seg) * (Math.PI / 2);
+                Composite.add(pachinkoEngine.world, Bodies.rectangle(
+                    cxL + R * Math.cos(angleL), cyL + R * Math.sin(angleL), 24, 24,
+                    { isStatic: true, angle: angleL, render: inv, restitution: 0.2 }
                 ));
-                // 右上角弧線（270° → 360°）
-                const angleR = 1.5 * Math.PI + (i / numWallBalls) * (Math.PI / 2);
-                Composite.add(pachinkoEngine.world, Bodies.circle(
-                    cxR + R * Math.cos(angleR), cyR + R * Math.sin(angleR), wallBallR,
-                    { isStatic: true, render: inv, restitution: 0.2 }
+                const angleR = 1.5 * Math.PI + (i / seg) * (Math.PI / 2);
+                Composite.add(pachinkoEngine.world, Bodies.rectangle(
+                    cxR + R * Math.cos(angleR), cyR + R * Math.sin(angleR), 24, 24,
+                    { isStatic: true, angle: angleR, render: inv, restitution: 0.2 }
                 ));
             }
 
+            // ===== 右側軌道左牆 =====
             const railRightX = renderWidth - 60;
             const railTopY = 60;
             const railBottomY = renderHeight - 80;
@@ -2300,6 +2301,7 @@
                 pegs.push({ x: b.x, y: b.y, r: b.r, isBumper: true });
             }
 
+            // 紅球脈衝
             Events.on(pachinkoEngine, 'collisionStart', (event) => {
                 if (!pachinkoBall) return;
                 for (const pair of event.pairs) {
@@ -2323,6 +2325,7 @@
                 }
             });
 
+            // 釘子碰撞音效
             let lastPegSoundTime = 0;
             Events.on(pachinkoEngine, 'collisionStart', (event) => {
                 if (!pachinkoBall) return;
@@ -2344,6 +2347,7 @@
                 }
             });
 
+            // 旋轉葉片
             const spinners = [];
             for (const d of spinnerDefs) {
                 const body = Bodies.rectangle(d.x, d.y, d.w, d.h, {
@@ -2353,9 +2357,12 @@
                 Composite.add(pachinkoEngine.world, body);
                 spinners.push({ body, w: d.w, h: d.h, speed: d.speed * d.dir });
             }
+
+            // ===== 每幀更新 + 安全區強拉回（穿牆時拉回） =====
             Events.on(pachinkoEngine, 'beforeUpdate', () => {
                 for (const s of spinners) Matter.Body.rotate(s.body, s.speed);
 
+                // 安全區強拉回：彈珠若跑出可視範圍，立刻拉回並反向彈
                 if (!pachinkoBall || pachinkoBall.isStatic) return;
                 const pos = pachinkoBall.position;
                 const r = 7;
@@ -2371,12 +2378,12 @@
                 if (needFix) {
                     Matter.Body.setPosition(pachinkoBall, { x: nx, y: ny });
                     const v = pachinkoBall.velocity;
-                    Matter.Body.setVelocity(pachinkoBall, { x: -v.x * 0.5, y: -v.y * 0.5 });
+                    Matter.Body.setVelocity(pachinkoBall, { x: -v.x * 0.4, y: -v.y * 0.4 });
                 }
             });
 
             // ===== 彈簧與彈珠預備位置 =====
-            const ballRestX = (railRightX + 6 + (renderWidth - 30)) / 2;
+            const ballRestX = (railRightX + 15 + (renderWidth - 30)) / 2;
             const ballRestY = railBottomY - 20;
             const springX = ballRestX;
             const springTopY = ballRestY + 10;
@@ -2658,7 +2665,7 @@
             document.addEventListener('touchmove', moveDrag, { passive: false });
             document.addEventListener('mouseup', endDrag);
             document.addEventListener('touchend', endDrag);
-            document.addEventListener('touchcancel', endDrag);
+            track.addEventListener('touchcancel', endDrag);
         }
 
         function sealPachinkoExit() {
@@ -2697,7 +2704,7 @@
                 const renderWidth = pachinkoRender ? pachinkoRender.options.width : pachinkoWidth;
                 const renderHeight = pachinkoRender ? pachinkoRender.options.height : pachinkoHeight;
                 const railRightX = renderWidth - 60;
-                const ballStartX = (railRightX + 6 + (renderWidth - 30)) / 2;
+                const ballStartX = (railRightX + 15 + (renderWidth - 30)) / 2;
                 pachinkoBall = Matter.Bodies.circle(ballStartX, renderHeight - 115, 7, {
                     isStatic: true,
                     restitution: 0.5,
