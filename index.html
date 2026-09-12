@@ -2165,7 +2165,7 @@
                   Events = Matter.Events;
 
             pachinkoEngine = Engine.create();
-            pachinkoEngine.gravity.y = 1.0;
+            pachinkoEngine.gravity.y = 0.55;
             pachinkoEngine.positionIterations = 18;
             pachinkoEngine.velocityIterations = 18;
             pachinkoEngine.constraintIterations = 4;
@@ -2367,7 +2367,7 @@
             Composite.add(pachinkoEngine.world, Bodies.rectangle(ballRestX, ballRestY + 12, 30, 8, { isStatic: true, render: inv }));
 
             pachinkoBall = Bodies.circle(ballRestX, ballRestY, 7, {
-                isStatic: true, restitution: 0.5, friction: 0.001, frictionAir: 0.0008,
+                isStatic: true, restitution: 0.5, friction: 0.001, frictionAir: 0.0018,
                 density: 0.002, render: inv
             });
             Composite.add(pachinkoEngine.world, pachinkoBall);
@@ -2680,7 +2680,7 @@
                     isStatic: true,
                     restitution: 0.5,
                     friction: 0.001,
-                    frictionAir: 0.0008,
+                    frictionAir: 0.0018,
                     density: 0.002,
                     render: { visible: false }
                 });
@@ -2688,8 +2688,8 @@
             }
 
             Matter.Body.setStatic(pachinkoBall, false);
-            const minSpeed = 10;
-            const maxSpeed = 28;
+            const minSpeed = 8;
+            const maxSpeed = 22;
             const speed = minSpeed + power * (maxSpeed - minSpeed);
             Matter.Body.setVelocity(pachinkoBall, { x: 0, y: -speed });
 
@@ -2915,7 +2915,7 @@
                     isStatic: true,
                     restitution: 0.5,
                     friction: 0.001,
-                    frictionAir: 0.0008,
+                    frictionAir: 0.0018,
                     density: 0.002,
                     render: { visible: false }
                 });
