@@ -1065,7 +1065,7 @@
             finally { isSlotSpinning = false; const lever = document.getElementById("slotLever"); if (lever) lever.style.pointerEvents = 'auto'; }
         }
 
-        // ---------- 彈珠台核心（全新改寫） ----------
+        // ---------- 彈珠台核心（自適應 328 寬度） ----------
         function drawGlassBall(ctx, x, y, r) {
             const grad = ctx.createRadialGradient(x - r * 0.35, y - r * 0.35, r * 0.05, x, y, r);
             grad.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
@@ -1097,7 +1097,6 @@
             ctx.beginPath(); ctx.arc(x - r * 0.35, y - r * 0.35, r * 0.3, 0, Math.PI * 2); ctx.fillStyle = 'rgba(255,255,255,0.95)'; ctx.fill();
         }
         function drawRedBouncyPin(ctx, x, y, r) {
-            // 紅色大球（彈性更好的 Pin）
             ctx.beginPath(); ctx.arc(x + 2, y + 3, r * 1.05, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.fill();
             const glow = ctx.createRadialGradient(x, y, r * 0.6, x, y, r * 2.5);
             glow.addColorStop(0, 'rgba(255,80,80,0.55)'); glow.addColorStop(1, 'rgba(255,80,80,0)');
@@ -1157,7 +1156,7 @@
             ctx.beginPath(); ctx.arc(cx - 4, cy - 4, 3, 0, Math.PI * 2); ctx.fillStyle = 'rgba(255,255,255,0.9)'; ctx.fill();
         }
 
-        // 沿圓弧建立物理牆（半圓拱形）
+        // 沿圓弧建立物理牆
         function buildArcWallByCircle(engine, cx, cy, R, startAngle, endAngle, thickness, segments) {
             const Bodies = Matter.Bodies; const Composite = Matter.Composite;
             for (let i = 0; i < segments; i++) {
@@ -1207,24 +1206,20 @@
             const woodGrad = cctx.createLinearGradient(0, 0, renderWidth, renderHeight);
             woodGrad.addColorStop(0, '#e0a866'); woodGrad.addColorStop(0.5, '#c07830'); woodGrad.addColorStop(1, '#8b4513');
 
-            // ===== 弧形拱橋：上半圓（180° → 360°），大拱 =====
+            // ===== 弧形拱橋（180° → 360°，半圓） =====
             cctx.save();
             cctx.lineCap = 'round'; cctx.lineJoin = 'round';
-            // 外陰影
             cctx.strokeStyle = 'rgba(0,0,0,0.6)'; cctx.lineWidth = 30;
             cctx.beginPath(); cctx.arc(arcCx, arcCy, arcR, Math.PI, Math.PI * 2); cctx.stroke();
-            // 發光
             cctx.strokeStyle = 'rgba(255, 220, 100, 0.3)'; cctx.lineWidth = 36;
             cctx.beginPath(); cctx.arc(arcCx, arcCy, arcR, Math.PI, Math.PI * 2); cctx.stroke();
-            // 主體
             cctx.strokeStyle = woodGrad; cctx.lineWidth = 22;
             cctx.beginPath(); cctx.arc(arcCx, arcCy, arcR, Math.PI, Math.PI * 2); cctx.stroke();
-            // 內高光
             cctx.strokeStyle = 'rgba(255,220,160,0.85)'; cctx.lineWidth = 4;
             cctx.beginPath(); cctx.arc(arcCx, arcCy, arcR - 5, Math.PI + 0.05, Math.PI * 2 - 0.05); cctx.stroke();
             cctx.restore();
 
-            // ===== 垂直軌道（拱的右端往下）=====
+            // ===== 垂直軌道（兩條木條） =====
             // 左木條
             cctx.fillStyle = woodGrad;
             cctx.fillRect(railLeft - 11, railTop, 22, railBottom - railTop);
@@ -1246,345 +1241,344 @@
                 else if (p.isRedPin) drawRedBouncyPin(cctx, p.x, p.y, p.r);
                 else drawPeg(cctx, p.x, p.y, p.r);
             }
-        }        
+        }
 
         function buildPachinkoBoard() {
-    if (typeof Matter === 'undefined') { console.error("Matter.js 尚未載入"); return; }
-    const container = document.getElementById("pachinkoContainer"); if (!container) return;
-    container.innerHTML = "";
+            if (typeof Matter === 'undefined') { console.error("Matter.js 尚未載入"); return; }
+            const container = document.getElementById("pachinkoContainer"); if (!container) return;
+            container.innerHTML = "";
 
-    if (pachinkoRenderLoopId) { cancelAnimationFrame(pachinkoRenderLoopId); pachinkoRenderLoopId = null; }
-    if (pachinkoPhysicsLoopId) { cancelAnimationFrame(pachinkoPhysicsLoopId); pachinkoPhysicsLoopId = null; }
-    if (pachinkoCheckIntervalId) { clearInterval(pachinkoCheckIntervalId); pachinkoCheckIntervalId = null; }
-    if (pachinkoEngine) { Matter.Engine.clear(pachinkoEngine); pachinkoEngine = null; }
-    pachinkoBall = null;
-    pachinkoBallDropped = false;
+            if (pachinkoRenderLoopId) { cancelAnimationFrame(pachinkoRenderLoopId); pachinkoRenderLoopId = null; }
+            if (pachinkoPhysicsLoopId) { cancelAnimationFrame(pachinkoPhysicsLoopId); pachinkoPhysicsLoopId = null; }
+            if (pachinkoCheckIntervalId) { clearInterval(pachinkoCheckIntervalId); pachinkoCheckIntervalId = null; }
+            if (pachinkoEngine) { Matter.Engine.clear(pachinkoEngine); pachinkoEngine = null; }
+            pachinkoBall = null;
+            pachinkoBallDropped = false;
 
-    const Engine = Matter.Engine, Bodies = Matter.Bodies, Composite = Matter.Composite, Events = Matter.Events, Body = Matter.Body;
+            const Engine = Matter.Engine, Bodies = Matter.Bodies, Composite = Matter.Composite, Events = Matter.Events, Body = Matter.Body;
 
-    pachinkoEngine = Engine.create();
-    pachinkoEngine.gravity.y = 0.55;
-    pachinkoEngine.positionIterations = 20;
-    pachinkoEngine.velocityIterations = 20;
-    pachinkoEngine.constraintIterations = 4;
+            pachinkoEngine = Engine.create();
+            pachinkoEngine.gravity.y = 0.55;
+            pachinkoEngine.positionIterations = 20;
+            pachinkoEngine.velocityIterations = 20;
+            pachinkoEngine.constraintIterations = 4;
 
-    let renderWidth = Math.min(pachinkoWidth, container.clientWidth || pachinkoWidth);
-    if (!renderWidth || renderWidth < 200) renderWidth = pachinkoWidth;
-    const renderHeight = pachinkoHeight;
+            // ===== 自適應尺寸（你的是 328） =====
+            let renderWidth = container.clientWidth || 328;
+            if (renderWidth < 260) renderWidth = 260;
+            if (renderWidth > 420) renderWidth = 420;
+            const renderHeight = Math.round(renderWidth * 1.45);
 
-    const canvas = document.createElement("canvas");
-    canvas.width = renderWidth; canvas.height = renderHeight;
-    canvas.style.display = "block"; canvas.style.maxWidth = "100%"; canvas.style.height = "auto"; canvas.style.background = "#050810";
-    container.appendChild(canvas);
-    const ctx2d = canvas.getContext("2d");
-    pachinkoRender = { options: { width: renderWidth, height: renderHeight }, canvas: canvas };
+            const canvas = document.createElement("canvas");
+            canvas.width = renderWidth; canvas.height = renderHeight;
+            canvas.style.display = "block"; canvas.style.maxWidth = "100%"; canvas.style.height = "auto"; canvas.style.background = "#050810";
+            container.appendChild(canvas);
+            const ctx2d = canvas.getContext("2d");
+            pachinkoRender = { options: { width: renderWidth, height: renderHeight }, canvas: canvas };
 
-    const inv = { visible: false };
-    const FRAME = 20;
-    const WALL_T = 30;
+            const inv = { visible: false };
+            const FRAME = 20;
+            const WALL_T = 30;
 
-    const playLeft = FRAME;
-    const playRight = renderWidth - FRAME;
-    const playTop = FRAME;
-    const playBottom = renderHeight - FRAME;
+            const playLeft = FRAME;
+            const playRight = renderWidth - FRAME;
+            const playTop = FRAME;
+            const playBottom = renderHeight - FRAME;
 
-    // ===== 外框牆 =====
-    Composite.add(pachinkoEngine.world, [
-        Bodies.rectangle(playLeft - WALL_T, renderHeight / 2, WALL_T * 2, renderHeight * 3, { isStatic: true, render: inv, restitution: 0.1, friction: 0 }),
-        Bodies.rectangle(playRight + WALL_T, renderHeight / 2, WALL_T * 2, renderHeight * 3, { isStatic: true, render: inv, restitution: 0.1, friction: 0 }),
-        Bodies.rectangle(renderWidth / 2, playTop - WALL_T, renderWidth * 3, WALL_T * 2, { isStatic: true, render: inv, restitution: 0.1, friction: 0 }),
-        Bodies.rectangle(renderWidth / 2, playBottom + WALL_T, renderWidth * 3, WALL_T * 2, { isStatic: true, render: inv, restitution: 0.1, friction: 0 })
-    ]);
+            // ===== 外框牆 =====
+            Composite.add(pachinkoEngine.world, [
+                Bodies.rectangle(playLeft - WALL_T, renderHeight / 2, WALL_T * 2, renderHeight * 3, { isStatic: true, render: inv, restitution: 0.1, friction: 0 }),
+                Bodies.rectangle(playRight + WALL_T, renderHeight / 2, WALL_T * 2, renderHeight * 3, { isStatic: true, render: inv, restitution: 0.1, friction: 0 }),
+                Bodies.rectangle(renderWidth / 2, playTop - WALL_T, renderWidth * 3, WALL_T * 2, { isStatic: true, render: inv, restitution: 0.1, friction: 0 }),
+                Bodies.rectangle(renderWidth / 2, playBottom + WALL_T, renderWidth * 3, WALL_T * 2, { isStatic: true, render: inv, restitution: 0.1, friction: 0 })
+            ]);
 
-    // ===== 座標系統（照參考圖比例：拱橋左端約在畫面 22%） =====
-    // 右側垂直軌道（發射區）：內寬 30
-    const railRight = playRight - 10;
-    const railLeft = railRight - 30;
-    const railTop = 105;
-    const railBottom = renderHeight - 145;
+            // ===== 座標系統（自適應） =====
+            // 右側垂直軌道（發射區）
+            const railWidth = Math.max(28, Math.round(renderWidth * 0.098));
+            const railRight = playRight - Math.round(renderWidth * 0.03);
+            const railLeft = railRight - railWidth;
+            const railTop = Math.round(renderHeight * 0.26);
+            const railBottom = Math.round(renderHeight * 0.74);
 
-    // 弧形拱橋：圓心在軌道中心，半徑 = 拱左端到圓心的距離
-    const arcCx = (railLeft + railRight) / 2;
-    const arcCy = railTop;
-    // 拱左端 x = 畫面寬度 * 0.22
-    const arcLeftX = renderWidth * 0.22;
-    const arcR = arcCx - arcLeftX;
+            // 弧形拱橋：圓心在軌道左側往左到拱橋左端的中心
+            const arcCy = railTop;
+            const arcLeftX = playLeft + Math.round(renderWidth * 0.09);
+            const arcCx = (railLeft + arcLeftX) / 2;
+            const arcR = (railLeft - arcLeftX) / 2;
 
-    // 建立弧形物理牆（180° → 360°，上半圓）
-    buildArcWallByCircle(pachinkoEngine, arcCx, arcCy, arcR, Math.PI, Math.PI * 2, 20, 32);
+            // 建立弧形物理牆（180° → 360°）
+            buildArcWallByCircle(pachinkoEngine, arcCx, arcCy, arcR, Math.PI, Math.PI * 2, 20, 36);
 
-    // 拱左端封口（避免彈珠從左側縫隙逃出）
-    Composite.add(pachinkoEngine.world, Bodies.rectangle(
-        arcCx - arcR - 8, arcCy, 20, 70,
-        { isStatic: true, render: inv, restitution: 0.1 }
-    ));
+            // 拱橋左端封口（避免彈珠從左側縫隙逃出）
+            Composite.add(pachinkoEngine.world, Bodies.rectangle(
+                arcCx - arcR - 10, arcCy, 24, 60,
+                { isStatic: true, render: inv, restitution: 0.1 }
+            ));
 
-    // ===== 垂直軌道兩側物理牆 =====
-    Composite.add(pachinkoEngine.world, Bodies.rectangle(
-        railLeft, (railTop + railBottom) / 2, 14, railBottom - railTop,
-        { isStatic: true, render: inv, restitution: 0.1, friction: 0, slop: 0.02 }
-    ));
-    Composite.add(pachinkoEngine.world, Bodies.rectangle(
-        railRight, (railTop + railBottom) / 2, 14, railBottom - railTop,
-        { isStatic: true, render: inv, restitution: 0.1, friction: 0, slop: 0.02 }
-    ));
+            // ===== 垂直軌道兩側物理牆 =====
+            Composite.add(pachinkoEngine.world, Bodies.rectangle(
+                railLeft, (railTop + railBottom) / 2, 14, railBottom - railTop,
+                { isStatic: true, render: inv, restitution: 0.1, friction: 0, slop: 0.02 }
+            ));
+            Composite.add(pachinkoEngine.world, Bodies.rectangle(
+                railRight, (railTop + railBottom) / 2, 14, railBottom - railTop,
+                { isStatic: true, render: inv, restitution: 0.1, friction: 0, slop: 0.02 }
+            ));
 
-    // ===== 釘子陣列、紅色大球、風車 =====
-    const pegRadius = 4;
-    const redPinRadius = 10;
-    const BALL_RADIUS = 7;
-    const pegs = [];
+            // ===== 釘子、紅色大球、風車 =====
+            const pegRadius = Math.max(3, Math.round(renderWidth * 0.012));
+            const redPinRadius = Math.max(8, Math.round(renderWidth * 0.030));
+            const BALL_RADIUS = Math.max(5, Math.round(renderWidth * 0.021));
+            const pegs = [];
 
-    // 釘子區（左側，避開右側發射軌道）
-    const areaLeft = playLeft + 20;
-    const areaRight = railLeft - 25;
-    // 釘子區頂端必須在拱橋最低點下方，避免穿出拱
-    const arcBottomY = arcCy;     // 拱橋兩端在同一水平高度
-    const areaTop = arcBottomY + 45;
-    const areaBottom = 420;
-    const pegCols = 8;
-    const pegRows = 13;
-    const dx = (areaRight - areaLeft) / (pegCols - 1);
-    const dy = (areaBottom - areaTop) / (pegRows - 1);
+            const areaLeft = playLeft + Math.round(renderWidth * 0.06);
+            const areaRight = railLeft - Math.round(renderWidth * 0.08);
+            const areaTop = Math.round(renderHeight * 0.37);
+            const areaBottom = Math.round(renderHeight * 0.80);
+            const pegCols = 8;
+            const pegRows = 13;
+            const dx = (areaRight - areaLeft) / (pegCols - 1);
+            const dy = (areaBottom - areaTop) / (pegRows - 1);
 
-    const redPins = [
-        { x: areaLeft + dx * 2.3, y: areaTop + dy * 3.2, r: redPinRadius },
-        { x: areaLeft + dx * 5.3, y: areaTop + dy * 5.2, r: redPinRadius }
-    ];
-    const windmills = [
-        { x: areaLeft + dx * 1.4, y: areaTop + dy * 6, r: 15 },
-        { x: areaLeft + dx * 6.3, y: areaTop + dy * 2.3, r: 15 },
-        { x: areaLeft + dx * 3.4, y: areaTop + dy * 10, r: 15 }
-    ];
+            const redPins = [
+                { x: areaLeft + dx * 2.3, y: areaTop + dy * 3.2, r: redPinRadius },
+                { x: areaLeft + dx * 5.3, y: areaTop + dy * 5.2, r: redPinRadius }
+            ];
+            const windmills = [
+                { x: areaLeft + dx * 1.4, y: areaTop + dy * 6, r: Math.round(renderWidth * 0.045) },
+                { x: areaLeft + dx * 6.3, y: areaTop + dy * 2.3, r: Math.round(renderWidth * 0.045) },
+                { x: areaLeft + dx * 3.4, y: areaTop + dy * 10, r: Math.round(renderWidth * 0.045) }
+            ];
 
-    function isNearObstacle(x, y) {
-        for (const w of windmills) { const need = w.r + pegRadius + BALL_RADIUS + 6; if (Math.hypot(x - w.x, y - w.y) < need) return true; }
-        for (const rp of redPins) { const need = rp.r + pegRadius + BALL_RADIUS + 6; if (Math.hypot(x - rp.x, y - rp.y) < need) return true; }
-        return false;
-    }
-
-    for (let row = 0; row < pegRows; row++) {
-        const y = areaTop + row * dy;
-        const isOdd = row % 2 === 1;
-        const offset = isOdd ? dx / 2 : 0;
-        for (let col = 0; col < pegCols; col++) {
-            const x = areaLeft + col * dx + offset;
-            if (x > areaRight + 0.5) continue;
-            if (isNearObstacle(x, y)) continue;
-            Composite.add(pachinkoEngine.world, Bodies.circle(x, y, pegRadius, {
-                isStatic: true, restitution: 0.7, friction: 0, frictionStatic: 0, slop: 0.01, render: inv, label: 'peg'
-            }));
-            pegs.push({ x, y, r: pegRadius, isWindmill: false, isRedPin: false });
-        }
-    }
-
-    for (const rp of redPins) {
-        Composite.add(pachinkoEngine.world, Bodies.circle(rp.x, rp.y, rp.r, {
-            isStatic: true, restitution: 1.1, friction: 0, frictionStatic: 0, slop: 0.01, render: inv, label: 'redpin'
-        }));
-        pegs.push({ x: rp.x, y: rp.y, r: rp.r, isWindmill: false, isRedPin: true });
-    }
-
-    for (const w of windmills) {
-        const part1 = Bodies.rectangle(w.x, w.y, w.r * 3.6, w.r * 1.6, { isStatic: true, render: inv, label: 'windmill', restitution: 0.9, slop: 0.01 });
-        const part2 = Bodies.rectangle(w.x, w.y, w.r * 1.6, w.r * 3.6, { isStatic: true, render: inv, label: 'windmill', restitution: 0.9, slop: 0.01 });
-        Composite.add(pachinkoEngine.world, [part1, part2]);
-        pegs.push({ x: w.x, y: w.y, r: w.r, isWindmill: true, isRedPin: false });
-    }
-
-    // ===== 碰撞事件 =====
-    let lastPegSoundTime = 0;
-    Events.on(pachinkoEngine, 'collisionStart', (event) => {
-        if (!pachinkoBall) return;
-        const now = Date.now();
-        for (const pair of event.pairs) {
-            const { bodyA, bodyB } = pair;
-            let other = null;
-            if (bodyA === pachinkoBall) other = bodyB;
-            else if (bodyB === pachinkoBall) other = bodyA;
-            else continue;
-
-            if (other.label === 'windmill') {
-                const v = pachinkoBall.velocity; const speed = Math.hypot(v.x, v.y);
-                if (speed < 1.5) continue;
-                const rx = pachinkoBall.position.x - other.position.x;
-                const ry = pachinkoBall.position.y - other.position.y;
-                const dist = Math.hypot(rx, ry) || 1;
-                Body.setVelocity(pachinkoBall, { x: v.x + (rx / dist) * 4, y: v.y + (ry / dist) * 4 });
+            function isNearObstacle(x, y) {
+                for (const w of windmills) { const need = w.r + pegRadius + BALL_RADIUS + 6; if (Math.hypot(x - w.x, y - w.y) < need) return true; }
+                for (const rp of redPins) { const need = rp.r + pegRadius + BALL_RADIUS + 6; if (Math.hypot(x - rp.x, y - rp.y) < need) return true; }
+                return false;
             }
-            if (other.label === 'redpin') {
-                const v = pachinkoBall.velocity; const speed = Math.hypot(v.x, v.y);
-                if (speed < 0.5) continue;
-                const rx = pachinkoBall.position.x - other.position.x;
-                const ry = pachinkoBall.position.y - other.position.y;
-                const dist = Math.hypot(rx, ry) || 1;
-                Body.setVelocity(pachinkoBall, { x: v.x * 0.4 + (rx / dist) * 8, y: v.y * 0.4 + (ry / dist) * 8 });
+
+            for (let row = 0; row < pegRows; row++) {
+                const y = areaTop + row * dy;
+                const isOdd = row % 2 === 1;
+                const offset = isOdd ? dx / 2 : 0;
+                for (let col = 0; col < pegCols; col++) {
+                    const x = areaLeft + col * dx + offset;
+                    if (x > areaRight + 0.5) continue;
+                    if (isNearObstacle(x, y)) continue;
+                    Composite.add(pachinkoEngine.world, Bodies.circle(x, y, pegRadius, {
+                        isStatic: true, restitution: 0.7, friction: 0, frictionStatic: 0, slop: 0.01, render: inv, label: 'peg'
+                    }));
+                    pegs.push({ x, y, r: pegRadius, isWindmill: false, isRedPin: false });
+                }
             }
-            if (other.label === 'peg' || other.label === 'windmill' || other.label === 'redpin') {
-                if (now - lastPegSoundTime < 45) continue;
-                const v = pachinkoBall.velocity; const speed = Math.hypot(v.x, v.y);
-                if (speed < 1.2) continue;
-                playPegDing(speed); lastPegSoundTime = now;
+
+            for (const rp of redPins) {
+                Composite.add(pachinkoEngine.world, Bodies.circle(rp.x, rp.y, rp.r, {
+                    isStatic: true, restitution: 1.1, friction: 0, frictionStatic: 0, slop: 0.01, render: inv, label: 'redpin'
+                }));
+                pegs.push({ x: rp.x, y: rp.y, r: rp.r, isWindmill: false, isRedPin: true });
             }
+
+            for (const w of windmills) {
+                const part1 = Bodies.rectangle(w.x, w.y, w.r * 3.6, w.r * 1.6, { isStatic: true, render: inv, label: 'windmill', restitution: 0.9, slop: 0.01 });
+                const part2 = Bodies.rectangle(w.x, w.y, w.r * 1.6, w.r * 3.6, { isStatic: true, render: inv, label: 'windmill', restitution: 0.9, slop: 0.01 });
+                Composite.add(pachinkoEngine.world, [part1, part2]);
+                pegs.push({ x: w.x, y: w.y, r: w.r, isWindmill: true, isRedPin: false });
+            }
+
+            // ===== 碰撞事件 =====
+            let lastPegSoundTime = 0;
+            Events.on(pachinkoEngine, 'collisionStart', (event) => {
+                if (!pachinkoBall) return;
+                const now = Date.now();
+                for (const pair of event.pairs) {
+                    const { bodyA, bodyB } = pair;
+                    let other = null;
+                    if (bodyA === pachinkoBall) other = bodyB;
+                    else if (bodyB === pachinkoBall) other = bodyA;
+                    else continue;
+
+                    if (other.label === 'windmill') {
+                        const v = pachinkoBall.velocity; const speed = Math.hypot(v.x, v.y);
+                        if (speed < 1.5) continue;
+                        const rx = pachinkoBall.position.x - other.position.x;
+                        const ry = pachinkoBall.position.y - other.position.y;
+                        const dist = Math.hypot(rx, ry) || 1;
+                        Body.setVelocity(pachinkoBall, { x: v.x + (rx / dist) * 4, y: v.y + (ry / dist) * 4 });
+                    }
+                    if (other.label === 'redpin') {
+                        const v = pachinkoBall.velocity; const speed = Math.hypot(v.x, v.y);
+                        if (speed < 0.5) continue;
+                        const rx = pachinkoBall.position.x - other.position.x;
+                        const ry = pachinkoBall.position.y - other.position.y;
+                        const dist = Math.hypot(rx, ry) || 1;
+                        Body.setVelocity(pachinkoBall, { x: v.x * 0.4 + (rx / dist) * 8, y: v.y * 0.4 + (ry / dist) * 8 });
+                    }
+                    if (other.label === 'peg' || other.label === 'windmill' || other.label === 'redpin') {
+                        if (now - lastPegSoundTime < 45) continue;
+                        const v = pachinkoBall.velocity; const speed = Math.hypot(v.x, v.y);
+                        if (speed < 1.2) continue;
+                        playPegDing(speed); lastPegSoundTime = now;
+                    }
+                }
+            });
+
+            // ===== 邊界軟約束 =====
+            Events.on(pachinkoEngine, 'beforeUpdate', () => {
+                if (!pachinkoBall || pachinkoBall.isStatic) return;
+                const pos = pachinkoBall.position; const r = BALL_RADIUS;
+                const leftBound = playLeft + 2 + r;
+                const rightBound = playRight - 2 - r;
+                const topBound = playTop + 2 + r;
+                const bottomBound = playBottom - 2 - r;
+                let nx = pos.x, ny = pos.y, needFix = false;
+                if (pos.x < leftBound) { nx = leftBound; needFix = true; }
+                if (pos.x > rightBound) { nx = rightBound; needFix = true; }
+                if (pos.y < topBound) { ny = topBound; needFix = true; }
+                if (pos.y > bottomBound) { ny = bottomBound; needFix = true; }
+                if (needFix) {
+                    Body.setPosition(pachinkoBall, { x: nx, y: ny });
+                    const v = pachinkoBall.velocity;
+                    Body.setVelocity(pachinkoBall, { x: -v.x * 0.4, y: -v.y * 0.4 });
+                }
+            });
+
+            // ===== 彈簧 + 彈珠預備位置 =====
+            const ballRestX = (railLeft + railRight) / 2;
+            const ballRestY = railBottom - Math.round(renderHeight * 0.017);
+            const springX = ballRestX;
+            const springTopY = ballRestY + Math.round(renderHeight * 0.026);
+            const springBottomY = Math.round(renderHeight * 0.87);
+            const leverY = Math.round(renderHeight * 0.92);
+            pachinkoBallRestX = ballRestX;
+            pachinkoBallRestY = ballRestY;
+
+            Composite.add(pachinkoEngine.world, Bodies.rectangle(ballRestX, ballRestY + 12, 28, 8, { isStatic: true, render: inv }));
+
+            pachinkoBall = Bodies.circle(ballRestX, ballRestY, BALL_RADIUS, {
+                isStatic: true, restitution: 0.4, friction: 0.001, frictionAir: 0.0018, density: 0.002, slop: 0.01, render: inv
+            });
+            Composite.add(pachinkoEngine.world, pachinkoBall);
+
+            // ===== 獎池 =====
+            pachinkoBins = []; pachinkoPrizeMap = {};
+            const binTopY = Math.round(renderHeight * 0.82);
+            const binBottomY = renderHeight - FRAME;
+            const binAreaLeft = playLeft + 4;
+            const binAreaRight = railLeft - 6;
+            const binAreaWidth = binAreaRight - binAreaLeft;
+
+            let binPrizes = [];
+            const useBinLayout = Array.isArray(pachinkoBinLayout) && pachinkoBinLayout.length > 0;
+            if (useBinLayout) {
+                for (const pid of pachinkoBinLayout) {
+                    const p = lastPrizes?.[pid]; if (!p) continue;
+                    if (!Array.isArray(p.groups) || !p.groups.includes(honorUnlockedGroup)) continue;
+                    binPrizes.push({ id: pid, data: p });
+                }
+            } else {
+                const prizes = [];
+                for (const id in lastPrizes) {
+                    const p = lastPrizes[id];
+                    if (!Array.isArray(p.groups) || !p.groups.includes(honorUnlockedGroup)) continue;
+                    if (Number(p.quantity || 0) <= 0) continue;
+                    const w = Number(p.weight || 0); if (w <= 0) continue;
+                    prizes.push({ id, data: p, weight: w });
+                }
+                binPrizes = prizes;
+                if (prizes.length > pachinkoBinCount) binPrizes = prizes.slice(0, pachinkoBinCount);
+            }
+
+            if (binPrizes.length > 0) {
+                const binCount = binPrizes.length;
+                const binWidth = binAreaWidth / binCount;
+                for (let i = 0; i < binCount; i++) {
+                    const binX = binAreaLeft + i * binWidth + binWidth / 2;
+                    const prize = binPrizes[i];
+                    Composite.add(pachinkoEngine.world, Bodies.rectangle(binAreaLeft + i * binWidth, binTopY + (binBottomY - binTopY) / 2, 8, binBottomY - binTopY, { isStatic: true, render: inv, friction: 0.1 }));
+                    pachinkoBins.push({ index: i, x: binX, width: binWidth, y: (binTopY + binBottomY) / 2, topY: binTopY, bottomY: binBottomY, prizeId: prize.id, prizeData: prize.data });
+                    pachinkoPrizeMap[i] = prize.id;
+                }
+                Composite.add(pachinkoEngine.world, Bodies.rectangle(binAreaRight, binTopY + (binBottomY - binTopY) / 2, 8, binBottomY - binTopY, { isStatic: true, render: inv, friction: 0.1 }));
+                Composite.add(pachinkoEngine.world, Bodies.rectangle((binAreaLeft + binAreaRight) / 2, binBottomY + 4, binAreaWidth + 20, 12, { isStatic: true, render: inv, friction: 0.1 }));
+            }
+
+            // ===== 靜態場景繪製 =====
+            const bgCanvas = document.createElement('canvas');
+            bgCanvas.width = renderWidth; bgCanvas.height = renderHeight;
+            const bctx = bgCanvas.getContext('2d');
+            drawPachinkoSceneStatic(bctx, renderWidth, renderHeight, pegs,
+                { x: springX, topY: springTopY, bottomY: springBottomY, leverY: leverY },
+                railLeft, railRight, railTop, railBottom, arcCx, arcCy, arcR);
+
+            // 畫獎池
+            const binColors = [
+                ['#ff7aa2', '#c9184a'], ['#f9c74f', '#e07a1f'], ['#90be6d', '#2d6a4f'], ['#4dabf7', '#1864ab'], ['#b197fc', '#5f3dc4'],
+                ['#ffa94d', '#d9480f'], ['#63e6be', '#087f5b'], ['#ff8787', '#c92a2a'], ['#74c0fc', '#1971c2']
+            ];
+            const prizeColorMap = {}; let colorIdx = 0;
+            for (const bin of pachinkoBins) { if (!prizeColorMap[bin.prizeId]) { prizeColorMap[bin.prizeId] = binColors[colorIdx % binColors.length]; colorIdx++; } }
+
+            for (let i = 0; i < pachinkoBins.length; i++) {
+                const bin = pachinkoBins[i];
+                const left = bin.x - bin.width / 2 + 4;
+                const top = bin.topY + 3;
+                const w = bin.width - 8;
+                const h = bin.bottomY - bin.topY - 6;
+                const colors = prizeColorMap[bin.prizeId] || binColors[0];
+                const bg2 = bctx.createLinearGradient(left, top, left, top + h);
+                bg2.addColorStop(0, colors[0]); bg2.addColorStop(1, colors[1]);
+                bctx.fillStyle = bg2; bctx.fillRect(left, top, w, h);
+                bctx.strokeStyle = 'rgba(255,255,255,0.8)'; bctx.lineWidth = 2;
+                bctx.strokeRect(left, top, w, h);
+                const hl = bctx.createLinearGradient(left, top, left, top + h * 0.4);
+                hl.addColorStop(0, 'rgba(255,255,255,0.5)'); hl.addColorStop(1, 'rgba(255,255,255,0)');
+                bctx.fillStyle = hl; bctx.fillRect(left, top, w, h * 0.4);
+
+                const nm = bin.prizeData.name || bin.prizeId;
+                const maxChars = Math.min(nm.length, 5); const sn = nm.slice(0, maxChars);
+                const availH = h - 10;
+                const charSpace = Math.max(9, Math.min(18, Math.floor(availH / Math.max(sn.length, 1))));
+                const fontSize = Math.max(8, Math.min(14, charSpace - 3));
+                bctx.font = `bold ${fontSize}px "Noto Sans TC", sans-serif`;
+                bctx.textAlign = 'center'; bctx.textBaseline = 'middle';
+                const totalTextH = sn.length * charSpace;
+                const startY = top + (h - totalTextH) / 2 + charSpace / 2;
+                bctx.shadowColor = 'rgba(0,0,0,0.85)'; bctx.shadowBlur = 4; bctx.shadowOffsetY = 1;
+                bctx.fillStyle = '#ffffff';
+                for (let ci = 0; ci < sn.length; ci++) { bctx.fillText(sn[ci], bin.x, startY + ci * charSpace); }
+                bctx.shadowBlur = 0; bctx.shadowOffsetY = 0;
+            }
+
+            if (pachinkoBins.length > 0) {
+                bctx.fillStyle = '#8b4513';
+                bctx.fillRect(binAreaLeft - 3, binTopY, 6, binBottomY - binTopY);
+                bctx.fillRect(binAreaRight - 3, binTopY, 6, binBottomY - binTopY);
+                const shelfGrad = bctx.createLinearGradient(0, binBottomY, 0, renderHeight - 20);
+                shelfGrad.addColorStop(0, '#d4af37'); shelfGrad.addColorStop(1, '#8b6914');
+                bctx.fillStyle = shelfGrad;
+                bctx.fillRect(20, binBottomY, renderWidth - 40, renderHeight - 20 - binBottomY);
+            }
+
+            // ===== 渲染 + 物理迴圈 =====
+            function renderLoop() {
+                ctx2d.clearRect(0, 0, renderWidth, renderHeight);
+                ctx2d.drawImage(bgCanvas, 0, 0);
+                if (pachinkoBall) drawGlassBall(ctx2d, pachinkoBall.position.x, pachinkoBall.position.y, BALL_RADIUS);
+                pachinkoRenderLoopId = requestAnimationFrame(renderLoop);
+            }
+            renderLoop();
+
+            let lastPhysTime = performance.now();
+            function physicsLoop(now) {
+                const dt = Math.min(now - lastPhysTime, 33);
+                lastPhysTime = now;
+                const sub = 4;
+                for (let i = 0; i < sub; i++) Engine.update(pachinkoEngine, dt / sub);
+                pachinkoPhysicsLoopId = requestAnimationFrame(physicsLoop);
+            }
+            pachinkoPhysicsLoopId = requestAnimationFrame(physicsLoop);
         }
-    });
-
-    // ===== 邊界軟約束 =====
-    Events.on(pachinkoEngine, 'beforeUpdate', () => {
-        if (!pachinkoBall || pachinkoBall.isStatic) return;
-        const pos = pachinkoBall.position; const r = BALL_RADIUS;
-        const leftBound = playLeft + 2 + r;
-        const rightBound = playRight - 2 - r;
-        const topBound = playTop + 2 + r;
-        const bottomBound = playBottom - 2 - r;
-        let nx = pos.x, ny = pos.y, needFix = false;
-        if (pos.x < leftBound) { nx = leftBound; needFix = true; }
-        if (pos.x > rightBound) { nx = rightBound; needFix = true; }
-        if (pos.y < topBound) { ny = topBound; needFix = true; }
-        if (pos.y > bottomBound) { ny = bottomBound; needFix = true; }
-        if (needFix) {
-            Body.setPosition(pachinkoBall, { x: nx, y: ny });
-            const v = pachinkoBall.velocity;
-            Body.setVelocity(pachinkoBall, { x: -v.x * 0.4, y: -v.y * 0.4 });
-        }
-    });
-
-    // ===== 彈簧 + 預備彈珠位置 =====
-    const ballRestX = (railLeft + railRight) / 2;
-    const ballRestY = railBottom - 8;
-    const springX = ballRestX;
-    const springTopY = ballRestY + 12;
-    const springBottomY = renderHeight - 60;
-    const leverY = renderHeight - 38;
-    pachinkoBallRestX = ballRestX;
-    pachinkoBallRestY = ballRestY;
-
-    Composite.add(pachinkoEngine.world, Bodies.rectangle(ballRestX, ballRestY + 12, 28, 8, { isStatic: true, render: inv }));
-
-    pachinkoBall = Bodies.circle(ballRestX, ballRestY, BALL_RADIUS, {
-        isStatic: true, restitution: 0.4, friction: 0.001, frictionAir: 0.0018, density: 0.002, slop: 0.01, render: inv
-    });
-    Composite.add(pachinkoEngine.world, pachinkoBall);
-
-    // ===== 獎池 =====
-    pachinkoBins = []; pachinkoPrizeMap = {};
-    const binTopY = 430;
-    const binBottomY = renderHeight - FRAME;
-    const binAreaLeft = playLeft + 4;
-    const binAreaRight = railLeft - 6;
-    const binAreaWidth = binAreaRight - binAreaLeft;
-
-    let binPrizes = [];
-    const useBinLayout = Array.isArray(pachinkoBinLayout) && pachinkoBinLayout.length > 0;
-    if (useBinLayout) {
-        for (const pid of pachinkoBinLayout) {
-            const p = lastPrizes?.[pid]; if (!p) continue;
-            if (!Array.isArray(p.groups) || !p.groups.includes(honorUnlockedGroup)) continue;
-            binPrizes.push({ id: pid, data: p });
-        }
-    } else {
-        const prizes = [];
-        for (const id in lastPrizes) {
-            const p = lastPrizes[id];
-            if (!Array.isArray(p.groups) || !p.groups.includes(honorUnlockedGroup)) continue;
-            if (Number(p.quantity || 0) <= 0) continue;
-            const w = Number(p.weight || 0); if (w <= 0) continue;
-            prizes.push({ id, data: p, weight: w });
-        }
-        binPrizes = prizes;
-        if (prizes.length > pachinkoBinCount) binPrizes = prizes.slice(0, pachinkoBinCount);
-    }
-
-    if (binPrizes.length > 0) {
-        const binCount = binPrizes.length;
-        const binWidth = binAreaWidth / binCount;
-        for (let i = 0; i < binCount; i++) {
-            const binX = binAreaLeft + i * binWidth + binWidth / 2;
-            const prize = binPrizes[i];
-            Composite.add(pachinkoEngine.world, Bodies.rectangle(binAreaLeft + i * binWidth, binTopY + (binBottomY - binTopY) / 2, 8, binBottomY - binTopY, { isStatic: true, render: inv, friction: 0.1 }));
-            pachinkoBins.push({ index: i, x: binX, width: binWidth, y: (binTopY + binBottomY) / 2, topY: binTopY, bottomY: binBottomY, prizeId: prize.id, prizeData: prize.data });
-            pachinkoPrizeMap[i] = prize.id;
-        }
-        Composite.add(pachinkoEngine.world, Bodies.rectangle(binAreaRight, binTopY + (binBottomY - binTopY) / 2, 8, binBottomY - binTopY, { isStatic: true, render: inv, friction: 0.1 }));
-        Composite.add(pachinkoEngine.world, Bodies.rectangle((binAreaLeft + binAreaRight) / 2, binBottomY + 4, binAreaWidth + 20, 12, { isStatic: true, render: inv, friction: 0.1 }));
-    }
-
-    // ===== 靜態場景 =====
-    const bgCanvas = document.createElement('canvas');
-    bgCanvas.width = renderWidth; bgCanvas.height = renderHeight;
-    const bctx = bgCanvas.getContext('2d');
-    drawPachinkoSceneStatic(bctx, renderWidth, renderHeight, pegs,
-        { x: springX, topY: springTopY, bottomY: springBottomY, leverY: leverY },
-        railLeft, railRight, railTop, railBottom, arcCx, arcCy, arcR);
-
-    // 畫獎池
-    const binColors = [
-        ['#ff7aa2', '#c9184a'], ['#f9c74f', '#e07a1f'], ['#90be6d', '#2d6a4f'], ['#4dabf7', '#1864ab'], ['#b197fc', '#5f3dc4'],
-        ['#ffa94d', '#d9480f'], ['#63e6be', '#087f5b'], ['#ff8787', '#c92a2a'], ['#74c0fc', '#1971c2']
-    ];
-    const prizeColorMap = {}; let colorIdx = 0;
-    for (const bin of pachinkoBins) { if (!prizeColorMap[bin.prizeId]) { prizeColorMap[bin.prizeId] = binColors[colorIdx % binColors.length]; colorIdx++; } }
-
-    for (let i = 0; i < pachinkoBins.length; i++) {
-        const bin = pachinkoBins[i];
-        const left = bin.x - bin.width / 2 + 4;
-        const top = bin.topY + 3;
-        const w = bin.width - 8;
-        const h = bin.bottomY - bin.topY - 6;
-        const colors = prizeColorMap[bin.prizeId] || binColors[0];
-        const bg2 = bctx.createLinearGradient(left, top, left, top + h);
-        bg2.addColorStop(0, colors[0]); bg2.addColorStop(1, colors[1]);
-        bctx.fillStyle = bg2; bctx.fillRect(left, top, w, h);
-        bctx.strokeStyle = 'rgba(255,255,255,0.8)'; bctx.lineWidth = 2;
-        bctx.strokeRect(left, top, w, h);
-        const hl = bctx.createLinearGradient(left, top, left, top + h * 0.4);
-        hl.addColorStop(0, 'rgba(255,255,255,0.5)'); hl.addColorStop(1, 'rgba(255,255,255,0)');
-        bctx.fillStyle = hl; bctx.fillRect(left, top, w, h * 0.4);
-
-        const nm = bin.prizeData.name || bin.prizeId;
-        const maxChars = Math.min(nm.length, 5); const sn = nm.slice(0, maxChars);
-        const availH = h - 10;
-        const charSpace = Math.max(10, Math.min(20, Math.floor(availH / Math.max(sn.length, 1))));
-        const fontSize = Math.max(9, Math.min(15, charSpace - 3));
-        bctx.font = `bold ${fontSize}px "Noto Sans TC", sans-serif`;
-        bctx.textAlign = 'center'; bctx.textBaseline = 'middle';
-        const totalTextH = sn.length * charSpace;
-        const startY = top + (h - totalTextH) / 2 + charSpace / 2;
-        bctx.shadowColor = 'rgba(0,0,0,0.85)'; bctx.shadowBlur = 4; bctx.shadowOffsetY = 1;
-        bctx.fillStyle = '#ffffff';
-        for (let ci = 0; ci < sn.length; ci++) { bctx.fillText(sn[ci], bin.x, startY + ci * charSpace); }
-        bctx.shadowBlur = 0; bctx.shadowOffsetY = 0;
-    }
-
-    if (pachinkoBins.length > 0) {
-        bctx.fillStyle = '#8b4513';
-        bctx.fillRect(binAreaLeft - 3, binTopY, 6, binBottomY - binTopY);
-        bctx.fillRect(binAreaRight - 3, binTopY, 6, binBottomY - binTopY);
-        const shelfGrad = bctx.createLinearGradient(0, binBottomY, 0, renderHeight - 20);
-        shelfGrad.addColorStop(0, '#d4af37'); shelfGrad.addColorStop(1, '#8b6914');
-        bctx.fillStyle = shelfGrad;
-        bctx.fillRect(20, binBottomY, renderWidth - 40, renderHeight - 20 - binBottomY);
-    }
-
-    // ===== 渲染 + 物理迴圈 =====
-    function renderLoop() {
-        ctx2d.clearRect(0, 0, renderWidth, renderHeight);
-        ctx2d.drawImage(bgCanvas, 0, 0);
-        if (pachinkoBall) drawGlassBall(ctx2d, pachinkoBall.position.x, pachinkoBall.position.y, BALL_RADIUS);
-        pachinkoRenderLoopId = requestAnimationFrame(renderLoop);
-    }
-    renderLoop();
-
-    let lastPhysTime = performance.now();
-    function physicsLoop(now) {
-        const dt = Math.min(now - lastPhysTime, 33);
-        lastPhysTime = now;
-        const sub = 4;
-        for (let i = 0; i < sub; i++) Engine.update(pachinkoEngine, dt / sub);
-        pachinkoPhysicsLoopId = requestAnimationFrame(physicsLoop);
-    }
-    pachinkoPhysicsLoopId = requestAnimationFrame(physicsLoop);
-}
 
         // ---------- 拉桿 ----------
         let leverDragging = false, leverStartClientY = 0, leverStartTop = 6, leverCurrentOffset = 0;
@@ -1640,14 +1634,17 @@
             if (!pachinkoBall) {
                 const renderWidth = pachinkoRender ? pachinkoRender.options.width : pachinkoWidth;
                 const renderHeight = pachinkoRender ? pachinkoRender.options.height : pachinkoHeight;
-                const FRAME = 20; const railRight = renderWidth - FRAME - 6; const railLeft = railRight - 40;
-                pachinkoBall = Matter.Bodies.circle((railLeft + railRight) / 2, renderHeight - 130 - 8, 7, {
+                const FRAME = 20; const railWidth = Math.max(28, Math.round(renderWidth * 0.098));
+                const railRight = renderWidth - FRAME - Math.round(renderWidth * 0.03);
+                const railLeft = railRight - railWidth;
+                const ballRestX = (railLeft + railRight) / 2;
+                const ballRestY = Math.round(renderHeight * 0.74) - Math.round(renderHeight * 0.017);
+                pachinkoBall = Matter.Bodies.circle(ballRestX, ballRestY, 7, {
                     isStatic: true, restitution: 0.4, friction: 0.001, frictionAir: 0.0018, density: 0.002, render: { visible: false }
                 });
                 Matter.Composite.add(pachinkoEngine.world, pachinkoBall);
             }
             Matter.Body.setStatic(pachinkoBall, false);
-            // 力道曲線：最低 15，最高 25
             const minSpeed = 15;
             const maxSpeed = 25;
             const speed = minSpeed + power * (maxSpeed - minSpeed);
