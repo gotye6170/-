@@ -1015,6 +1015,22 @@
             if (soundUrls.pachinko) { new Audio(soundUrls.pachinko).play().catch(() => {}); }
             else { for (let i = 0; i < 12; i++) playTone(600 + Math.random() * 300, 0.05, "square", i * 0.08, 0.04); }
         }
+        function playPegDing(speed) {
+            if (!soundEnabled) return;
+            if (soundUrls.peg) {
+                try {
+                    const audio = new Audio(soundUrls.peg);
+                    audio.volume = Math.min(0.6, 0.15 + speed * 0.02);
+                    audio.play().catch(() => {});
+                } catch (e) {}
+                return;
+            }
+            // 合成金屬叮聲：兩層正弦波疊加，高頻快速衰減
+            const baseFreq = 1800 + Math.random() * 600;
+            const vol = Math.min(0.22, 0.06 + speed * 0.012);
+            playTone(baseFreq, 0.06, "sine", 0, vol);
+            playTone(baseFreq * 1.5, 0.04, "sine", 0, vol * 0.5);
+        }
         function toggleSound() {
             soundEnabled = !soundEnabled;
             document.getElementById("soundToggleBtn").textContent = soundEnabled ? "🔊 音效" : "🔇 靜音";
@@ -2265,7 +2281,8 @@
                         friction: 0,
                         frictionStatic: 0,
                         slop: 0.01,
-                        render: inv
+                        render: inv,
+                        label: 'peg'
                     }));
                     pegs.push({ x, y, r: pegRadius, isBumper: false });
                 }
@@ -2300,6 +2317,27 @@
                         x: v.x + (rx / dist) * pulse,
                         y: v.y + (ry / dist) * pulse
                     });
+                }
+            });
+            // 釘子 / 紅球碰撞音效
+            let lastPegSoundTime = 0;
+            Events.on(pachinkoEngine, 'collisionStart', (event) => {
+                if (!pachinkoBall) return;
+                const now = Date.now();
+                if (now - lastPegSoundTime < 45) return;
+                for (const pair of event.pairs) {
+                    const { bodyA, bodyB } = pair;
+                    let other = null;
+                    if (bodyA === pachinkoBall) other = bodyB;
+                    else if (bodyB === pachinkoBall) other = bodyA;
+                    else continue;
+                    if (other.label !== 'peg' && other.label !== 'bumper') continue;
+                    const v = pachinkoBall.velocity;
+                    const speed = Math.hypot(v.x, v.y);
+                    if (speed < 1.2) continue;
+                    playPegDing(speed);
+                    lastPegSoundTime = now;
+                    break;
                 }
             });
 
