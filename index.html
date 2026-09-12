@@ -457,8 +457,6 @@
             margin-top: 10px;
             text-align: center;
         }
-
-        /* ===== 彈珠台 ===== */
         .pachinko-machine {
             width: 100%;
             max-width: 420px;
@@ -491,7 +489,6 @@
             justify-content: center;
         }
         .pachinko-container canvas { display: block; max-width: 100%; height: auto !important; }
-
         .pachinko-lever-area {
             display: flex;
             align-items: center;
@@ -573,7 +570,6 @@
             background: rgba(0,0,0,0.5);
             border-radius: 1px;
         }
-
         .pachinko-power-display { flex: 1; max-width: 180px; }
         .pachinko-power-bar {
             width: 100%;
@@ -599,7 +595,6 @@
             font-size: 13px;
             text-shadow: 0 0 8px #ffd700;
         }
-
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -978,6 +973,7 @@
 
         let audioCtx = null;
         let soundEnabled = true;
+
         function getAudioCtx() {
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             if (audioCtx.state === "suspended") audioCtx.resume();
@@ -1410,7 +1406,6 @@
             const selectEl = document.getElementById("playerName");
             selectEl.innerHTML = "";
 
-            // 比對 password，找到對應的群組 key
             let matchedKey = null;
             for (const k in groupLists) {
                 if (groupLists[k].password === inputPass) { matchedKey = k; break; }
@@ -1432,7 +1427,7 @@
                     optGroup.appendChild(opt);
                 });
                 selectEl.appendChild(optGroup);
-                honorUnlockedGroup = matchedKey;   // ← 用 key，不是輸入的密語
+                honorUnlockedGroup = matchedKey;
                 renderHonorBoard(lastPlayedList);
                 updateMarquee(buildMarqueeText(lastPlayedList));
                 if (lastPrizes) renderStatusBoard(lastPrizes);
@@ -1457,7 +1452,6 @@
             let list = [];
             const seenKeys = new Set();
 
-            // 先檢查是否有任何一筆被標記為「顯示在首頁」
             let hasAnyMarked = false;
             for (const name in drawRecordsData) {
                 const records = drawRecordsData[name];
@@ -1475,10 +1469,7 @@
                     const rec = records[key];
                     if (!rec || !rec.won) continue;
                     if (rec.won.includes("銘謝惠顧") || rec.won === "未中獎" || rec.won.includes("未設定獎品")) continue;
-
-                    // 若有任何一筆被標記為顯示，則只顯示被標記的；否則顯示全部
                     if (hasAnyMarked && rec.showOnBoard !== true) continue;
-
                     const uniqueKey = `${name}_${rec.time}_${rec.won}`;
                     if (seenKeys.has(uniqueKey)) continue;
                     seenKeys.add(uniqueKey);
@@ -1486,7 +1477,6 @@
                 }
             }
 
-            // 只有當完全沒有被標記時，才 fallback 到 playedUsers（舊資料相容）
             if (!hasAnyMarked) {
                 for (const name in globalPlayedUsers) {
                     const u = globalPlayedUsers[name];
@@ -1589,6 +1579,7 @@
                 });
                 if (!result.committed) { alert("抽獎過於頻繁，請稍後再試。"); isDrawing = false; if (spinBtn) spinBtn.disabled = false; return; }
                 globalPlayedUsers[name] = { ...(globalPlayedUsers[name] || {}), drawCount: (playerData?.drawCount || 0) + 1, lastDrawTime: Date.now() };
+
                 const isThanksGacha = chosen.name && chosen.name.includes("銘謝惠顧");
                 await push(ref(db, `drawRecords/${name}`), {
                     type: "gacha",
@@ -1598,6 +1589,7 @@
                     group: myGroup,
                     showOnBoard: !isThanksGacha
                 });
+
                 const minP = Number(chosen.minPoints);
                 const maxP = Number(chosen.maxPoints);
                 if (!isNaN(minP) && !isNaN(maxP) && maxP >= minP && maxP > 0) {
@@ -1843,8 +1835,8 @@
                             won: `符號 ${prizeId} 未設定獎品`,
                             code: "",
                             time: Date.now(),
-                            group: honorUnlockedGroup
-                            showOnBoard: true
+                            group: honorUnlockedGroup,
+                            showOnBoard: false
                         });
                     } catch (e) { console.error(e); }
                     alert(`🎰 三個相同符號，但「${prizeId}」尚未設定獎品`);
@@ -1855,7 +1847,7 @@
                             won: "銘謝惠顧",
                             code: "",
                             time: Date.now(),
-                            group: honorUnlockedGroup
+                            group: honorUnlockedGroup,
                             showOnBoard: false
                         });
                     } catch (e) { console.error(e); }
@@ -1951,7 +1943,6 @@
             ctx.beginPath();
             ctx.arc(x, y, r * 1.5, 0, Math.PI * 2);
             ctx.fill();
-
             const grad = ctx.createRadialGradient(x - r * 0.3, y - r * 0.3, r * 0.2, x, y, r);
             grad.addColorStop(0, '#ff6b6b');
             grad.addColorStop(0.6, '#c92a2a');
@@ -1963,7 +1954,6 @@
             ctx.strokeStyle = 'rgba(255,255,255,0.5)';
             ctx.lineWidth = 2;
             ctx.stroke();
-
             ctx.beginPath();
             ctx.arc(x - r * 0.3, y - r * 0.3, r * 0.3, 0, Math.PI * 2);
             ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
@@ -2222,22 +2212,21 @@
                 { isStatic: true, render: inv, restitution: 0.2 }
             ));
 
-            // ===== 障礙物與釘子（固定佈局，加密版） =====
+            // ===== 障礙物與釘子 =====
             const pegRadius = 4;
             const BALL_D = 14;
-            const SAFETY = 3;   // 從 4 縮到 2，讓釘子能更貼近障礙物
+            const SAFETY = 3;
 
             const areaLeft = 44;
             const areaRight = railRightX - 20;
-            const areaTop = 148;      // 往上多爭取一點空間
-            const areaBottom = 408;   // 往下多爭取一點空間
+            const areaTop = 148;
+            const areaBottom = 408;
 
-            const pegCols = 8;        // 7 → 9
-            const pegRows = 11;       // 10 → 11
+            const pegCols = 9;
+            const pegRows = 11;
             const dx = (areaRight - areaLeft) / (pegCols - 1);
             const dy = (areaBottom - areaTop) / (pegRows - 1);
 
-            // 紅球微縮、葉片微縮，讓淨空圈變小
             const bumpers = [
                 { x: areaLeft + dx * 1.5, y: areaTop + dy * 2.5, r: 13 },
                 { x: areaLeft + dx * 5.5, y: areaTop + dy * 2.5, r: 13 },
@@ -2250,7 +2239,6 @@
 
             function isNearObstacle(x, y) {
                 for (const b of bumpers) {
-                    // 用 BALL_D/2（半徑）取代 BALL_D，只保留通過所需的最小淨空
                     const need = b.r + pegRadius + (BALL_D / 2) + SAFETY;
                     if (Math.hypot(x - b.x, y - b.y) < need) return true;
                 }
@@ -2271,7 +2259,7 @@
                     const x = areaLeft + col * dx + offset;
                     if (x > areaRight + 0.5) continue;
                     if (isNearObstacle(x, y)) continue;
-                        Composite.add(pachinkoEngine.world, Bodies.circle(x, y, pegRadius, {
+                    Composite.add(pachinkoEngine.world, Bodies.circle(x, y, pegRadius, {
                         isStatic: true,
                         restitution: 0.92,
                         friction: 0,
@@ -2678,7 +2666,6 @@
             let enteredPlayArea = false;
             let countDeducted = false;
 
-            // 卡住偵測用
             let stuckTime = 0;
             let lastPosX = -1;
             let lastPosY = -1;
@@ -2689,7 +2676,6 @@
                 checkCount++;
                 const pos = pachinkoBall.position;
 
-                // ===== 卡住偵測 =====
                 if (enteredPlayArea && pos.y < renderHeight - 90) {
                     const moved = Math.hypot(pos.x - lastPosX, pos.y - lastPosY);
                     if (lastPosX >= 0 && moved < 2.5) {
@@ -2699,14 +2685,12 @@
                     }
                     if (stuckTime >= 250) {
                         unstuckCount++;
-                        // 卡左半 → 往右踢；卡右半 → 往左踢
                         const centerX = renderWidth / 2;
                         let pushX = pos.x < centerX
                             ? 4 + Math.random() * 2
                             : -4 - Math.random() * 2;
                         let pushY = 3 + Math.random() * 2;
 
-                        // 連續卡 3 次，直接大力往下推
                         if (unstuckCount >= 3) {
                             pushX = 0;
                             pushY = 8;
@@ -2719,7 +2703,6 @@
                 }
                 lastPosX = pos.x;
                 lastPosY = pos.y;
-                // ===== 卡住偵測結束 =====
 
                 if (pos.x < -50 || pos.x > renderWidth + 50 || pos.y < -50 || pos.y > renderHeight + 50) {
                     clearInterval(checkInterval);
@@ -2866,7 +2849,7 @@
                     won: prizeData.name || prizeId,
                     code: code,
                     time: Date.now(),
-                    group: honorUnlockedGroup
+                    group: honorUnlockedGroup,
                     showOnBoard: true
                 });
 
