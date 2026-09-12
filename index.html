@@ -1025,7 +1025,6 @@
                 } catch (e) {}
                 return;
             }
-            // 合成金屬叮聲：兩層正弦波疊加，高頻快速衰減
             const baseFreq = 1800 + Math.random() * 600;
             const vol = Math.min(0.22, 0.06 + speed * 0.012);
             playTone(baseFreq, 0.06, "sine", 0, vol);
@@ -1096,10 +1095,10 @@
             const drawBtn = document.querySelector(".choice-btn-draw");
             const slotBtn = document.querySelector(".choice-btn-slot");
             const pachinkoBtn = document.querySelector(".choice-btn-pachinko");
-            if (!drawBtn || !slotBtn) return;
+            if (!drawBtn || !slotBtn || !pachinkoBtn) return;
             drawBtn.style.display = enabledGames.gacha ? "flex" : "none";
             slotBtn.style.display = enabledGames.slot ? "flex" : "none";
-            if (pachinkoBtn) pachinkoBtn.style.display = enabledGames.pachinko ? "flex" : "none";
+            pachinkoBtn.style.display = enabledGames.pachinko ? "flex" : "none";
         }
 
         function updateDrawCountDisplay() {
@@ -2223,7 +2222,7 @@
             }
 
             const railRightX = renderWidth - 60;
-            const railTopY = 35;
+            const railTopY = 60;
             const railBottomY = renderHeight - 80;
             Composite.add(pachinkoEngine.world, Bodies.rectangle(
                 railRightX, (railTopY + railBottomY) / 2, 12, railBottomY - railTopY,
@@ -2321,7 +2320,7 @@
                     });
                 }
             });
-            // 釘子 / 紅球碰撞音效
+
             let lastPegSoundTime = 0;
             Events.on(pachinkoEngine, 'collisionStart', (event) => {
                 if (!pachinkoBall) return;
@@ -2647,7 +2646,7 @@
             if (pachinkoSealWall) return;
             const renderWidth = pachinkoRender.options.width;
             const railRightX = renderWidth - 60;
-            const railTopY = 35;
+            const railTopY = 60;
             const sealX = (railRightX + (renderWidth - 20)) / 2;
             const sealW = (renderWidth - 20) - railRightX + 20;
             const sealH = 20;
@@ -2691,8 +2690,8 @@
             }
 
             Matter.Body.setStatic(pachinkoBall, false);
-            const minSpeed = 8;
-            const maxSpeed = 22;
+            const minSpeed = 12;
+            const maxSpeed = 34;
             const speed = minSpeed + power * (maxSpeed - minSpeed);
             Matter.Body.setVelocity(pachinkoBall, { x: 0, y: -speed });
 
@@ -2726,9 +2725,7 @@
                     }
                     if (stuckTime >= 250) {
                         unstuckCount++;
-                        // 隨機方向彈射（0~360 度）
                         const angle = Math.random() * Math.PI * 2;
-                        // 力度：一般隨機，連續卡 3 次就加大
                         let force = 5 + Math.random() * 3;
                         if (unstuckCount >= 3) {
                             force = 9 + Math.random() * 3;
