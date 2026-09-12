@@ -2220,7 +2220,7 @@
                 ));
             }
 
-            const railRightX = renderWidth - 75;
+            const railRightX = renderWidth - 60;
             const railTopY = 110;
             const railBottomY = renderHeight - 80;
             Composite.add(pachinkoEngine.world, Bodies.rectangle(
@@ -2355,7 +2355,7 @@
             });
 
             // ===== 彈簧與彈珠預備位置 =====
-            const ballRestX = renderWidth - 50;
+            const ballRestX = (railRightX + 6 + (renderWidth - 30)) / 2;
             const ballRestY = railBottomY - 20;
             const springX = ballRestX;
             const springTopY = ballRestY + 10;
@@ -2644,7 +2644,7 @@
             if (!pachinkoEngine || !pachinkoRender) return;
             if (pachinkoSealWall) return;
             const renderWidth = pachinkoRender.options.width;
-            const railRightX = renderWidth - 75;
+            const railRightX = renderWidth - 60;
             const railTopY = 110;
             const sealX = (railRightX + (renderWidth - 20)) / 2;
             const sealW = (renderWidth - 20) - railRightX + 20;
@@ -2675,8 +2675,9 @@
             if (!pachinkoBall) {
                 const renderWidth = pachinkoRender ? pachinkoRender.options.width : pachinkoWidth;
                 const renderHeight = pachinkoRender ? pachinkoRender.options.height : pachinkoHeight;
-                const railRightX = renderWidth - 75;
-                pachinkoBall = Matter.Bodies.circle(railRightX + 25, renderHeight - 115, 7, {
+                const railRightX = renderWidth - 60;
+                const ballStartX = (railRightX + 6 + (renderWidth - 30)) / 2;
+                pachinkoBall = Matter.Bodies.circle(ballStartX, renderHeight - 115, 7, {
                     isStatic: true,
                     restitution: 0.5,
                     friction: 0.001,
