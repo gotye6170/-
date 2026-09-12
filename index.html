@@ -25,11 +25,33 @@
             padding-bottom: env(safe-area-inset-bottom);
         }
         @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-        .gacha-title { font-weight: 900; color: #ff3366; letter-spacing: 2px; -webkit-text-stroke: 10px #ffffff; paint-order: stroke fill; filter: drop-shadow(4px 4px 0px rgba(0,0,0,0.08)) drop-shadow(0px 8px 15px rgba(244,63,94,0.2)); }
-        .gacha-machine { position: relative; width: 320px; background: linear-gradient(to bottom, #ef4444, #dc2626); border-radius: 40px 40px 20px 20px; box-shadow: 0 20px 0 #b91c1c, 0 30px 40px rgba(0,0,0,0.3); padding: 25px; margin: 24px auto 24px auto; border: 6px solid #fee2e2; }
-        .gacha-glass { position: relative; height: 240px; background: radial-gradient(circle at 50% 30%, rgba(255,255,255,0.4) 0%, rgba(243,244,246,0.8) 70%); border-radius: 30px; border: 6px solid #b91c1c; overflow: hidden; box-shadow: inset 0 10px 20px rgba(0,0,0,0.15); margin-bottom: 25px; }
-        .gacha-egg { position: absolute; width: 38px; height: 38px; border-radius: 50%; box-shadow: inset -4px -4px 8px rgba(0,0,0,0.2), 2px 4px 6px rgba(0,0,0,0.1); transition: transform 0.3s ease, opacity 0.5s ease; }
-        .gacha-egg::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 50%; background: rgba(255,255,255,0.35); border-radius: 19px 19px 0 0; }
+        .gacha-title {
+            font-weight: 900; color: #ff3366; letter-spacing: 2px;
+            -webkit-text-stroke: 10px #ffffff; paint-order: stroke fill;
+            filter: drop-shadow(4px 4px 0px rgba(0,0,0,0.08)) drop-shadow(0px 8px 15px rgba(244,63,94,0.2));
+        }
+        .gacha-machine {
+            position: relative; width: 320px;
+            background: linear-gradient(to bottom, #ef4444, #dc2626);
+            border-radius: 40px 40px 20px 20px;
+            box-shadow: 0 20px 0 #b91c1c, 0 30px 40px rgba(0,0,0,0.3);
+            padding: 25px; margin: 24px auto 24px auto; border: 6px solid #fee2e2;
+        }
+        .gacha-glass {
+            position: relative; height: 240px;
+            background: radial-gradient(circle at 50% 30%, rgba(255,255,255,0.4) 0%, rgba(243,244,246,0.8) 70%);
+            border-radius: 30px; border: 6px solid #b91c1c; overflow: hidden;
+            box-shadow: inset 0 10px 20px rgba(0,0,0,0.15); margin-bottom: 25px;
+        }
+        .gacha-egg {
+            position: absolute; width: 38px; height: 38px; border-radius: 50%;
+            box-shadow: inset -4px -4px 8px rgba(0,0,0,0.2), 2px 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, opacity 0.5s ease;
+        }
+        .gacha-egg::after {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 50%;
+            background: rgba(255,255,255,0.35); border-radius: 19px 19px 0 0;
+        }
         .egg-pink { background: #ec4899; } .egg-blue { background: #3b82f6; }
         .egg-yellow { background: #eab308; } .egg-green { background: #22c55e; }
         .egg-purple { background: #a855f7; } .egg-orange { background: #f97316; }
@@ -39,7 +61,11 @@
         .eggs-drop-down .gacha-egg:not(.egg-falling-out) { animation: gravitySettle 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.3s forwards; }
         @keyframes gravitySettle { 0% { transform: translateY(0); } 50% { transform: translateY(6px); } 75% { transform: translateY(3px); } 100% { transform: translateY(4px); } }
         .gacha-panel { background: #991b1b; border-radius: 20px; padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 15px; box-shadow: inset 0 4px 8px rgba(0,0,0,0.3); }
-        .gacha-crank { width: 70px; height: 70px; background: radial-gradient(circle, #f3f4f6 30%, #9ca3af 70%); border-radius: 50%; border: 6px solid #4b5563; position: relative; cursor: pointer; box-shadow: 0 4px 0 #374151, 0 6px 10px rgba(0,0,0,0.3); }
+        .gacha-crank {
+            width: 70px; height: 70px; background: radial-gradient(circle, #f3f4f6 30%, #9ca3af 70%);
+            border-radius: 50%; border: 6px solid #4b5563; position: relative; cursor: pointer;
+            box-shadow: 0 4px 0 #374151, 0 6px 10px rgba(0,0,0,0.3);
+        }
         .gacha-crank::before { content: ''; position: absolute; width: 14px; height: 45px; background: #4b5563; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 7px; }
         .gacha-crank::after { content: ''; position: absolute; width: 24px; height: 24px; background: #dc2626; border-radius: 50%; top: -5px; left: 50%; transform: translateX(-50%); box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
         .rotating-crank { animation: rotateCrank 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
@@ -159,7 +185,6 @@
 </head>
 
 <body class="p-4 md:p-8 min-h-screen flex flex-col items-center justify-center">
-
     <div id="closedOverlay" style="display:none; position:fixed; inset:0; z-index:9999; backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); background:rgba(15,23,42,0.72); align-items:center; justify-content:center; padding:20px;">
         <div style="background:rgba(255,255,255,0.95); border-radius:28px; padding:40px 32px; max-width:360px; width:100%; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
             <div style="font-size:56px; margin-bottom:12px;">🚧</div>
@@ -167,7 +192,6 @@
             <div style="font-size:14px; color:#64748b; font-weight:600;">目前暫停抽獎，請稍後再回來試試手氣唷！</div>
         </div>
     </div>
-
     <div class="w-full max-w-5xl bg-slate-900 text-cyan-400 font-bold px-4 py-2.5 rounded-full shadow-lg overflow-hidden border-2 border-cyan-500/30 mb-4 md:mb-8 flex items-center gap-3">
         <span class="bg-cyan-500 text-slate-950 text-xs px-2.5 py-1 rounded-full flex-shrink-0 animate-pulse">📢 最新動態</span>
         <div class="marquee-viewport">
@@ -177,11 +201,9 @@
             </div>
         </div>
     </div>
-
     <div class="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 items-start">
         <div class="lg:col-span-6 order-1 flex flex-col items-center mobile-main-area">
             <h1 class="gacha-title text-4xl md:text-5xl mb-4 md:mb-6">呆呆幸運抽獎</h1>
-
             <div id="controlPanel" class="w-full max-w-sm bg-white/80 backdrop-blur-md rounded-3xl p-6 shadow-xl border border-white mt-2 md:mt-4 space-y-4">
                 <div>
                     <label class="block text-xs font-bold text-gray-500 mb-1.5 ml-1">🔑 請輸入群組密語解鎖名單</label>
@@ -200,7 +222,6 @@
                     <button onclick="promptAdminMode()" class="admin-test-btn">🔧 管理員測試</button>
                 </div>
             </div>
-
             <div id="contentArea" class="hidden w-full max-w-sm flex flex-col items-center mt-3 md:mt-4">
                 <div class="w-full flex items-center justify-between mb-4 md:mb-6">
                     <button onclick="goBack()" class="back-btn">← 上一步</button>
@@ -209,15 +230,12 @@
                     </span>
                     <div style="width:60px;"></div>
                 </div>
-
                 <div id="drawSystemArea" class="w-full">
                     <div id="drawCountDisplay" class="w-full text-center mb-2 text-sm font-bold text-gray-600"></div>
                     <div id="drawActionArea" class="w-full">
                         <button id="spinBtn" onclick="openConfirmModal()" class="w-full bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white font-black py-4 rounded-2xl shadow-lg shadow-rose-500/20 active:scale-98 transition-all tracking-wider text-base cursor-pointer">🎰 啟動幸運扭蛋</button>
                     </div>
-                    <div id="alreadyPlayedMsg" class="hidden w-full text-center py-3 text-gray-500 font-bold text-sm bg-white/50 rounded-xl mt-4">
-                        ⚠️ 你已達抽獎次數上限，無法繼續抽獎
-                    </div>
+                    <div id="alreadyPlayedMsg" class="hidden w-full text-center py-3 text-gray-500 font-bold text-sm bg-white/50 rounded-xl mt-4">⚠️ 你已達抽獎次數上限，無法繼續抽獎</div>
                     <div class="gacha-machine mt-4 md:mt-6">
                         <div class="gacha-glass" id="gachaGlass">
                             <div class="gacha-egg egg-pink egg-layer-a" style="left: 15px;"></div>
@@ -242,12 +260,9 @@
                         </div>
                     </div>
                 </div>
-
                 <div id="slotSystemArea" class="w-full hidden">
                     <div class="casino-slot-machine">
-                        <div class="slot-top-lights">
-                            <div class="slot-light"></div><div class="slot-light"></div><div class="slot-light"></div><div class="slot-light"></div><div class="slot-light"></div>
-                        </div>
+                        <div class="slot-top-lights"><div class="slot-light"></div><div class="slot-light"></div><div class="slot-light"></div><div class="slot-light"></div><div class="slot-light"></div></div>
                         <h3 class="slot-title"></h3>
                         <div class="slot-reels-container">
                             <div class="slot-reel-window"><div class="slot-reel-strip" id="reelStrip1"></div></div>
@@ -260,12 +275,9 @@
                         <p class="slot-info">剩餘次數：<span id="slotCountDisplay">0</span></p>
                     </div>
                 </div>
-
                 <div id="pachinkoSystemArea" class="w-full hidden">
                     <div class="pachinko-machine">
-                        <div class="pachinko-top-lights">
-                            <div class="slot-light"></div><div class="slot-light"></div><div class="slot-light"></div><div class="slot-light"></div><div class="slot-light"></div>
-                        </div>
+                        <div class="pachinko-top-lights"><div class="slot-light"></div><div class="slot-light"></div><div class="slot-light"></div><div class="slot-light"></div><div class="slot-light"></div></div>
                         <h3 class="pachinko-title"></h3>
                         <div id="pachinkoContainer" class="pachinko-container"></div>
                         <div class="pachinko-lever-area">
@@ -283,7 +295,6 @@
                         <p class="slot-info">剩餘次數：<span id="pachinkoCountDisplay">0</span></p>
                     </div>
                 </div>
-
                 <div id="pointsSystemArea" class="w-full hidden">
                     <div class="w-full bg-white/80 backdrop-blur-md rounded-2xl p-5 shadow-md border border-white">
                         <h3 class="text-center text-base font-black text-amber-600 mb-3">🎁 點數兌換系統</h3>
@@ -301,14 +312,12 @@
                 </div>
             </div>
         </div>
-
         <div class="lg:col-span-3 order-2 lg:order-1 mobile-side-panels" id="prizeListPanel">
             <div class="dashboard-panel" id="statusBoard">
                 <span class="board-title-text prize-title-text">📋 禮物列表</span>
                 <div class="scroller-content text-gray-400 text-sm italic p-2 text-center">連線中，正在加載禮品庫存...</div>
             </div>
         </div>
-
         <div class="lg:col-span-3 order-3 mobile-side-panels" id="honorBoardPanel">
             <div class="dashboard-panel" id="honorBoard">
                 <span class="board-title-text honor-title-text">👑 幸運中獎者</span>
@@ -316,7 +325,6 @@
             </div>
         </div>
     </div>
-
     <div id="choiceModal" class="modal-overlay" style="display: none;">
         <div class="modal-card p-6 text-center">
             <h2 class="text-xl font-black text-slate-800 mb-1">👋 你好，<span id="choicePlayerName" class="text-rose-500"></span>！</h2>
@@ -329,7 +337,6 @@
             </div>
         </div>
     </div>
-
     <div id="confirmModal" class="modal-overlay" style="display: none;">
         <div class="modal-card p-6 text-center border-4 border-rose-300">
             <h2 class="text-xl font-black text-slate-800 mb-2">🎯 確定要抽獎嗎？</h2>
@@ -340,7 +347,6 @@
             </div>
         </div>
     </div>
-
     <div id="winModal" class="modal-overlay" style="display: none;">
         <div class="modal-card p-6 text-center border-4 border-amber-400">
             <h2 id="modalTitle" class="text-2xl font-black text-rose-500 mb-2">🎉 恭喜中獎！</h2>
@@ -354,7 +360,6 @@
             <button onclick="closeModal()" class="w-full bg-gray-800 hover:bg-gray-700 text-white font-bold py-3 rounded-xl text-base transition-all mt-4">收下好禮</button>
         </div>
     </div>
-
     <div id="walletPassModal" class="modal-overlay" style="display: none;">
         <div class="modal-card p-6 text-center border-4 border-yellow-400">
             <h2 class="text-xl font-black text-slate-800 mb-2">🔐 解鎖點數錢包</h2>
@@ -367,7 +372,6 @@
             <p id="walletPassError" class="text-xs text-rose-500 mt-3"></p>
         </div>
     </div>
-
     <div id="shopModal" class="modal-overlay" style="display: none;">
         <div class="modal-card p-6 max-w-lg flex flex-col max-h-[85vh]">
             <div class="flex items-center justify-between mb-4">
@@ -388,7 +392,6 @@
             <div id="redeemHistoryList" class="hidden overflow-y-auto flex-grow space-y-2 pr-1"><p class="text-gray-400 text-sm text-center">尚無兌換記錄</p></div>
         </div>
     </div>
-
     <button id="soundToggleBtn" onclick="toggleSound()" class="music-control-btn fixed bottom-5 right-5 bg-slate-900 text-cyan-400 text-sm font-bold px-4 py-2 rounded-full shadow-lg border border-cyan-500/30 z-40 transition-all active:scale-95">🔊 音效</button>
 
     <script type="module">
@@ -453,7 +456,6 @@
         let pachinkoRenderLoopId = null;
         let pachinkoPhysicsLoopId = null;
         let pachinkoCheckIntervalId = null;
-        let pachinkoSpinners = [];
 
         let audioCtx = null;
         let soundEnabled = true;
@@ -626,7 +628,6 @@
                 if (document.getElementById("shopModal").style.display === "flex") renderShopItems();
             } else { document.getElementById("walletPassError").innerText = "密語錯誤"; }
         }
-
         function openShop() {
             if (!currentPlayerName) return;
             if (!walletUnlocked) { promptWalletPass(); return; }
@@ -1064,18 +1065,20 @@
             finally { isSlotSpinning = false; const lever = document.getElementById("slotLever"); if (lever) lever.style.pointerEvents = 'auto'; }
         }
 
-        // ---------- 彈珠台核心（照圖重新設計） ----------
+        // ---------- 彈珠台核心（全新設計：真正圓弧軌道，十字木釘，紅珠） ----------
         function drawGlassBall(ctx, x, y, r) {
+            // 改為圖片中的紅色金屬珠
             const grad = ctx.createRadialGradient(x - r * 0.35, y - r * 0.35, r * 0.05, x, y, r);
-            grad.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
-            grad.addColorStop(0.25, 'rgba(200, 240, 255, 0.55)');
-            grad.addColorStop(0.6, 'rgba(130, 200, 240, 0.45)');
-            grad.addColorStop(0.9, 'rgba(80, 150, 220, 0.55)');
-            grad.addColorStop(1, 'rgba(50, 100, 180, 0.75)');
+            grad.addColorStop(0, '#ffffff');
+            grad.addColorStop(0.2, '#ff9999');
+            grad.addColorStop(0.6, '#e60000');
+            grad.addColorStop(1, '#660000');
             ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fillStyle = grad; ctx.fill();
-            ctx.beginPath(); ctx.arc(x, y, r - 0.5, 0, Math.PI * 2); ctx.strokeStyle = 'rgba(220, 240, 255, 0.85)'; ctx.lineWidth = 1; ctx.stroke();
-            ctx.beginPath(); ctx.arc(x - r * 0.32, y - r * 0.35, r * 0.3, 0, Math.PI * 2); ctx.fillStyle = 'rgba(255, 255, 255, 0.92)'; ctx.fill();
-            ctx.beginPath(); ctx.arc(x + r * 0.25, y + r * 0.35, r * 0.12, 0, Math.PI * 2); ctx.fillStyle = 'rgba(255, 255, 255, 0.45)'; ctx.fill();
+            
+            // 高光
+            ctx.beginPath(); ctx.arc(x - r * 0.3, y - r * 0.3, r * 0.3, 0, Math.PI * 2); ctx.fillStyle = 'rgba(255, 255, 255, 0.85)'; ctx.fill();
+            // 底部反光
+            ctx.beginPath(); ctx.arc(x + r * 0.2, y + r * 0.3, r * 0.15, 0, Math.PI * 2); ctx.fillStyle = 'rgba(255, 255, 255, 0.4)'; ctx.fill();
         }
         function drawBulb(ctx, x, y, r) {
             const glow = ctx.createRadialGradient(x, y, 0, x, y, r * 3.5);
@@ -1086,14 +1089,32 @@
             ctx.fillStyle = bulb; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
         }
         function drawPeg(ctx, x, y, r) {
-            ctx.beginPath(); ctx.arc(x + 1.2, y + 1.8, r * 1.05, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0,0,0,0.55)'; ctx.fill();
-            const glow = ctx.createRadialGradient(x, y, r * 0.6, x, y, r * 2.2);
-            glow.addColorStop(0, 'rgba(255,220,80,0.45)'); glow.addColorStop(1, 'rgba(255,220,80,0)');
-            ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(x, y, r * 2.2, 0, Math.PI * 2); ctx.fill();
-            const grad = ctx.createRadialGradient(x - r * 0.35, y - r * 0.35, 0, x, y, r);
-            grad.addColorStop(0, '#fffbd0'); grad.addColorStop(0.5, '#ffd700'); grad.addColorStop(0.85, '#e0a800'); grad.addColorStop(1, '#8b6914');
-            ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fillStyle = grad; ctx.fill();
-            ctx.beginPath(); ctx.arc(x - r * 0.35, y - r * 0.35, r * 0.3, 0, Math.PI * 2); ctx.fillStyle = 'rgba(255,255,255,0.95)'; ctx.fill();
+            // 陰影
+            ctx.beginPath(); ctx.arc(x + 1.5, y + 2, r, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.fill();
+            
+            // 十字木釘
+            const arm = r * 1.6;
+            const thickness = r * 0.8;
+            ctx.save();
+            ctx.translate(x, y);
+            
+            // 發光效果
+            const glow = ctx.createRadialGradient(0, 0, r * 0.5, 0, 0, arm * 1.5);
+            glow.addColorStop(0, 'rgba(255, 200, 50, 0.4)'); glow.addColorStop(1, 'rgba(255, 200, 50, 0)');
+            ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(0, 0, arm * 1.5, 0, Math.PI * 2); ctx.fill();
+
+            const grad = ctx.createLinearGradient(-arm, -arm, arm, arm);
+            grad.addColorStop(0, '#fceabb'); grad.addColorStop(0.5, '#f8b500'); grad.addColorStop(1, '#b37a00');
+            ctx.fillStyle = grad;
+            
+            // 橫條
+            ctx.beginPath(); ctx.rect(-arm, -thickness/2, arm*2, thickness); ctx.fill();
+            // 直條
+            ctx.beginPath(); ctx.rect(-thickness/2, -arm, thickness, arm*2); ctx.fill();
+            
+            // 中心點綴
+            ctx.beginPath(); ctx.arc(0, 0, thickness/2, 0, Math.PI * 2); ctx.fillStyle = '#fffbd0'; ctx.fill();
+            ctx.restore();
         }
         function drawBumper(ctx, x, y, r) {
             const glow = ctx.createRadialGradient(x, y, r * 0.8, x, y, r * 1.5);
@@ -1104,35 +1125,6 @@
             ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fillStyle = grad; ctx.fill();
             ctx.strokeStyle = 'rgba(255,255,255,0.5)'; ctx.lineWidth = 2; ctx.stroke();
             ctx.beginPath(); ctx.arc(x - r * 0.3, y - r * 0.3, r * 0.3, 0, Math.PI * 2); ctx.fillStyle = 'rgba(255, 255, 255, 0.8)'; ctx.fill();
-        }
-        function drawSpinner(ctx, x, y, angle, armLen, armW) {
-            ctx.save();
-            ctx.translate(x, y);
-            ctx.rotate(angle);
-            // 四臂十字風車
-            const armGrad = ctx.createLinearGradient(0, -armLen, 0, armLen);
-            armGrad.addColorStop(0, '#e0a866'); armGrad.addColorStop(0.5, '#c07830'); armGrad.addColorStop(1, '#8b4513');
-            // 水平臂
-            ctx.fillStyle = armGrad;
-            ctx.fillRect(-armLen, -armW / 2, armLen * 2, armW);
-            ctx.strokeStyle = 'rgba(0,0,0,0.55)'; ctx.lineWidth = 1;
-            ctx.strokeRect(-armLen, -armW / 2, armLen * 2, armW);
-            ctx.fillStyle = 'rgba(255,255,255,0.4)';
-            ctx.fillRect(-armLen + 2, -armW / 2 + 1, armLen * 2 - 4, 1.5);
-            // 垂直臂
-            ctx.fillStyle = armGrad;
-            ctx.fillRect(-armW / 2, -armLen, armW, armLen * 2);
-            ctx.strokeRect(-armW / 2, -armLen, armW, armLen * 2);
-            ctx.fillStyle = 'rgba(255,255,255,0.4)';
-            ctx.fillRect(-armW / 2 + 1, -armLen + 2, 1.5, armLen * 2 - 4);
-            // 中心軸
-            ctx.beginPath(); ctx.arc(0, 0, armW * 0.9, 0, Math.PI * 2);
-            const centerGrad = ctx.createRadialGradient(-2, -2, 1, 0, 0, armW * 0.9);
-            centerGrad.addColorStop(0, '#fff4c2'); centerGrad.addColorStop(1, '#8b6914');
-            ctx.fillStyle = centerGrad; ctx.fill();
-            ctx.strokeStyle = 'rgba(0,0,0,0.6)'; ctx.lineWidth = 1.2; ctx.stroke();
-            ctx.beginPath(); ctx.arc(-2, -2, armW * 0.3, 0, Math.PI * 2); ctx.fillStyle = 'rgba(255,255,255,0.9)'; ctx.fill();
-            ctx.restore();
         }
         function drawSpring(ctx, cx, topY, bottomY, radius, turns) {
             ctx.save(); ctx.strokeStyle = '#c0c0c0'; ctx.lineWidth = 2.5; ctx.lineCap = 'round';
@@ -1169,21 +1161,91 @@
             ctx.beginPath(); ctx.arc(cx - 4, cy - 4, 3, 0, Math.PI * 2); ctx.fillStyle = 'rgba(255,255,255,0.9)'; ctx.fill();
         }
 
-        // 沿橢圓弧建立物理牆
-        function buildEllipseArcWall(engine, cx, cy, rx, ry, startAngle, endAngle, thickness, segments) {
+        // 沿圓弧建立物理牆（真正的 1/4 圓弧）
+        function buildArcWallByCircle(engine, cx, cy, R, startAngle, endAngle, thickness, segments) {
             const Bodies = Matter.Bodies; const Composite = Matter.Composite;
             for (let i = 0; i < segments; i++) {
                 const a1 = startAngle + (endAngle - startAngle) * (i / segments);
                 const a2 = startAngle + (endAngle - startAngle) * ((i + 1) / segments);
-                const p1 = { x: cx + rx * Math.cos(a1), y: cy + ry * Math.sin(a1) };
-                const p2 = { x: cx + rx * Math.cos(a2), y: cy + ry * Math.sin(a2) };
+                const p1 = { x: cx + R * Math.cos(a1), y: cy + R * Math.sin(a1) };
+                const p2 = { x: cx + R * Math.cos(a2), y: cy + R * Math.sin(a2) };
                 const mid = { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 };
                 const len = Math.hypot(p2.x - p1.x, p2.y - p1.y) + thickness * 0.9;
                 const angle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
                 Composite.add(engine.world, Bodies.rectangle(mid.x, mid.y, len, thickness, {
-                    isStatic: true, angle: angle, friction: 0, frictionStatic: 0, restitution: 0.15, slop: 0.02, render: { visible: false }
+                    isStatic: true, angle: angle, friction: 0, frictionStatic: 0, restitution: 0.2, slop: 0.02, render: { visible: false }
                 }));
             }
+        }
+
+        function drawPachinkoSceneStatic(cctx, renderWidth, renderHeight, pegs, springCenter, railLeft, railRight, railTop, railBottom, arcCx, arcCy, arcR) {
+            // 背景
+            const bg = cctx.createLinearGradient(0, 0, 0, renderHeight);
+            bg.addColorStop(0, '#0a1226'); bg.addColorStop(1, '#03050a');
+            cctx.fillStyle = bg; cctx.fillRect(0, 0, renderWidth, renderHeight);
+
+            // 遊戲區淡藍光暈
+            const playBg = cctx.createRadialGradient(renderWidth * 0.4, renderHeight * 0.4, 30, renderWidth * 0.4, renderHeight * 0.4, renderHeight * 0.75);
+            playBg.addColorStop(0, 'rgba(40,80,160,0.35)'); playBg.addColorStop(1, 'rgba(0,0,0,0)');
+            cctx.fillStyle = playBg; cctx.fillRect(20, 20, renderWidth - 40, renderHeight - 40);
+
+            // 星點
+            cctx.fillStyle = 'rgba(200,220,255,0.4)';
+            for (let i = 0; i < 60; i++) {
+                const x = 25 + Math.random() * (renderWidth - 50);
+                const y = 25 + Math.random() * (renderHeight - 50);
+                const rr = Math.random() * 1.4 + 0.2;
+                cctx.beginPath(); cctx.arc(x, y, rr, 0, Math.PI * 2); cctx.fill();
+            }
+
+            // 金色外框
+            const goldGrad = cctx.createLinearGradient(0, 0, renderWidth, renderHeight);
+            goldGrad.addColorStop(0, '#f6e27a'); goldGrad.addColorStop(0.4, '#d4af37'); goldGrad.addColorStop(0.7, '#b8860b'); goldGrad.addColorStop(1, '#8b6914');
+            cctx.fillStyle = goldGrad;
+            cctx.fillRect(0, 0, renderWidth, 20); cctx.fillRect(0, renderHeight - 20, renderWidth, 20);
+            cctx.fillRect(0, 0, 20, renderHeight); cctx.fillRect(renderWidth - 20, 0, 20, renderHeight);
+            cctx.strokeStyle = 'rgba(0,0,0,0.7)'; cctx.lineWidth = 3; cctx.strokeRect(21.5, 21.5, renderWidth - 43, renderHeight - 43);
+            cctx.strokeStyle = 'rgba(255,255,255,0.35)'; cctx.lineWidth = 1; cctx.strokeRect(20.5, 20.5, renderWidth - 41, renderHeight - 41);
+
+            // 燈泡
+            for (let x = 40; x < renderWidth - 30; x += 42) { drawBulb(cctx, x, 10, 3.5); drawBulb(cctx, x, renderHeight - 10, 3.5); }
+            for (let y = 42; y < renderHeight - 30; y += 42) { drawBulb(cctx, 10, y, 3.5); drawBulb(cctx, renderWidth - 10, y, 3.5); }
+
+            const woodGrad = cctx.createLinearGradient(0, 0, renderWidth, renderHeight);
+            woodGrad.addColorStop(0, '#e0a866'); woodGrad.addColorStop(0.5, '#c07830'); woodGrad.addColorStop(1, '#8b4513');
+
+            // 弧形軌道（加強發光效果，符合圖片）
+            cctx.save();
+            cctx.lineCap = 'round'; cctx.lineJoin = 'round';
+            // 外陰影
+            cctx.strokeStyle = 'rgba(0,0,0,0.6)'; cctx.lineWidth = 30;
+            cctx.beginPath(); cctx.arc(arcCx, arcCy, arcR, Math.PI, Math.PI * 1.5); cctx.stroke();
+            // 發光效果
+            cctx.strokeStyle = 'rgba(255, 220, 100, 0.3)'; cctx.lineWidth = 35;
+            cctx.beginPath(); cctx.arc(arcCx, arcCy, arcR, Math.PI, Math.PI * 1.5); cctx.stroke();
+            // 主體
+            cctx.strokeStyle = woodGrad; cctx.lineWidth = 22;
+            cctx.beginPath(); cctx.arc(arcCx, arcCy, arcR, Math.PI, Math.PI * 1.5); cctx.stroke();
+            // 內高光
+            cctx.strokeStyle = 'rgba(255,220,160,0.8)'; cctx.lineWidth = 4;
+            cctx.beginPath(); cctx.arc(arcCx, arcCy, arcR - 5, Math.PI + 0.1, Math.PI * 1.5 - 0.1); cctx.stroke();
+            cctx.restore();
+
+            // 垂直軌道左牆（畫木條）
+            cctx.fillStyle = woodGrad;
+            cctx.fillRect(railLeft - 12, railTop, 24, railBottom - railTop);
+            cctx.fillStyle = 'rgba(255,220,160,0.6)'; cctx.fillRect(railLeft - 11, railTop, 3, railBottom - railTop);
+            cctx.fillStyle = 'rgba(0,0,0,0.4)'; cctx.fillRect(railLeft + 8, railTop, 3, railBottom - railTop);
+
+            // 彈簧 + 拉桿
+            drawSpring(cctx, springCenter.x, springCenter.topY, springCenter.bottomY, 9, 4.5);
+            drawLeverKnob(cctx, springCenter.x, springCenter.leverY);
+
+            // 釘子
+            for (const p of pegs) { if (p.isBumper) drawBumper(cctx, p.x, p.y, p.r); else drawPeg(cctx, p.x, p.y, p.r); }
+
+            // 預備彈珠
+            drawGlassBall(cctx, springCenter.x, springCenter.topY - 12, 7);
         }
 
         function buildPachinkoBoard() {
@@ -1191,17 +1253,18 @@
             const container = document.getElementById("pachinkoContainer"); if (!container) return;
             container.innerHTML = "";
 
+            // 清理舊實例
             if (pachinkoRenderLoopId) { cancelAnimationFrame(pachinkoRenderLoopId); pachinkoRenderLoopId = null; }
             if (pachinkoPhysicsLoopId) { cancelAnimationFrame(pachinkoPhysicsLoopId); pachinkoPhysicsLoopId = null; }
             if (pachinkoCheckIntervalId) { clearInterval(pachinkoCheckIntervalId); pachinkoCheckIntervalId = null; }
             if (pachinkoEngine) { Matter.Engine.clear(pachinkoEngine); pachinkoEngine = null; }
             pachinkoBall = null;
             pachinkoBallDropped = false;
-            pachinkoSpinners = [];
 
             const Engine = Matter.Engine, Bodies = Matter.Bodies, Composite = Matter.Composite, Events = Matter.Events, Body = Matter.Body;
+
             pachinkoEngine = Engine.create();
-            pachinkoEngine.gravity.y = 0.5;
+            pachinkoEngine.gravity.y = 0.55;
             pachinkoEngine.positionIterations = 20;
             pachinkoEngine.velocityIterations = 20;
             pachinkoEngine.constraintIterations = 4;
@@ -1219,75 +1282,69 @@
 
             const inv = { visible: false };
             const FRAME = 20;
-            const WALL_T = 40;
+            const WALL_T = 30;
 
             const playLeft = FRAME;
             const playRight = renderWidth - FRAME;
             const playTop = FRAME;
             const playBottom = renderHeight - FRAME;
 
-            // ===== 外框厚牆 =====
+            // ===== 外框牆（超厚） =====
             Composite.add(pachinkoEngine.world, [
-                Bodies.rectangle(playLeft - WALL_T, renderHeight/2, WALL_T*2, renderHeight*3, { isStatic: true, render: inv, restitution: 0.2, friction: 0 }),
-                Bodies.rectangle(playRight + WALL_T, renderHeight/2, WALL_T*2, renderHeight*3, { isStatic: true, render: inv, restitution: 0.2, friction: 0 }),
-                Bodies.rectangle(renderWidth/2, playTop - WALL_T, renderWidth*3, WALL_T*2, { isStatic: true, render: inv, restitution: 0.2, friction: 0 }),
-                Bodies.rectangle(renderWidth/2, playBottom + WALL_T, renderWidth*3, WALL_T*2, { isStatic: true, render: inv, restitution: 0.2, friction: 0 })
+                Bodies.rectangle(playLeft - WALL_T, renderHeight/2, WALL_T*2, renderHeight*3, { isStatic: true, render: inv, restitution: 0.1, friction: 0 }),
+                Bodies.rectangle(playRight + WALL_T, renderHeight/2, WALL_T*2, renderHeight*3, { isStatic: true, render: inv, restitution: 0.1, friction: 0 }),
+                Bodies.rectangle(renderWidth/2, playTop - WALL_T, renderWidth*3, WALL_T*2, { isStatic: true, render: inv, restitution: 0.1, friction: 0 }),
+                Bodies.rectangle(renderWidth/2, playBottom + WALL_T, renderWidth*3, WALL_T*2, { isStatic: true, render: inv, restitution: 0.1, friction: 0 })
             ]);
 
-            // ===== 幾何座標 =====
-            // 右側垂直軌道
+            // ===== 座標配置 =====
+            // 垂直軌道：靠右側，寬 30px
             const railRight = playRight - 4;
-            const railLeft = railRight - 30;
-            const railTop = 180;              // 軌道頂端和拱門右端同高
-            const railBottom = renderHeight - 115;
+            const railLeft = railRight - 34;
+            const railTop = 140;
+            const railBottom = renderHeight - 120;
 
-            // 頂部大拱門（橢圓弧）
-            const arcLeftX = playLeft + 15;
-            const arcRightX = railLeft - 2;
-            const arcCx = (arcLeftX + arcRightX) / 2;
-            const arcRx = (arcRightX - arcLeftX) / 2;
-            const arcCy = railTop;             // 拱門兩端的高度
-            const arcRy = 120;                 // 拱門從 arcCy 往上 120px 到頂點
+            // 弧形軌道：圓心在 (railRight, railTop)，半徑 60
+            const arcCx = railRight;
+            const arcCy = railTop;
+            const arcR = 60;
 
-            // 建立拱門物理牆（從 180° 到 360°，順時針經過 270° 頂點）
-            // θ=π → 左端 (arcCx - arcRx, arcCy)
-            // θ=1.5π → 頂點 (arcCx, arcCy - arcRy)
-            // θ=2π → 右端 (arcCx + arcRx, arcCy)
-            buildEllipseArcWall(pachinkoEngine, arcCx, arcCy, arcRx, arcRy, Math.PI, Math.PI * 2, 20, 28);
+            // 建立弧形物理牆
+            buildArcWallByCircle(pachinkoEngine, arcCx, arcCy, arcR, Math.PI, Math.PI * 1.5, 22, 20);
 
-            // 右側垂直軌道左牆
+            // 弧形頂端擋片（防止球從上方飛出）
             Composite.add(pachinkoEngine.world, Bodies.rectangle(
-                railLeft, (railTop + railBottom) / 2, 16, railBottom - railTop,
-                { isStatic: true, render: inv, restitution: 0.2, friction: 0, slop: 0.02 }
+                arcCx, arcCy - arcR - 10, 30, 20,
+                { isStatic: true, render: inv, restitution: 0.1 }
             ));
 
-            // ===== 釘子 + 紅球 + 風車 =====
+            // 垂直軌道左牆（從 railTop 到 railBottom）
+            Composite.add(pachinkoEngine.world, Bodies.rectangle(
+                railLeft, (railTop + railBottom) / 2, 20, railBottom - railTop,
+                { isStatic: true, render: inv, restitution: 0.1, friction: 0, slop: 0.02 }
+            ));
+
+            // ===== 釘子陣列（增加密度，符合圖片） =====
             const pegRadius = 4;
             const BALL_RADIUS = 7;
             const pegs = [];
             const areaLeft = playLeft + 30;
-            const areaRight = railLeft - 30;
-            const areaTop = 220;
+            const areaRight = railLeft - 25;
+            const areaTop = 190;
             const areaBottom = 400;
-            const pegCols = 8;
-            const pegRows = 10;
+            const pegCols = 9; // 增加一行
+            const pegRows = 14; // 增加一列
             const dx = (areaRight - areaLeft) / (pegCols - 1);
             const dy = (areaBottom - areaTop) / (pegRows - 1);
 
             const bumpers = [
-                { x: areaLeft + dx * 1.5, y: areaTop + dy * 2.5, r: 13 },
-                { x: areaLeft + dx * 5.5, y: areaTop + dy * 2.5, r: 13 },
-                { x: areaLeft + dx * 3.5, y: areaTop + dy * 5.0, r: 14 }
-            ];
-            const spinnerDefs = [
-                { x: areaLeft + dx * 0.7, y: areaTop + dy * 4.5, armLen: 18, armW: 7, speed: 0.04, angle: 0 },
-                { x: areaLeft + dx * 6.3, y: areaTop + dy * 4.5, armLen: 18, armW: 7, speed: -0.04, angle: 0.5 },
-                { x: areaLeft + dx * 3.5, y: areaTop + dy * 8.0, armLen: 18, armW: 7, speed: 0.035, angle: 1.0 }
+                { x: areaLeft + dx * 2, y: areaTop + dy * 3, r: 13 },
+                { x: areaLeft + dx * 6, y: areaTop + dy * 3, r: 13 },
+                { x: areaLeft + dx * 4, y: areaTop + dy * 7, r: 14 }
             ];
 
             function isNearObstacle(x, y) {
                 for (const b of bumpers) { const need = b.r + pegRadius + BALL_RADIUS + 3; if (Math.hypot(x - b.x, y - b.y) < need) return true; }
-                for (const s of spinnerDefs) { const sweep = s.armLen + 4; const need = sweep + pegRadius + BALL_RADIUS + 3; if (Math.hypot(x - s.x, y - s.y) < need) return true; }
                 return false;
             }
 
@@ -1300,34 +1357,19 @@
                     if (x > areaRight + 0.5) continue;
                     if (isNearObstacle(x, y)) continue;
                     Composite.add(pachinkoEngine.world, Bodies.circle(x, y, pegRadius, {
-                        isStatic: true, restitution: 0.92, friction: 0, frictionStatic: 0, slop: 0.01, render: inv, label: 'peg'
+                        isStatic: true, restitution: 0.7, friction: 0, frictionStatic: 0, slop: 0.01, render: inv, label: 'peg'
                     }));
                     pegs.push({ x, y, r: pegRadius, isBumper: false });
                 }
             }
             for (const b of bumpers) {
                 Composite.add(pachinkoEngine.world, Bodies.circle(b.x, b.y, b.r, {
-                    isStatic: true, restitution: 0.95, friction: 0, frictionStatic: 0, slop: 0.01, render: inv, label: 'bumper'
+                    isStatic: true, restitution: 0.8, friction: 0, frictionStatic: 0, slop: 0.01, render: inv, label: 'bumper'
                 }));
                 pegs.push({ x: b.x, y: b.y, r: b.r, isBumper: true });
             }
 
-            // 建立旋轉風車（物理本體用十字形，兩條長方形交叉）
-            for (const s of spinnerDefs) {
-                const arm1 = Bodies.rectangle(s.x, s.y, s.armLen * 2, s.armW, {
-                    isStatic: true, restitution: 1.0, friction: 0, frictionStatic: 0, render: inv, label: 'spinner'
-                });
-                Matter.Body.setAngle(arm1, s.angle);
-                Composite.add(pachinkoEngine.world, arm1);
-                const arm2 = Bodies.rectangle(s.x, s.y, s.armW, s.armLen * 2, {
-                    isStatic: true, restitution: 1.0, friction: 0, frictionStatic: 0, render: inv, label: 'spinner'
-                });
-                Matter.Body.setAngle(arm2, s.angle);
-                Composite.add(pachinkoEngine.world, arm2);
-                pachinkoSpinners.push({ bodies: [arm1, arm2], x: s.x, y: s.y, armLen: s.armLen, armW: s.armW, speed: s.speed, angle: s.angle });
-            }
-
-            // 紅球脈衝 + 釘子音效
+            // ===== 紅球脈衝 + 釘子音效 =====
             let lastPegSoundTime = 0;
             Events.on(pachinkoEngine, 'collisionStart', (event) => {
                 if (!pachinkoBall) return;
@@ -1344,9 +1386,9 @@
                         const rx = pachinkoBall.position.x - other.position.x;
                         const ry = pachinkoBall.position.y - other.position.y;
                         const dist = Math.hypot(rx, ry) || 1;
-                        Body.setVelocity(pachinkoBall, { x: v.x + (rx / dist) * 6, y: v.y + (ry / dist) * 6 });
+                        Body.setVelocity(pachinkoBall, { x: v.x + (rx / dist) * 5, y: v.y + (ry / dist) * 5 });
                     }
-                    if (other.label === 'peg' || other.label === 'bumper' || other.label === 'spinner') {
+                    if (other.label === 'peg' || other.label === 'bumper') {
                         if (now - lastPegSoundTime < 45) continue;
                         const v = pachinkoBall.velocity; const speed = Math.hypot(v.x, v.y);
                         if (speed < 1.2) continue;
@@ -1355,12 +1397,8 @@
                 }
             });
 
-            // 每幀旋轉風車 + 彈珠軟約束
+            // ===== 彈珠位置軟約束 =====
             Events.on(pachinkoEngine, 'beforeUpdate', () => {
-                for (const s of pachinkoSpinners) {
-                    s.angle += s.speed;
-                    for (const b of s.bodies) Matter.Body.setAngle(b, s.angle);
-                }
                 if (!pachinkoBall || pachinkoBall.isStatic) return;
                 const pos = pachinkoBall.position; const r = BALL_RADIUS;
                 const leftBound = playLeft + 2 + r;
@@ -1379,27 +1417,29 @@
                 }
             });
 
-            // 彈簧與彈珠預備位置
+            // ===== 彈簧與彈珠預備位置 =====
             const ballRestX = (railLeft + railRight) / 2;
             const ballRestY = railBottom - 20;
             const springX = ballRestX;
             const springTopY = ballRestY + 10;
-            const springBottomY = renderHeight - 55;
-            const leverY = renderHeight - 35;
+            const springBottomY = renderHeight - 50;
+            const leverY = renderHeight - 32;
             pachinkoBallRestX = ballRestX;
             pachinkoBallRestY = ballRestY;
 
-            Composite.add(pachinkoEngine.world, Bodies.rectangle(ballRestX, ballRestY + 12, 26, 8, { isStatic: true, render: inv }));
+            // 隱形平台
+            Composite.add(pachinkoEngine.world, Bodies.rectangle(ballRestX, ballRestY + 12, 32, 8, { isStatic: true, render: inv }));
 
+            // 預備彈珠
             pachinkoBall = Bodies.circle(ballRestX, ballRestY, BALL_RADIUS, {
-                isStatic: true, restitution: 0.5, friction: 0.001, frictionAir: 0.0018, density: 0.002, slop: 0.01, render: inv
+                isStatic: true, restitution: 0.4, friction: 0.001, frictionAir: 0.0018, density: 0.002, slop: 0.01, render: inv
             });
             Composite.add(pachinkoEngine.world, pachinkoBall);
 
-            // 獎池
+            // ===== 獎池 =====
             pachinkoBins = []; pachinkoPrizeMap = {};
             const binTopY = 425;
-            const binBottomY = playBottom;
+            const binBottomY = renderHeight - FRAME;
             const binAreaLeft = playLeft + 4;
             const binAreaRight = railLeft - 4;
             const binAreaWidth = binAreaRight - binAreaLeft;
@@ -1431,81 +1471,21 @@
                 for (let i = 0; i < binCount; i++) {
                     const binX = binAreaLeft + i * binWidth + binWidth / 2;
                     const prize = binPrizes[i];
-                    Composite.add(pachinkoEngine.world, Bodies.rectangle(binAreaLeft + i * binWidth, binTopY + (binBottomY - binTopY) / 2, 10, binBottomY - binTopY, { isStatic: true, render: inv, friction: 0.1 }));
+                    Composite.add(pachinkoEngine.world, Bodies.rectangle(binAreaLeft + i * binWidth, binTopY + (binBottomY - binTopY) / 2, 8, binBottomY - binTopY, { isStatic: true, render: inv, friction: 0.1 }));
                     pachinkoBins.push({ index: i, x: binX, width: binWidth, y: (binTopY + binBottomY) / 2, topY: binTopY, bottomY: binBottomY, prizeId: prize.id, prizeData: prize.data });
                     pachinkoPrizeMap[i] = prize.id;
                 }
-                Composite.add(pachinkoEngine.world, Bodies.rectangle(binAreaRight, binTopY + (binBottomY - binTopY) / 2, 10, binBottomY - binTopY, { isStatic: true, render: inv, friction: 0.1 }));
-                Composite.add(pachinkoEngine.world, Bodies.rectangle((binAreaLeft + binAreaRight) / 2, binBottomY + 6, binAreaWidth + 20, 12, { isStatic: true, render: inv, friction: 0.1 }));
+                Composite.add(pachinkoEngine.world, Bodies.rectangle(binAreaRight, binTopY + (binBottomY - binTopY) / 2, 8, binBottomY - binTopY, { isStatic: true, render: inv, friction: 0.1 }));
+                Composite.add(pachinkoEngine.world, Bodies.rectangle((binAreaLeft + binAreaRight) / 2, binBottomY + 4, binAreaWidth + 20, 12, { isStatic: true, render: inv, friction: 0.1 }));
             }
 
             // ===== 靜態場景繪製 =====
             const bgCanvas = document.createElement('canvas');
             bgCanvas.width = renderWidth; bgCanvas.height = renderHeight;
             const bctx = bgCanvas.getContext('2d');
+            drawPachinkoSceneStatic(bctx, renderWidth, renderHeight, pegs, { x: springX, topY: springTopY, bottomY: springBottomY, leverY: leverY }, railLeft, railRight, railTop, railBottom, arcCx, arcCy, arcR);
 
-            // 背景
-            const bgGrad = bctx.createLinearGradient(0, 0, 0, renderHeight);
-            bgGrad.addColorStop(0, '#101a35'); bgGrad.addColorStop(1, '#050810');
-            bctx.fillStyle = bgGrad; bctx.fillRect(0, 0, renderWidth, renderHeight);
-
-            const playBg = bctx.createRadialGradient(renderWidth * 0.4, renderHeight * 0.4, 30, renderWidth * 0.4, renderHeight * 0.4, renderHeight * 0.75);
-            playBg.addColorStop(0, 'rgba(40,80,160,0.35)'); playBg.addColorStop(1, 'rgba(0,0,0,0)');
-            bctx.fillStyle = playBg; bctx.fillRect(20, 20, renderWidth - 40, renderHeight - 40);
-
-            // 星點
-            bctx.fillStyle = 'rgba(200,220,255,0.4)';
-            for (let i = 0; i < 60; i++) {
-                const x = 25 + Math.random() * (renderWidth - 50);
-                const y = 25 + Math.random() * (renderHeight - 50);
-                const rr = Math.random() * 1.4 + 0.2;
-                bctx.beginPath(); bctx.arc(x, y, rr, 0, Math.PI * 2); bctx.fill();
-            }
-
-            // 金色外框
-            const goldGrad = bctx.createLinearGradient(0, 0, renderWidth, renderHeight);
-            goldGrad.addColorStop(0, '#f6e27a'); goldGrad.addColorStop(0.4, '#d4af37'); goldGrad.addColorStop(0.7, '#b8860b'); goldGrad.addColorStop(1, '#8b6914');
-            bctx.fillStyle = goldGrad;
-            bctx.fillRect(0, 0, renderWidth, 20); bctx.fillRect(0, renderHeight - 20, renderWidth, 20);
-            bctx.fillRect(0, 0, 20, renderHeight); bctx.fillRect(renderWidth - 20, 0, 20, renderHeight);
-            bctx.strokeStyle = 'rgba(0,0,0,0.7)'; bctx.lineWidth = 3; bctx.strokeRect(21.5, 21.5, renderWidth - 43, renderHeight - 43);
-            bctx.strokeStyle = 'rgba(255,255,255,0.35)'; bctx.lineWidth = 1; bctx.strokeRect(20.5, 20.5, renderWidth - 41, renderHeight - 41);
-
-            // 燈泡
-            for (let x = 40; x < renderWidth - 30; x += 42) { drawBulb(bctx, x, 10, 3.5); drawBulb(bctx, x, renderHeight - 10, 3.5); }
-            for (let y = 42; y < renderHeight - 30; y += 42) { drawBulb(bctx, 10, y, 3.5); drawBulb(bctx, renderWidth - 10, y, 3.5); }
-
-            const woodGrad = bctx.createLinearGradient(0, 0, renderWidth, renderHeight);
-            woodGrad.addColorStop(0, '#e0a866'); woodGrad.addColorStop(0.5, '#c07830'); woodGrad.addColorStop(1, '#8b4513');
-
-            // 頂部大拱門（橢圓弧）
-            bctx.save();
-            bctx.lineCap = 'round'; bctx.lineJoin = 'round';
-            bctx.strokeStyle = 'rgba(0,0,0,0.6)'; bctx.lineWidth = 24;
-            bctx.beginPath(); bctx.ellipse(arcCx, arcCy, arcRx, arcRy, 0, Math.PI, Math.PI * 2); bctx.stroke();
-            bctx.strokeStyle = woodGrad; bctx.lineWidth = 20;
-            bctx.beginPath(); bctx.ellipse(arcCx, arcCy, arcRx, arcRy, 0, Math.PI, Math.PI * 2); bctx.stroke();
-            bctx.strokeStyle = 'rgba(255,220,160,0.6)'; bctx.lineWidth = 3;
-            bctx.beginPath(); bctx.ellipse(arcCx, arcCy, arcRx - 5, arcRy - 5, 0, Math.PI + 0.05, Math.PI * 2 - 0.05); bctx.stroke();
-            bctx.restore();
-
-            // 垂直軌道左牆
-            bctx.fillStyle = woodGrad;
-            bctx.fillRect(railLeft - 8, railTop, 16, railBottom - railTop);
-            bctx.fillStyle = 'rgba(255,220,160,0.5)'; bctx.fillRect(railLeft - 7, railTop, 3, railBottom - railTop);
-            bctx.fillStyle = 'rgba(0,0,0,0.4)'; bctx.fillRect(railLeft + 5, railTop, 3, railBottom - railTop);
-
-            // 彈簧 + 拉桿
-            drawSpring(bctx, springX, springTopY, springBottomY, 9, 4.5);
-            drawLeverKnob(bctx, springX, leverY);
-
-            // 釘子
-            for (const p of pegs) { if (p.isBumper) drawBumper(bctx, p.x, p.y, p.r); else drawPeg(bctx, p.x, p.y, p.r); }
-
-            // 預備彈珠
-            drawGlassBall(bctx, springX, springTopY - 12, 7);
-
-            // 畫獎池
+            // 畫獎池 (增加白色邊框，符合圖片)
             const binColors = [
                 ['#ff7aa2', '#c9184a'], ['#f9c74f', '#e07a1f'], ['#90be6d', '#2d6a4f'], ['#4dabf7', '#1864ab'], ['#b197fc', '#5f3dc4'],
                 ['#ffa94d', '#d9480f'], ['#63e6be', '#087f5b'], ['#ff8787', '#c92a2a'], ['#74c0fc', '#1971c2']
@@ -1515,14 +1495,19 @@
 
             for (let i = 0; i < pachinkoBins.length; i++) {
                 const bin = pachinkoBins[i];
-                const left = bin.x - bin.width / 2 + 5;
+                const left = bin.x - bin.width / 2 + 4;
                 const top = bin.topY + 3;
-                const w = bin.width - 10;
+                const w = bin.width - 8;
                 const h = bin.bottomY - bin.topY - 6;
                 const colors = prizeColorMap[bin.prizeId] || binColors[0];
                 const bg2 = bctx.createLinearGradient(left, top, left, top + h);
                 bg2.addColorStop(0, colors[0]); bg2.addColorStop(1, colors[1]);
                 bctx.fillStyle = bg2; bctx.fillRect(left, top, w, h);
+                
+                // 白色邊框
+                bctx.strokeStyle = 'rgba(255,255,255,0.8)'; bctx.lineWidth = 2;
+                bctx.strokeRect(left, top, w, h);
+
                 const hl = bctx.createLinearGradient(left, top, left, top + h * 0.4);
                 hl.addColorStop(0, 'rgba(255,255,255,0.5)'); hl.addColorStop(1, 'rgba(255,255,255,0)');
                 bctx.fillStyle = hl; bctx.fillRect(left, top, w, h * 0.4);
@@ -1544,22 +1529,18 @@
 
             if (pachinkoBins.length > 0) {
                 bctx.fillStyle = '#8b4513';
-                bctx.fillRect(binAreaLeft - 4, binTopY, 8, binBottomY - binTopY);
-                bctx.fillRect(binAreaRight - 4, binTopY, 8, binBottomY - binTopY);
+                bctx.fillRect(binAreaLeft - 3, binTopY, 6, binBottomY - binTopY);
+                bctx.fillRect(binAreaRight - 3, binTopY, 6, binBottomY - binTopY);
                 const shelfGrad = bctx.createLinearGradient(0, binBottomY, 0, renderHeight - 20);
                 shelfGrad.addColorStop(0, '#d4af37'); shelfGrad.addColorStop(1, '#8b6914');
                 bctx.fillStyle = shelfGrad;
                 bctx.fillRect(20, binBottomY, renderWidth - 40, renderHeight - 20 - binBottomY);
             }
 
-            // 渲染 + 物理迴圈
+            // ===== 渲染 + 物理迴圈 =====
             function renderLoop() {
                 ctx2d.clearRect(0, 0, renderWidth, renderHeight);
                 ctx2d.drawImage(bgCanvas, 0, 0);
-                // 動態畫旋轉風車（畫在球下面）
-                for (const s of pachinkoSpinners) {
-                    drawSpinner(ctx2d, s.x, s.y, s.angle, s.armLen, s.armW);
-                }
                 if (pachinkoBall) drawGlassBall(ctx2d, pachinkoBall.position.x, pachinkoBall.position.y, BALL_RADIUS);
                 pachinkoRenderLoopId = requestAnimationFrame(renderLoop);
             }
@@ -1630,16 +1611,16 @@
             if (!pachinkoBall) {
                 const renderWidth = pachinkoRender ? pachinkoRender.options.width : pachinkoWidth;
                 const renderHeight = pachinkoRender ? pachinkoRender.options.height : pachinkoHeight;
-                const FRAME = 20; const railRight = renderWidth - FRAME - 4; const railLeft = railRight - 30;
-                pachinkoBall = Matter.Bodies.circle((railLeft + railRight) / 2, renderHeight - 135, 7, {
-                    isStatic: true, restitution: 0.5, friction: 0.001, frictionAir: 0.0018, density: 0.002, render: { visible: false }
+                const FRAME = 20; const railRight = renderWidth - FRAME - 4; const railLeft = railRight - 34;
+                pachinkoBall = Matter.Bodies.circle((railLeft + railRight) / 2, renderHeight - 140, 7, {
+                    isStatic: true, restitution: 0.4, friction: 0.001, frictionAir: 0.0018, density: 0.002, render: { visible: false }
                 });
                 Matter.Composite.add(pachinkoEngine.world, pachinkoBall);
             }
             Matter.Body.setStatic(pachinkoBall, false);
-            // 力道 11 ~ 27，20% 以下飛不到拱門
-            const minSpeed = 11;
-            const maxSpeed = 27;
+            // 調整力道曲線，讓球更容易上到弧形軌道
+            const minSpeed = 14; // 提高最低速度
+            const maxSpeed = 24; // 稍微降低最高速度
             const speed = minSpeed + power * (maxSpeed - minSpeed);
             Matter.Body.setVelocity(pachinkoBall, { x: 0, y: -speed });
             pachinkoBallDropped = true;
@@ -1741,7 +1722,7 @@
             if (pachinkoBall) { Matter.Composite.remove(pachinkoEngine.world, pachinkoBall); pachinkoBall = null; }
             if (pachinkoEngine && pachinkoRender) {
                 pachinkoBall = Matter.Bodies.circle(pachinkoBallRestX, pachinkoBallRestY, 7, {
-                    isStatic: true, restitution: 0.5, friction: 0.001, frictionAir: 0.0018, density: 0.002, render: { visible: false }
+                    isStatic: true, restitution: 0.4, friction: 0.001, frictionAir: 0.0018, density: 0.002, render: { visible: false }
                 });
                 Matter.Composite.add(pachinkoEngine.world, pachinkoBall);
             }
