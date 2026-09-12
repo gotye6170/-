@@ -2205,7 +2205,7 @@
             }
 
             const railRightX = renderWidth - 75;
-            const railTopY = 150;
+            const railTopY = 110;
             const railBottomY = renderHeight - 80;
             Composite.add(pachinkoEngine.world, Bodies.rectangle(
                 railRightX, (railTopY + railBottomY) / 2, 12, railBottomY - railTopY,
@@ -2219,11 +2219,11 @@
 
             const areaLeft = 44;
             const areaRight = railRightX - 20;
-            const areaTop = 148;
+            const areaTop = 108;
             const areaBottom = 408;
 
             const pegCols = 9;
-            const pegRows = 11;
+            const pegRows = 13;
             const dx = (areaRight - areaLeft) / (pegCols - 1);
             const dy = (areaBottom - areaTop) / (pegRows - 1);
 
@@ -2607,7 +2607,7 @@
             if (pachinkoSealWall) return;
             const renderWidth = pachinkoRender.options.width;
             const railRightX = renderWidth - 75;
-            const railTopY = 150;
+            const railTopY = 110;
             const sealX = (railRightX + (renderWidth - 20)) / 2;
             const sealW = (renderWidth - 20) - railRightX + 20;
             const sealH = 20;
