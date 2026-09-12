@@ -2207,17 +2207,21 @@
             const R = 60;
             const cxL = 20 + R, cyL = 20 + R;
             const cxR = renderWidth - 20 - R, cyR = 20 + R;
-            const seg = 20;
-            for (let i = 0; i <= seg; i++) {
-                const angleL = Math.PI + (i / seg) * (Math.PI / 2);
-                Composite.add(pachinkoEngine.world, Bodies.rectangle(
-                    cxL + R * Math.cos(angleL), cyL + R * Math.sin(angleL), 20, 20,
-                    { isStatic: true, angle: angleL, render: inv, restitution: 0.2 }
+            // 用一圈小圓球拼牆，球球互相重疊，絕不會有縫隙
+            const wallBallR = 10;
+            const numWallBalls = 40;
+            for (let i = 0; i <= numWallBalls; i++) {
+                // 左上角弧線（180° → 270°）
+                const angleL = Math.PI + (i / numWallBalls) * (Math.PI / 2);
+                Composite.add(pachinkoEngine.world, Bodies.circle(
+                    cxL + R * Math.cos(angleL), cyL + R * Math.sin(angleL), wallBallR,
+                    { isStatic: true, render: inv, restitution: 0.2 }
                 ));
-                const angleR = 1.5 * Math.PI + (i / seg) * (Math.PI / 2);
-                Composite.add(pachinkoEngine.world, Bodies.rectangle(
-                    cxR + R * Math.cos(angleR), cyR + R * Math.sin(angleR), 20, 20,
-                    { isStatic: true, angle: angleR, render: inv, restitution: 0.2 }
+                // 右上角弧線（270° → 360°）
+                const angleR = 1.5 * Math.PI + (i / numWallBalls) * (Math.PI / 2);
+                Composite.add(pachinkoEngine.world, Bodies.circle(
+                    cxR + R * Math.cos(angleR), cyR + R * Math.sin(angleR), wallBallR,
+                    { isStatic: true, render: inv, restitution: 0.2 }
                 ));
             }
 
