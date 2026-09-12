@@ -2105,7 +2105,7 @@
             woodGrad.addColorStop(0.5, '#c07830');
             woodGrad.addColorStop(1, '#8b4513');
             
-            const R = 80;
+            const R = 60;
             const cxL = 20 + R;
             const cyL = 20 + R;
             const cxR = renderWidth - 20 - R;
@@ -2205,7 +2205,7 @@
                 Bodies.rectangle(renderWidth/2, renderHeight - 10, renderWidth, 20, { isStatic: true, render: inv, restitution: 0.2 })
             ]);
 
-            const R = 80;
+            const R = 60;
             const cxL = 20 + R, cyL = 20 + R;
             const cxR = renderWidth - 20 - R, cyR = 20 + R;
             const seg = 20;
@@ -2223,7 +2223,7 @@
             }
 
             const railRightX = renderWidth - 60;
-            const railTopY = 110;
+            const railTopY = 35;
             const railBottomY = renderHeight - 80;
             Composite.add(pachinkoEngine.world, Bodies.rectangle(
                 railRightX, (railTopY + railBottomY) / 2, 12, railBottomY - railTopY,
@@ -2647,7 +2647,7 @@
             if (pachinkoSealWall) return;
             const renderWidth = pachinkoRender.options.width;
             const railRightX = renderWidth - 60;
-            const railTopY = 110;
+            const railTopY = 35;
             const sealX = (railRightX + (renderWidth - 20)) / 2;
             const sealW = (renderWidth - 20) - railRightX + 20;
             const sealH = 20;
