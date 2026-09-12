@@ -1469,14 +1469,14 @@
             hamsterCaught = false;
             hamsterArea = { left: areaLeft, right: areaRight, top: areaTop, bottom: areaBottom };
             if (hamsterPrizeId && lastPrizes && lastPrizes[hamsterPrizeId]) {
-                const hr = Math.max(11, Math.round(renderWidth * 0.038));
+                const hr = Math.max(11, Math.round(renderWidth * 0.075));
                 hamster = {
                     x: areaLeft + (areaRight - areaLeft) * 0.5,
                     y: areaTop + (areaBottom - areaTop) * 0.5,
                     radius: hr,
                     targetX: areaLeft + (areaRight - areaLeft) * 0.5,
                     targetY: areaTop + (areaBottom - areaTop) * 0.5,
-                    speed: Math.max(0.5, renderWidth * 0.0022),
+                    speed: Math.max(0.5, renderWidth * 0.0075),
                     bobPhase: 0
                 };
                 pickHamsterTarget();
