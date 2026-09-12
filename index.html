@@ -1844,13 +1844,13 @@
 
                     await push(ref(db, `drawRecords/${currentPlayerName}`), {
                         type: "pachinko-hamster",
-                        won: `🐹 倉鼠大放送：${prizeData.name}`,
+                        won: `🐹 因為你打中呆呆，所以只能得到：${prizeData.name}`,
                         code: code,
                         time: Date.now(),
                         group: honorUnlockedGroup,
                         showOnBoard: true
                     });
-                    showSlotWinModal(`🐹 倉鼠大放送：${prizeData.name}`, code, awardedPoints);
+                    showSlotWinModal(`🐹 因為你打中呆呆，所以只能得到：${prizeData.name}`, code, awardedPoints);
                 }
             } catch (e) {
                 console.error("倉鼠獎處理失敗", e);
@@ -1936,6 +1936,7 @@
             let checkCount = 0, enteredPlayArea = false, countDeducted = false;
             let stuckTime = 0, lastPosX = -1, lastPosY = -1, unstuckCount = 0;
             let ballReturned = false;
+            let everLeftRest = false;
 
             if (pachinkoCheckIntervalId) clearInterval(pachinkoCheckIntervalId);
             pachinkoCheckIntervalId = setInterval(async () => {
@@ -1950,26 +1951,32 @@
                 const nearBottom = pos.y > renderHeight - 130;
 
                 // ★ 球落回發射軌底部 → 不算中獎、退次數
-                if (!ballReturned && inRail && nearBottom && speed < 2 && countDeducted) {
+                // ★ 判斷球是否已經離開過彈簧位置
+                if (pos.y < pachinkoBallRestY - 3) everLeftRest = true;
+
+                // ★ 球落回發射軌底部 → 不算中獎、退次數、可重新發射
+                if (everLeftRest && !ballReturned && inRail && nearBottom && speed < 5) {
                     ballReturned = true;
                     clearInterval(pachinkoCheckIntervalId);
                     pachinkoCheckIntervalId = null;
 
-                    try {
-                        await runTransaction(playedRef, (current) => {
-                            if (!current) return current;
-                            const c = Math.max(0, (current.drawCount || 0) - 1);
-                            return { ...current, drawCount: c };
-                        });
-                        if (globalPlayedUsers[currentPlayerName]) {
-                            const cur = globalPlayedUsers[currentPlayerName].drawCount || 0;
-                            globalPlayedUsers[currentPlayerName] = {
-                                ...globalPlayedUsers[currentPlayerName],
-                                drawCount: Math.max(0, cur - 1)
-                            };
-                        }
-                        updateDrawCountDisplay();
-                    } catch (e) { console.error("退次數失敗", e); }
+                    if (countDeducted) {
+                        try {
+                            await runTransaction(playedRef, (current) => {
+                                if (!current) return current;
+                                const c = Math.max(0, (current.drawCount || 0) - 1);
+                                return { ...current, drawCount: c };
+                            });
+                            if (globalPlayedUsers[currentPlayerName]) {
+                                const cur = globalPlayedUsers[currentPlayerName].drawCount || 0;
+                                globalPlayedUsers[currentPlayerName] = {
+                                    ...globalPlayedUsers[currentPlayerName],
+                                    drawCount: Math.max(0, cur - 1)
+                                };
+                            }
+                            updateDrawCountDisplay();
+                        } catch (e) { console.error("退次數失敗", e); }
+                    }
 
                     pachinkoBallDropped = false;
                     enteredPlayArea = false;
@@ -2015,7 +2022,7 @@
                     }).catch((e) => console.error("扣次數失敗", e));
                 }
 
-                if (enteredPlayArea && pos.y > renderHeight - 65) {
+                if (enteredPlayArea && pos.y > renderHeight - 65 && !inRail) {
                     clearInterval(pachinkoCheckIntervalId); pachinkoCheckIntervalId = null;
                     let targetBin = null;
                     for (const bin of pachinkoBins) { if (pos.x >= bin.x - bin.width / 2 && pos.x < bin.x + bin.width / 2) { targetBin = bin; break; } }
