@@ -463,6 +463,8 @@
         let hamsterArea = null;
         let hamsterPrizeId = null;
         let hamsterCaught = false;
+        let hamsterImageUrl = null;
+        let hamsterImage = null;
 
         let audioCtx = null;
         let soundEnabled = true;
@@ -517,6 +519,7 @@
                 pachinkoBinCount = data.bins || 7;
                 pachinkoBinLayout = Array.isArray(data.binLayout) ? data.binLayout.slice() : [];
                 hamsterPrizeId = data.hamsterPrizeId || null;
+                hamsterImageUrl = data.hamsterImageUrl || null;
                 if (document.getElementById("pachinkoSystemArea").style.display !== "none") buildPachinkoBoard();
             });
         }
@@ -1465,18 +1468,28 @@
             const dx = (areaRight - areaLeft) / (pegCols - 1);
             const dy = (areaBottom - areaTop) / (pegRows - 1);
 
+            // ★ 載入自訂倉鼠圖片（沒設定則用預設繪圖）
+            hamsterImage = null;
+            if (hamsterImageUrl) {
+                const img = new Image();
+                img.crossOrigin = "anonymous";
+                img.onload = () => { hamsterImage = img; };
+                img.onerror = () => { console.warn("倉鼠圖片載入失敗，使用預設繪圖"); hamsterImage = null; };
+                img.src = hamsterImageUrl;
+            }
+
             // ★ 倉鼠初始化（只有設定 hamsterPrizeId 時才會出現）
             hamsterCaught = false;
             hamsterArea = { left: areaLeft, right: areaRight, top: areaTop, bottom: areaBottom };
             if (hamsterPrizeId && lastPrizes && lastPrizes[hamsterPrizeId]) {
-                const hr = Math.max(11, Math.round(renderWidth * 0.075));
+                const hr = Math.max(11, Math.round(renderWidth * 0.038));
                 hamster = {
                     x: areaLeft + (areaRight - areaLeft) * 0.5,
                     y: areaTop + (areaBottom - areaTop) * 0.5,
                     radius: hr,
                     targetX: areaLeft + (areaRight - areaLeft) * 0.5,
                     targetY: areaTop + (areaBottom - areaTop) * 0.5,
-                    speed: Math.max(0.5, renderWidth * 0.0075),
+                    speed: Math.max(0.5, renderWidth * 0.0022),
                     bobPhase: 0
                 };
                 pickHamsterTarget();
@@ -1735,11 +1748,18 @@
                     drawWindmillLocal(ctx2d, wm.r);
                     ctx2d.restore();
                 }
-                // ★ 倉鼠
+                // ★ 倉鼠（優先畫自訂圖片，沒圖才畫預設）
                 if (hamster && !hamsterCaught) {
                     ctx2d.save();
                     ctx2d.translate(hamster.x, hamster.y);
-                    drawHamsterLocal(ctx2d, hamster.radius, hamster.bobPhase);
+                    const bob = Math.sin(hamster.bobPhase) * hamster.radius * 0.15;
+                    ctx2d.translate(0, bob);
+                    if (hamsterImage && hamsterImage.complete && hamsterImage.naturalWidth > 0) {
+                        const imgSize = hamster.radius * 2.4;
+                        ctx2d.drawImage(hamsterImage, -imgSize / 2, -imgSize / 2, imgSize, imgSize);
+                    } else {
+                        drawHamsterLocal(ctx2d, hamster.radius, hamster.bobPhase);
+                    }
                     ctx2d.restore();
                 }
                 if (pachinkoBall) drawGlassBall(ctx2d, pachinkoBall.position.x, pachinkoBall.position.y, pachinkoBallRadius);
