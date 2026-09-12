@@ -2188,8 +2188,8 @@
             const BALL_D = 14;
             const SAFETY = 3;   // 從 4 縮到 2，讓釘子能更貼近障礙物
 
-            const areaLeft = 46;
-            const areaRight = railRightX - 22;
+            const areaLeft = 44;
+            const areaRight = railRightX - 20;
             const areaTop = 148;      // 往上多爭取一點空間
             const areaBottom = 408;   // 往下多爭取一點空間
 
@@ -2639,11 +2639,49 @@
             let enteredPlayArea = false;
             let countDeducted = false;
 
+            // 卡住偵測用
+            let stuckTime = 0;
+            let lastPosX = -1;
+            let lastPosY = -1;
+            let unstuckCount = 0;
+
             const checkInterval = setInterval(async () => {
                 if (!pachinkoBall) { clearInterval(checkInterval); return; }
                 checkCount++;
                 const pos = pachinkoBall.position;
-                
+
+                // ===== 卡住偵測 =====
+                if (enteredPlayArea && pos.y < renderHeight - 90) {
+                    const moved = Math.hypot(pos.x - lastPosX, pos.y - lastPosY);
+                    if (lastPosX >= 0 && moved < 2.5) {
+                        stuckTime += 100;
+                    } else {
+                        stuckTime = 0;
+                    }
+                    if (stuckTime >= 250) {
+                        unstuckCount++;
+                        // 卡左半 → 往右踢；卡右半 → 往左踢
+                        const centerX = renderWidth / 2;
+                        let pushX = pos.x < centerX
+                            ? 4 + Math.random() * 2
+                            : -4 - Math.random() * 2;
+                        let pushY = 3 + Math.random() * 2;
+
+                        // 連續卡 3 次，直接大力往下推
+                        if (unstuckCount >= 3) {
+                            pushX = 0;
+                            pushY = 8;
+                            unstuckCount = 0;
+                        }
+
+                        Matter.Body.setVelocity(pachinkoBall, { x: pushX, y: pushY });
+                        stuckTime = 0;
+                    }
+                }
+                lastPosX = pos.x;
+                lastPosY = pos.y;
+                // ===== 卡住偵測結束 =====
+
                 if (pos.x < -50 || pos.x > renderWidth + 50 || pos.y < -50 || pos.y > renderHeight + 50) {
                     clearInterval(checkInterval);
                     resetPachinkoAfterDraw();
