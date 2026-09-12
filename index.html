@@ -1207,14 +1207,14 @@
             // ===== 拱橋（半圓，橫跨整個遊戲區寬度，180° → 360°） =====
             cctx.save();
             cctx.lineCap = 'round'; cctx.lineJoin = 'round';
-            cctx.strokeStyle = 'rgba(0,0,0,0.6)'; cctx.lineWidth = 30;
+            cctx.strokeStyle = 'rgba(0,0,0,0.6)'; cctx.lineWidth = 18;
             cctx.beginPath(); cctx.arc(arcCx, arcCy, arcR, Math.PI, Math.PI * 2); cctx.stroke();
-            cctx.strokeStyle = 'rgba(255, 220, 100, 0.3)'; cctx.lineWidth = 36;
+            cctx.strokeStyle = 'rgba(255, 220, 100, 0.3)'; cctx.lineWidth = 24;
             cctx.beginPath(); cctx.arc(arcCx, arcCy, arcR, Math.PI, Math.PI * 2); cctx.stroke();
-            cctx.strokeStyle = woodGrad; cctx.lineWidth = 22;
+            cctx.strokeStyle = woodGrad; cctx.lineWidth = 14;
             cctx.beginPath(); cctx.arc(arcCx, arcCy, arcR, Math.PI, Math.PI * 2); cctx.stroke();
-            cctx.strokeStyle = 'rgba(255,220,160,0.85)'; cctx.lineWidth = 4;
-            cctx.beginPath(); cctx.arc(arcCx, arcCy, arcR - 5, Math.PI + 0.05, Math.PI * 2 - 0.05); cctx.stroke();
+            cctx.strokeStyle = 'rgba(255,220,160,0.85)'; cctx.lineWidth = 3;
+            cctx.beginPath(); cctx.arc(arcCx, arcCy, arcR - 4, Math.PI + 0.05, Math.PI * 2 - 0.05); cctx.stroke();
             cctx.restore();
 
             // ===== 左牆（從拱橋左端筆直往下） =====
@@ -1297,28 +1297,24 @@
             // =========================================================
             // ★★★ 核心：所有座標都從「拱橋」開始往下推 ★★★
             // =========================================================
-            // 拱橋左端 x = 遊戲區左緣 + 10
-            // 拱橋右端 x = 遊戲區右緣 - 10
-            // 拱橋橫跨整個遊戲區寬度
-            const arcLeftEndX = playLeft + Math.round(renderWidth * 0.03);    // 約 30
-            const arcRightEndX = playRight - Math.round(renderWidth * 0.03);  // 約 298
+            // 右側發射軌先定（拱橋右端要接它的左壁）
+            const railWidth = Math.max(28, Math.round(renderWidth * 0.10));
+            const railRight = playRight - 8;
+            const railLeft = railRight - railWidth;
+            const railTop = Math.round(renderHeight * 0.32);
+            const railBottom = Math.round(renderHeight * 0.78);
+
+            // 拱橋：左端貼左牆，右端接發射軌左壁，橫跨整個遊戲區
+            const arcLeftEndX = playLeft + 8;
+            const arcRightEndX = railLeft;
             const arcCx = (arcLeftEndX + arcRightEndX) / 2;
             const arcR = (arcRightEndX - arcLeftEndX) / 2;
-            const arcCy = Math.round(renderHeight * 0.33);                     // 拱橋兩端的高度
-            // 拱橋頂端 y = arcCy - arcR，大約落在畫面上方
+            const arcCy = railTop;
 
             // 左牆：從拱橋左端往下
             const leftWallX = arcLeftEndX;
             const leftWallTop = arcCy;
             const leftWallBottom = Math.round(renderHeight * 0.94);
-
-            // 右牆（發射軌）：從拱橋右端往下
-            // 發射軌 = 兩條垂直木條，內寬 = renderWidth * 0.10
-            const railWidth = Math.max(26, Math.round(renderWidth * 0.10));
-            const railRight = arcRightEndX;
-            const railLeft = railRight - railWidth;
-            const railTop = arcCy;
-            const railBottom = Math.round(renderHeight * 0.78);
 
             // 彈簧 & 拉桿（在發射軌正下方）
             const ballRestX = (railLeft + railRight) / 2;
