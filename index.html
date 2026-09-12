@@ -1173,8 +1173,7 @@
             }
         }
 
-        function drawPachinkoSceneStatic(cctx, renderWidth, renderHeight, pegs, springInfo, railLeft, railRight, railTop, railBottom, arcCx, arcCy, arcR) {
-            // 背景
+        function drawPachinkoSceneStatic(cctx, renderWidth, renderHeight, pegs, springInfo, railLeft, railRight, railTop, railBottom, arcCx, arcCy, arcR, leftWallX, leftWallTop, leftWallBottom) {
             const bg = cctx.createLinearGradient(0, 0, 0, renderHeight);
             bg.addColorStop(0, '#0a1226'); bg.addColorStop(1, '#03050a');
             cctx.fillStyle = bg; cctx.fillRect(0, 0, renderWidth, renderHeight);
@@ -1191,7 +1190,6 @@
                 cctx.beginPath(); cctx.arc(x, y, rr, 0, Math.PI * 2); cctx.fill();
             }
 
-            // 金色外框
             const goldGrad = cctx.createLinearGradient(0, 0, renderWidth, renderHeight);
             goldGrad.addColorStop(0, '#f6e27a'); goldGrad.addColorStop(0.4, '#d4af37'); goldGrad.addColorStop(0.7, '#b8860b'); goldGrad.addColorStop(1, '#8b6914');
             cctx.fillStyle = goldGrad;
@@ -1206,7 +1204,7 @@
             const woodGrad = cctx.createLinearGradient(0, 0, renderWidth, renderHeight);
             woodGrad.addColorStop(0, '#e0a866'); woodGrad.addColorStop(0.5, '#c07830'); woodGrad.addColorStop(1, '#8b4513');
 
-            // ===== 弧形拱橋（180° → 360°，半圓） =====
+            // ===== 拱橋（半圓，橫跨整個遊戲區寬度，180° → 360°） =====
             cctx.save();
             cctx.lineCap = 'round'; cctx.lineJoin = 'round';
             cctx.strokeStyle = 'rgba(0,0,0,0.6)'; cctx.lineWidth = 30;
@@ -1219,17 +1217,22 @@
             cctx.beginPath(); cctx.arc(arcCx, arcCy, arcR - 5, Math.PI + 0.05, Math.PI * 2 - 0.05); cctx.stroke();
             cctx.restore();
 
-            // ===== 垂直軌道（兩條木條） =====
-            // 左木條
+            // ===== 左牆（從拱橋左端筆直往下） =====
             cctx.fillStyle = woodGrad;
-            cctx.fillRect(railLeft - 11, railTop, 22, railBottom - railTop);
-            cctx.fillStyle = 'rgba(255,220,160,0.6)'; cctx.fillRect(railLeft - 10, railTop, 3, railBottom - railTop);
-            cctx.fillStyle = 'rgba(0,0,0,0.4)'; cctx.fillRect(railLeft + 7, railTop, 3, railBottom - railTop);
-            // 右木條
+            cctx.fillRect(leftWallX - 8, leftWallTop, 16, leftWallBottom - leftWallTop);
+            cctx.fillStyle = 'rgba(255,220,160,0.6)'; cctx.fillRect(leftWallX - 7, leftWallTop, 3, leftWallBottom - leftWallTop);
+            cctx.fillStyle = 'rgba(0,0,0,0.4)'; cctx.fillRect(leftWallX + 5, leftWallTop, 3, leftWallBottom - leftWallTop);
+
+            // ===== 右牆（發射軌，從拱橋右端筆直往下） =====
             cctx.fillStyle = woodGrad;
-            cctx.fillRect(railRight - 11, railTop, 22, railBottom - railTop);
-            cctx.fillStyle = 'rgba(255,220,160,0.6)'; cctx.fillRect(railRight - 10, railTop, 3, railBottom - railTop);
-            cctx.fillStyle = 'rgba(0,0,0,0.4)'; cctx.fillRect(railRight + 7, railTop, 3, railBottom - railTop);
+            cctx.fillRect(railLeft - 5, railTop, 10, railBottom - railTop);
+            cctx.fillStyle = 'rgba(255,220,160,0.6)'; cctx.fillRect(railLeft - 4, railTop, 2, railBottom - railTop);
+            cctx.fillStyle = 'rgba(0,0,0,0.4)'; cctx.fillRect(railLeft + 3, railTop, 2, railBottom - railTop);
+
+            cctx.fillStyle = woodGrad;
+            cctx.fillRect(railRight - 5, railTop, 10, railBottom - railTop);
+            cctx.fillStyle = 'rgba(255,220,160,0.6)'; cctx.fillRect(railRight - 4, railTop, 2, railBottom - railTop);
+            cctx.fillStyle = 'rgba(0,0,0,0.4)'; cctx.fillRect(railRight + 3, railTop, 2, railBottom - railTop);
 
             // ===== 彈簧 + 拉桿 =====
             drawSpring(cctx, springInfo.x, springInfo.topY, springInfo.bottomY, 9, 4.5);
@@ -1263,7 +1266,6 @@
             pachinkoEngine.velocityIterations = 20;
             pachinkoEngine.constraintIterations = 4;
 
-            // ===== 自適應尺寸（你的是 328） =====
             let renderWidth = container.clientWidth || 328;
             if (renderWidth < 260) renderWidth = 260;
             if (renderWidth > 420) renderWidth = 420;
@@ -1278,7 +1280,6 @@
 
             const inv = { visible: false };
             const FRAME = 20;
-            const WALL_T = 30;
 
             const playLeft = FRAME;
             const playRight = renderWidth - FRAME;
@@ -1287,55 +1288,87 @@
 
             // ===== 外框牆 =====
             Composite.add(pachinkoEngine.world, [
-                Bodies.rectangle(playLeft - WALL_T, renderHeight / 2, WALL_T * 2, renderHeight * 3, { isStatic: true, render: inv, restitution: 0.1, friction: 0 }),
-                Bodies.rectangle(playRight + WALL_T, renderHeight / 2, WALL_T * 2, renderHeight * 3, { isStatic: true, render: inv, restitution: 0.1, friction: 0 }),
-                Bodies.rectangle(renderWidth / 2, playTop - WALL_T, renderWidth * 3, WALL_T * 2, { isStatic: true, render: inv, restitution: 0.1, friction: 0 }),
-                Bodies.rectangle(renderWidth / 2, playBottom + WALL_T, renderWidth * 3, WALL_T * 2, { isStatic: true, render: inv, restitution: 0.1, friction: 0 })
+                Bodies.rectangle(playLeft - 40, renderHeight / 2, 80, renderHeight * 3, { isStatic: true, render: inv, restitution: 0.1, friction: 0 }),
+                Bodies.rectangle(playRight + 40, renderHeight / 2, 80, renderHeight * 3, { isStatic: true, render: inv, restitution: 0.1, friction: 0 }),
+                Bodies.rectangle(renderWidth / 2, playTop - 40, renderWidth * 3, 80, { isStatic: true, render: inv, restitution: 0.1, friction: 0 }),
+                Bodies.rectangle(renderWidth / 2, playBottom + 40, renderWidth * 3, 80, { isStatic: true, render: inv, restitution: 0.1, friction: 0 })
             ]);
 
-            // ===== 座標系統（自適應） =====
-            // 右側垂直軌道（發射區）
-            const railWidth = Math.max(28, Math.round(renderWidth * 0.098));
-            const railRight = playRight - Math.round(renderWidth * 0.03);
+            // =========================================================
+            // ★★★ 核心：所有座標都從「拱橋」開始往下推 ★★★
+            // =========================================================
+            // 拱橋左端 x = 遊戲區左緣 + 10
+            // 拱橋右端 x = 遊戲區右緣 - 10
+            // 拱橋橫跨整個遊戲區寬度
+            const arcLeftEndX = playLeft + Math.round(renderWidth * 0.03);    // 約 30
+            const arcRightEndX = playRight - Math.round(renderWidth * 0.03);  // 約 298
+            const arcCx = (arcLeftEndX + arcRightEndX) / 2;
+            const arcR = (arcRightEndX - arcLeftEndX) / 2;
+            const arcCy = Math.round(renderHeight * 0.33);                     // 拱橋兩端的高度
+            // 拱橋頂端 y = arcCy - arcR，大約落在畫面上方
+
+            // 左牆：從拱橋左端往下
+            const leftWallX = arcLeftEndX;
+            const leftWallTop = arcCy;
+            const leftWallBottom = Math.round(renderHeight * 0.94);
+
+            // 右牆（發射軌）：從拱橋右端往下
+            // 發射軌 = 兩條垂直木條，內寬 = renderWidth * 0.10
+            const railWidth = Math.max(26, Math.round(renderWidth * 0.10));
+            const railRight = arcRightEndX;
             const railLeft = railRight - railWidth;
-            const railTop = Math.round(renderHeight * 0.26);
-            const railBottom = Math.round(renderHeight * 0.74);
+            const railTop = arcCy;
+            const railBottom = Math.round(renderHeight * 0.78);
 
-            // 弧形拱橋：圓心在軌道左側往左到拱橋左端的中心
-            const arcCy = railTop;
-            const arcLeftX = playLeft + Math.round(renderWidth * 0.09);
-            const arcCx = (railLeft + arcLeftX) / 2;
-            const arcR = (railLeft - arcLeftX) / 2;
+            // 彈簧 & 拉桿（在發射軌正下方）
+            const ballRestX = (railLeft + railRight) / 2;
+            const ballRestY = railBottom - 10;
+            const springX = ballRestX;
+            const springTopY = ballRestY + 12;
+            const springBottomY = Math.round(renderHeight * 0.90);
+            const leverY = Math.round(renderHeight * 0.95);
+            pachinkoBallRestX = ballRestX;
+            pachinkoBallRestY = ballRestY;
 
-            // 建立弧形物理牆（180° → 360°）
-            buildArcWallByCircle(pachinkoEngine, arcCx, arcCy, arcR, Math.PI, Math.PI * 2, 20, 36);
+            // ===== 拱橋物理牆 =====
+            buildArcWallByCircle(pachinkoEngine, arcCx, arcCy, arcR, Math.PI, Math.PI * 2, 22, 40);
 
-            // 拱橋左端封口（避免彈珠從左側縫隙逃出）
+            // ===== 左牆物理 =====
             Composite.add(pachinkoEngine.world, Bodies.rectangle(
-                arcCx - arcR - 10, arcCy, 24, 60,
+                leftWallX, (leftWallTop + leftWallBottom) / 2, 14, leftWallBottom - leftWallTop,
+                { isStatic: true, render: inv, restitution: 0.15, friction: 0, slop: 0.02 }
+            ));
+
+            // ===== 發射軌兩側物理牆 =====
+            // 左木條（比拱橋右端再低一點，讓彈珠可以從拱橋滑進來）
+            const railLeftWallTop = arcCy + Math.round(renderHeight * 0.05);
+            Composite.add(pachinkoEngine.world, Bodies.rectangle(
+                railLeft, (railLeftWallTop + railBottom) / 2, 12, railBottom - railLeftWallTop,
+                { isStatic: true, render: inv, restitution: 0.15, friction: 0, slop: 0.02 }
+            ));
+            // 右木條（從拱橋右端往下，完全不封頂）
+            Composite.add(pachinkoEngine.world, Bodies.rectangle(
+                railRight, (railTop + railBottom) / 2, 12, railBottom - railTop,
+                { isStatic: true, render: inv, restitution: 0.15, friction: 0, slop: 0.02 }
+            ));
+
+            // 發射軌底部平台（球靜止處）
+            Composite.add(pachinkoEngine.world, Bodies.rectangle(
+                ballRestX, ballRestY + 12, railWidth - 4, 10,
                 { isStatic: true, render: inv, restitution: 0.1 }
             ));
 
-            // ===== 垂直軌道兩側物理牆 =====
-            Composite.add(pachinkoEngine.world, Bodies.rectangle(
-                railLeft, (railTop + railBottom) / 2, 14, railBottom - railTop,
-                { isStatic: true, render: inv, restitution: 0.1, friction: 0, slop: 0.02 }
-            ));
-            Composite.add(pachinkoEngine.world, Bodies.rectangle(
-                railRight, (railTop + railBottom) / 2, 14, railBottom - railTop,
-                { isStatic: true, render: inv, restitution: 0.1, friction: 0, slop: 0.02 }
-            ));
-
-            // ===== 釘子、紅色大球、風車 =====
+            // ===== 釘子、紅球、風車 =====
             const pegRadius = Math.max(3, Math.round(renderWidth * 0.012));
             const redPinRadius = Math.max(8, Math.round(renderWidth * 0.030));
             const BALL_RADIUS = Math.max(5, Math.round(renderWidth * 0.021));
             const pegs = [];
 
-            const areaLeft = playLeft + Math.round(renderWidth * 0.06);
-            const areaRight = railLeft - Math.round(renderWidth * 0.08);
-            const areaTop = Math.round(renderHeight * 0.37);
-            const areaBottom = Math.round(renderHeight * 0.80);
+            // 釘子區：拱橋左端 ~ 發射軌左端，拱橋下方 ~ 獎池上方
+            const areaLeft = leftWallX + Math.round(renderWidth * 0.05);
+            const areaRight = railLeft - Math.round(renderWidth * 0.05);
+            const areaTop = arcCy + Math.round(renderHeight * 0.08);
+            const areaBottom = Math.round(renderHeight * 0.75);
             const pegCols = 8;
             const pegRows = 13;
             const dx = (areaRight - areaLeft) / (pegCols - 1);
@@ -1443,18 +1476,7 @@
                 }
             });
 
-            // ===== 彈簧 + 彈珠預備位置 =====
-            const ballRestX = (railLeft + railRight) / 2;
-            const ballRestY = railBottom - Math.round(renderHeight * 0.017);
-            const springX = ballRestX;
-            const springTopY = ballRestY + Math.round(renderHeight * 0.026);
-            const springBottomY = Math.round(renderHeight * 0.87);
-            const leverY = Math.round(renderHeight * 0.92);
-            pachinkoBallRestX = ballRestX;
-            pachinkoBallRestY = ballRestY;
-
-            Composite.add(pachinkoEngine.world, Bodies.rectangle(ballRestX, ballRestY + 12, 28, 8, { isStatic: true, render: inv }));
-
+            // ===== 預備彈珠 =====
             pachinkoBall = Bodies.circle(ballRestX, ballRestY, BALL_RADIUS, {
                 isStatic: true, restitution: 0.4, friction: 0.001, frictionAir: 0.0018, density: 0.002, slop: 0.01, render: inv
             });
@@ -1462,10 +1484,10 @@
 
             // ===== 獎池 =====
             pachinkoBins = []; pachinkoPrizeMap = {};
-            const binTopY = Math.round(renderHeight * 0.82);
-            const binBottomY = renderHeight - FRAME;
-            const binAreaLeft = playLeft + 4;
-            const binAreaRight = railLeft - 6;
+            const binTopY = Math.round(renderHeight * 0.80);
+            const binBottomY = Math.round(renderHeight * 0.94);
+            const binAreaLeft = leftWallX;
+            const binAreaRight = railLeft;
             const binAreaWidth = binAreaRight - binAreaLeft;
 
             let binPrizes = [];
@@ -1509,7 +1531,8 @@
             const bctx = bgCanvas.getContext('2d');
             drawPachinkoSceneStatic(bctx, renderWidth, renderHeight, pegs,
                 { x: springX, topY: springTopY, bottomY: springBottomY, leverY: leverY },
-                railLeft, railRight, railTop, railBottom, arcCx, arcCy, arcR);
+                railLeft, railRight, railTop, railBottom, arcCx, arcCy, arcR,
+                leftWallX, leftWallTop, leftWallBottom);
 
             // 畫獎池
             const binColors = [
