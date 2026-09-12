@@ -459,6 +459,10 @@
         let pachinkoRenderLoopId = null;
         let pachinkoPhysicsLoopId = null;
         let pachinkoCheckIntervalId = null;
+        let hamster = null;
+        let hamsterArea = null;
+        let hamsterPrizeId = null;
+        let hamsterCaught = false;
 
         let audioCtx = null;
         let soundEnabled = true;
@@ -512,6 +516,7 @@
                 const data = snap.val() || {};
                 pachinkoBinCount = data.bins || 7;
                 pachinkoBinLayout = Array.isArray(data.binLayout) ? data.binLayout.slice() : [];
+                hamsterPrizeId = data.hamsterPrizeId || null;
                 if (document.getElementById("pachinkoSystemArea").style.display !== "none") buildPachinkoBoard();
             });
         }
@@ -1070,7 +1075,7 @@
         }
 
 
-        // ---------- 彈珠台核心（自適應寬度 + 高解析度） ----------
+        // ---------- 彈珠台核心（自適應寬度 + 高解析度 + 倉鼠） ----------
         function drawGlassBall(ctx, x, y, r) {
             const grad = ctx.createRadialGradient(x - r * 0.35, y - r * 0.35, r * 0.05, x, y, r);
             grad.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
@@ -1122,6 +1127,68 @@
             ctx.beginPath(); ctx.rect(-armW / 2, -armLen, armW, armLen * 2); ctx.fill();
             ctx.beginPath(); ctx.arc(0, 0, armW * 0.8, 0, Math.PI * 2); ctx.fillStyle = '#fffbd0'; ctx.fill();
             ctx.strokeStyle = '#8b6914'; ctx.lineWidth = 1; ctx.stroke();
+        }
+        function drawHamsterLocal(ctx, r, bobPhase) {
+            const bob = Math.sin(bobPhase) * r * 0.15;
+            ctx.save();
+            ctx.translate(0, bob);
+
+            // 陰影
+            ctx.beginPath();
+            ctx.ellipse(0, r * 0.75, r * 0.9, r * 0.25, 0, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(0,0,0,0.4)';
+            ctx.fill();
+
+            // 身體
+            const bodyGrad = ctx.createRadialGradient(-r * 0.3, -r * 0.3, r * 0.1, 0, 0, r);
+            bodyGrad.addColorStop(0, '#fff5e0');
+            bodyGrad.addColorStop(0.55, '#f5c97a');
+            bodyGrad.addColorStop(1, '#a06820');
+            ctx.beginPath();
+            ctx.ellipse(0, 0, r, r * 0.78, 0, 0, Math.PI * 2);
+            ctx.fillStyle = bodyGrad;
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(80,40,0,0.55)';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            // 耳朵
+            ctx.beginPath();
+            ctx.arc(-r * 0.55, -r * 0.55, r * 0.26, 0, Math.PI * 2);
+            ctx.fillStyle = '#f5c97a'; ctx.fill();
+            ctx.strokeStyle = 'rgba(80,40,0,0.5)'; ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(r * 0.55, -r * 0.55, r * 0.26, 0, Math.PI * 2);
+            ctx.fillStyle = '#f5c97a'; ctx.fill();
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(-r * 0.55, -r * 0.55, r * 0.13, 0, Math.PI * 2);
+            ctx.fillStyle = '#ff90a0'; ctx.fill();
+            ctx.beginPath();
+            ctx.arc(r * 0.55, -r * 0.55, r * 0.13, 0, Math.PI * 2);
+            ctx.fillStyle = '#ff90a0'; ctx.fill();
+
+            // 眼睛
+            ctx.beginPath(); ctx.arc(-r * 0.3, -r * 0.1, r * 0.13, 0, Math.PI * 2);
+            ctx.fillStyle = '#000'; ctx.fill();
+            ctx.beginPath(); ctx.arc(r * 0.3, -r * 0.1, r * 0.13, 0, Math.PI * 2);
+            ctx.fillStyle = '#000'; ctx.fill();
+            ctx.beginPath(); ctx.arc(-r * 0.27, -r * 0.14, r * 0.045, 0, Math.PI * 2);
+            ctx.fillStyle = '#fff'; ctx.fill();
+            ctx.beginPath(); ctx.arc(r * 0.33, -r * 0.14, r * 0.045, 0, Math.PI * 2);
+            ctx.fillStyle = '#fff'; ctx.fill();
+
+            // 鼻子
+            ctx.beginPath(); ctx.arc(0, r * 0.15, r * 0.09, 0, Math.PI * 2);
+            ctx.fillStyle = '#7a3020'; ctx.fill();
+
+            // 腮紅
+            ctx.beginPath(); ctx.arc(-r * 0.55, r * 0.18, r * 0.15, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(255,150,150,0.7)'; ctx.fill();
+            ctx.beginPath(); ctx.arc(r * 0.55, r * 0.18, r * 0.15, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(255,150,150,0.7)'; ctx.fill();
+
+            ctx.restore();
         }
         function drawSpring(ctx, cx, topY, bottomY, radius, turns) {
             ctx.save(); ctx.strokeStyle = '#c0c0c0'; ctx.lineWidth = 2.5; ctx.lineCap = 'round';
@@ -1288,7 +1355,7 @@
             if (renderWidth > 420) renderWidth = 420;
             const renderHeight = Math.round(renderWidth * 1.45);
 
-            // ★ DPR 高解析度
+            // DPR 高解析度
             const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
             const canvas = document.createElement("canvas");
@@ -1387,24 +1454,44 @@
             pachinkoBallRadius = BALL_RADIUS;
             const pegs = [];
 
-            const areaLeft = leftWallX + wallT + Math.round(renderWidth * 0.045);
-            const areaRight = innerRailX - wallT - Math.round(renderWidth * 0.045);
+            // ★ 左右留 0.032 讓球貼牆會被釘子擦到，不至於直溜
+            const areaLeft = leftWallX + wallT + Math.round(renderWidth * 0.032);
+            const areaRight = innerRailX - wallT - Math.round(renderWidth * 0.032);
             const areaTop = arcCy + Math.round(renderHeight * 0.05);
             const areaBottom = Math.round(renderHeight * 0.74);
-            // ★ 密度調整：左右留通道、底下留空間給球滾動
+            // ★ 密度調整：底下留空間給球滾
             const pegCols = 8;
             const pegRows = 12;
             const dx = (areaRight - areaLeft) / (pegCols - 1);
             const dy = (areaBottom - areaTop) / (pegRows - 1);
 
+            // ★ 倉鼠初始化（只有設定 hamsterPrizeId 時才會出現）
+            hamsterCaught = false;
+            hamsterArea = { left: areaLeft, right: areaRight, top: areaTop, bottom: areaBottom };
+            if (hamsterPrizeId && lastPrizes && lastPrizes[hamsterPrizeId]) {
+                const hr = Math.max(11, Math.round(renderWidth * 0.038));
+                hamster = {
+                    x: areaLeft + (areaRight - areaLeft) * 0.5,
+                    y: areaTop + (areaBottom - areaTop) * 0.5,
+                    radius: hr,
+                    targetX: areaLeft + (areaRight - areaLeft) * 0.5,
+                    targetY: areaTop + (areaBottom - areaTop) * 0.5,
+                    speed: Math.max(0.5, renderWidth * 0.0022),
+                    bobPhase: 0
+                };
+                pickHamsterTarget();
+            } else {
+                hamster = null;
+            }
+
             // ★ 障礙物位置配合新密度
             const redPins = [
                 { x: areaLeft + dx * 2.5, y: areaTop + dy * 3.0, r: redPinRadius },
-                { x: areaLeft + dx * 6.0, y: areaTop + dy * 7.5, r: redPinRadius }
+                { x: areaLeft + dx * 5.5, y: areaTop + dy * 7.5, r: redPinRadius }
             ];
             const windmills = [
-                { x: areaLeft + dx * 1.5, y: areaTop + dy * 6.0, r: Math.round(renderWidth * 0.045) },
-                { x: areaLeft + dx * 6.5, y: areaTop + dy * 3.0, r: Math.round(renderWidth * 0.045) },
+                { x: areaLeft + dx * 1.5, y: areaTop + dy * 5.5, r: Math.round(renderWidth * 0.045) },
+                { x: areaLeft + dx * 6.0, y: areaTop + dy * 2.5, r: Math.round(renderWidth * 0.045) },
                 { x: areaLeft + dx * 4.0, y: areaTop + dy * 9.5, r: Math.round(renderWidth * 0.045) }
             ];
 
@@ -1466,7 +1553,6 @@
                     damping: 0.02
                 });
                 Composite.add(pachinkoEngine.world, pin);
-                // 交錯方向，看起來更自然
                 const dir = (wi % 2 === 0) ? 1 : -1;
                 windmillBodies.push({ body: windmillBody, r: w.r, spinSpeed: 0.045 * dir });
                 pegs.push({ x: w.x, y: w.y, r: w.r, isWindmill: true, isRedPin: false });
@@ -1578,7 +1664,7 @@
                 Composite.add(pachinkoEngine.world, Bodies.rectangle((binAreaLeft + binAreaRight) / 2, binBottomY + 4, binAreaWidth + 20, 12, { isStatic: true, render: inv, friction: 0.1 }));
             }
 
-            // ===== 靜態場景（DPR 高解析度） =====
+            // ===== 靜態場景 =====
             const bgCanvas = document.createElement('canvas');
             bgCanvas.width = Math.round(renderWidth * dpr);
             bgCanvas.height = Math.round(renderHeight * dpr);
@@ -1612,7 +1698,6 @@
                 hl.addColorStop(0, 'rgba(255,255,255,0.5)'); hl.addColorStop(1, 'rgba(255,255,255,0)');
                 bctx.fillStyle = hl; bctx.fillRect(left, top, w, h * 0.4);
 
-                // ★ 獎品文字：限制字數、增大最小字級
                 const nm = bin.prizeData.name || bin.prizeId;
                 const maxChars = Math.min(nm.length, 4);
                 const sn = nm.slice(0, maxChars);
@@ -1639,7 +1724,7 @@
                 bctx.fillRect(20, binBottomY, renderWidth - 40, renderHeight - 20 - binBottomY);
             }
 
-            // ★ render loop（DPR 縮放後，drawImage 要用邏輯尺寸）
+            // render loop
             function renderLoop() {
                 ctx2d.clearRect(0, 0, renderWidth, renderHeight);
                 ctx2d.drawImage(bgCanvas, 0, 0, renderWidth, renderHeight);
@@ -1650,12 +1735,19 @@
                     drawWindmillLocal(ctx2d, wm.r);
                     ctx2d.restore();
                 }
+                // ★ 倉鼠
+                if (hamster && !hamsterCaught) {
+                    ctx2d.save();
+                    ctx2d.translate(hamster.x, hamster.y);
+                    drawHamsterLocal(ctx2d, hamster.radius, hamster.bobPhase);
+                    ctx2d.restore();
+                }
                 if (pachinkoBall) drawGlassBall(ctx2d, pachinkoBall.position.x, pachinkoBall.position.y, pachinkoBallRadius);
                 pachinkoRenderLoopId = requestAnimationFrame(renderLoop);
             }
             renderLoop();
 
-            // ★ 物理迴圈：每次 update 前強制設定風車角速度
+            // 物理迴圈
             let lastPhysTime = performance.now();
             function physicsLoop(now) {
                 const dt = Math.min(now - lastPhysTime, 33);
@@ -1667,9 +1759,113 @@
                     }
                     Engine.update(pachinkoEngine, dt / sub);
                 }
+                // ★ 更新倉鼠
+                updateHamster();
                 pachinkoPhysicsLoopId = requestAnimationFrame(physicsLoop);
             }
             pachinkoPhysicsLoopId = requestAnimationFrame(physicsLoop);
+        }
+
+        // ---------- 倉鼠邏輯 ----------
+        function pickHamsterTarget() {
+            if (!hamster || !hamsterArea) return;
+            const pad = hamster.radius * 2;
+            const w = hamsterArea.right - hamsterArea.left - pad * 2;
+            const h = hamsterArea.bottom - hamsterArea.top - pad * 2;
+            hamster.targetX = hamsterArea.left + pad + Math.random() * w;
+            hamster.targetY = hamsterArea.top + pad + Math.random() * h;
+        }
+
+        function updateHamster() {
+            if (!hamster || hamsterCaught) return;
+            const dx = hamster.targetX - hamster.x;
+            const dy = hamster.targetY - hamster.y;
+            const dist = Math.hypot(dx, dy);
+            if (dist < 4) {
+                pickHamsterTarget();
+            } else {
+                const nx = dx / dist, ny = dy / dist;
+                hamster.x += nx * hamster.speed;
+                hamster.y += ny * hamster.speed;
+            }
+            hamster.bobPhase += 0.12;
+
+            // 偵測彈珠碰撞
+            if (pachinkoBall && !pachinkoBall.isStatic && !hamsterCaught) {
+                const pdx = pachinkoBall.position.x - hamster.x;
+                const pdy = pachinkoBall.position.y - hamster.y;
+                const pdist = Math.hypot(pdx, pdy);
+                if (pdist < pachinkoBallRadius + hamster.radius * 0.85) {
+                    hamsterCaught = true;
+                    triggerHamsterPrize();
+                }
+            }
+        }
+
+        async function triggerHamsterPrize() {
+            if (!hamsterPrizeId) return;
+            const prizeData = lastPrizes?.[hamsterPrizeId];
+            if (!prizeData) { console.warn("倉鼠獎品不存在"); return; }
+
+            if (pachinkoBall) Matter.Body.setStatic(pachinkoBall, true);
+            if (pachinkoCheckIntervalId) {
+                clearInterval(pachinkoCheckIntervalId);
+                pachinkoCheckIntervalId = null;
+            }
+
+            try {
+                const qRef = ref(db, `prizes/${hamsterPrizeId}/quantity`);
+                const tx = await runTransaction(qRef, cur => (cur === null || cur <= 0) ? undefined : cur - 1);
+                if (!tx.committed) {
+                    alert(`很抱歉，「${prizeData.name}」已無庫存。`);
+                } else {
+                    let code = "";
+                    try {
+                        const cs = await get(ref(db, `prizeCodes/${hamsterPrizeId}`));
+                        if (cs.exists()) {
+                            const cObj = cs.val();
+                            const used = new Set(Object.values(globalPlayedUsers).map(u => u && u.code).filter(c => c));
+                            const av = Object.values(cObj).filter(c => c && !used.has(c));
+                            if (av.length) code = av[0];
+                        }
+                    } catch (e) {}
+
+                    let awardedPoints = 0;
+                    const minP = Number(prizeData.minPoints);
+                    const maxP = Number(prizeData.maxPoints);
+                    if (!code && !isNaN(minP) && !isNaN(maxP) && maxP >= minP && maxP > 0) {
+                        awardedPoints = Math.floor(Math.random() * (maxP - minP + 1)) + minP;
+                        try {
+                            await runTransaction(ref(db, `pointUsers/${currentPlayerName}/points`), cur => (cur || 0) + awardedPoints);
+                            await push(ref(db, "pendingPoints"), { playerName: currentPlayerName, points: awardedPoints, prizeName: prizeData.name, timestamp: Date.now(), status: "approved", processedAt: Date.now() });
+                        } catch (e) {}
+                        code = "點數已自動匯入你的錢包";
+                    }
+
+                    await push(ref(db, `drawRecords/${currentPlayerName}`), {
+                        type: "pachinko-hamster",
+                        won: `🐹 倉鼠大放送：${prizeData.name}`,
+                        code: code,
+                        time: Date.now(),
+                        group: honorUnlockedGroup,
+                        showOnBoard: true
+                    });
+                    showSlotWinModal(`🐹 倉鼠大放送：${prizeData.name}`, code, awardedPoints);
+                }
+            } catch (e) {
+                console.error("倉鼠獎處理失敗", e);
+                alert("倉鼠獎處理失敗");
+            } finally {
+                setTimeout(() => {
+                    if (hamster && hamsterArea) {
+                        hamster.x = hamsterArea.left + (hamsterArea.right - hamsterArea.left) * 0.5;
+                        hamster.y = hamsterArea.top + (hamsterArea.bottom - hamsterArea.top) * 0.5;
+                        pickHamsterTarget();
+                    }
+                    hamsterCaught = false;
+                    resetPachinkoAfterDraw();
+                }, 100);
+            }
         }
 
         // ---------- 拉桿 ----------
@@ -1726,9 +1922,8 @@
             if (!pachinkoBall) return;
 
             Matter.Body.setStatic(pachinkoBall, false);
-            // ★ 發射力度：拉大區間，讓 1% 和 100% 明顯不同
-            const minSpeed = 3;
-            const maxSpeed = 25;
+            const minSpeed = 6;
+            const maxSpeed = 32;
             const speed = minSpeed + power * (maxSpeed - minSpeed);
             Matter.Body.setVelocity(pachinkoBall, { x: 0, y: -speed });
             pachinkoBallDropped = true;
@@ -1754,29 +1949,27 @@
                 const inRail = pos.x > railLeftX - 2;
                 const nearBottom = pos.y > renderHeight - 130;
 
-                // ★ 球落回發射軌底部 → 不算中獎、退次數（若有扣）
-                if (!ballReturned && inRail && nearBottom && speed < 2) {
+                // ★ 球落回發射軌底部 → 不算中獎、退次數
+                if (!ballReturned && inRail && nearBottom && speed < 2 && countDeducted) {
                     ballReturned = true;
                     clearInterval(pachinkoCheckIntervalId);
                     pachinkoCheckIntervalId = null;
 
-                    if (countDeducted) {
-                        try {
-                            await runTransaction(playedRef, (current) => {
-                                if (!current) return current;
-                                const c = Math.max(0, (current.drawCount || 0) - 1);
-                                return { ...current, drawCount: c };
-                            });
-                            if (globalPlayedUsers[currentPlayerName]) {
-                                const cur = globalPlayedUsers[currentPlayerName].drawCount || 0;
-                                globalPlayedUsers[currentPlayerName] = {
-                                    ...globalPlayedUsers[currentPlayerName],
-                                    drawCount: Math.max(0, cur - 1)
-                                };
-                            }
-                            updateDrawCountDisplay();
-                        } catch (e) { console.error("退次數失敗", e); }
-                    }
+                    try {
+                        await runTransaction(playedRef, (current) => {
+                            if (!current) return current;
+                            const c = Math.max(0, (current.drawCount || 0) - 1);
+                            return { ...current, drawCount: c };
+                        });
+                        if (globalPlayedUsers[currentPlayerName]) {
+                            const cur = globalPlayedUsers[currentPlayerName].drawCount || 0;
+                            globalPlayedUsers[currentPlayerName] = {
+                                ...globalPlayedUsers[currentPlayerName],
+                                drawCount: Math.max(0, cur - 1)
+                            };
+                        }
+                        updateDrawCountDisplay();
+                    } catch (e) { console.error("退次數失敗", e); }
 
                     pachinkoBallDropped = false;
                     enteredPlayArea = false;
