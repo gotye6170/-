@@ -1537,24 +1537,18 @@
             const pegRows = 12;
             const dx = (areaRight - areaLeft) / (pegCols - 1);
             const dy = (areaBottom - areaTop) / (pegRows - 1);
-            // ★ 傳送門初始化（固定位置，兩兩成對）
+            // ★ 傳送門初始化（固定位置，一對）
             portals = [];
             portalFlashes = [];
             portalCooldownUntil = 0;
             {
                 const pr = Math.round(renderWidth * 0.055);
                 portals = [
-                    // 對 1：中左 ↔ 中右（水平傳送）
+                    // 中左 ↔ 中右（水平傳送）
                     {
-                        ax: areaLeft + dx * 0.5, ay: areaTop + dy * 4.0,
-                        bx: areaLeft + dx * 6.5, by: areaTop + dy * 4.0,
+                        ax: areaLeft + dx * 0.5, ay: areaTop + dy * 5.0,
+                        bx: areaLeft + dx * 6.5, by: areaTop + dy * 5.0,
                         radius: pr, phase: 0
-                    },
-                    // 對 2：中右 ↔ 中左（斜對角傳送）
-                    {
-                        ax: areaLeft + dx * 6.5, ay: areaTop + dy * 6.5,
-                        bx: areaLeft + dx * 0.5, by: areaTop + dy * 9.0,
-                        radius: pr, phase: Math.PI
                     }
                 ];
             }
