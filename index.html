@@ -2185,11 +2185,11 @@
 
             // ===== 障礙物與釘子（固定佈局，加密版） =====
             const pegRadius = 4;
-            const BALL_D = 16;
+            const BALL_D = 14;
             const SAFETY = 3;   // 從 4 縮到 2，讓釘子能更貼近障礙物
 
-            const areaLeft = 60;
-            const areaRight = railRightX - 30;
+            const areaLeft = 56;
+            const areaRight = railRightX - 28;
             const areaTop = 148;      // 往上多爭取一點空間
             const areaBottom = 408;   // 往下多爭取一點空間
 
@@ -2301,7 +2301,7 @@
 
             Composite.add(pachinkoEngine.world, Bodies.rectangle(ballRestX, ballRestY + 12, 30, 8, { isStatic: true, render: inv }));
 
-            pachinkoBall = Bodies.circle(ballRestX, ballRestY, 8, {
+            pachinkoBall = Bodies.circle(ballRestX, ballRestY, 7, {
                 isStatic: true, restitution: 0.5, friction: 0.001, frictionAir: 0.0008,
                 density: 0.002, render: inv
             });
@@ -2486,7 +2486,7 @@
                 }
 
                 if (pachinkoBall) {
-                    drawGlassBall(ctx2d, pachinkoBall.position.x, pachinkoBall.position.y, 8);
+                    drawGlassBall(ctx2d, pachinkoBall.position.x, pachinkoBall.position.y, 7);
                 }
 
                 pachinkoRenderLoopId = requestAnimationFrame(renderLoop);
@@ -2611,7 +2611,7 @@
                 const renderWidth = pachinkoRender ? pachinkoRender.options.width : pachinkoWidth;
                 const renderHeight = pachinkoRender ? pachinkoRender.options.height : pachinkoHeight;
                 const railRightX = renderWidth - 75;
-                pachinkoBall = Matter.Bodies.circle(railRightX + 25, renderHeight - 115, 8, {
+                pachinkoBall = Matter.Bodies.circle(railRightX + 25, renderHeight - 115, 7, {
                     isStatic: true,
                     restitution: 0.5,
                     friction: 0.001,
@@ -2813,7 +2813,7 @@
             if (pachinkoEngine && pachinkoRender) {
                 const ballRestX = pachinkoBallRestX;
                 const ballRestY = pachinkoBallRestY;
-                pachinkoBall = Matter.Bodies.circle(ballRestX, ballRestY, 8, {
+                pachinkoBall = Matter.Bodies.circle(ballRestX, ballRestY, 7, {
                     isStatic: true,
                     restitution: 0.5,
                     friction: 0.001,
