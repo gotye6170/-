@@ -1387,13 +1387,13 @@
             pachinkoBallRadius = BALL_RADIUS;
             const pegs = [];
 
-            const areaLeft = leftWallX + wallT + Math.round(renderWidth * 0.025);
-            const areaRight = innerRailX - wallT - Math.round(renderWidth * 0.025);
+            const areaLeft = leftWallX + wallT + Math.round(renderWidth * 0.045);
+            const areaRight = innerRailX - wallT - Math.round(renderWidth * 0.045);
             const areaTop = arcCy + Math.round(renderHeight * 0.05);
-            const areaBottom = Math.round(renderHeight * 0.77);
-            // ★ 密度調整：垂直間距拉大，讓球有空間通過
-            const pegCols = 9;
-            const pegRows = 13;
+            const areaBottom = Math.round(renderHeight * 0.74);
+            // ★ 密度調整：左右留通道、底下留空間給球滾動
+            const pegCols = 8;
+            const pegRows = 12;
             const dx = (areaRight - areaLeft) / (pegCols - 1);
             const dy = (areaBottom - areaTop) / (pegRows - 1);
 
