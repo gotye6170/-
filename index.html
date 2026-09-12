@@ -950,7 +950,7 @@
 
         let slotSymbols = {};
         let isSlotSpinning = false;
-        let gameMode = "both";
+        let enabledGames = { gacha: true, slot: true, pachinko: true };
 
         let soundUrls = {};
         let drawRecordsData = {};
@@ -1068,8 +1068,13 @@
                 if (honorUnlockedGroup) verifyGroupPass();
                 if (currentPlayerName) updateDrawCountDisplay();
             });
-            onValue(ref(db, "settings/global/gameMode"), (snap) => {
-                gameMode = snap.val() || "both";
+            onValue(ref(db, "settings/global/enabledGames"), (snap) => {
+                const data = snap.val() || { gacha: true, slot: true, pachinko: true };
+                enabledGames = {
+                    gacha: data.gacha !== false,
+                    slot: data.slot !== false,
+                    pachinko: data.pachinko !== false
+                };
                 updateGameModeUI();
             });
             onValue(ref(db, "slotSymbols"), (snap) => {
@@ -1092,12 +1097,9 @@
             const slotBtn = document.querySelector(".choice-btn-slot");
             const pachinkoBtn = document.querySelector(".choice-btn-pachinko");
             if (!drawBtn || !slotBtn) return;
-            drawBtn.style.display = "flex";
-            slotBtn.style.display = "flex";
-            if (pachinkoBtn) pachinkoBtn.style.display = "flex";
-            if (gameMode === "gacha") { slotBtn.style.display = "none"; if (pachinkoBtn) pachinkoBtn.style.display = "none"; }
-            else if (gameMode === "slot") { drawBtn.style.display = "none"; if (pachinkoBtn) pachinkoBtn.style.display = "none"; }
-            else if (gameMode === "pachinko") { drawBtn.style.display = "none"; slotBtn.style.display = "none"; if (pachinkoBtn) pachinkoBtn.style.display = "flex"; }
+            drawBtn.style.display = enabledGames.gacha ? "flex" : "none";
+            slotBtn.style.display = enabledGames.slot ? "flex" : "none";
+            if (pachinkoBtn) pachinkoBtn.style.display = enabledGames.pachinko ? "flex" : "none";
         }
 
         function updateDrawCountDisplay() {
@@ -1398,8 +1400,8 @@
             content.classList.remove("hidden");
             listenToWallet(val);
             showChoiceModal(val);
-            if (gameMode === "slot") { showSlotSystem(); }
-            else if (gameMode === "pachinko") { showPachinkoSystem(); }
+            if (!enabledGames.gacha && enabledGames.slot) { showSlotSystem(); }
+            else if (!enabledGames.gacha && !enabledGames.slot && enabledGames.pachinko) { showPachinkoSystem(); }
             else {
                 showDrawSystem();
                 const drawCount = globalPlayedUsers[val]?.drawCount || 0;
