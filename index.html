@@ -2230,94 +2230,273 @@
         }
 
         // ---------- 保齡球核心 ----------
+        function getBowlingScale(y) {
+            if (bowlingLaneBottom === bowlingLaneTop) return 1;
+            let t = (y - bowlingLaneTop) / (bowlingLaneBottom - bowlingLaneTop);
+            t = Math.max(0, Math.min(1, t));
+            return 0.68 + t * 0.32;
+        }
+
+        function getLaneEdgesAtY(y) {
+            const w = bowlingLaneRight - bowlingLaneLeft;
+            const cx = (bowlingLaneLeft + bowlingLaneRight) / 2;
+            if (bowlingLaneBottom === bowlingLaneTop) return { left: bowlingLaneLeft, right: bowlingLaneRight, width: w, cx: cx };
+            let t = (y - bowlingLaneTop) / (bowlingLaneBottom - bowlingLaneTop);
+            t = Math.max(0, Math.min(1, t));
+            const scale = 0.68 + t * 0.32;
+            const halfW = (w / 2) * scale;
+            return { left: cx - halfW, right: cx + halfW, width: halfW * 2, cx: cx, scale: scale };
+        }
+
         function drawBowlingLane(ctx, w, h, l, r, t, b) {
-            ctx.fillStyle = '#0a0a14';
+            ctx.fillStyle = '#06060c';
             ctx.fillRect(0, 0, w, h);
 
-            const topInset = (r - l) * 0.08;
-            const laneTL = l + topInset;
-            const laneTR = r - topInset;
-            const laneBL = l;
-            const laneBR = r;
+            const farScale = 0.68;
+            const cx = (l + r) / 2;
+            const lanePhysW = r - l;
 
-            const grad = ctx.createLinearGradient(0, b, 0, t);
-            grad.addColorStop(0, '#7a4a20');
-            grad.addColorStop(0.5, '#b07840');
-            grad.addColorStop(1, '#e0b080');
+            const gutterRatio = 0.09;
+            const farLaneW = lanePhysW * farScale;
+            const nearLaneW = lanePhysW;
+            const farGutter = farLaneW * gutterRatio;
+            const nearGutter = nearLaneW * gutterRatio;
+
+            const farLaneL = cx - farLaneW / 2;
+            const farLaneR = cx + farLaneW / 2;
+            const nearLaneL = cx - nearLaneW / 2;
+            const nearLaneR = cx + nearLaneW / 2;
+
+            const farGutL = farLaneL - farGutter;
+            const farGutR = farLaneR + farGutter;
+            const nearGutL = nearLaneL - nearGutter;
+            const nearGutR = nearLaneR + nearGutter;
+
+            // 遠端回球區（黑）
+            const pitH = (b - t) * 0.08;
+            ctx.fillStyle = '#020206';
+            ctx.fillRect(0, t - 5, w, pitH);
+
+            // 回球區擋板
+            ctx.fillStyle = '#1a1a2a';
+            ctx.fillRect(farGutL - 4, t + pitH - 6, (farGutR - farGutL) + 8, 6);
+            ctx.strokeStyle = 'rgba(120,120,160,0.5)';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(farGutL - 4, t + pitH - 6, (farGutR - farGutL) + 8, 6);
+
+            // 兩側溝槽（深色梯形）
+            const gutterGrad = ctx.createLinearGradient(0, t, 0, b);
+            gutterGrad.addColorStop(0, '#0a0a14');
+            gutterGrad.addColorStop(0.5, '#151520');
+            gutterGrad.addColorStop(1, '#252538');
 
             ctx.beginPath();
-            ctx.moveTo(laneTL, t);
-            ctx.lineTo(laneTR, t);
-            ctx.lineTo(laneBR, b);
-            ctx.lineTo(laneBL, b);
+            ctx.moveTo(farGutL, t + pitH);
+            ctx.lineTo(farLaneL, t + pitH);
+            ctx.lineTo(nearLaneL, b);
+            ctx.lineTo(nearGutL, b);
             ctx.closePath();
-            ctx.fillStyle = grad;
+            ctx.fillStyle = gutterGrad;
             ctx.fill();
 
-            const stripes = 12;
+            ctx.beginPath();
+            ctx.moveTo(farGutR, t + pitH);
+            ctx.lineTo(farLaneR, t + pitH);
+            ctx.lineTo(nearLaneR, b);
+            ctx.lineTo(nearGutR, b);
+            ctx.closePath();
+            ctx.fillStyle = gutterGrad;
+            ctx.fill();
+
+            // 球道（木紋梯形）
+            const laneGrad = ctx.createLinearGradient(0, t, 0, b);
+            laneGrad.addColorStop(0, '#6b4622');
+            laneGrad.addColorStop(0.4, '#a07040');
+            laneGrad.addColorStop(0.75, '#d0a060');
+            laneGrad.addColorStop(1, '#ecc080');
+
+            ctx.beginPath();
+            ctx.moveTo(farLaneL, t + pitH);
+            ctx.lineTo(farLaneR, t + pitH);
+            ctx.lineTo(nearLaneR, b);
+            ctx.lineTo(nearLaneL, b);
+            ctx.closePath();
+            ctx.fillStyle = laneGrad;
+            ctx.fill();
+
+            // 木紋縱條（透視）
+            const stripes = 10;
             for (let i = 0; i < stripes; i++) {
                 if (i % 2 === 1) continue;
-                const t1 = i / stripes;
-                const t2 = (i + 1) / stripes;
+                const r1 = i / stripes;
+                const r2 = (i + 1) / stripes;
+                const x1F = farLaneL + (farLaneR - farLaneL) * r1;
+                const x2F = farLaneL + (farLaneR - farLaneL) * r2;
+                const x1N = nearLaneL + (nearLaneR - nearLaneL) * r1;
+                const x2N = nearLaneL + (nearLaneR - nearLaneL) * r2;
                 ctx.beginPath();
-                ctx.moveTo(laneTL + (laneTR - laneTL) * t1, t);
-                ctx.lineTo(laneTL + (laneTR - laneTL) * t2, t);
-                ctx.lineTo(laneBL + (laneBR - laneBL) * t2, b);
-                ctx.lineTo(laneBL + (laneBR - laneBL) * t1, b);
+                ctx.moveTo(x1F, t + pitH);
+                ctx.lineTo(x2F, t + pitH);
+                ctx.lineTo(x2N, b);
+                ctx.lineTo(x1N, b);
                 ctx.closePath();
-                ctx.fillStyle = 'rgba(0,0,0,0.06)';
+                ctx.fillStyle = 'rgba(60,30,0,0.10)';
                 ctx.fill();
             }
 
-            const farShade = ctx.createLinearGradient(0, t, 0, t + (b - t) * 0.35);
-            farShade.addColorStop(0, 'rgba(0,0,0,0.5)');
+            // 遠端暗色漸層（增加深度感）
+            const farShade = ctx.createLinearGradient(0, t + pitH, 0, t + pitH + (b - t - pitH) * 0.35);
+            farShade.addColorStop(0, 'rgba(0,0,0,0.45)');
             farShade.addColorStop(1, 'rgba(0,0,0,0)');
             ctx.fillStyle = farShade;
             ctx.beginPath();
-            ctx.moveTo(laneTL, t);
-            ctx.lineTo(laneTR, t);
-            ctx.lineTo(laneTR - (laneTR - laneTL) * 0.0, t + (b - t) * 0.35);
-            ctx.lineTo(laneTL, t + (b - t) * 0.35);
+            ctx.moveTo(farLaneL, t + pitH);
+            ctx.lineTo(farLaneR, t + pitH);
+            ctx.lineTo(farLaneR + (nearLaneR - farLaneR) * 0.35, t + pitH + (b - t - pitH) * 0.35);
+            ctx.lineTo(farLaneL + (nearLaneL - farLaneL) * 0.35, t + pitH + (b - t - pitH) * 0.35);
             ctx.closePath();
             ctx.fill();
 
-            ctx.fillStyle = 'rgba(0,0,0,0.6)';
-            ctx.beginPath();
-            ctx.moveTo(l, t);
-            ctx.lineTo(laneTL, t);
-            ctx.lineTo(laneBL, b);
-            ctx.lineTo(l, b);
-            ctx.closePath();
-            ctx.fill();
+            // 球道箭頭記號
+            const arrowT = 0.55;
+            const arrowY = t + pitH + (b - t - pitH) * arrowT;
+            const edges = getLaneEdgesAtY(arrowY);
+            const arrowSpacing = edges.width * 0.085;
+            for (let i = -2; i <= 2; i++) {
+                const ax = edges.cx + i * arrowSpacing;
+                const ay = arrowY + Math.abs(i) * 9;
+                ctx.beginPath();
+                ctx.moveTo(ax, ay - 6);
+                ctx.lineTo(ax + 4.5, ay + 5);
+                ctx.lineTo(ax - 4.5, ay + 5);
+                ctx.closePath();
+                ctx.fillStyle = 'rgba(50,25,0,0.55)';
+                ctx.fill();
+            }
 
+            // 犯規線
+            const foulY = t + pitH + (b - t - pitH) * 0.93;
+            const foulEdges = getLaneEdgesAtY(foulY);
+            ctx.strokeStyle = 'rgba(0,0,0,0.7)';
+            ctx.lineWidth = 2;
             ctx.beginPath();
-            ctx.moveTo(r, t);
-            ctx.lineTo(laneTR, t);
-            ctx.lineTo(laneBR, b);
-            ctx.lineTo(r, b);
-            ctx.closePath();
-            ctx.fill();
-
-            ctx.strokeStyle = 'rgba(0,0,0,0.8)';
-            ctx.lineWidth = 3;
-            ctx.beginPath();
-            ctx.moveTo(laneTL, t);
-            ctx.lineTo(laneTR, t);
-            ctx.lineTo(laneBR, b);
-            ctx.lineTo(laneBL, b);
-            ctx.closePath();
+            ctx.moveTo(foulEdges.left, foulY);
+            ctx.lineTo(foulEdges.right, foulY);
             ctx.stroke();
 
-            ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+            // 球道邊框
+            ctx.strokeStyle = 'rgba(0,0,0,0.75)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(farLaneL, t + pitH);
+            ctx.lineTo(nearLaneL, b);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(farLaneR, t + pitH);
+            ctx.lineTo(nearLaneR, b);
+            ctx.stroke();
+        }
+
+        function draw3DPin(ctx, r, h) {
+            const bottomY = h * 0.42;
+            const topY = -h * 0.5;
+            const neckY = -h * 0.28;
+
+            // 底部橢圓陰影
+            ctx.beginPath();
+            ctx.ellipse(2, bottomY + r * 0.2, r * 1.15, r * 0.42, 0, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(0,0,0,0.4)';
+            ctx.fill();
+
+            // 主體
+            const grad = ctx.createLinearGradient(-r, 0, r, 0);
+            grad.addColorStop(0, '#606060');
+            grad.addColorStop(0.25, '#d0d0d0');
+            grad.addColorStop(0.45, '#ffffff');
+            grad.addColorStop(0.7, '#e0e0e0');
+            grad.addColorStop(1, '#505050');
+
+            ctx.beginPath();
+            ctx.moveTo(-r * 1.1, bottomY);
+            ctx.bezierCurveTo(-r * 1.1, bottomY - h * 0.25, -r * 0.55, neckY + h * 0.05, -r * 0.45, neckY);
+            ctx.bezierCurveTo(-r * 0.5, neckY - h * 0.06, -r * 0.55, topY + h * 0.08, -r * 0.3, topY + h * 0.02);
+            ctx.bezierCurveTo(-r * 0.15, topY - h * 0.03, r * 0.15, topY - h * 0.03, r * 0.3, topY + h * 0.02);
+            ctx.bezierCurveTo(r * 0.55, topY + h * 0.08, r * 0.5, neckY - h * 0.06, r * 0.45, neckY);
+            ctx.bezierCurveTo(r * 0.55, neckY + h * 0.05, r * 1.1, bottomY - h * 0.25, r * 1.1, bottomY);
+            ctx.ellipse(0, bottomY, r * 1.1, r * 0.42, 0, 0, Math.PI);
+            ctx.closePath();
+            ctx.fillStyle = grad;
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(40,40,40,0.6)';
             ctx.lineWidth = 1;
+            ctx.stroke();
+
+            // 紅環
+            ctx.strokeStyle = '#dc2626';
+            ctx.lineWidth = h * 0.055;
             ctx.beginPath();
-            ctx.moveTo(laneTL, t + (b - t) * 0.05);
-            ctx.lineTo(laneTR, t + (b - t) * 0.05);
+            ctx.moveTo(-r * 0.75, neckY - h * 0.04);
+            ctx.lineTo(r * 0.75, neckY - h * 0.04);
             ctx.stroke();
             ctx.beginPath();
-            ctx.moveTo(laneTL + topInset, t + (b - t) * 0.32);
-            ctx.lineTo(laneTR - topInset, t + (b - t) * 0.32);
+            ctx.moveTo(-r * 0.8, neckY - h * 0.11);
+            ctx.lineTo(r * 0.8, neckY - h * 0.11);
             ctx.stroke();
+
+            // 高光
+            const hl = ctx.createRadialGradient(-r * 0.35, -h * 0.05, 0, -r * 0.35, -h * 0.05, r * 1.2);
+            hl.addColorStop(0, 'rgba(255,255,255,0.95)');
+            hl.addColorStop(0.5, 'rgba(255,255,255,0.35)');
+            hl.addColorStop(1, 'rgba(255,255,255,0)');
+            ctx.beginPath();
+            ctx.ellipse(-r * 0.35, -h * 0.05, r * 0.45, h * 0.28, 0, 0, Math.PI * 2);
+            ctx.fillStyle = hl;
+            ctx.fill();
+        }
+
+        function draw3DBall(ctx, r) {
+            // 底部陰影
+            ctx.beginPath();
+            ctx.ellipse(2, r * 0.9, r * 1.05, r * 0.28, 0, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(0,0,0,0.45)';
+            ctx.fill();
+
+            // 球體
+            const grad = ctx.createRadialGradient(-r * 0.38, -r * 0.42, r * 0.05, 0, 0, r);
+            grad.addColorStop(0, '#ffe0ff');
+            grad.addColorStop(0.15, '#f0a0f0');
+            grad.addColorStop(0.4, '#c050d0');
+            grad.addColorStop(0.7, '#8020a0');
+            grad.addColorStop(0.92, '#401050');
+            grad.addColorStop(1, '#200830');
+            ctx.beginPath();
+            ctx.arc(0, 0, r, 0, Math.PI * 2);
+            ctx.fillStyle = grad;
+            ctx.fill();
+
+            // 邊框
+            ctx.strokeStyle = 'rgba(0,0,0,0.6)';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            // 高光（橢圓形白色亮點）
+            const hl = ctx.createRadialGradient(-r * 0.4, -r * 0.45, 0, -r * 0.4, -r * 0.45, r * 0.55);
+            hl.addColorStop(0, 'rgba(255,255,255,1)');
+            hl.addColorStop(0.4, 'rgba(255,255,255,0.6)');
+            hl.addColorStop(1, 'rgba(255,255,255,0)');
+            ctx.beginPath();
+            ctx.ellipse(-r * 0.4, -r * 0.45, r * 0.5, r * 0.32, -0.6, 0, Math.PI * 2);
+            ctx.fillStyle = hl;
+            ctx.fill();
+
+            // 底部反光
+            const bl = ctx.createRadialGradient(r * 0.3, r * 0.5, 0, r * 0.3, r * 0.5, r * 0.4);
+            bl.addColorStop(0, 'rgba(255,200,255,0.35)');
+            bl.addColorStop(1, 'rgba(255,200,255,0)');
+            ctx.beginPath();
+            ctx.arc(r * 0.3, r * 0.5, r * 0.4, 0, Math.PI * 2);
+            ctx.fillStyle = bl;
+            ctx.fill();
         }
 
         function drawDefaultBowlingPin(ctx, r) {
@@ -2691,6 +2870,7 @@
                 ctx2d.clearRect(0, 0, renderWidth, renderHeight);
                 drawBowlingLane(ctx2d, renderWidth, renderHeight, laneLeft, laneRight, laneTop, laneBottom);
 
+                // === 呆呆鼠 ===
                 for (const m of bowlingMice) {
                     const scale = getBowlingScale(m.y);
                     const drawR = m.radius * scale;
@@ -2699,8 +2879,8 @@
                     const bob = Math.sin(m.bobPhase) * drawR * 0.1;
                     ctx2d.translate(0, bob);
                     ctx2d.beginPath();
-                    ctx2d.ellipse(0, drawR * 0.75, drawR * 0.9, drawR * 0.25, 0, 0, Math.PI * 2);
-                    ctx2d.fillStyle = 'rgba(0,0,0,0.35)';
+                    ctx2d.ellipse(2, drawR * 0.75, drawR * 1.0, drawR * 0.32, 0, 0, Math.PI * 2);
+                    ctx2d.fillStyle = 'rgba(0,0,0,0.4)';
                     ctx2d.fill();
                     if (bowlingMouseImage && bowlingMouseImage.complete && bowlingMouseImage.naturalWidth > 0) {
                         ctx2d.save();
@@ -2712,8 +2892,8 @@
                         ctx2d.restore();
                         ctx2d.beginPath();
                         ctx2d.arc(0, 0, drawR, 0, Math.PI * 2);
-                        ctx2d.strokeStyle = 'rgba(0,0,0,0.4)';
-                        ctx2d.lineWidth = 1;
+                        ctx2d.strokeStyle = 'rgba(0,0,0,0.5)';
+                        ctx2d.lineWidth = 1.5;
                         ctx2d.stroke();
                     } else {
                         drawDefaultBowlingMouse(ctx2d, drawR);
@@ -2721,23 +2901,27 @@
                     ctx2d.restore();
                 }
 
-                for (const p of bowlingPins) {
-                    if (!p.body) continue;
+                // === 球瓶（3D 立體）===
+                // 按 y 排序，遠的（y 小）先畫，近的後畫
+                const sortedPins = bowlingPins.slice().filter(p => p.body).sort((a, b) => a.body.position.y - b.body.position.y);
+                for (const p of sortedPins) {
                     const pos = p.body.position;
                     const ang = p.body.angle;
                     const scale = getBowlingScale(pos.y);
                     const drawR = p.radius * scale;
+                    const pinH = drawR * 3.0;
+
                     ctx2d.save();
-                    ctx2d.translate(pos.x, pos.y);
-                    if (!p.knocked) {
-                        ctx2d.beginPath();
-                        ctx2d.ellipse(2, drawR * 0.6, drawR * 1.0, drawR * 0.35, 0, 0, Math.PI * 2);
-                        ctx2d.fillStyle = 'rgba(0,0,0,0.35)';
-                        ctx2d.fill();
-                    }
+                    ctx2d.translate(pos.x, pos.y + drawR * 0.4);
                     ctx2d.rotate(ang);
-                    if (p.knocked) ctx2d.globalAlpha = 0.55;
+                    if (p.knocked) ctx2d.globalAlpha = 0.7;
+
                     if (bowlingPinImage && bowlingPinImage.complete && bowlingPinImage.naturalWidth > 0) {
+                        // 自訂圖片：圓形裁切 + 底部陰影
+                        ctx2d.beginPath();
+                        ctx2d.ellipse(2, drawR * 1.05, drawR * 1.05, drawR * 0.32, 0, 0, Math.PI * 2);
+                        ctx2d.fillStyle = 'rgba(0,0,0,0.45)';
+                        ctx2d.fill();
                         ctx2d.save();
                         ctx2d.beginPath();
                         ctx2d.arc(0, 0, drawR, 0, Math.PI * 2);
@@ -2747,27 +2931,32 @@
                         ctx2d.restore();
                         ctx2d.beginPath();
                         ctx2d.arc(0, 0, drawR, 0, Math.PI * 2);
-                        ctx2d.strokeStyle = 'rgba(0,0,0,0.5)';
+                        ctx2d.strokeStyle = 'rgba(0,0,0,0.55)';
                         ctx2d.lineWidth = 1.5;
                         ctx2d.stroke();
                     } else {
-                        drawDefaultBowlingPin(ctx2d, drawR);
+                        // 預設：3D 立體瓶
+                        draw3DPin(ctx2d, drawR, pinH);
                     }
                     ctx2d.restore();
                 }
 
+                // === 球（3D 球體）===
                 if (bowlingBall) {
                     const bp = bowlingBall.position;
                     const scale = getBowlingScale(bp.y);
                     const drawR = BALL_RADIUS * scale;
                     ctx2d.save();
                     ctx2d.translate(bp.x, bp.y);
-                    ctx2d.beginPath();
-                    ctx2d.ellipse(2, drawR * 0.5, drawR * 1.05, drawR * 0.35, 0, 0, Math.PI * 2);
-                    ctx2d.fillStyle = 'rgba(0,0,0,0.35)';
-                    ctx2d.fill();
                     ctx2d.rotate(bowlingBall.angle);
+
                     if (bowlingBallImage && bowlingBallImage.complete && bowlingBallImage.naturalWidth > 0) {
+                        // 底部陰影
+                        ctx2d.beginPath();
+                        ctx2d.ellipse(2, drawR * 0.9, drawR * 1.05, drawR * 0.3, 0, 0, Math.PI * 2);
+                        ctx2d.fillStyle = 'rgba(0,0,0,0.45)';
+                        ctx2d.fill();
+                        // 球體（圓形裁切圖片）
                         ctx2d.save();
                         ctx2d.beginPath();
                         ctx2d.arc(0, 0, drawR, 0, Math.PI * 2);
@@ -2775,34 +2964,47 @@
                         const size = drawR * 2;
                         ctx2d.drawImage(bowlingBallImage, -size / 2, -size / 2, size, size);
                         ctx2d.restore();
+                        // 立體感：暗角
+                        const dark = ctx2d.createRadialGradient(-drawR * 0.2, -drawR * 0.2, drawR * 0.3, 0, 0, drawR);
+                        dark.addColorStop(0, 'rgba(0,0,0,0)');
+                        dark.addColorStop(0.7, 'rgba(0,0,0,0.15)');
+                        dark.addColorStop(1, 'rgba(0,0,0,0.55)');
                         ctx2d.beginPath();
                         ctx2d.arc(0, 0, drawR, 0, Math.PI * 2);
-                        ctx2d.strokeStyle = 'rgba(0,0,0,0.6)';
-                        ctx2d.lineWidth = 1.5;
-                        ctx2d.stroke();
-                        const hl = ctx2d.createRadialGradient(-drawR * 0.4, -drawR * 0.4, 0, -drawR * 0.4, -drawR * 0.4, drawR * 1.1);
-                        hl.addColorStop(0, 'rgba(255,255,255,0.6)');
-                        hl.addColorStop(0.5, 'rgba(255,255,255,0.15)');
+                        ctx2d.fillStyle = dark;
+                        ctx2d.fill();
+                        // 高光
+                        const hl = ctx2d.createRadialGradient(-drawR * 0.4, -drawR * 0.45, 0, -drawR * 0.4, -drawR * 0.45, drawR * 0.55);
+                        hl.addColorStop(0, 'rgba(255,255,255,0.95)');
+                        hl.addColorStop(0.4, 'rgba(255,255,255,0.5)');
                         hl.addColorStop(1, 'rgba(255,255,255,0)');
                         ctx2d.beginPath();
-                        ctx2d.arc(0, 0, drawR, 0, Math.PI * 2);
+                        ctx2d.ellipse(-drawR * 0.4, -drawR * 0.45, drawR * 0.5, drawR * 0.32, -0.6, 0, Math.PI * 2);
                         ctx2d.fillStyle = hl;
                         ctx2d.fill();
+                        // 外框
+                        ctx2d.beginPath();
+                        ctx2d.arc(0, 0, drawR, 0, Math.PI * 2);
+                        ctx2d.strokeStyle = 'rgba(0,0,0,0.65)';
+                        ctx2d.lineWidth = 1.5;
+                        ctx2d.stroke();
                     } else {
-                        drawDefaultBowlingBall(ctx2d, drawR);
+                        draw3DBall(ctx2d, drawR);
                     }
                     ctx2d.restore();
                 }
 
+                // === 拖曳指示線 ===
                 if (bowlingDragging) {
                     ctx2d.save();
                     const dx = bowlingDragCurrentX - bowlingDragStartX;
                     const dy = bowlingDragCurrentY - bowlingDragStartY;
                     const dist = Math.hypot(dx, dy);
                     if (dist > 10) {
-                        ctx2d.strokeStyle = 'rgba(255,220,80,0.85)';
+                        ctx2d.strokeStyle = 'rgba(255,220,80,0.9)';
                         ctx2d.lineWidth = 4;
-                        ctx2d.setLineDash([8, 6]);
+                        ctx2d.setLineDash([10, 7]);
+                        ctx2d.lineCap = 'round';
                         ctx2d.beginPath();
                         ctx2d.moveTo(bowlingDragStartX, bowlingDragStartY);
                         ctx2d.lineTo(bowlingDragCurrentX, bowlingDragCurrentY);
@@ -2810,14 +3012,24 @@
                         ctx2d.setLineDash([]);
                         const nx = dx / dist;
                         const ny = dy / dist;
-                        const arrowLen = 18;
+                        const arrowLen = 20;
                         ctx2d.beginPath();
                         ctx2d.moveTo(bowlingDragCurrentX, bowlingDragCurrentY);
-                        ctx2d.lineTo(bowlingDragCurrentX - nx * arrowLen + ny * 9, bowlingDragCurrentY - ny * arrowLen - nx * 9);
-                        ctx2d.lineTo(bowlingDragCurrentX - nx * arrowLen - ny * 9, bowlingDragCurrentY - ny * arrowLen + nx * 9);
+                        ctx2d.lineTo(bowlingDragCurrentX - nx * arrowLen + ny * 10, bowlingDragCurrentY - ny * arrowLen - nx * 10);
+                        ctx2d.lineTo(bowlingDragCurrentX - nx * arrowLen - ny * 10, bowlingDragCurrentY - ny * arrowLen + nx * 10);
                         ctx2d.closePath();
-                        ctx2d.fillStyle = 'rgba(255,220,80,0.9)';
+                        ctx2d.fillStyle = 'rgba(255,220,80,0.95)';
                         ctx2d.fill();
+
+                        // 力度文字
+                        const power = Math.min(100, Math.round(dist / (renderHeight * 0.65) * 100));
+                        ctx2d.font = 'bold 14px "Noto Sans TC", sans-serif';
+                        ctx2d.textAlign = 'center';
+                        ctx2d.fillStyle = 'rgba(255,220,80,1)';
+                        ctx2d.shadowColor = 'rgba(0,0,0,0.8)';
+                        ctx2d.shadowBlur = 4;
+                        ctx2d.fillText(`力度 ${power}%`, bowlingDragCurrentX, bowlingDragCurrentY + 30);
+                        ctx2d.shadowBlur = 0;
                     }
                     ctx2d.restore();
                 }
