@@ -2398,60 +2398,95 @@
         }
 
         function draw3DPin(ctx, r, h) {
-            const bottomY = h * 0.42;
+            const bottomY = h * 0.5;
             const topY = -h * 0.5;
-            const neckY = -h * 0.28;
 
             // 底部橢圓陰影
             ctx.beginPath();
-            ctx.ellipse(2, bottomY + r * 0.2, r * 1.15, r * 0.42, 0, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(0,0,0,0.4)';
+            ctx.ellipse(2, bottomY * 0.95 + r * 0.15, r * 1.15, r * 0.32, 0, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(0,0,0,0.45)';
             ctx.fill();
 
-            // 主體
+            // 球瓶主體漸層
             const grad = ctx.createLinearGradient(-r, 0, r, 0);
-            grad.addColorStop(0, '#606060');
-            grad.addColorStop(0.25, '#d0d0d0');
-            grad.addColorStop(0.45, '#ffffff');
-            grad.addColorStop(0.7, '#e0e0e0');
-            grad.addColorStop(1, '#505050');
+            grad.addColorStop(0.00, '#6a6a6a');
+            grad.addColorStop(0.15, '#c8c8c8');
+            grad.addColorStop(0.35, '#ffffff');
+            grad.addColorStop(0.55, '#f8f8f8');
+            grad.addColorStop(0.75, '#dcdcdc');
+            grad.addColorStop(0.90, '#a8a8a8');
+            grad.addColorStop(1.00, '#5a5a5a');
 
+            // 瓶身輪廓：底部寬 → 頸部細 → 頭部圓
             ctx.beginPath();
-            ctx.moveTo(-r * 1.1, bottomY);
-            ctx.bezierCurveTo(-r * 1.1, bottomY - h * 0.25, -r * 0.55, neckY + h * 0.05, -r * 0.45, neckY);
-            ctx.bezierCurveTo(-r * 0.5, neckY - h * 0.06, -r * 0.55, topY + h * 0.08, -r * 0.3, topY + h * 0.02);
-            ctx.bezierCurveTo(-r * 0.15, topY - h * 0.03, r * 0.15, topY - h * 0.03, r * 0.3, topY + h * 0.02);
-            ctx.bezierCurveTo(r * 0.55, topY + h * 0.08, r * 0.5, neckY - h * 0.06, r * 0.45, neckY);
-            ctx.bezierCurveTo(r * 0.55, neckY + h * 0.05, r * 1.1, bottomY - h * 0.25, r * 1.1, bottomY);
-            ctx.ellipse(0, bottomY, r * 1.1, r * 0.42, 0, 0, Math.PI);
+            // 從左下角底座開始
+            ctx.moveTo(-r * 1.05, bottomY - r * 0.15);
+            // 底部曲線（很寬、很圓）
+            ctx.bezierCurveTo(-r * 1.15, bottomY + r * 0.05, -r * 0.9, bottomY + r * 0.3, -r * 0.5, bottomY + r * 0.32);
+            ctx.bezierCurveTo(-r * 0.1, bottomY + r * 0.35, r * 0.1, bottomY + r * 0.35, r * 0.5, bottomY + r * 0.32);
+            ctx.bezierCurveTo(r * 0.9, bottomY + r * 0.3, r * 1.15, bottomY + r * 0.05, r * 1.05, bottomY - r * 0.15);
+            // 右側向上收窄
+            ctx.bezierCurveTo(r * 1.05, bottomY - h * 0.15, r * 0.75, bottomY - h * 0.28, r * 0.5, bottomY - h * 0.42);
+            // 頸部（最細處）
+            ctx.bezierCurveTo(r * 0.32, bottomY - h * 0.55, r * 0.30, bottomY - h * 0.65, r * 0.40, bottomY - h * 0.72);
+            // 頭部凸起（圓弧）
+            ctx.bezierCurveTo(r * 0.60, bottomY - h * 0.82, r * 0.55, topY + h * 0.05, r * 0.25, topY);
+            ctx.bezierCurveTo(r * 0.10, topY - h * 0.03, -r * 0.10, topY - h * 0.03, -r * 0.25, topY);
+            // 左側頭部
+            ctx.bezierCurveTo(-r * 0.55, topY + h * 0.05, -r * 0.60, bottomY - h * 0.82, -r * 0.40, bottomY - h * 0.72);
+            // 左側頸部
+            ctx.bezierCurveTo(-r * 0.30, bottomY - h * 0.65, -r * 0.32, bottomY - h * 0.55, -r * 0.5, bottomY - h * 0.42);
+            // 左側向下
+            ctx.bezierCurveTo(-r * 0.75, bottomY - h * 0.28, -r * 1.05, bottomY - h * 0.15, -r * 1.05, bottomY - r * 0.15);
             ctx.closePath();
             ctx.fillStyle = grad;
             ctx.fill();
-            ctx.strokeStyle = 'rgba(40,40,40,0.6)';
+            ctx.strokeStyle = 'rgba(50,50,50,0.6)';
             ctx.lineWidth = 1;
             ctx.stroke();
 
-            // 紅環
-            ctx.strokeStyle = '#dc2626';
-            ctx.lineWidth = h * 0.055;
+            // 紅色雙環（位置在頸部略上方）
+            const ring1Y = bottomY - h * 0.72;
+            const ring2Y = bottomY - h * 0.78;
+            ctx.strokeStyle = '#c8102e';
+            ctx.lineCap = 'round';
+            ctx.lineWidth = r * 0.32;
             ctx.beginPath();
-            ctx.moveTo(-r * 0.75, neckY - h * 0.04);
-            ctx.lineTo(r * 0.75, neckY - h * 0.04);
+            ctx.moveTo(-r * 0.38, ring1Y);
+            ctx.lineTo(r * 0.38, ring1Y);
             ctx.stroke();
             ctx.beginPath();
-            ctx.moveTo(-r * 0.8, neckY - h * 0.11);
-            ctx.lineTo(r * 0.8, neckY - h * 0.11);
+            ctx.moveTo(-r * 0.40, ring2Y);
+            ctx.lineTo(r * 0.40, ring2Y);
             ctx.stroke();
 
             // 高光
-            const hl = ctx.createRadialGradient(-r * 0.35, -h * 0.05, 0, -r * 0.35, -h * 0.05, r * 1.2);
+            const hl = ctx.createRadialGradient(-r * 0.4, bottomY - h * 0.35, 0, -r * 0.4, bottomY - h * 0.35, r * 2.0);
             hl.addColorStop(0, 'rgba(255,255,255,0.95)');
-            hl.addColorStop(0.5, 'rgba(255,255,255,0.35)');
+            hl.addColorStop(0.35, 'rgba(255,255,255,0.4)');
             hl.addColorStop(1, 'rgba(255,255,255,0)');
             ctx.beginPath();
-            ctx.ellipse(-r * 0.35, -h * 0.05, r * 0.45, h * 0.28, 0, 0, Math.PI * 2);
+            ctx.ellipse(-r * 0.42, bottomY - h * 0.35, r * 0.4, h * 0.25, 0, 0, Math.PI * 2);
             ctx.fillStyle = hl;
             ctx.fill();
+
+            // 底部反光
+            const bl = ctx.createRadialGradient(0, bottomY + r * 0.1, 0, 0, bottomY + r * 0.1, r * 0.8);
+            bl.addColorStop(0, 'rgba(255,255,255,0.35)');
+            bl.addColorStop(1, 'rgba(255,255,255,0)');
+            ctx.beginPath();
+            ctx.ellipse(0, bottomY + r * 0.1, r * 0.7, r * 0.2, 0, 0, Math.PI * 2);
+            ctx.fillStyle = bl;
+            ctx.fill();
+        }
+
+        function drawFallenPin(ctx, r, h) {
+            // 倒下的球瓶：橫躺，用相同的瓶身但旋轉 90 度繪製
+            ctx.save();
+            ctx.rotate(Math.PI / 2);
+            ctx.scale(0.9, 0.9);
+            draw3DPin(ctx, r, h);
+            ctx.restore();
         }
 
         function draw3DBall(ctx, r) {
@@ -2723,11 +2758,13 @@
                     const rowStartX = pinCenterX - (rowCount - 1) * pinSpacing / 2;
                     for (let i = 0; i < rowCount && count < totalToBuild; i++) {
                         const x = rowStartX + i * pinSpacing;
-                        const body = Bodies.circle(x, rowY, pinRadius, {
-                            restitution: 0.55,
-                            friction: 0.02,
-                            frictionAir: 0.025,
-                            density: 0.0008,
+                        // 球瓶較高，稍微壓扁一點物理碰撞圈
+                        const body = Bodies.circle(x, rowY, pinRadius * 0.95, {
+                            restitution: 0.30,
+                            friction: 0.08,
+                            frictionStatic: 0.15,
+                            frictionAir: 0.055,
+                            density: 0.0022,
                             slop: 0.01,
                             render: inv,
                             label: 'bowlingPin'
@@ -2738,6 +2775,9 @@
                             homeX: x,
                             homeY: rowY,
                             knocked: false,
+                            knockedAt: 0,
+                            fallAngle: 0,
+                            targetFallAngle: 0,
                             radius: pinRadius
                         });
                         count++;
@@ -2776,10 +2816,11 @@
                 }
                 bowlingBall = Bodies.circle(bowlingBallRestX, bowlingBallRestY, BALL_RADIUS, {
                     isStatic: true,
-                    restitution: 0.3,
-                    friction: 0.02,
-                    frictionAir: 0.004,
-                    density: 0.006,
+                    restitution: 0.22,
+                    friction: 0.05,
+                    frictionStatic: 0.1,
+                    frictionAir: 0.007,
+                    density: 0.004,
                     slop: 0.01,
                     render: inv,
                     label: 'bowlingBall'
@@ -2845,8 +2886,8 @@
                 if (ny > -0.2) return;
                 const maxDist = renderHeight * 0.65;
                 const power = Math.min(1, dist / maxDist);
-                const minSpeed = 9;
-                const maxSpeed = 30;
+                const minSpeed = 7;
+                const maxSpeed = 20;
                 const speed = minSpeed + power * (maxSpeed - minSpeed);
                 launchBowlingBall(nx * speed, ny * speed);
             }
@@ -2879,7 +2920,7 @@
                     const bob = Math.sin(m.bobPhase) * drawR * 0.1;
                     ctx2d.translate(0, bob);
                     ctx2d.beginPath();
-                    ctx2d.ellipse(2, drawR * 0.75, drawR * 1.0, drawR * 0.32, 0, 0, Math.PI * 2);
+                    ctx2d.ellipse(2, drawR * 0.85, drawR * 1.1, drawR * 0.32, 0, 0, Math.PI * 2);
                     ctx2d.fillStyle = 'rgba(0,0,0,0.4)';
                     ctx2d.fill();
                     if (bowlingMouseImage && bowlingMouseImage.complete && bowlingMouseImage.naturalWidth > 0) {
@@ -2901,47 +2942,65 @@
                     ctx2d.restore();
                 }
 
-                // === 球瓶（3D 立體）===
-                // 按 y 排序，遠的（y 小）先畫，近的後畫
-                const sortedPins = bowlingPins.slice().filter(p => p.body).sort((a, b) => a.body.position.y - b.body.position.y);
+                // === 球瓶（按 y 排序，遠的先畫）===
+                const sortedPins = bowlingPins.slice().sort((a, b) => {
+                    const ya = a.body ? a.body.position.y : (a.frozenY || 0);
+                    const yb = b.body ? b.body.position.y : (b.frozenY || 0);
+                    return ya - yb;
+                });
+
                 for (const p of sortedPins) {
-                    const pos = p.body.position;
-                    const ang = p.body.angle;
-                    const scale = getBowlingScale(pos.y);
+                    let drawX, drawY, baseAngle;
+                    if (p.body) {
+                        drawX = p.body.position.x;
+                        drawY = p.body.position.y;
+                        baseAngle = p.body.angle;
+                    } else if (p.knocked) {
+                        drawX = p.frozenX;
+                        drawY = p.frozenY;
+                        baseAngle = p.frozenAngle || 0;
+                    } else {
+                        continue;
+                    }
+
+                    const scale = getBowlingScale(drawY);
                     const drawR = p.radius * scale;
-                    const pinH = drawR * 3.0;
+                    const pinH = drawR * 3.8;
 
                     ctx2d.save();
-                    ctx2d.translate(pos.x, pos.y + drawR * 0.4);
-                    ctx2d.rotate(ang);
-                    if (p.knocked) ctx2d.globalAlpha = 0.7;
+                    ctx2d.translate(drawX, drawY);
+
+                    if (p.knocked) {
+                        // 倒下動畫：從 0 漸變到 targetFallAngle
+                        const elapsed = performance.now() - p.knockedAt;
+                        const t = Math.min(1, elapsed / 250);
+                        // 用 easeOut 讓倒下更自然
+                        const eased = 1 - Math.pow(1 - t, 3);
+                        p.fallAngle = p.targetFallAngle * eased;
+
+                        // 倒下後往球道遠處偏移一點（看起來像滾進溝槽）
+                        ctx2d.translate(0, -pinH * 0.35 * eased);
+                        ctx2d.rotate(baseAngle + p.fallAngle);
+                        ctx2d.globalAlpha = 0.82;
+                    } else {
+                        ctx2d.rotate(baseAngle);
+                    }
 
                     if (bowlingPinImage && bowlingPinImage.complete && bowlingPinImage.naturalWidth > 0) {
-                        // 自訂圖片：圓形裁切 + 底部陰影
-                        ctx2d.beginPath();
-                        ctx2d.ellipse(2, drawR * 1.05, drawR * 1.05, drawR * 0.32, 0, 0, Math.PI * 2);
-                        ctx2d.fillStyle = 'rgba(0,0,0,0.45)';
-                        ctx2d.fill();
+                        const size = drawR * 3.6;
                         ctx2d.save();
                         ctx2d.beginPath();
-                        ctx2d.arc(0, 0, drawR, 0, Math.PI * 2);
+                        ctx2d.ellipse(0, 0, drawR * 1.1, size * 0.5, 0, 0, Math.PI * 2);
                         ctx2d.clip();
-                        const size = drawR * 2.4;
                         ctx2d.drawImage(bowlingPinImage, -size / 2, -size / 2, size, size);
                         ctx2d.restore();
-                        ctx2d.beginPath();
-                        ctx2d.arc(0, 0, drawR, 0, Math.PI * 2);
-                        ctx2d.strokeStyle = 'rgba(0,0,0,0.55)';
-                        ctx2d.lineWidth = 1.5;
-                        ctx2d.stroke();
                     } else {
-                        // 預設：3D 立體瓶
                         draw3DPin(ctx2d, drawR, pinH);
                     }
                     ctx2d.restore();
                 }
 
-                // === 球（3D 球體）===
+                // === 球 ===
                 if (bowlingBall) {
                     const bp = bowlingBall.position;
                     const scale = getBowlingScale(bp.y);
@@ -2951,12 +3010,10 @@
                     ctx2d.rotate(bowlingBall.angle);
 
                     if (bowlingBallImage && bowlingBallImage.complete && bowlingBallImage.naturalWidth > 0) {
-                        // 底部陰影
                         ctx2d.beginPath();
-                        ctx2d.ellipse(2, drawR * 0.9, drawR * 1.05, drawR * 0.3, 0, 0, Math.PI * 2);
-                        ctx2d.fillStyle = 'rgba(0,0,0,0.45)';
+                        ctx2d.ellipse(2, drawR * 0.9, drawR * 1.1, drawR * 0.3, 0, 0, Math.PI * 2);
+                        ctx2d.fillStyle = 'rgba(0,0,0,0.5)';
                         ctx2d.fill();
-                        // 球體（圓形裁切圖片）
                         ctx2d.save();
                         ctx2d.beginPath();
                         ctx2d.arc(0, 0, drawR, 0, Math.PI * 2);
@@ -2964,17 +3021,15 @@
                         const size = drawR * 2;
                         ctx2d.drawImage(bowlingBallImage, -size / 2, -size / 2, size, size);
                         ctx2d.restore();
-                        // 立體感：暗角
                         const dark = ctx2d.createRadialGradient(-drawR * 0.2, -drawR * 0.2, drawR * 0.3, 0, 0, drawR);
                         dark.addColorStop(0, 'rgba(0,0,0,0)');
-                        dark.addColorStop(0.7, 'rgba(0,0,0,0.15)');
-                        dark.addColorStop(1, 'rgba(0,0,0,0.55)');
+                        dark.addColorStop(0.7, 'rgba(0,0,0,0.2)');
+                        dark.addColorStop(1, 'rgba(0,0,0,0.65)');
                         ctx2d.beginPath();
                         ctx2d.arc(0, 0, drawR, 0, Math.PI * 2);
                         ctx2d.fillStyle = dark;
                         ctx2d.fill();
-                        // 高光
-                        const hl = ctx2d.createRadialGradient(-drawR * 0.4, -drawR * 0.45, 0, -drawR * 0.4, -drawR * 0.45, drawR * 0.55);
+                        const hl = ctx2d.createRadialGradient(-drawR * 0.4, -drawR * 0.45, 0, -drawR * 0.4, -drawR * 0.45, drawR * 0.6);
                         hl.addColorStop(0, 'rgba(255,255,255,0.95)');
                         hl.addColorStop(0.4, 'rgba(255,255,255,0.5)');
                         hl.addColorStop(1, 'rgba(255,255,255,0)');
@@ -2982,10 +3037,9 @@
                         ctx2d.ellipse(-drawR * 0.4, -drawR * 0.45, drawR * 0.5, drawR * 0.32, -0.6, 0, Math.PI * 2);
                         ctx2d.fillStyle = hl;
                         ctx2d.fill();
-                        // 外框
                         ctx2d.beginPath();
                         ctx2d.arc(0, 0, drawR, 0, Math.PI * 2);
-                        ctx2d.strokeStyle = 'rgba(0,0,0,0.65)';
+                        ctx2d.strokeStyle = 'rgba(0,0,0,0.7)';
                         ctx2d.lineWidth = 1.5;
                         ctx2d.stroke();
                     } else {
@@ -2994,7 +3048,7 @@
                     ctx2d.restore();
                 }
 
-                // === 拖曳指示線 ===
+                // === 拖曳指示 ===
                 if (bowlingDragging) {
                     ctx2d.save();
                     const dx = bowlingDragCurrentX - bowlingDragStartX;
@@ -3020,8 +3074,6 @@
                         ctx2d.closePath();
                         ctx2d.fillStyle = 'rgba(255,220,80,0.95)';
                         ctx2d.fill();
-
-                        // 力度文字
                         const power = Math.min(100, Math.round(dist / (renderHeight * 0.65) * 100));
                         ctx2d.font = 'bold 14px "Noto Sans TC", sans-serif';
                         ctx2d.textAlign = 'center';
@@ -3124,12 +3176,21 @@
                 const pos = p.body.position;
                 const moved = Math.hypot(pos.x - p.homeX, pos.y - p.homeY);
                 const ang = Math.abs(p.body.angle);
-                if (moved > p.radius * 1.2 || ang > 0.6) {
+                // 判定「倒下」門檻提高 → 更難全倒
+                if (moved > p.radius * 1.6 || ang > 0.9) {
                     p.knocked = true;
+                    p.knockedAt = performance.now();
+                    p.targetFallAngle = (Math.random() < 0.5 ? -1 : 1) * (Math.PI / 2);
                     newKnocked++;
-                    Matter.Body.setStatic(p.body, true);
-                    Matter.Body.setVelocity(p.body, { x: 0, y: 0 });
-                    Matter.Body.setAngularVelocity(p.body, 0);
+                    // 凍結物理：從 world 移除，之後只做視覺
+                    const fx = pos.x;
+                    const fy = pos.y;
+                    const fang = p.body.angle;
+                    Matter.Composite.remove(bowlingEngine.world, p.body);
+                    p.body = null;
+                    p.frozenX = fx;
+                    p.frozenY = fy;
+                    p.frozenAngle = fang;
                 }
             }
 
@@ -3146,27 +3207,22 @@
                     bowlingScore += 10;
                     playStrikeSound();
                     updateBowlingUI();
-                    setTimeout(() => { advanceBowlingFrame(); }, 1400);
+                    setTimeout(() => { advanceBowlingFrame(); }, 1600);
                     return;
                 }
                 setTimeout(() => {
-                    for (const p of bowlingPins) {
-                        if (p.knocked && p.body) {
-                            Matter.Composite.remove(bowlingEngine.world, p.body);
-                            p.body = null;
-                        }
-                    }
+                    // 剩下的站瓶會保留，倒下的瓶視覺上仍存在
                     resetBowlingBallForNextThrow();
                     bowlingBallInFrame = 2;
                     updateBowlingUI();
-                }, 1100);
+                }, 1300);
             } else {
                 if (standingCount === 0 && bowlingPins.length > 0) {
                     bowlingScore += 5;
                     playStrikeSound();
                 }
                 updateBowlingUI();
-                setTimeout(() => { advanceBowlingFrame(); }, 1400);
+                setTimeout(() => { advanceBowlingFrame(); }, 1600);
             }
         }
 
@@ -3210,11 +3266,12 @@
                 const rowStartX = params.pinCenterX - (rowCount - 1) * params.pinSpacing / 2;
                 for (let i = 0; i < rowCount && count < totalToBuild; i++) {
                     const x = rowStartX + i * params.pinSpacing;
-                    const body = Bodies.circle(x, rowY, params.pinRadius, {
-                        restitution: 0.55,
-                        friction: 0.02,
-                        frictionAir: 0.025,
-                        density: 0.0008,
+                    const body = Bodies.circle(x, rowY, params.pinRadius * 0.95, {
+                        restitution: 0.30,
+                        friction: 0.08,
+                        frictionStatic: 0.15,
+                        frictionAir: 0.055,
+                        density: 0.0022,
                         slop: 0.01,
                         render: { visible: false },
                         label: 'bowlingPin'
@@ -3225,6 +3282,9 @@
                         homeX: x,
                         homeY: rowY,
                         knocked: false,
+                        knockedAt: 0,
+                        fallAngle: 0,
+                        targetFallAngle: 0,
                         radius: params.pinRadius
                     });
                     count++;
