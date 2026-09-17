@@ -562,6 +562,9 @@
         let bowlingLaneRight = 0;
         let bowlingMouseConfig = [];
         let bowlingAwardedBonus = false;
+        let bowlingPitTop = 0;
+        let bowlingPitBottom = 0;
+        let bowlingGutterW = 0;
         let bowlingPinParams = null;
 
         let audioCtx = null;
@@ -2234,17 +2237,18 @@
             if (bowlingLaneBottom === bowlingLaneTop) return 1;
             let t = (y - bowlingLaneTop) / (bowlingLaneBottom - bowlingLaneTop);
             t = Math.max(0, Math.min(1, t));
-            return 0.68 + t * 0.32;
+            return 0.62 + t * 0.38;
         }
 
         function getLaneEdgesAtY(y) {
             const w = bowlingLaneRight - bowlingLaneLeft;
+            const lanePhysW = w * 0.82;
             const cx = (bowlingLaneLeft + bowlingLaneRight) / 2;
-            if (bowlingLaneBottom === bowlingLaneTop) return { left: bowlingLaneLeft, right: bowlingLaneRight, width: w, cx: cx };
+            if (bowlingLaneBottom === bowlingLaneTop) return { left: cx - lanePhysW/2, right: cx + lanePhysW/2, width: lanePhysW, cx: cx, scale: 1 };
             let t = (y - bowlingLaneTop) / (bowlingLaneBottom - bowlingLaneTop);
             t = Math.max(0, Math.min(1, t));
-            const scale = 0.68 + t * 0.32;
-            const halfW = (w / 2) * scale;
+            const scale = 0.62 + t * 0.38;
+            const halfW = (lanePhysW / 2) * scale;
             return { left: cx - halfW, right: cx + halfW, width: halfW * 2, cx: cx, scale: scale };
         }
 
@@ -2252,11 +2256,11 @@
             ctx.fillStyle = '#06060c';
             ctx.fillRect(0, 0, w, h);
 
-            const farScale = 0.68;
+            const farScale = 0.62;
             const cx = (l + r) / 2;
-            const lanePhysW = r - l;
+            const lanePhysW = (r - l) * 0.82;   // ★ 球道變窄
+            const gutterRatio = 0.10;
 
-            const gutterRatio = 0.09;
             const farLaneW = lanePhysW * farScale;
             const nearLaneW = lanePhysW;
             const farGutter = farLaneW * gutterRatio;
@@ -2272,19 +2276,39 @@
             const nearGutL = nearLaneL - nearGutter;
             const nearGutR = nearLaneR + nearGutter;
 
-            // 遠端回球區（黑）
-            const pitH = (b - t) * 0.08;
-            ctx.fillStyle = '#020206';
-            ctx.fillRect(0, t - 5, w, pitH);
+            // ★ 球瓶後方凹槽（pit）
+            const pitH = (b - t) * 0.10;
+            bowlingPitTop = t;
+            bowlingPitBottom = t + pitH;
+            bowlingGutterW = nearGutter;
 
-            // 回球區擋板
-            ctx.fillStyle = '#1a1a2a';
-            ctx.fillRect(farGutL - 4, t + pitH - 6, (farGutR - farGutL) + 8, 6);
-            ctx.strokeStyle = 'rgba(120,120,160,0.5)';
-            ctx.lineWidth = 1;
-            ctx.strokeRect(farGutL - 4, t + pitH - 6, (farGutR - farGutL) + 8, 6);
+            // 最外圍黑底
+            ctx.fillStyle = '#04040a';
+            ctx.fillRect(0, 0, w, t + pitH);
 
-            // 兩側溝槽（深色梯形）
+            // 後方凹槽（深黑，稍微反射）
+            const pitGrad = ctx.createLinearGradient(0, t, 0, t + pitH);
+            pitGrad.addColorStop(0, '#000000');
+            pitGrad.addColorStop(0.5, '#0a0a14');
+            pitGrad.addColorStop(1, '#15152a');
+            ctx.fillStyle = pitGrad;
+            ctx.beginPath();
+            ctx.moveTo(farGutL, t);
+            ctx.lineTo(farGutR, t);
+            ctx.lineTo(farGutR + (nearGutR - farGutR) * 0.15, t + pitH);
+            ctx.lineTo(farGutL + (nearGutL - farGutL) * 0.15, t + pitH);
+            ctx.closePath();
+            ctx.fill();
+
+            // 凹槽上方反射光
+            ctx.strokeStyle = 'rgba(180,180,220,0.35)';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(farGutL, t + pitH - 1);
+            ctx.lineTo(farGutR, t + pitH - 1);
+            ctx.stroke();
+
+            // 兩側溝槽
             const gutterGrad = ctx.createLinearGradient(0, t, 0, b);
             gutterGrad.addColorStop(0, '#0a0a14');
             gutterGrad.addColorStop(0.5, '#151520');
@@ -2308,12 +2332,12 @@
             ctx.fillStyle = gutterGrad;
             ctx.fill();
 
-            // 球道（木紋梯形）
+            // 球道木紋梯形
             const laneGrad = ctx.createLinearGradient(0, t, 0, b);
-            laneGrad.addColorStop(0, '#6b4622');
-            laneGrad.addColorStop(0.4, '#a07040');
-            laneGrad.addColorStop(0.75, '#d0a060');
-            laneGrad.addColorStop(1, '#ecc080');
+            laneGrad.addColorStop(0, '#7a5030');
+            laneGrad.addColorStop(0.4, '#a87848');
+            laneGrad.addColorStop(0.75, '#d0a870');
+            laneGrad.addColorStop(1, '#e8c890');
 
             ctx.beginPath();
             ctx.moveTo(farLaneL, t + pitH);
@@ -2324,8 +2348,8 @@
             ctx.fillStyle = laneGrad;
             ctx.fill();
 
-            // 木紋縱條（透視）
-            const stripes = 10;
+            // 木紋縱條
+            const stripes = 12;
             for (let i = 0; i < stripes; i++) {
                 if (i % 2 === 1) continue;
                 const r1 = i / stripes;
@@ -2344,9 +2368,9 @@
                 ctx.fill();
             }
 
-            // 遠端暗色漸層（增加深度感）
+            // 遠端暗色漸層
             const farShade = ctx.createLinearGradient(0, t + pitH, 0, t + pitH + (b - t - pitH) * 0.35);
-            farShade.addColorStop(0, 'rgba(0,0,0,0.45)');
+            farShade.addColorStop(0, 'rgba(0,0,0,0.5)');
             farShade.addColorStop(1, 'rgba(0,0,0,0)');
             ctx.fillStyle = farShade;
             ctx.beginPath();
@@ -2357,7 +2381,7 @@
             ctx.closePath();
             ctx.fill();
 
-            // 球道箭頭記號
+            // 箭頭記號
             const arrowT = 0.55;
             const arrowY = t + pitH + (b - t - pitH) * arrowT;
             const edges = getLaneEdgesAtY(arrowY);
@@ -2758,27 +2782,28 @@
                     const rowStartX = pinCenterX - (rowCount - 1) * pinSpacing / 2;
                     for (let i = 0; i < rowCount && count < totalToBuild; i++) {
                         const x = rowStartX + i * pinSpacing;
-                        // 球瓶較高，稍微壓扁一點物理碰撞圈
-                        const body = Bodies.circle(x, rowY, pinRadius * 0.95, {
-                            restitution: 0.30,
-                            friction: 0.08,
-                            frictionStatic: 0.15,
-                            frictionAir: 0.055,
-                            density: 0.0022,
+                        // ★ 用長方體：寬 = pinRadius * 1.6，高 = pinRadius * 5（俯視看是細長）
+                        const body = Matter.Bodies.rectangle(x, rowY, pinRadius * 1.6, pinRadius * 5, {
+                            restitution: 0.18,
+                            friction: 0.05,
+                            frictionStatic: 0.1,
+                            frictionAir: 0.012,
+                            density: 0.0018,
                             slop: 0.01,
+                            angle: 0,
                             render: inv,
-                            label: 'bowlingPin'
+                            label: 'bowlingPin',
+                            chamfer: { radius: pinRadius * 0.4 }
                         });
                         Matter.Composite.add(bowlingEngine.world, body);
                         bowlingPins.push({
                             body: body,
                             homeX: x,
                             homeY: rowY,
-                            knocked: false,
-                            knockedAt: 0,
-                            fallAngle: 0,
-                            targetFallAngle: 0,
-                            radius: pinRadius
+                            homeAngle: 0,
+                            radius: pinRadius,
+                            fallen: false,
+                            gone: false
                         });
                         count++;
                     }
@@ -2816,11 +2841,10 @@
                 }
                 bowlingBall = Bodies.circle(bowlingBallRestX, bowlingBallRestY, BALL_RADIUS, {
                     isStatic: true,
-                    restitution: 0.22,
-                    friction: 0.05,
-                    frictionStatic: 0.1,
-                    frictionAir: 0.007,
-                    density: 0.004,
+                    restitution: 0.25,
+                    friction: 0.02,
+                    frictionAir: 0.004,
+                    density: 0.0035,
                     slop: 0.01,
                     render: inv,
                     label: 'bowlingBall'
@@ -2886,8 +2910,8 @@
                 if (ny > -0.2) return;
                 const maxDist = renderHeight * 0.65;
                 const power = Math.min(1, dist / maxDist);
-                const minSpeed = 7;
-                const maxSpeed = 20;
+                const minSpeed = 6;
+                const maxSpeed = 18;
                 const speed = minSpeed + power * (maxSpeed - minSpeed);
                 launchBowlingBall(nx * speed, ny * speed);
             }
@@ -2942,49 +2966,19 @@
                     ctx2d.restore();
                 }
 
-                // === 球瓶（按 y 排序，遠的先畫）===
-                const sortedPins = bowlingPins.slice().sort((a, b) => {
-                    const ya = a.body ? a.body.position.y : (a.frozenY || 0);
-                    const yb = b.body ? b.body.position.y : (b.frozenY || 0);
-                    return ya - yb;
-                });
+                // === 球瓶（實時物理角度）===
+                const sortedPins = bowlingPins.slice().filter(p => p.body).sort((a, b) => a.body.position.y - b.body.position.y);
 
                 for (const p of sortedPins) {
-                    let drawX, drawY, baseAngle;
-                    if (p.body) {
-                        drawX = p.body.position.x;
-                        drawY = p.body.position.y;
-                        baseAngle = p.body.angle;
-                    } else if (p.knocked) {
-                        drawX = p.frozenX;
-                        drawY = p.frozenY;
-                        baseAngle = p.frozenAngle || 0;
-                    } else {
-                        continue;
-                    }
-
-                    const scale = getBowlingScale(drawY);
+                    const pos = p.body.position;
+                    const ang = p.body.angle;
+                    const scale = getBowlingScale(pos.y);
                     const drawR = p.radius * scale;
                     const pinH = drawR * 3.8;
 
                     ctx2d.save();
-                    ctx2d.translate(drawX, drawY);
-
-                    if (p.knocked) {
-                        // 倒下動畫：從 0 漸變到 targetFallAngle
-                        const elapsed = performance.now() - p.knockedAt;
-                        const t = Math.min(1, elapsed / 250);
-                        // 用 easeOut 讓倒下更自然
-                        const eased = 1 - Math.pow(1 - t, 3);
-                        p.fallAngle = p.targetFallAngle * eased;
-
-                        // 倒下後往球道遠處偏移一點（看起來像滾進溝槽）
-                        ctx2d.translate(0, -pinH * 0.35 * eased);
-                        ctx2d.rotate(baseAngle + p.fallAngle);
-                        ctx2d.globalAlpha = 0.82;
-                    } else {
-                        ctx2d.rotate(baseAngle);
-                    }
+                    ctx2d.translate(pos.x, pos.y);
+                    ctx2d.rotate(ang);
 
                     if (bowlingPinImage && bowlingPinImage.complete && bowlingPinImage.naturalWidth > 0) {
                         const size = drawR * 3.6;
@@ -3094,7 +3088,7 @@
             function physicsLoop(now) {
                 const dt = Math.min(now - lastPhysTime, 33);
                 lastPhysTime = now;
-                const sub = 4;
+                const sub = 6;
                 for (let i = 0; i < sub; i++) {
                     Engine.update(bowlingEngine, dt / sub);
                 }
@@ -3139,13 +3133,47 @@
         }
 
         function checkBowlingBallState() {
+            // 每幀檢查球瓶是否出界（掉入溝槽或後方凹槽）
+            for (const p of bowlingPins) {
+                if (!p.body || p.gone) continue;
+                const pos = p.body.position;
+                const edges = getLaneEdgesAtY(pos.y);
+                const outLeft = pos.x < edges.left - p.radius * 0.3;
+                const outRight = pos.x > edges.right + p.radius * 0.3;
+                const outBack = pos.y < bowlingLaneTop + (bowlingPitBottom - bowlingLaneTop) * 0.95;
+                if (outLeft || outRight || outBack) {
+                    // 出界：從 world 移除
+                    Matter.Composite.remove(bowlingEngine.world, p.body);
+                    p.body = null;
+                    p.gone = true;
+                    p.fallen = true;
+                    playPinHitSound();
+                } else {
+                    // 倒下判定：角度超過 60 度
+                    const ang = Math.abs(p.body.angle % Math.PI);
+                    const tiltFromUpright = Math.min(ang, Math.PI - ang);
+                    if (tiltFromUpright > Math.PI / 3) {
+                        p.fallen = true;
+                    }
+                }
+            }
+
             if (bowlingState !== "rolling") { checkBowlingBallState._t = 0; return; }
             if (!bowlingBall || bowlingBall.isStatic) return;
+
             const vel = bowlingBall.velocity;
             const speed = Math.hypot(vel.x, vel.y);
-            if (speed < 0.8) {
+            // 球停了 + 球瓶也大致停了
+            let allPinsQuiet = true;
+            for (const p of bowlingPins) {
+                if (!p.body || p.gone) continue;
+                const pv = p.body.velocity;
+                if (Math.hypot(pv.x, pv.y) > 1.2) { allPinsQuiet = false; break; }
+            }
+
+            if (speed < 0.8 && allPinsQuiet) {
                 if (!checkBowlingBallState._t) checkBowlingBallState._t = performance.now();
-                else if (performance.now() - checkBowlingBallState._t > 800) {
+                else if (performance.now() - checkBowlingBallState._t > 700) {
                     checkBowlingBallState._t = 0;
                     endBowlingBall();
                 }
@@ -3169,38 +3197,24 @@
             if (bowlingState !== "rolling") return;
             bowlingState = "settling";
 
+            // 計算這球打下幾瓶（不含之前已倒的）
             let newKnocked = 0;
             for (const p of bowlingPins) {
-                if (p.knocked) continue;
-                if (!p.body) continue;
-                const pos = p.body.position;
-                const moved = Math.hypot(pos.x - p.homeX, pos.y - p.homeY);
-                const ang = Math.abs(p.body.angle);
-                // 判定「倒下」門檻提高 → 更難全倒
-                if (moved > p.radius * 1.6 || ang > 0.9) {
-                    p.knocked = true;
-                    p.knockedAt = performance.now();
-                    p.targetFallAngle = (Math.random() < 0.5 ? -1 : 1) * (Math.PI / 2);
+                if (p.gone && !p.counted) {
+                    p.counted = true;
                     newKnocked++;
-                    // 凍結物理：從 world 移除，之後只做視覺
-                    const fx = pos.x;
-                    const fy = pos.y;
-                    const fang = p.body.angle;
-                    Matter.Composite.remove(bowlingEngine.world, p.body);
-                    p.body = null;
-                    p.frozenX = fx;
-                    p.frozenY = fy;
-                    p.frozenAngle = fang;
+                } else if (p.fallen && !p.gone && !p.counted) {
+                    p.counted = true;
+                    newKnocked++;
                 }
             }
 
             bowlingPinsKnockedThisFrame += newKnocked;
             bowlingFramePins = bowlingPinsKnockedThisFrame;
             bowlingScore += newKnocked * 2;
-            if (newKnocked > 0) playPinHitSound();
             updateBowlingUI();
 
-            const standingCount = bowlingPins.filter(p => !p.knocked && p.body).length;
+            const standingCount = bowlingPins.filter(p => !p.fallen && !p.gone && p.body).length;
 
             if (bowlingBallInFrame === 1) {
                 if (standingCount === 0 && bowlingPins.length > 0) {
@@ -3211,11 +3225,18 @@
                     return;
                 }
                 setTimeout(() => {
-                    // 剩下的站瓶會保留，倒下的瓶視覺上仍存在
+                    // 移除所有倒下的瓶，只留站著的
+                    for (const p of bowlingPins) {
+                        if ((p.fallen || p.gone) && p.body) {
+                            Matter.Composite.remove(bowlingEngine.world, p.body);
+                            p.body = null;
+                            p.gone = true;
+                        }
+                    }
                     resetBowlingBallForNextThrow();
                     bowlingBallInFrame = 2;
                     updateBowlingUI();
-                }, 1300);
+                }, 1400);
             } else {
                 if (standingCount === 0 && bowlingPins.length > 0) {
                     bowlingScore += 5;
@@ -3246,7 +3267,6 @@
             bowlingBallInFrame = 1;
             bowlingFramePins = 0;
             bowlingPinsKnockedThisFrame = 0;
-
             if (!bowlingEngine || !bowlingPinParams) return;
 
             for (const p of bowlingPins) {
@@ -3266,26 +3286,27 @@
                 const rowStartX = params.pinCenterX - (rowCount - 1) * params.pinSpacing / 2;
                 for (let i = 0; i < rowCount && count < totalToBuild; i++) {
                     const x = rowStartX + i * params.pinSpacing;
-                    const body = Bodies.circle(x, rowY, params.pinRadius * 0.95, {
-                        restitution: 0.30,
-                        friction: 0.08,
-                        frictionStatic: 0.15,
-                        frictionAir: 0.055,
-                        density: 0.0022,
+                    const body = Bodies.rectangle(x, rowY, params.pinRadius * 1.6, params.pinRadius * 5, {
+                        restitution: 0.18,
+                        friction: 0.05,
+                        frictionStatic: 0.1,
+                        frictionAir: 0.012,
+                        density: 0.0018,
                         slop: 0.01,
+                        angle: 0,
                         render: { visible: false },
-                        label: 'bowlingPin'
+                        label: 'bowlingPin',
+                        chamfer: { radius: params.pinRadius * 0.4 }
                     });
                     Composite.add(bowlingEngine.world, body);
                     bowlingPins.push({
                         body: body,
                         homeX: x,
                         homeY: rowY,
-                        knocked: false,
-                        knockedAt: 0,
-                        fallAngle: 0,
-                        targetFallAngle: 0,
-                        radius: params.pinRadius
+                        homeAngle: 0,
+                        radius: params.pinRadius,
+                        fallen: false,
+                        gone: false
                     });
                     count++;
                 }
