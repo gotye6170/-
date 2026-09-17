@@ -454,7 +454,7 @@
         const db = getDatabase(app);
         const auth = getAuth(app);
 
-        window.startDraw = startDraw; window.closeModal = closeModal; window.clickTicket = clickTicket;
+        window.startDraw = startDraw; window.clickTicket = clickTicket;
         window.verifyGroupPass = verifyGroupPass; window.handleNameChange = handleNameChange;
         window.openConfirmModal = openConfirmModal; window.closeConfirmModal = closeConfirmModal;
         window.confirmAndDraw = confirmAndDraw; window.toggleSound = toggleSound;
@@ -551,6 +551,8 @@
         let bowlingDragStartY = 0;
         let bowlingDragCurrentX = 0;
         let bowlingDragCurrentY = 0;
+        let bowlingPinRadius = 10;
+        let bowlingBallRadius = 10;
         let bowlingBallRestX = 0;
         let bowlingBallRestY = 0;
         let bowlingRenderHeight = 0;
