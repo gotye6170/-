@@ -118,6 +118,7 @@
         .choice-btn-points { background: linear-gradient(135deg, #34d399, #059669); color: white; box-shadow: 0 8px 20px rgba(16,185,129,0.35); }
         .choice-btn-slot { background: linear-gradient(135deg, #a78bfa, #7c3aed); color: white; box-shadow: 0 8px 20px rgba(124, 58, 237, 0.35); }
         .choice-btn-pachinko { background: linear-gradient(135deg, #60a5fa, #2563eb); color: white; box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35); }
+        .choice-btn-bowling { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; box-shadow: 0 8px 20px rgba(217, 119, 6, 0.35); }
         .casino-slot-machine { width: 100%; max-width: 420px; margin: 0 auto; background: linear-gradient(180deg, #3a1c5a 0%, #1e0f33 100%); border-radius: 30px; padding: 20px; border: 8px solid #d4af37; box-shadow: 0 25px 0 #0d0618, 0 35px 50px rgba(0,0,0,0.7), inset 0 2px 0 #d4af37, inset 0 -10px 20px rgba(0,0,0,0.6); position: relative; overflow: hidden; transform: perspective(800px) rotateX(2deg); }
         .slot-top-lights { display: flex; justify-content: space-around; margin-bottom: 10px; }
         .slot-light { width: 18px; height: 18px; background: radial-gradient(circle at 40% 40%, #fff, #ffdd00 70%, #ff9900); border-radius: 50%; box-shadow: 0 0 15px #ffdd00, 0 0 30px #ff9900; animation: blinkLight 0.8s infinite alternate; }
@@ -152,6 +153,18 @@
         .pachinko-power-bar { width: 100%; height: 18px; background: #0a0612; border-radius: 9px; border: 2px solid #d4af37; overflow: hidden; box-shadow: inset 0 2px 6px rgba(0,0,0,0.9); }
         .pachinko-power-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #22c55e, #eab308 50%, #ef4444); transition: width 0.05s linear; border-radius: 7px; }
         .pachinko-power-text { text-align: center; margin-top: 6px; color: #ffd700; font-weight: bold; font-size: 13px; text-shadow: 0 0 8px #ffd700; }
+        .bowling-machine { width: 100%; max-width: 420px; margin: 0 auto; background: linear-gradient(180deg, #3a1c5a 0%, #1e0f33 100%); border-radius: 30px; padding: 20px; border: 8px solid #d4af37; box-shadow: 0 25px 0 #0d0618, 0 35px 50px rgba(0,0,0,0.7), inset 0 2px 0 #d4af37, inset 0 -10px 20px rgba(0,0,0,0.6); position: relative; overflow: hidden; }
+        .bowling-top-lights { display: flex; justify-content: space-around; margin-bottom: 10px; }
+        .bowling-title { text-align: center; font-size: 28px; font-weight: 900; color: #ffd700; text-shadow: 0 0 15px #ffd700; margin-bottom: 15px; }
+        .bowling-container { width: 100%; background: #0a0a14; border-radius: 15px; box-shadow: inset 0 0 30px rgba(0,0,0,0.9); overflow: hidden; position: relative; display: flex; justify-content: center; touch-action: none; user-select: none; -webkit-user-select: none; }
+        .bowling-container canvas { display: block; max-width: 100%; height: auto !important; touch-action: none; }
+        .bowling-info { display: flex; justify-content: space-around; align-items: center; margin-top: 15px; padding: 10px 6px; background: rgba(0,0,0,0.35); border-radius: 12px; border: 2px solid rgba(212,175,55,0.4); flex-wrap: wrap; gap: 6px; }
+        .bowling-stat { text-align: center; min-width: 62px; }
+        .bowling-stat-label { display: block; font-size: 10px; color: #94a3b8; font-weight: bold; margin-bottom: 2px; }
+        .bowling-stat-value { display: block; font-size: 16px; font-weight: 900; color: #ffd700; text-shadow: 0 0 6px rgba(255,215,0,0.6); }
+        .bowling-stat-value b { font-size: 22px; }
+        .bowling-target { text-align: center; margin-top: 10px; font-size: 12px; color: #ffd700; font-weight: bold; }
+        .bowling-aim-hint { text-align: center; margin-top: 6px; font-size: 11px; color: #cbd5e1; }
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 50; display: flex; align-items: center; justify-content: center; padding: 20px; }
         .modal-card { background: white; border-radius: 24px; width: 100%; max-width: 400px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
         @media (max-width: 640px) {
@@ -179,6 +192,10 @@
             .pachinko-lever-rod { height: 28px; width: 10px; }
             .pachinko-power-display { max-width: 150px; }
             .pachinko-power-text { font-size: 12px; }
+            .bowling-title { font-size: 22px; }
+            .bowling-stat-value b { font-size: 18px; }
+            .bowling-stat-label { font-size: 9px; }
+            .bowling-stat { min-width: 55px; }
         }
         @media (min-width: 1024px) { .gacha-title { font-size: 3rem; } .gacha-machine { transform: scale(1); margin: 32px auto 32px auto; } }
     </style>
@@ -295,6 +312,33 @@
                         <p class="slot-info">剩餘次數：<span id="pachinkoCountDisplay">0</span></p>
                     </div>
                 </div>
+                <div id="bowlingSystemArea" class="w-full hidden">
+                    <div class="bowling-machine">
+                        <div class="bowling-top-lights"><div class="slot-light"></div><div class="slot-light"></div><div class="slot-light"></div><div class="slot-light"></div><div class="slot-light"></div></div>
+                        <h3 class="bowling-title">🎳 幸運保齡球</h3>
+                        <div id="bowlingContainer" class="bowling-container"></div>
+                        <div class="bowling-info">
+                            <div class="bowling-stat">
+                                <span class="bowling-stat-label">局數</span>
+                                <span class="bowling-stat-value"><b id="bowlingFrameDisplay">1</b>/4</span>
+                            </div>
+                            <div class="bowling-stat">
+                                <span class="bowling-stat-label">本局球數</span>
+                                <span class="bowling-stat-value"><b id="bowlingBallDisplay">1</b>/2</span>
+                            </div>
+                            <div class="bowling-stat">
+                                <span class="bowling-stat-label">本局瓶數</span>
+                                <span class="bowling-stat-value"><b id="bowlingFramePinsDisplay">0</b></span>
+                            </div>
+                            <div class="bowling-stat">
+                                <span class="bowling-stat-label">總分</span>
+                                <span class="bowling-stat-value"><b id="bowlingScoreDisplay">0</b></span>
+                            </div>
+                        </div>
+                        <div class="bowling-target">🎯 目標 <b id="bowlingTargetDisplay">50</b> 分，達標送 1 次扭蛋抽獎！</div>
+                        <div class="bowling-aim-hint">💡 在球上按住拖曳，往後拉蓄力，放開發射</div>
+                    </div>
+                </div>
                 <div id="pointsSystemArea" class="w-full hidden">
                     <div class="w-full bg-white/80 backdrop-blur-md rounded-2xl p-5 shadow-md border border-white">
                         <h3 class="text-center text-base font-black text-amber-600 mb-3">🎁 點數兌換系統</h3>
@@ -333,6 +377,7 @@
                 <button onclick="chooseDraw()" class="choice-btn choice-btn-draw w-full"><span class="text-2xl">🟡</span><span>扭蛋機</span></button>
                 <button onclick="chooseSlot()" class="choice-btn choice-btn-slot w-full"><span class="text-2xl">🎰</span><span>拉霸機</span></button>
                 <button onclick="choosePachinko()" class="choice-btn choice-btn-pachinko w-full"><span class="text-2xl">🎱</span><span>彈珠台</span></button>
+                <button onclick="chooseBowling()" class="choice-btn choice-btn-bowling w-full"><span class="text-2xl">🎳</span><span>保齡球</span></button>
                 <button onclick="choosePoints()" class="choice-btn choice-btn-points w-full"><span class="text-2xl">🎁</span><span>點數兌換系統</span></button>
             </div>
         </div>
@@ -395,7 +440,8 @@
     <button id="soundToggleBtn" onclick="toggleSound()" class="music-control-btn fixed bottom-5 right-5 bg-slate-900 text-cyan-400 text-sm font-bold px-4 py-2 rounded-full shadow-lg border border-cyan-500/30 z-40 transition-all active:scale-95">🔊 音效</button>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
+
+            import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
         import { getDatabase, ref, runTransaction, onValue, get, update, push, set } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
 
@@ -416,7 +462,8 @@
         window.verifyPersonalPass = verifyPersonalPass; window.closeWalletPassModal = closeWalletPassModal;
         window.goBack = goBack; window.promptAdminMode = promptAdminMode;
         window.chooseDraw = chooseDraw; window.choosePoints = choosePoints;
-        window.chooseSlot = chooseSlot; window.startSlot = startSlot; window.choosePachinko = choosePachinko;
+        window.chooseSlot = chooseSlot; window.startSlot = startSlot;
+        window.choosePachinko = choosePachinko; window.chooseBowling = chooseBowling;
 
         let isDrawing = false;
         let currentPrizeUrl = "";
@@ -441,6 +488,7 @@
         let soundUrls = {};
         let drawRecordsData = {};
 
+        // ---------- 彈珠台變數 ----------
         let pachinkoEngine = null;
         let pachinkoRender = null;
         let pachinkoBall = null;
@@ -453,9 +501,9 @@
         let pachinkoBinLayout = [];
         let pachinkoBallRestX = 0;
         let pachinkoBallRestY = 0;
-        let pachinkoBallRadius = 7;              // ← 新增：全域記錄球半徑
-        let pachinkoRailLeftX = 0;               // ← 新增：發射軌內壁左緣（判斷球是否回到軌道用）
-        let pachinkoRenderHeight = 0;            // ← 新增：渲染高度（判斷球是否落底用）
+        let pachinkoBallRadius = 7;
+        let pachinkoRailLeftX = 0;
+        let pachinkoRenderHeight = 0;
         let pachinkoRenderLoopId = null;
         let pachinkoPhysicsLoopId = null;
         let pachinkoCheckIntervalId = null;
@@ -469,9 +517,52 @@
         let portalCooldownUntil = 0;
         let portalFlashes = [];
 
+        // ---------- 保齡球變數 ----------
+        let bowlingEngine = null;
+        let bowlingRender = null;
+        let bowlingBall = null;
+        let bowlingPins = [];
+        let bowlingMice = [];
+        let bowlingMouseBodies = [];
+        let bowlingRenderLoopId = null;
+        let bowlingPhysicsLoopId = null;
+        let bowlingCheckIntervalId = null;
+        let bowlingState = "idle"; // idle / aiming / rolling / settling / done
+        let bowlingFrame = 1;
+        let bowlingBallInFrame = 1;
+        let bowlingScore = 0;
+        let bowlingFramePins = 0;
+        let bowlingPinsKnockedThisFrame = 0;
+        let bowlingStrikePending = false;
+        let bowlingSparePending = false;
+        let bowlingPendingBonus = 0;
+        let bowlingTargetScore = 50;
+        let bowlingMaxFrames = 4;
+        let bowlingBallsPerFrame = 2;
+        let bowlingPinCount = 10;
+        let bowlingBallImageUrl = null;
+        let bowlingPinImageUrl = null;
+        let bowlingMouseImageUrl = null;
+        let bowlingBallImage = null;
+        let bowlingPinImage = null;
+        let bowlingMouseImage = null;
+        let bowlingDragging = false;
+        let bowlingDragStartX = 0;
+        let bowlingDragStartY = 0;
+        let bowlingDragCurrentX = 0;
+        let bowlingDragCurrentY = 0;
+        let bowlingBallRestX = 0;
+        let bowlingBallRestY = 0;
+        let bowlingRenderHeight = 0;
+        let bowlingLaneTop = 0;
+        let bowlingLaneBottom = 0;
+        let bowlingLaneLeft = 0;
+        let bowlingLaneRight = 0;
+        let bowlingMouseConfig = [];
+        let bowlingAwardedBonus = false;
+
         let audioCtx = null;
         let soundEnabled = true;
-
 
         function getAudioCtx() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); if (audioCtx.state === "suspended") audioCtx.resume(); return audioCtx; }
         function playTone(freq, duration, type, startDelay, gainValue) {
@@ -496,6 +587,9 @@
             playTone(baseFreq, 0.06, "sine", 0, vol);
             playTone(baseFreq * 1.5, 0.04, "sine", 0, vol * 0.5);
         }
+        function playBowlingRollSound() { if (!soundEnabled) return; playTone(180 + Math.random() * 40, 0.3, "sine", 0, 0.15); }
+        function playPinHitSound() { if (!soundEnabled) return; playTone(800 + Math.random() * 400, 0.08, "triangle", 0, 0.18); playTone(1200 + Math.random() * 300, 0.06, "sine", 0.02, 0.12); }
+        function playStrikeSound() { if (!soundEnabled) return; playTone(523.25, 0.12, "triangle", 0, 0.2); playTone(659.25, 0.12, "triangle", 0.12, 0.2); playTone(783.99, 0.12, "triangle", 0.24, 0.2); playTone(1046.5, 0.3, "triangle", 0.36, 0.25); }
         function toggleSound() { soundEnabled = !soundEnabled; document.getElementById("soundToggleBtn").textContent = soundEnabled ? "🔊 音效" : "🔇 靜音"; }
 
         const groupLists = {
@@ -525,19 +619,37 @@
                 hamsterImageUrl = data.hamsterImageUrl || null;
                 if (document.getElementById("pachinkoSystemArea").style.display !== "none") buildPachinkoBoard();
             });
+            onValue(ref(db, "settings/bowling"), (snap) => {
+                const data = snap.val() || {};
+                bowlingTargetScore = Number(data.targetScore) || 50;
+                bowlingMaxFrames = Number(data.maxFrames) || 4;
+                bowlingBallsPerFrame = Number(data.ballsPerFrame) || 2;
+                bowlingPinCount = Number(data.pinCount) || 10;
+                bowlingBallImageUrl = data.ballImageUrl || null;
+                bowlingPinImageUrl = data.pinImageUrl || null;
+                bowlingMouseImageUrl = data.mouseImageUrl || null;
+                bowlingMouseConfig = Array.isArray(data.mice) ? data.mice.slice() : [];
+                const td = document.getElementById("bowlingTargetDisplay");
+                if (td) td.textContent = bowlingTargetScore;
+                if (document.getElementById("bowlingSystemArea").style.display !== "none") buildBowlingBoard();
+            });
         }
 
         function updateGameModeUI() {
             const drawBtn = document.querySelector(".choice-btn-draw");
             const slotBtn = document.querySelector(".choice-btn-slot");
             const pachinkoBtn = document.querySelector(".choice-btn-pachinko");
+            const bowlingBtn = document.querySelector(".choice-btn-bowling");
             if (!drawBtn || !slotBtn || !pachinkoBtn) return;
-            const showGacha = gameMode === "both" || gameMode === "gacha" || gameMode === "gacha_slot" || gameMode === "gacha_pachinko";
-            const showSlot = gameMode === "both" || gameMode === "slot" || gameMode === "gacha_slot" || gameMode === "slot_pachinko";
-            const showPachinko = gameMode === "both" || gameMode === "pachinko" || gameMode === "gacha_pachinko" || gameMode === "slot_pachinko";
+            const m = gameMode || "both";
+            const showGacha = m === "both" || m.indexOf("gacha") === 0 || m.indexOf("_gacha") > -1;
+            const showSlot = m === "both" || m === "slot" || m.indexOf("slot") > -1;
+            const showPachinko = m === "both" || m === "pachinko" || m.indexOf("pachinko") > -1;
+            const showBowling = m === "both" || m === "bowling" || m.indexOf("bowling") > -1;
             drawBtn.style.display = showGacha ? "flex" : "none";
             slotBtn.style.display = showSlot ? "flex" : "none";
             pachinkoBtn.style.display = showPachinko ? "flex" : "none";
+            if (bowlingBtn) bowlingBtn.style.display = showBowling ? "flex" : "none";
         }
 
         function updateDrawCountDisplay() {
@@ -730,16 +842,25 @@
             } catch (e) { console.error(e); alert("兌換失敗"); }
         };
         function promptAdminMode() { const pwd = prompt("請輸入管理員測試密碼："); if (pwd === ADMIN_TEST_PASSWORD) { isAdminMode = true; alert("✅ 管理員模式已開啟，抽獎無限制。"); } else if (pwd !== null) { alert("❌ 密碼錯誤"); } }
-        function goBack() { document.getElementById("contentArea").classList.add("hidden"); document.getElementById("controlPanel").classList.remove("hidden"); document.getElementById("prizeListPanel").style.display = ""; document.getElementById("honorBoardPanel").style.display = ""; }
-        function showDrawSystem() { document.getElementById("drawSystemArea").style.display = "block"; document.getElementById("slotSystemArea").style.display = "none"; document.getElementById("pointsSystemArea").style.display = "none"; document.getElementById("pachinkoSystemArea").style.display = "none"; document.getElementById("prizeListPanel").style.display = ""; document.getElementById("honorBoardPanel").style.display = ""; updateDrawCountDisplay(); }
-        function showSlotSystem() { document.getElementById("drawSystemArea").style.display = "none"; document.getElementById("slotSystemArea").style.display = "block"; document.getElementById("pointsSystemArea").style.display = "none"; document.getElementById("pachinkoSystemArea").style.display = "none"; document.getElementById("prizeListPanel").style.display = ""; document.getElementById("honorBoardPanel").style.display = ""; updateDrawCountDisplay(); }
-        function showPointsSystem() { document.getElementById("drawSystemArea").style.display = "none"; document.getElementById("slotSystemArea").style.display = "none"; document.getElementById("pachinkoSystemArea").style.display = "none"; document.getElementById("pointsSystemArea").style.display = "block"; document.getElementById("prizeListPanel").style.display = "none"; document.getElementById("honorBoardPanel").style.display = "none"; }
+        function goBack() { document.getElementById("contentArea").classList.add("hidden"); document.getElementById("controlPanel").classList.remove("hidden"); document.getElementById("prizeListPanel").style.display = ""; document.getElementById("honorBoardPanel").style.display = ""; if (bowlingCheckIntervalId) { clearInterval(bowlingCheckIntervalId); bowlingCheckIntervalId = null; } }
+        function showDrawSystem() { document.getElementById("drawSystemArea").style.display = "block"; document.getElementById("slotSystemArea").style.display = "none"; document.getElementById("pointsSystemArea").style.display = "none"; document.getElementById("pachinkoSystemArea").style.display = "none"; document.getElementById("bowlingSystemArea").style.display = "none"; document.getElementById("prizeListPanel").style.display = ""; document.getElementById("honorBoardPanel").style.display = ""; updateDrawCountDisplay(); }
+        function showSlotSystem() { document.getElementById("drawSystemArea").style.display = "none"; document.getElementById("slotSystemArea").style.display = "block"; document.getElementById("pointsSystemArea").style.display = "none"; document.getElementById("pachinkoSystemArea").style.display = "none"; document.getElementById("bowlingSystemArea").style.display = "none"; document.getElementById("prizeListPanel").style.display = ""; document.getElementById("honorBoardPanel").style.display = ""; updateDrawCountDisplay(); }
+        function showPointsSystem() { document.getElementById("drawSystemArea").style.display = "none"; document.getElementById("slotSystemArea").style.display = "none"; document.getElementById("pachinkoSystemArea").style.display = "none"; document.getElementById("bowlingSystemArea").style.display = "none"; document.getElementById("pointsSystemArea").style.display = "block"; document.getElementById("prizeListPanel").style.display = "none"; document.getElementById("honorBoardPanel").style.display = "none"; }
         function showPachinkoSystem() {
             document.getElementById("drawSystemArea").style.display = "none"; document.getElementById("slotSystemArea").style.display = "none";
             document.getElementById("pointsSystemArea").style.display = "none"; document.getElementById("pachinkoSystemArea").style.display = "block";
+            document.getElementById("bowlingSystemArea").style.display = "none";
             document.getElementById("prizeListPanel").style.display = ""; document.getElementById("honorBoardPanel").style.display = "";
             updateDrawCountDisplay();
             setTimeout(() => { buildPachinkoBoard(); }, 100);
+        }
+        function showBowlingSystem() {
+            document.getElementById("drawSystemArea").style.display = "none"; document.getElementById("slotSystemArea").style.display = "none";
+            document.getElementById("pointsSystemArea").style.display = "none"; document.getElementById("pachinkoSystemArea").style.display = "none";
+            document.getElementById("bowlingSystemArea").style.display = "block";
+            document.getElementById("prizeListPanel").style.display = ""; document.getElementById("honorBoardPanel").style.display = "";
+            updateDrawCountDisplay();
+            setTimeout(() => { buildBowlingBoard(); }, 100);
         }
         function showChoiceModal(playerName) { document.getElementById("choicePlayerName").innerText = playerName; document.getElementById("choiceModal").style.display = "flex"; updateGameModeUI(); }
         function closeChoiceModal() { document.getElementById("choiceModal").style.display = "none"; }
@@ -755,6 +876,7 @@
         }
         function chooseSlot() { closeChoiceModal(); showSlotSystem(); }
         function choosePachinko() { closeChoiceModal(); showPachinkoSystem(); }
+        function chooseBowling() { closeChoiceModal(); showBowlingSystem(); }
         function choosePoints() { closeChoiceModal(); showPointsSystem(); }
         function handleNameChange() {
             const val = document.getElementById("playerName").value;
@@ -768,6 +890,7 @@
             listenToWallet(val); showChoiceModal(val);
             if (gameMode === "slot") { showSlotSystem(); }
             else if (gameMode === "pachinko") { showPachinkoSystem(); }
+            else if (gameMode === "bowling") { showBowlingSystem(); }
             else {
                 showDrawSystem();
                 const drawCount = globalPlayedUsers[val]?.drawCount || 0;
@@ -1080,8 +1203,7 @@
             finally { isSlotSpinning = false; const lever = document.getElementById("slotLever"); if (lever) lever.style.pointerEvents = 'auto'; }
         }
 
-
-        // ---------- 彈珠台核心（自適應寬度 + 高解析度 + 倉鼠） ----------
+        // ---------- 彈珠台核心 ----------
         function drawGlassBall(ctx, x, y, r) {
             const grad = ctx.createRadialGradient(x - r * 0.35, y - r * 0.35, r * 0.05, x, y, r);
             grad.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
@@ -1138,14 +1260,10 @@
             const bob = Math.sin(bobPhase) * r * 0.15;
             ctx.save();
             ctx.translate(0, bob);
-
-            // 陰影
             ctx.beginPath();
             ctx.ellipse(0, r * 0.75, r * 0.9, r * 0.25, 0, 0, Math.PI * 2);
             ctx.fillStyle = 'rgba(0,0,0,0.4)';
             ctx.fill();
-
-            // 身體
             const bodyGrad = ctx.createRadialGradient(-r * 0.3, -r * 0.3, r * 0.1, 0, 0, r);
             bodyGrad.addColorStop(0, '#fff5e0');
             bodyGrad.addColorStop(0.55, '#f5c97a');
@@ -1157,8 +1275,6 @@
             ctx.strokeStyle = 'rgba(80,40,0,0.55)';
             ctx.lineWidth = 1;
             ctx.stroke();
-
-            // 耳朵
             ctx.beginPath();
             ctx.arc(-r * 0.55, -r * 0.55, r * 0.26, 0, Math.PI * 2);
             ctx.fillStyle = '#f5c97a'; ctx.fill();
@@ -1173,8 +1289,6 @@
             ctx.beginPath();
             ctx.arc(r * 0.55, -r * 0.55, r * 0.13, 0, Math.PI * 2);
             ctx.fillStyle = '#ff90a0'; ctx.fill();
-
-            // 眼睛
             ctx.beginPath(); ctx.arc(-r * 0.3, -r * 0.1, r * 0.13, 0, Math.PI * 2);
             ctx.fillStyle = '#000'; ctx.fill();
             ctx.beginPath(); ctx.arc(r * 0.3, -r * 0.1, r * 0.13, 0, Math.PI * 2);
@@ -1183,31 +1297,22 @@
             ctx.fillStyle = '#fff'; ctx.fill();
             ctx.beginPath(); ctx.arc(r * 0.33, -r * 0.14, r * 0.045, 0, Math.PI * 2);
             ctx.fillStyle = '#fff'; ctx.fill();
-
-            // 鼻子
             ctx.beginPath(); ctx.arc(0, r * 0.15, r * 0.09, 0, Math.PI * 2);
             ctx.fillStyle = '#7a3020'; ctx.fill();
-
-            // 腮紅
             ctx.beginPath(); ctx.arc(-r * 0.55, r * 0.18, r * 0.15, 0, Math.PI * 2);
             ctx.fillStyle = 'rgba(255,150,150,0.7)'; ctx.fill();
             ctx.beginPath(); ctx.arc(r * 0.55, r * 0.18, r * 0.15, 0, Math.PI * 2);
             ctx.fillStyle = 'rgba(255,150,150,0.7)'; ctx.fill();
-
             ctx.restore();
         }
         function drawPortalLocal(ctx, r, phase) {
             const t = performance.now() * 0.004 + phase;
-
-            // 外光暈
             const glow = ctx.createRadialGradient(0, 0, 0, 0, 0, r * 1.6);
             glow.addColorStop(0, 'rgba(200,130,255,0.85)');
             glow.addColorStop(0.4, 'rgba(140,80,230,0.55)');
             glow.addColorStop(1, 'rgba(120,60,220,0)');
             ctx.fillStyle = glow;
             ctx.beginPath(); ctx.arc(0, 0, r * 1.6, 0, Math.PI * 2); ctx.fill();
-
-            // 底盤
             const base = ctx.createRadialGradient(-r * 0.3, -r * 0.3, r * 0.1, 0, 0, r);
             base.addColorStop(0, '#e0c0ff');
             base.addColorStop(0.5, '#9b5de5');
@@ -1215,8 +1320,6 @@
             ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2);
             ctx.fillStyle = base; ctx.fill();
             ctx.strokeStyle = 'rgba(255,255,255,0.7)'; ctx.lineWidth = 2; ctx.stroke();
-
-            // 漩渦環
             for (let i = 0; i < 3; i++) {
                 const rr = r * (0.35 + i * 0.22);
                 const alpha = 0.85 - i * 0.2;
@@ -1226,42 +1329,11 @@
                 ctx.lineWidth = 2.5;
                 ctx.stroke();
             }
-
-            // 中心亮點
             const cg = ctx.createRadialGradient(0, 0, 0, 0, 0, r * 0.3);
             cg.addColorStop(0, '#ffffff');
             cg.addColorStop(1, 'rgba(180,100,255,0.6)');
             ctx.beginPath(); ctx.arc(0, 0, r * 0.3, 0, Math.PI * 2);
             ctx.fillStyle = cg; ctx.fill();
-        }
-
-        function updatePortals() {
-            if (!pachinkoBall || pachinkoBall.isStatic) return;
-            if (Date.now() < portalCooldownUntil) return;
-            const pos = pachinkoBall.position;
-            for (const p of portals) {
-                const da = Math.hypot(pos.x - p.ax, pos.y - p.ay);
-                if (da < p.radius * 0.7) {
-                    teleportBall(p.bx, p.by);
-                    return;
-                }
-                const db = Math.hypot(pos.x - p.bx, pos.y - p.by);
-                if (db < p.radius * 0.7) {
-                    teleportBall(p.ax, p.ay);
-                    return;
-                }
-            }
-        }
-
-        function teleportBall(tx, ty) {
-            portalCooldownUntil = Date.now() + 500;
-            const oldPos = { x: pachinkoBall.position.x, y: pachinkoBall.position.y };
-            const nowMs = performance.now();
-            portalFlashes.push({ x: oldPos.x, y: oldPos.y, startTime: nowMs, maxAge: 500 });
-            portalFlashes.push({ x: tx, y: ty, startTime: nowMs, maxAge: 500 });
-            Matter.Body.setPosition(pachinkoBall, { x: tx, y: ty });
-            Matter.Body.setVelocity(pachinkoBall, { x: (Math.random() - 0.5) * 3, y: 2 + Math.random() * 2 });
-            playPachinkoSound();
         }
         function drawSpring(ctx, cx, topY, bottomY, radius, turns) {
             ctx.save(); ctx.strokeStyle = '#c0c0c0'; ctx.lineWidth = 2.5; ctx.lineCap = 'round';
@@ -1316,15 +1388,12 @@
 
         function drawPachinkoSceneStatic(cctx, renderWidth, renderHeight, pegs, springInfo, railLeft, railRight, railTop, railBottom, arcCx, arcCy, arcR, leftWallX, leftWallTop, leftWallBottom) {
             const wallT = Math.max(10, Math.round(renderWidth * 0.042));
-
             const bg = cctx.createLinearGradient(0, 0, 0, renderHeight);
             bg.addColorStop(0, '#0a1226'); bg.addColorStop(1, '#03050a');
             cctx.fillStyle = bg; cctx.fillRect(0, 0, renderWidth, renderHeight);
-
             const playBg = cctx.createRadialGradient(renderWidth * 0.4, renderHeight * 0.4, 30, renderWidth * 0.4, renderHeight * 0.4, renderHeight * 0.75);
             playBg.addColorStop(0, 'rgba(40,80,160,0.35)'); playBg.addColorStop(1, 'rgba(0,0,0,0)');
             cctx.fillStyle = playBg; cctx.fillRect(20, 20, renderWidth - 40, renderHeight - 40);
-
             cctx.fillStyle = 'rgba(200,220,255,0.4)';
             for (let i = 0; i < 60; i++) {
                 const x = 25 + Math.random() * (renderWidth - 50);
@@ -1332,7 +1401,6 @@
                 const rr = Math.random() * 1.4 + 0.2;
                 cctx.beginPath(); cctx.arc(x, y, rr, 0, Math.PI * 2); cctx.fill();
             }
-
             const goldGrad = cctx.createLinearGradient(0, 0, renderWidth, renderHeight);
             goldGrad.addColorStop(0, '#f6e27a'); goldGrad.addColorStop(0.4, '#d4af37'); goldGrad.addColorStop(0.7, '#b8860b'); goldGrad.addColorStop(1, '#8b6914');
             cctx.fillStyle = goldGrad;
@@ -1340,20 +1408,15 @@
             cctx.fillRect(0, 0, 20, renderHeight); cctx.fillRect(renderWidth - 20, 0, 20, renderHeight);
             cctx.strokeStyle = 'rgba(0,0,0,0.7)'; cctx.lineWidth = 3; cctx.strokeRect(21.5, 21.5, renderWidth - 43, renderHeight - 43);
             cctx.strokeStyle = 'rgba(255,255,255,0.35)'; cctx.lineWidth = 1; cctx.strokeRect(20.5, 20.5, renderWidth - 41, renderHeight - 41);
-
             for (let x = 40; x < renderWidth - 30; x += 42) { drawBulb(cctx, x, 10, 3.5); drawBulb(cctx, x, renderHeight - 10, 3.5); }
             for (let y = 42; y < renderHeight - 30; y += 42) { drawBulb(cctx, 10, y, 3.5); drawBulb(cctx, renderWidth - 10, y, 3.5); }
-
             const woodGrad = cctx.createLinearGradient(0, 0, renderWidth, renderHeight);
             woodGrad.addColorStop(0, '#e0a866'); woodGrad.addColorStop(0.5, '#c07830'); woodGrad.addColorStop(1, '#8b4513');
-
             const topY = arcCy - arcR;
             const topLeftCornerCx = leftWallX + arcR;
             const topRightCornerCx = railRight - arcR;
-
             cctx.save();
             cctx.lineCap = 'butt'; cctx.lineJoin = 'round';
-
             function drawTopFrame(style, lineWidth) {
                 cctx.strokeStyle = style;
                 cctx.lineWidth = lineWidth;
@@ -1364,11 +1427,9 @@
                 cctx.arc(topRightCornerCx, arcCy, arcR, Math.PI * 1.5, Math.PI * 2);
                 cctx.stroke();
             }
-
             drawTopFrame('rgba(0,0,0,0.6)', wallT + 4);
             drawTopFrame('rgba(255, 220, 100, 0.25)', wallT + 10);
             drawTopFrame(woodGrad, wallT);
-
             cctx.strokeStyle = 'rgba(255,220,160,0.5)'; cctx.lineWidth = 2;
             cctx.beginPath();
             cctx.moveTo(leftWallX, arcCy);
@@ -1377,25 +1438,20 @@
             cctx.arc(topRightCornerCx, arcCy, arcR - 3, Math.PI * 1.5, Math.PI * 2);
             cctx.stroke();
             cctx.restore();
-
             cctx.fillStyle = woodGrad;
             cctx.fillRect(leftWallX - wallT / 2, leftWallTop, wallT, leftWallBottom - leftWallTop);
             cctx.fillStyle = 'rgba(255,220,160,0.6)'; cctx.fillRect(leftWallX - wallT / 2 + 1, leftWallTop, 3, leftWallBottom - leftWallTop);
             cctx.fillStyle = 'rgba(0,0,0,0.4)'; cctx.fillRect(leftWallX + wallT / 2 - 4, leftWallTop, 3, leftWallBottom - leftWallTop);
-
             cctx.fillStyle = woodGrad;
             cctx.fillRect(railRight - wallT / 2, leftWallTop, wallT, railBottom - leftWallTop);
             cctx.fillStyle = 'rgba(255,220,160,0.6)'; cctx.fillRect(railRight - wallT / 2 + 1, leftWallTop, 3, railBottom - leftWallTop);
             cctx.fillStyle = 'rgba(0,0,0,0.4)'; cctx.fillRect(railRight + wallT / 2 - 4, leftWallTop, 3, railBottom - leftWallTop);
-
             cctx.fillStyle = woodGrad;
             cctx.fillRect(railLeft - wallT / 2, railTop, wallT, railBottom - railTop);
             cctx.fillStyle = 'rgba(255,220,160,0.6)'; cctx.fillRect(railLeft - wallT / 2 + 1, railTop, 3, railBottom - railTop);
             cctx.fillStyle = 'rgba(0,0,0,0.4)'; cctx.fillRect(railLeft + wallT / 2 - 4, railTop, 3, railBottom - railTop);
-
             drawSpring(cctx, springInfo.x, springInfo.topY, springInfo.bottomY, 9, 4.5);
             drawLeverKnob(cctx, springInfo.x, springInfo.leverY);
-
             for (const p of pegs) {
                 if (p.isWindmill) continue;
                 if (p.isRedPin) drawRedBouncyPin(cctx, p.x, p.y, p.r);
@@ -1407,30 +1463,23 @@
             if (typeof Matter === 'undefined') { console.error("Matter.js 尚未載入"); return; }
             const container = document.getElementById("pachinkoContainer"); if (!container) return;
             container.innerHTML = "";
-
             if (pachinkoRenderLoopId) { cancelAnimationFrame(pachinkoRenderLoopId); pachinkoRenderLoopId = null; }
             if (pachinkoPhysicsLoopId) { cancelAnimationFrame(pachinkoPhysicsLoopId); pachinkoPhysicsLoopId = null; }
             if (pachinkoCheckIntervalId) { clearInterval(pachinkoCheckIntervalId); pachinkoCheckIntervalId = null; }
             if (pachinkoEngine) { Matter.Engine.clear(pachinkoEngine); pachinkoEngine = null; }
             pachinkoBall = null;
             pachinkoBallDropped = false;
-
             const Engine = Matter.Engine, Bodies = Matter.Bodies, Composite = Matter.Composite, Events = Matter.Events, Body = Matter.Body, Constraint = Matter.Constraint;
-
             pachinkoEngine = Engine.create();
             pachinkoEngine.gravity.y = 0.55;
             pachinkoEngine.positionIterations = 20;
             pachinkoEngine.velocityIterations = 20;
             pachinkoEngine.constraintIterations = 4;
-
             let renderWidth = container.clientWidth || 328;
             if (renderWidth < 260) renderWidth = 260;
             if (renderWidth > 420) renderWidth = 420;
             const renderHeight = Math.round(renderWidth * 1.45);
-
-            // DPR 高解析度
             const dpr = Math.min(window.devicePixelRatio || 1, 2);
-
             const canvas = document.createElement("canvas");
             canvas.width = Math.round(renderWidth * dpr);
             canvas.height = Math.round(renderHeight * dpr);
@@ -1443,43 +1492,34 @@
             ctx2d.scale(dpr, dpr);
             pachinkoRender = { options: { width: renderWidth, height: renderHeight }, canvas: canvas };
             pachinkoRenderHeight = renderHeight;
-
             const inv = { visible: false };
             const FRAME = 20;
-
             const playLeft = FRAME;
             const playRight = renderWidth - FRAME;
             const playTop = FRAME;
             const playBottom = renderHeight - FRAME;
-
             Composite.add(pachinkoEngine.world, [
                 Bodies.rectangle(playLeft - 40, renderHeight / 2, 80, renderHeight * 3, { isStatic: true, render: inv, restitution: 0.1, friction: 0 }),
                 Bodies.rectangle(playRight + 40, renderHeight / 2, 80, renderHeight * 3, { isStatic: true, render: inv, restitution: 0.1, friction: 0 }),
                 Bodies.rectangle(renderWidth / 2, playTop - 40, renderWidth * 3, 80, { isStatic: true, render: inv, restitution: 0.1, friction: 0 }),
                 Bodies.rectangle(renderWidth / 2, playBottom + 40, renderWidth * 3, 80, { isStatic: true, render: inv, restitution: 0.1, friction: 0 })
             ]);
-
             const wallT = Math.max(10, Math.round(renderWidth * 0.042));
-
             const arcLeftEndX = playLeft + 4;
             const arcRightEndX = playRight - 4;
             const arcCx = (arcLeftEndX + arcRightEndX) / 2;
             const cornerRadius = Math.round(renderWidth * 0.14);
             const arcR = cornerRadius;
             const arcCy = playTop + wallT / 2 + cornerRadius;
-
             const leftWallX = arcLeftEndX;
             const leftWallTop = arcCy;
             const leftWallBottom = Math.round(renderHeight * 0.89);
-
             const rightWallX = arcRightEndX;
             const rightWallBottom = Math.round(renderHeight * 0.89);
-
             const railInnerWidth = Math.max(22, Math.round(renderWidth * 0.075));
             const innerRailX = rightWallX - wallT / 2 - railInnerWidth - wallT / 2;
             const innerRailTop = arcCy + Math.round(renderHeight * 0.04);
             const innerRailBottom = rightWallBottom;
-
             const ballRestX = (innerRailX + rightWallX) / 2;
             const ballRestY = rightWallBottom - 10;
             const springX = ballRestX;
@@ -1489,7 +1529,6 @@
             pachinkoBallRestX = ballRestX;
             pachinkoBallRestY = ballRestY;
             pachinkoRailLeftX = innerRailX;
-
             const topLeftCornerCx = arcLeftEndX + cornerRadius;
             const topRightCornerCx = arcRightEndX - cornerRadius;
             buildArcWallByCircle(pachinkoEngine, topLeftCornerCx, arcCy, cornerRadius, Math.PI, Math.PI * 1.5, wallT + 4, 16);
@@ -1499,61 +1538,36 @@
                 arcRightEndX - arcLeftEndX - cornerRadius * 2, wallT + 4,
                 { isStatic: true, render: inv, restitution: 0.1, friction: 0 }
             ));
-
             Composite.add(pachinkoEngine.world, Bodies.rectangle(
                 leftWallX, (leftWallTop + leftWallBottom) / 2, wallT, leftWallBottom - leftWallTop,
                 { isStatic: true, render: inv, restitution: 0.1, friction: 0, slop: 0.02 }
             ));
-
             Composite.add(pachinkoEngine.world, Bodies.rectangle(
                 rightWallX, (leftWallTop + rightWallBottom) / 2, wallT, rightWallBottom - leftWallTop,
                 { isStatic: true, render: inv, restitution: 0.1, friction: 0, slop: 0.02 }
             ));
-
             Composite.add(pachinkoEngine.world, Bodies.rectangle(
                 innerRailX, (innerRailTop + innerRailBottom) / 2, wallT, innerRailBottom - innerRailTop,
                 { isStatic: true, render: inv, restitution: 0.1, friction: 0, slop: 0.02 }
             ));
-
             Composite.add(pachinkoEngine.world, Bodies.rectangle(
                 ballRestX, ballRestY + 12, railInnerWidth, 10,
                 { isStatic: true, render: inv, restitution: 0.1 }
             ));
-
-            // ===== 釘子、紅球、風車 =====
             const pegRadius = Math.max(3, Math.round(renderWidth * 0.013));
             const redPinRadius = Math.max(8, Math.round(renderWidth * 0.030));
             const BALL_RADIUS = Math.max(5, Math.round(renderWidth * 0.021));
             pachinkoBallRadius = BALL_RADIUS;
             const pegs = [];
-
-            // ★ 第一/最後一列釘子緊貼牆邊，球貼牆撞到釘子「外側」會被推離牆面
             const areaLeft = leftWallX + wallT / 2 + pegRadius + 2;
             const areaRight = innerRailX - wallT / 2 - pegRadius - 2;
             const areaTop = arcCy + Math.round(renderHeight * 0.05);
             const areaBottom = Math.round(renderHeight * 0.74);
-            // ★ 密度調整：底下留空間給球滾
             const pegCols = 8;
             const pegRows = 12;
             const dx = (areaRight - areaLeft) / (pegCols - 1);
             const dy = (areaBottom - areaTop) / (pegRows - 1);
-            // ★ 傳送門初始化（固定位置，一對）
-            portals = [];
-            portalFlashes = [];
-            portalCooldownUntil = 0;
-            {
-                const pr = Math.round(renderWidth * 0.055);
-                portals = [
-                    // 中左 ↔ 中右（水平傳送）
-                    {
-                        ax: areaLeft + dx * 0.5, ay: areaTop + dy * 5.0,
-                        bx: areaLeft + dx * 6.5, by: areaTop + dy * 5.0,
-                        radius: pr, phase: 0
-                    }
-                ];
-            }
 
-            // ★ 載入自訂倉鼠圖片（沒設定則用預設繪圖）
             hamsterImage = null;
             if (hamsterImageUrl) {
                 const img = new Image();
@@ -1562,10 +1576,7 @@
                 img.onerror = () => { console.warn("倉鼠圖片載入失敗，使用預設繪圖"); hamsterImage = null; };
                 img.src = hamsterImageUrl;
             }
-
-            // ★ 倉鼠初始化（只有設定 hamsterPrizeId 時才會出現）
             hamsterCaught = false;
-            // 倉鼠活動區：比釘子區更寬，涵蓋拱橋下方到獎池上方
             hamsterArea = {
                 left: leftWallX + wallT,
                 right: innerRailX - wallT,
@@ -1573,14 +1584,14 @@
                 bottom: Math.round(renderHeight * 0.78)
             };
             if (hamsterPrizeId && lastPrizes && lastPrizes[hamsterPrizeId]) {
-                const hr = Math.max(11, Math.round(renderWidth * 0.06));
+                const hr = Math.max(11, Math.round(renderWidth * 0.038));
                 hamster = {
                     x: areaLeft + (areaRight - areaLeft) * 0.5,
                     y: areaTop + (areaBottom - areaTop) * 0.5,
                     radius: hr,
                     targetX: areaLeft + (areaRight - areaLeft) * 0.5,
                     targetY: areaTop + (areaBottom - areaTop) * 0.5,
-                    speed: Math.max(0.5, renderWidth * 0.005),
+                    speed: Math.max(0.5, renderWidth * 0.0022),
                     bobPhase: 0
                 };
                 pickHamsterTarget();
@@ -1588,7 +1599,20 @@
                 hamster = null;
             }
 
-            // ★ 障礙物位置配合新密度
+            portals = [];
+            portalFlashes = [];
+            portalCooldownUntil = 0;
+            {
+                const pr = Math.round(renderWidth * 0.055);
+                portals = [
+                    {
+                        ax: areaLeft + dx * 0.5, ay: areaTop + dy * 5.0,
+                        bx: areaLeft + dx * 6.5, by: areaTop + dy * 5.0,
+                        radius: pr, phase: 0
+                    }
+                ];
+            }
+
             const redPins = [
                 { x: areaLeft + dx * 2.5, y: areaTop + dy * 3.0, r: redPinRadius },
                 { x: areaLeft + dx * 5.5, y: areaTop + dy * 7.5, r: redPinRadius }
@@ -1599,7 +1623,6 @@
                 { x: areaLeft + dx * 4.0, y: areaTop + dy * 9.5, r: Math.round(renderWidth * 0.045) }
             ];
 
-            // ★ 障礙物淨空（配合新密度）
             function isNearObstacle(x, y) {
                 for (const w of windmills) {
                     const need = w.r * 1.7 + pegRadius + BALL_RADIUS + 6;
@@ -1631,15 +1654,12 @@
                     pegs.push({ x, y, r: pegRadius, isWindmill: false, isRedPin: false });
                 }
             }
-
             for (const rp of redPins) {
                 Composite.add(pachinkoEngine.world, Bodies.circle(rp.x, rp.y, rp.r, {
                     isStatic: true, restitution: 0.95, friction: 0, frictionStatic: 0, slop: 0.01, render: inv, label: 'redpin'
                 }));
                 pegs.push({ x: rp.x, y: rp.y, r: rp.r, isWindmill: false, isRedPin: true });
             }
-
-            // ★ 風車：持續旋轉
             const windmillBodies = [];
             for (let wi = 0; wi < windmills.length; wi++) {
                 const w = windmills[wi];
@@ -1667,7 +1687,6 @@
                 pegs.push({ x: w.x, y: w.y, r: w.r, isWindmill: true, isRedPin: false });
             }
 
-            // 碰撞事件
             let lastPegSoundTime = 0;
             Events.on(pachinkoEngine, 'collisionStart', (event) => {
                 if (!pachinkoBall) return;
@@ -1678,7 +1697,6 @@
                     if (bodyA === pachinkoBall) other = bodyB;
                     else if (bodyB === pachinkoBall) other = bodyA;
                     else continue;
-
                     if (other.label === 'windmill') {
                         const v = pachinkoBall.velocity; const speed = Math.hypot(v.x, v.y);
                         if (speed < 1.5) continue;
@@ -1704,7 +1722,6 @@
                 }
             });
 
-            // 邊界軟約束
             Events.on(pachinkoEngine, 'beforeUpdate', () => {
                 if (!pachinkoBall || pachinkoBall.isStatic) return;
                 const pos = pachinkoBall.position; const r = pachinkoBallRadius;
@@ -1724,20 +1741,17 @@
                 }
             });
 
-            // 預備彈珠
             pachinkoBall = Bodies.circle(ballRestX, ballRestY, BALL_RADIUS, {
                 isStatic: true, restitution: 0.4, friction: 0.001, frictionAir: 0.0018, density: 0.002, slop: 0.01, render: inv
             });
             Composite.add(pachinkoEngine.world, pachinkoBall);
 
-            // ===== 獎池 =====
             pachinkoBins = []; pachinkoPrizeMap = {};
             const binTopY = Math.round(renderHeight * 0.79);
             const binBottomY = rightWallBottom;
             const binAreaLeft = leftWallX + wallT / 2;
             const binAreaRight = innerRailX - wallT / 2;
             const binAreaWidth = binAreaRight - binAreaLeft;
-
             let binPrizes = [];
             const useBinLayout = Array.isArray(pachinkoBinLayout) && pachinkoBinLayout.length > 0;
             if (useBinLayout) {
@@ -1758,7 +1772,6 @@
                 binPrizes = prizes;
                 if (prizes.length > pachinkoBinCount) binPrizes = prizes.slice(0, pachinkoBinCount);
             }
-
             if (binPrizes.length > 0) {
                 const binCount = binPrizes.length;
                 const binWidth = binAreaWidth / binCount;
@@ -1773,7 +1786,6 @@
                 Composite.add(pachinkoEngine.world, Bodies.rectangle((binAreaLeft + binAreaRight) / 2, binBottomY + 4, binAreaWidth + 20, 12, { isStatic: true, render: inv, friction: 0.1 }));
             }
 
-            // ===== 靜態場景 =====
             const bgCanvas = document.createElement('canvas');
             bgCanvas.width = Math.round(renderWidth * dpr);
             bgCanvas.height = Math.round(renderHeight * dpr);
@@ -1790,7 +1802,6 @@
             ];
             const prizeColorMap = {}; let colorIdx = 0;
             for (const bin of pachinkoBins) { if (!prizeColorMap[bin.prizeId]) { prizeColorMap[bin.prizeId] = binColors[colorIdx % binColors.length]; colorIdx++; } }
-
             for (let i = 0; i < pachinkoBins.length; i++) {
                 const bin = pachinkoBins[i];
                 const left = bin.x - bin.width / 2 + 4;
@@ -1806,7 +1817,6 @@
                 const hl = bctx.createLinearGradient(left, top, left, top + h * 0.4);
                 hl.addColorStop(0, 'rgba(255,255,255,0.5)'); hl.addColorStop(1, 'rgba(255,255,255,0)');
                 bctx.fillStyle = hl; bctx.fillRect(left, top, w, h * 0.4);
-
                 const nm = bin.prizeData.name || bin.prizeId;
                 const maxChars = Math.min(nm.length, 4);
                 const sn = nm.slice(0, maxChars);
@@ -1822,7 +1832,6 @@
                 for (let ci = 0; ci < sn.length; ci++) { bctx.fillText(sn[ci], bin.x, startY + ci * charSpace); }
                 bctx.shadowBlur = 0; bctx.shadowOffsetY = 0;
             }
-
             if (pachinkoBins.length > 0) {
                 bctx.fillStyle = '#8b4513';
                 bctx.fillRect(binAreaLeft - 3, binTopY, 6, binBottomY - binTopY);
@@ -1833,12 +1842,9 @@
                 bctx.fillRect(20, binBottomY, renderWidth - 40, renderHeight - 20 - binBottomY);
             }
 
-            // render loop
             function renderLoop() {
                 ctx2d.clearRect(0, 0, renderWidth, renderHeight);
                 ctx2d.drawImage(bgCanvas, 0, 0, renderWidth, renderHeight);
-
-                // ★ 傳送門
                 for (const p of portals) {
                     ctx2d.save();
                     ctx2d.translate(p.ax, p.ay);
@@ -1849,8 +1855,6 @@
                     drawPortalLocal(ctx2d, p.radius, p.phase + Math.PI);
                     ctx2d.restore();
                 }
-
-                // ★ 傳送門閃光
                 const nowMs = performance.now();
                 for (let i = portalFlashes.length - 1; i >= 0; i--) {
                     const fl = portalFlashes[i];
@@ -1869,7 +1873,6 @@
                     ctx2d.beginPath(); ctx2d.arc(fl.x, fl.y, r, 0, Math.PI * 2); ctx2d.fill();
                     ctx2d.restore();
                 }
-
                 for (const wm of windmillBodies) {
                     ctx2d.save();
                     ctx2d.translate(wm.body.position.x, wm.body.position.y);
@@ -1877,7 +1880,6 @@
                     drawWindmillLocal(ctx2d, wm.r);
                     ctx2d.restore();
                 }
-                // ★ 倉鼠（優先畫自訂圖片，沒圖才畫預設）
                 if (hamster && !hamsterCaught) {
                     ctx2d.save();
                     ctx2d.translate(hamster.x, hamster.y);
@@ -1896,7 +1898,6 @@
             }
             renderLoop();
 
-            // 物理迴圈
             let lastPhysTime = performance.now();
             function physicsLoop(now) {
                 const dt = Math.min(now - lastPhysTime, 33);
@@ -1908,16 +1909,13 @@
                     }
                     Engine.update(pachinkoEngine, dt / sub);
                 }
-                // ★ 更新倉鼠
                 updateHamster();
-                // ★ 更新傳送門
                 updatePortals();
                 pachinkoPhysicsLoopId = requestAnimationFrame(physicsLoop);
             }
             pachinkoPhysicsLoopId = requestAnimationFrame(physicsLoop);
         }
 
-        // ---------- 倉鼠邏輯 ----------
         function pickHamsterTarget() {
             if (!hamster || !hamsterArea) return;
             const pad = hamster.radius * 1.2;
@@ -1926,7 +1924,6 @@
             hamster.targetX = hamsterArea.left + pad + Math.random() * w;
             hamster.targetY = hamsterArea.top + pad + Math.random() * h;
         }
-
         function updateHamster() {
             if (!hamster || hamsterCaught) return;
             const dx = hamster.targetX - hamster.x;
@@ -1940,8 +1937,6 @@
                 hamster.y += ny * hamster.speed;
             }
             hamster.bobPhase += 0.12;
-
-            // 偵測彈珠碰撞
             if (pachinkoBall && !pachinkoBall.isStatic && !hamsterCaught) {
                 const pdx = pachinkoBall.position.x - hamster.x;
                 const pdy = pachinkoBall.position.y - hamster.y;
@@ -1952,18 +1947,15 @@
                 }
             }
         }
-
         async function triggerHamsterPrize() {
             if (!hamsterPrizeId) return;
             const prizeData = lastPrizes?.[hamsterPrizeId];
             if (!prizeData) { console.warn("倉鼠獎品不存在"); return; }
-
             if (pachinkoBall) Matter.Body.setStatic(pachinkoBall, true);
             if (pachinkoCheckIntervalId) {
                 clearInterval(pachinkoCheckIntervalId);
                 pachinkoCheckIntervalId = null;
             }
-
             try {
                 const qRef = ref(db, `prizes/${hamsterPrizeId}/quantity`);
                 const tx = await runTransaction(qRef, cur => (cur === null || cur <= 0) ? undefined : cur - 1);
@@ -1980,7 +1972,6 @@
                             if (av.length) code = av[0];
                         }
                     } catch (e) {}
-
                     let awardedPoints = 0;
                     const minP = Number(prizeData.minPoints);
                     const maxP = Number(prizeData.maxPoints);
@@ -1992,16 +1983,15 @@
                         } catch (e) {}
                         code = "點數已自動匯入你的錢包";
                     }
-
                     await push(ref(db, `drawRecords/${currentPlayerName}`), {
                         type: "pachinko-hamster",
-                        won: `🐹 因為你打中呆呆，所以只能得到：${prizeData.name}`,
+                        won: `🐹 倉鼠大放送：${prizeData.name}`,
                         code: code,
                         time: Date.now(),
                         group: honorUnlockedGroup,
                         showOnBoard: true
                     });
-                    showSlotWinModal(`🐹 因為你打中呆呆，所以只能得到：${prizeData.name}`, code, awardedPoints);
+                    showSlotWinModal(`🐹 倉鼠大放送：${prizeData.name}`, code, awardedPoints);
                 }
             } catch (e) {
                 console.error("倉鼠獎處理失敗", e);
@@ -2018,8 +2008,34 @@
                 }, 100);
             }
         }
+        function updatePortals() {
+            if (!pachinkoBall || pachinkoBall.isStatic) return;
+            if (Date.now() < portalCooldownUntil) return;
+            const pos = pachinkoBall.position;
+            for (const p of portals) {
+                const da = Math.hypot(pos.x - p.ax, pos.y - p.ay);
+                if (da < p.radius * 0.7) {
+                    teleportBall(p.bx, p.by);
+                    return;
+                }
+                const db2 = Math.hypot(pos.x - p.bx, pos.y - p.by);
+                if (db2 < p.radius * 0.7) {
+                    teleportBall(p.ax, p.ay);
+                    return;
+                }
+            }
+        }
+        function teleportBall(tx, ty) {
+            portalCooldownUntil = Date.now() + 500;
+            const oldPos = { x: pachinkoBall.position.x, y: pachinkoBall.position.y };
+            const nowMs = performance.now();
+            portalFlashes.push({ x: oldPos.x, y: oldPos.y, startTime: nowMs, maxAge: 500 });
+            portalFlashes.push({ x: tx, y: ty, startTime: nowMs, maxAge: 500 });
+            Matter.Body.setPosition(pachinkoBall, { x: tx, y: ty });
+            Matter.Body.setVelocity(pachinkoBall, { x: (Math.random() - 0.5) * 3, y: 2 + Math.random() * 2 });
+            playPachinkoSound();
+        }
 
-        // ---------- 拉桿 ----------
         let leverDragging = false, leverStartClientY = 0, leverStartTop = 6, leverCurrentOffset = 0;
         function getPointerClientY(e) { if (e.touches && e.touches.length) return e.touches[0].clientY; if (e.changedTouches && e.changedTouches.length) return e.changedTouches[0].clientY; return e.clientY; }
         function updatePowerDisplay(percent) { const fill = document.getElementById("pachinkoPowerFill"); const text = document.getElementById("pachinkoPowerText"); if (fill) fill.style.width = percent + '%'; if (text) text.textContent = percent; }
@@ -2071,7 +2087,6 @@
             const limit = getMaxDrawsForPlayer(currentPlayerName);
             if (!isAdminMode && drawCount >= limit) return;
             if (!pachinkoBall) return;
-
             Matter.Body.setStatic(pachinkoBall, false);
             const minSpeed = 6;
             const maxSpeed = 32;
@@ -2079,16 +2094,13 @@
             Matter.Body.setVelocity(pachinkoBall, { x: 0, y: -speed });
             pachinkoBallDropped = true;
             playPachinkoSound();
-
             const renderWidth = pachinkoRender ? pachinkoRender.options.width : pachinkoWidth;
             const renderHeight = pachinkoRender ? pachinkoRender.options.height : pachinkoHeight;
             const playedRef = ref(db, `playedUsers/${currentPlayerName}`);
-
             let checkCount = 0, enteredPlayArea = false, countDeducted = false;
             let stuckTime = 0, lastPosX = -1, lastPosY = -1, unstuckCount = 0;
             let ballReturned = false;
             let everLeftRest = false;
-
             if (pachinkoCheckIntervalId) clearInterval(pachinkoCheckIntervalId);
             pachinkoCheckIntervalId = setInterval(async () => {
                 if (!pachinkoBall) { clearInterval(pachinkoCheckIntervalId); pachinkoCheckIntervalId = null; return; }
@@ -2096,21 +2108,14 @@
                 const pos = pachinkoBall.position;
                 const vel = pachinkoBall.velocity;
                 const speed = Math.hypot(vel.x, vel.y);
-
                 const railLeftX = pachinkoRailLeftX;
                 const inRail = pos.x > railLeftX - 2;
                 const nearBottom = pos.y > renderHeight - 130;
-
-                // ★ 球落回發射軌底部 → 不算中獎、退次數
-                // ★ 判斷球是否已經離開過彈簧位置
                 if (pos.y < pachinkoBallRestY - 3) everLeftRest = true;
-
-                // ★ 球落回發射軌底部 → 不算中獎、退次數、可重新發射
                 if (everLeftRest && !ballReturned && inRail && nearBottom && speed < 5) {
                     ballReturned = true;
                     clearInterval(pachinkoCheckIntervalId);
                     pachinkoCheckIntervalId = null;
-
                     if (countDeducted) {
                         try {
                             await runTransaction(playedRef, (current) => {
@@ -2128,7 +2133,6 @@
                             updateDrawCountDisplay();
                         } catch (e) { console.error("退次數失敗", e); }
                     }
-
                     pachinkoBallDropped = false;
                     enteredPlayArea = false;
                     countDeducted = false;
@@ -2137,7 +2141,6 @@
                     Matter.Body.setVelocity(pachinkoBall, { x: 0, y: 0 });
                     return;
                 }
-
                 if (enteredPlayArea && pos.y < renderHeight - 90) {
                     const moved = Math.hypot(pos.x - lastPosX, pos.y - lastPosY);
                     if (lastPosX >= 0 && moved < 2.5) stuckTime += 100; else stuckTime = 0;
@@ -2151,13 +2154,10 @@
                     }
                 }
                 lastPosX = pos.x; lastPosY = pos.y;
-
                 if (pos.x < -50 || pos.x > renderWidth + 50 || pos.y < -50 || pos.y > renderHeight + 50) {
                     clearInterval(pachinkoCheckIntervalId); pachinkoCheckIntervalId = null; resetPachinkoAfterDraw(); return;
                 }
-
                 if (pos.x < renderWidth - 90 && !inRail) enteredPlayArea = true;
-
                 if (enteredPlayArea && !countDeducted) {
                     countDeducted = true;
                     runTransaction(playedRef, (current) => {
@@ -2172,7 +2172,6 @@
                         }
                     }).catch((e) => console.error("扣次數失敗", e));
                 }
-
                 if (enteredPlayArea && pos.y > renderHeight - 65 && !inRail) {
                     clearInterval(pachinkoCheckIntervalId); pachinkoCheckIntervalId = null;
                     let targetBin = null;
@@ -2181,7 +2180,6 @@
                     if (targetBin) await settlePachinkoResult(targetBin); else resetPachinkoAfterDraw();
                     return;
                 }
-
                 if (checkCount > 600) {
                     clearInterval(pachinkoCheckIntervalId); pachinkoCheckIntervalId = null;
                     if (!enteredPlayArea) { resetPachinkoAfterDraw(); return; }
@@ -2228,17 +2226,717 @@
             pachinkoBallDropped = false;
         }
 
-        function clickTicket() { if (currentPrizeUrl && currentPrizeUrl.startsWith("http")) { window.open(currentPrizeUrl, "_blank"); } else if (currentPrizeUrl) { alert(currentPrizeUrl); } else { alert("無連結"); } }
+        // ---------- 保齡球核心 ----------
+        function drawBowlingLane(ctx, w, h, l, r, t, b) {
+            ctx.fillStyle = '#0a0a14';
+            ctx.fillRect(0, 0, w, h);
+            const grad = ctx.createLinearGradient(0, b, 0, t);
+            grad.addColorStop(0, '#5a3a1a');
+            grad.addColorStop(0.5, '#8b5a2b');
+            grad.addColorStop(1, '#c8904a');
+            ctx.fillStyle = grad;
+            ctx.fillRect(l, t, r - l, b - t);
+            const stripes = 12;
+            const stripeW = (r - l) / stripes;
+            for (let i = 0; i < stripes; i++) {
+                if (i % 2 === 0) {
+                    ctx.fillStyle = 'rgba(0,0,0,0.05)';
+                    ctx.fillRect(l + i * stripeW, t, stripeW, b - t);
+                }
+            }
+            const edgeGrad = ctx.createLinearGradient(l, 0, l + 22, 0);
+            edgeGrad.addColorStop(0, 'rgba(0,0,0,0.55)');
+            edgeGrad.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.fillStyle = edgeGrad;
+            ctx.fillRect(l, t, 22, b - t);
+            const edgeGrad2 = ctx.createLinearGradient(r, 0, r - 22, 0);
+            edgeGrad2.addColorStop(0, 'rgba(0,0,0,0.55)');
+            edgeGrad2.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.fillStyle = edgeGrad2;
+            ctx.fillRect(r - 22, t, 22, b - t);
+            ctx.fillStyle = 'rgba(255,255,255,0.05)';
+            const pinAreaH = (b - t) * 0.28;
+            ctx.fillRect(l, t, r - l, pinAreaH);
+            for (let i = 1; i <= 4; i++) {
+                const y = t + (b - t) * (i * 0.2);
+                ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(l + 10, y);
+                ctx.lineTo(r - 10, y);
+                ctx.stroke();
+            }
+            ctx.strokeStyle = 'rgba(0,0,0,0.75)';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(l - 1.5, t - 1.5, (r - l) + 3, (b - t) + 3);
+        }
 
-        function closeModal() {
+        function drawDefaultBowlingPin(ctx, r) {
+            ctx.beginPath();
+            ctx.arc(2, 3, r * 1.05, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(0,0,0,0.4)';
+            ctx.fill();
+            const grad = ctx.createRadialGradient(-r * 0.3, -r * 0.3, r * 0.1, 0, 0, r);
+            grad.addColorStop(0, '#ffffff');
+            grad.addColorStop(0.5, '#f0f0f0');
+            grad.addColorStop(1, '#a0a0a0');
+            ctx.beginPath();
+            ctx.arc(0, 0, r, 0, Math.PI * 2);
+            ctx.fillStyle = grad;
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(80,80,80,0.6)';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(0, 0, r * 0.55, 0, Math.PI * 2);
+            ctx.strokeStyle = '#dc2626';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(-r * 0.3, -r * 0.35, r * 0.22, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(255,255,255,0.9)';
+            ctx.fill();
+        }
+
+        function drawDefaultBowlingMouse(ctx, r) {
+            ctx.beginPath();
+            ctx.ellipse(0, r * 0.75, r * 0.9, r * 0.25, 0, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(0,0,0,0.35)';
+            ctx.fill();
+            const grad = ctx.createRadialGradient(-r * 0.3, -r * 0.3, r * 0.1, 0, 0, r);
+            grad.addColorStop(0, '#fff5e0');
+            grad.addColorStop(0.55, '#f5c97a');
+            grad.addColorStop(1, '#a06820');
+            ctx.beginPath();
+            ctx.ellipse(0, 0, r, r * 0.78, 0, 0, Math.PI * 2);
+            ctx.fillStyle = grad;
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(80,40,0,0.55)';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(-r * 0.55, -r * 0.55, r * 0.26, 0, Math.PI * 2);
+            ctx.fillStyle = '#f5c97a'; ctx.fill();
+            ctx.strokeStyle = 'rgba(80,40,0,0.5)'; ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(r * 0.55, -r * 0.55, r * 0.26, 0, Math.PI * 2);
+            ctx.fillStyle = '#f5c97a'; ctx.fill();
+            ctx.stroke();
+            ctx.beginPath(); ctx.arc(-r * 0.3, -r * 0.1, r * 0.13, 0, Math.PI * 2);
+            ctx.fillStyle = '#000'; ctx.fill();
+            ctx.beginPath(); ctx.arc(r * 0.3, -r * 0.1, r * 0.13, 0, Math.PI * 2);
+            ctx.fillStyle = '#000'; ctx.fill();
+            ctx.beginPath(); ctx.arc(-r * 0.27, -r * 0.14, r * 0.045, 0, Math.PI * 2);
+            ctx.fillStyle = '#fff'; ctx.fill();
+            ctx.beginPath(); ctx.arc(r * 0.33, -r * 0.14, r * 0.045, 0, Math.PI * 2);
+            ctx.fillStyle = '#fff'; ctx.fill();
+            ctx.beginPath(); ctx.arc(0, r * 0.15, r * 0.09, 0, Math.PI * 2);
+            ctx.fillStyle = '#7a3020'; ctx.fill();
+            ctx.beginPath(); ctx.arc(-r * 0.55, r * 0.18, r * 0.15, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(255,150,150,0.7)'; ctx.fill();
+            ctx.beginPath(); ctx.arc(r * 0.55, r * 0.18, r * 0.15, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(255,150,150,0.7)'; ctx.fill();
+        }
+
+        function drawDefaultBowlingBall(ctx, r) {
+            ctx.beginPath();
+            ctx.arc(2, 3, r * 1.05, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(0,0,0,0.4)';
+            ctx.fill();
+            const grad = ctx.createRadialGradient(-r * 0.35, -r * 0.35, r * 0.1, 0, 0, r);
+            grad.addColorStop(0, '#5a8cff');
+            grad.addColorStop(0.5, '#2a5cd4');
+            grad.addColorStop(1, '#0a1f66');
+            ctx.beginPath();
+            ctx.arc(0, 0, r, 0, Math.PI * 2);
+            ctx.fillStyle = grad;
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(0,0,0,0.6)';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(-r * 0.25, -r * 0.3, r * 0.13, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(0,0,0,0.65)';
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(r * 0.25, -r * 0.3, r * 0.13, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(0,0,0,0.65)';
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(0, -r * 0.05, r * 0.13, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(0,0,0,0.65)';
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(-r * 0.35, -r * 0.4, r * 0.28, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(255,255,255,0.55)';
+            ctx.fill();
+        }
+
+        function updateBowlingUI() {
+            const frameEl = document.getElementById("bowlingFrameDisplay");
+            const ballEl = document.getElementById("bowlingBallDisplay");
+            const pinsEl = document.getElementById("bowlingFramePinsDisplay");
+            const scoreEl = document.getElementById("bowlingScoreDisplay");
+            if (frameEl) frameEl.textContent = bowlingFrame;
+            if (ballEl) ballEl.textContent = bowlingBallInFrame;
+            if (pinsEl) pinsEl.textContent = bowlingFramePins;
+            if (scoreEl) scoreEl.textContent = bowlingScore;
+        }
+
+        function buildBowlingBoard() {
+            if (typeof Matter === 'undefined') { console.error("Matter.js 尚未載入"); return; }
+            const container = document.getElementById("bowlingContainer");
+            if (!container) return;
+            container.innerHTML = "";
+
+            if (bowlingRenderLoopId) { cancelAnimationFrame(bowlingRenderLoopId); bowlingRenderLoopId = null; }
+            if (bowlingPhysicsLoopId) { cancelAnimationFrame(bowlingPhysicsLoopId); bowlingPhysicsLoopId = null; }
+            if (bowlingCheckIntervalId) { clearInterval(bowlingCheckIntervalId); bowlingCheckIntervalId = null; }
+            if (bowlingEngine) { Matter.Engine.clear(bowlingEngine); bowlingEngine = null; }
+
+            bowlingBall = null;
+            bowlingPins = [];
+            bowlingMice = [];
+            bowlingMouseBodies = [];
+
+            bowlingState = "idle";
+            bowlingFrame = 1;
+            bowlingBallInFrame = 1;
+            bowlingScore = 0;
+            bowlingFramePins = 0;
+            bowlingPinsKnockedThisFrame = 0;
+            bowlingPendingBonus = 0;
+            bowlingAwardedBonus = false;
+
+            updateBowlingUI();
+
+            const Engine = Matter.Engine, Bodies = Matter.Bodies, Composite = Matter.Composite, Events = Matter.Events, Body = Matter.Body;
+
+            bowlingEngine = Engine.create();
+            bowlingEngine.gravity.y = 0;
+            bowlingEngine.gravity.x = 0;
+            bowlingEngine.positionIterations = 20;
+            bowlingEngine.velocityIterations = 20;
+
+            let renderWidth = container.clientWidth || 328;
+            if (renderWidth < 260) renderWidth = 260;
+            if (renderWidth > 420) renderWidth = 420;
+            const renderHeight = Math.round(renderWidth * 1.5);
+
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+            const canvas = document.createElement("canvas");
+            canvas.width = Math.round(renderWidth * dpr);
+            canvas.height = Math.round(renderHeight * dpr);
+            canvas.style.display = "block";
+            canvas.style.maxWidth = "100%";
+            canvas.style.height = "auto";
+            canvas.style.background = "#0a0a14";
+            canvas.style.touchAction = "none";
+            container.appendChild(canvas);
+            const ctx2d = canvas.getContext("2d");
+            ctx2d.scale(dpr, dpr);
+            bowlingRender = { options: { width: renderWidth, height: renderHeight }, canvas: canvas };
+            bowlingRenderHeight = renderHeight;
+
+            const inv = { visible: false };
+            const FRAME = 20;
+
+            const laneLeft = FRAME;
+            const laneRight = renderWidth - FRAME;
+            const laneTop = FRAME;
+            const laneBottom = renderHeight - FRAME;
+
+            bowlingLaneLeft = laneLeft;
+            bowlingLaneRight = laneRight;
+            bowlingLaneTop = laneTop;
+            bowlingLaneBottom = laneBottom;
+
+            Composite.add(bowlingEngine.world, [
+                Bodies.rectangle(laneLeft - 40, renderHeight / 2, 80, renderHeight * 3, { isStatic: true, render: inv, restitution: 0.15, friction: 0.1 }),
+                Bodies.rectangle(laneRight + 40, renderHeight / 2, 80, renderHeight * 3, { isStatic: true, render: inv, restitution: 0.15, friction: 0.1 }),
+                Bodies.rectangle(renderWidth / 2, laneTop - 40, renderWidth * 3, 80, { isStatic: true, render: inv, restitution: 0.15, friction: 0.1 }),
+                Bodies.rectangle(renderWidth / 2, laneBottom + 40, renderWidth * 3, 80, { isStatic: true, render: inv, restitution: 0.15, friction: 0.1 })
+            ]);
+
+            const pinSpacing = renderWidth * 0.078;
+            const rowSpacing = pinSpacing * 0.85;
+            const pinRadius = pinSpacing * 0.42;
+            const pinAreaTop = laneTop + renderHeight * 0.08;
+            const pinCenterX = renderWidth / 2;
+
+            bowlingPinRadius = pinRadius;
+
+            bowlingBallRestX = renderWidth / 2;
+            bowlingBallRestY = laneBottom - renderHeight * 0.07;
+
+            const BALL_RADIUS = renderWidth * 0.036;
+            bowlingBallRadius = BALL_RADIUS;
+
+            function buildPins() {
+                for (const p of bowlingPins) {
+                    if (p.body) Matter.Composite.remove(bowlingEngine.world, p.body);
+                }
+                bowlingPins = [];
+                let count = 0;
+                const totalToBuild = Math.min(bowlingPinCount, 10);
+                const maxRows = 4;
+                for (let row = 0; row < maxRows && count < totalToBuild; row++) {
+                    const rowCount = row + 1;
+                    const rowY = pinAreaTop + row * rowSpacing;
+                    const rowStartX = pinCenterX - (rowCount - 1) * pinSpacing / 2;
+                    for (let i = 0; i < rowCount && count < totalToBuild; i++) {
+                        const x = rowStartX + i * pinSpacing;
+                        const body = Bodies.circle(x, rowY, pinRadius, {
+                            restitution: 0.55,
+                            friction: 0.02,
+                            frictionAir: 0.025,
+                            density: 0.0008,
+                            slop: 0.01,
+                            render: inv,
+                            label: 'bowlingPin'
+                        });
+                        Matter.Composite.add(bowlingEngine.world, body);
+                        bowlingPins.push({
+                            body: body,
+                            homeX: x,
+                            homeY: rowY,
+                            knocked: false,
+                            radius: pinRadius
+                        });
+                        count++;
+                    }
+                }
+            }
+
+            function buildMice() {
+                bowlingMice = [];
+                const config = bowlingMouseConfig.length > 0 ? bowlingMouseConfig : [
+                    { y: 0.62, speed: 1.0, direction: 1 },
+                    { y: 0.45, speed: 1.2, direction: -1 }
+                ];
+                for (let i = 0; i < config.length; i++) {
+                    const cfg = config[i];
+                    const my = laneTop + (laneBottom - laneTop) * (cfg.y || 0.5);
+                    const speed = (cfg.speed || 1.0) * renderWidth * 0.0035;
+                    bowlingMice.push({
+                        x: renderWidth * (0.3 + Math.random() * 0.4),
+                        y: my,
+                        direction: cfg.direction || (Math.random() < 0.5 ? 1 : -1),
+                        speed: speed,
+                        radius: renderWidth * 0.038,
+                        bobPhase: Math.random() * Math.PI * 2
+                    });
+                }
+            }
+
+            buildPins();
+            buildMice();
+
+            function createBall() {
+                if (bowlingBall) {
+                    Matter.Composite.remove(bowlingEngine.world, bowlingBall);
+                    bowlingBall = null;
+                }
+                bowlingBall = Bodies.circle(bowlingBallRestX, bowlingBallRestY, BALL_RADIUS, {
+                    isStatic: true,
+                    restitution: 0.3,
+                    friction: 0.02,
+                    frictionAir: 0.004,
+                    density: 0.006,
+                    slop: 0.01,
+                    render: inv,
+                    label: 'bowlingBall'
+                });
+                Matter.Composite.add(bowlingEngine.world, bowlingBall);
+            }
+            createBall();
+
+            function loadImage(url, setter) {
+                if (!url) { setter(null); return; }
+                const img = new Image();
+                img.crossOrigin = "anonymous";
+                img.onload = () => { setter(img); };
+                img.onerror = () => { console.warn("圖片載入失敗:", url); setter(null); };
+                img.src = url;
+            }
+            loadImage(bowlingBallImageUrl, (img) => { bowlingBallImage = img; });
+            loadImage(bowlingPinImageUrl, (img) => { bowlingPinImage = img; });
+            loadImage(bowlingMouseImageUrl, (img) => { bowlingMouseImage = img; });
+
+            function getCanvasPoint(e) {
+                const rect = canvas.getBoundingClientRect();
+                let cx, cy;
+                if (e.touches && e.touches.length) { cx = e.touches[0].clientX; cy = e.touches[0].clientY; }
+                else if (e.changedTouches && e.changedTouches.length) { cx = e.changedTouches[0].clientX; cy = e.changedTouches[0].clientY; }
+                else { cx = e.clientX; cy = e.clientY; }
+                const scaleX = renderWidth / rect.width;
+                const scaleY = renderHeight / rect.height;
+                return { x: (cx - rect.left) * scaleX, y: (cy - rect.top) * scaleY };
+            }
+
+            function startDrag(e) {
+                if (bowlingState !== "idle") return;
+                if (!currentPlayerName) return;
+                const p = getCanvasPoint(e);
+                const dist = Math.hypot(p.x - bowlingBallRestX, p.y - bowlingBallRestY);
+                if (dist > BALL_RADIUS * 4.5) return;
+                bowlingDragging = true;
+                bowlingDragStartX = bowlingBallRestX;
+                bowlingDragStartY = bowlingBallRestY;
+                bowlingDragCurrentX = p.x;
+                bowlingDragCurrentY = p.y;
+                if (e.cancelable) e.preventDefault();
+            }
+
+            function moveDrag(e) {
+                if (!bowlingDragging) return;
+                const p = getCanvasPoint(e);
+                bowlingDragCurrentX = p.x;
+                bowlingDragCurrentY = p.y;
+                if (e.cancelable) e.preventDefault();
+            }
+
+            function endDrag(e) {
+                if (!bowlingDragging) return;
+                bowlingDragging = false;
+                const dx = bowlingDragCurrentX - bowlingDragStartX;
+                const dy = bowlingDragCurrentY - bowlingDragStartY;
+                const dist = Math.hypot(dx, dy);
+                if (dist < 10) return;
+                const nx = dx / dist;
+                const ny = dy / dist;
+                if (ny > -0.2) return;
+                const maxDist = renderHeight * 0.65;
+                const power = Math.min(1, dist / maxDist);
+                const minSpeed = 9;
+                const maxSpeed = 30;
+                const speed = minSpeed + power * (maxSpeed - minSpeed);
+                launchBowlingBall(nx * speed, ny * speed);
+            }
+
+            canvas.addEventListener('mousedown', startDrag);
+            canvas.addEventListener('touchstart', startDrag, { passive: false });
+            document.addEventListener('mousemove', moveDrag);
+            document.addEventListener('touchmove', moveDrag, { passive: false });
+            document.addEventListener('mouseup', endDrag);
+            document.addEventListener('touchend', endDrag);
+
+            function renderLoop() {
+                ctx2d.clearRect(0, 0, renderWidth, renderHeight);
+                drawBowlingLane(ctx2d, renderWidth, renderHeight, laneLeft, laneRight, laneTop, laneBottom);
+
+                for (const p of bowlingPins) {
+                    if (!p.body) continue;
+                    const pos = p.body.position;
+                    const ang = p.body.angle;
+                    ctx2d.save();
+                    ctx2d.translate(pos.x, pos.y);
+                    ctx2d.rotate(ang);
+                    if (bowlingPinImage && bowlingPinImage.complete && bowlingPinImage.naturalWidth > 0) {
+                        const size = p.radius * 3;
+                        ctx2d.drawImage(bowlingPinImage, -size / 2, -size / 2, size, size);
+                    } else {
+                        drawDefaultBowlingPin(ctx2d, p.radius);
+                    }
+                    ctx2d.restore();
+                }
+
+                for (const m of bowlingMice) {
+                    ctx2d.save();
+                    ctx2d.translate(m.x, m.y);
+                    const bob = Math.sin(m.bobPhase) * m.radius * 0.1;
+                    ctx2d.translate(0, bob);
+                    if (bowlingMouseImage && bowlingMouseImage.complete && bowlingMouseImage.naturalWidth > 0) {
+                        const size = m.radius * 2.4;
+                        ctx2d.drawImage(bowlingMouseImage, -size / 2, -size / 2, size, size);
+                    } else {
+                        drawDefaultBowlingMouse(ctx2d, m.radius);
+                    }
+                    ctx2d.restore();
+                }
+
+                if (bowlingBall) {
+                    const bp = bowlingBall.position;
+                    ctx2d.save();
+                    ctx2d.translate(bp.x, bp.y);
+                    ctx2d.rotate(bowlingBall.angle);
+                    if (bowlingBallImage && bowlingBallImage.complete && bowlingBallImage.naturalWidth > 0) {
+                        const size = BALL_RADIUS * 2.4;
+                        ctx2d.drawImage(bowlingBallImage, -size / 2, -size / 2, size, size);
+                    } else {
+                        drawDefaultBowlingBall(ctx2d, BALL_RADIUS);
+                    }
+                    ctx2d.restore();
+                }
+
+                if (bowlingDragging) {
+                    ctx2d.save();
+                    const dx = bowlingDragCurrentX - bowlingDragStartX;
+                    const dy = bowlingDragCurrentY - bowlingDragStartY;
+                    const dist = Math.hypot(dx, dy);
+                    if (dist > 10) {
+                        ctx2d.strokeStyle = 'rgba(255,220,80,0.85)';
+                        ctx2d.lineWidth = 4;
+                        ctx2d.setLineDash([8, 6]);
+                        ctx2d.beginPath();
+                        ctx2d.moveTo(bowlingDragStartX, bowlingDragStartY);
+                        ctx2d.lineTo(bowlingDragCurrentX, bowlingDragCurrentY);
+                        ctx2d.stroke();
+                        ctx2d.setLineDash([]);
+                        const nx = dx / dist;
+                        const ny = dy / dist;
+                        const arrowLen = 18;
+                        ctx2d.beginPath();
+                        ctx2d.moveTo(bowlingDragCurrentX, bowlingDragCurrentY);
+                        ctx2d.lineTo(bowlingDragCurrentX - nx * arrowLen + ny * 9, bowlingDragCurrentY - ny * arrowLen - nx * 9);
+                        ctx2d.lineTo(bowlingDragCurrentX - nx * arrowLen - ny * 9, bowlingDragCurrentY - ny * arrowLen + nx * 9);
+                        ctx2d.closePath();
+                        ctx2d.fillStyle = 'rgba(255,220,80,0.9)';
+                        ctx2d.fill();
+                    }
+                    ctx2d.restore();
+                }
+
+                bowlingRenderLoopId = requestAnimationFrame(renderLoop);
+            }
+            renderLoop();
+
+            let lastPhysTime = performance.now();
+            function physicsLoop(now) {
+                const dt = Math.min(now - lastPhysTime, 33);
+                lastPhysTime = now;
+                const sub = 4;
+                for (let i = 0; i < sub; i++) {
+                    Engine.update(bowlingEngine, dt / sub);
+                }
+                updateBowlingMice();
+                checkBowlingBallState();
+                bowlingPhysicsLoopId = requestAnimationFrame(physicsLoop);
+            }
+            bowlingPhysicsLoopId = requestAnimationFrame(physicsLoop);
+        }
+
+        function updateBowlingMice() {
+            for (const m of bowlingMice) {
+                m.x += m.direction * m.speed;
+                if (m.x < bowlingLaneLeft + m.radius + 6) {
+                    m.x = bowlingLaneLeft + m.radius + 6;
+                    m.direction = 1;
+                }
+                if (m.x > bowlingLaneRight - m.radius - 6) {
+                    m.x = bowlingLaneRight - m.radius - 6;
+                    m.direction = -1;
+                }
+                m.bobPhase += 0.12;
+
+                if (bowlingBall && !bowlingBall.isStatic && bowlingState === "rolling") {
+                    const bp = bowlingBall.position;
+                    const dx = bp.x - m.x;
+                    const dy = bp.y - m.y;
+                    const dist = Math.hypot(dx, dy);
+                    if (dist < bowlingBallRadius + m.radius * 0.9) {
+                        const nx = dx / (dist || 1);
+                        const ny = dy / (dist || 1);
+                        const v = bowlingBall.velocity;
+                        Matter.Body.setVelocity(bowlingBall, {
+                            x: v.x * 0.55 + nx * 3.5,
+                            y: v.y * 0.55 + ny * 3.5
+                        });
+                        m.direction *= -1;
+                        m.x += m.direction * m.radius * 0.8;
+                    }
+                }
+            }
+        }
+
+        function checkBowlingBallState() {
+            if (bowlingState !== "rolling") { checkBowlingBallState._t = 0; return; }
+            if (!bowlingBall || bowlingBall.isStatic) return;
+            const vel = bowlingBall.velocity;
+            const speed = Math.hypot(vel.x, vel.y);
+            if (speed < 0.8) {
+                if (!checkBowlingBallState._t) checkBowlingBallState._t = performance.now();
+                else if (performance.now() - checkBowlingBallState._t > 800) {
+                    checkBowlingBallState._t = 0;
+                    endBowlingBall();
+                }
+            } else {
+                checkBowlingBallState._t = 0;
+            }
+        }
+
+        function launchBowlingBall(vx, vy) {
+            if (bowlingState !== "idle") return;
+            if (!bowlingBall) return;
+            Matter.Body.setStatic(bowlingBall, false);
+            Matter.Body.setVelocity(bowlingBall, { x: vx, y: vy });
+            Matter.Body.setAngularVelocity(bowlingBall, 0.15);
+            bowlingState = "rolling";
+            playBowlingRollSound();
+        }
+
+        function endBowlingBall() {
+            if (!bowlingBall) return;
+            if (bowlingState !== "rolling") return;
+            bowlingState = "settling";
+
+            let newKnocked = 0;
+            for (const p of bowlingPins) {
+                if (p.knocked) continue;
+                if (!p.body) continue;
+                const pos = p.body.position;
+                const moved = Math.hypot(pos.x - p.homeX, pos.y - p.homeY);
+                const ang = Math.abs(p.body.angle);
+                if (moved > p.radius * 1.0 || ang > 0.5) {
+                    p.knocked = true;
+                    newKnocked++;
+                    if (p.body) {
+                        Matter.Composite.remove(bowlingEngine.world, p.body);
+                        p.body = null;
+                    }
+                }
+            }
+
+            bowlingPinsKnockedThisFrame += newKnocked;
+            bowlingFramePins = bowlingPinsKnockedThisFrame;
+            bowlingScore += newKnocked * 2;
+            if (newKnocked > 0) playPinHitSound();
+            updateBowlingUI();
+
+            if (bowlingBallInFrame === 1) {
+                if (bowlingPinsKnockedThisFrame >= bowlingPinCount) {
+                    bowlingScore += 10;
+                    playStrikeSound();
+                    updateBowlingUI();
+                    setTimeout(() => { advanceBowlingFrame(); }, 900);
+                    return;
+                }
+                setTimeout(() => {
+                    resetBowlingBallForNextThrow();
+                    bowlingBallInFrame = 2;
+                    updateBowlingUI();
+                }, 700);
+            } else {
+                if (bowlingPinsKnockedThisFrame >= bowlingPinCount) {
+                    bowlingScore += 5;
+                    playStrikeSound();
+                }
+                updateBowlingUI();
+                setTimeout(() => { advanceBowlingFrame(); }, 900);
+            }
+        }
+
+        function resetBowlingBallForNextThrow() {
+            if (bowlingBall) {
+                Matter.Body.setStatic(bowlingBall, true);
+                Matter.Body.setPosition(bowlingBall, { x: bowlingBallRestX, y: bowlingBallRestY });
+                Matter.Body.setVelocity(bowlingBall, { x: 0, y: 0 });
+                Matter.Body.setAngularVelocity(bowlingBall, 0);
+                Matter.Body.setAngle(bowlingBall, 0);
+            }
+            bowlingState = "idle";
+        }
+
+        function advanceBowlingFrame() {
+            if (bowlingFrame >= bowlingMaxFrames) {
+                endBowlingGame();
+                return;
+            }
+            bowlingFrame++;
+            bowlingBallInFrame = 1;
+            bowlingFramePins = 0;
+            bowlingPinsKnockedThisFrame = 0;
+
+            for (const p of bowlingPins) {
+                if (!p.body) continue;
+                Matter.Body.setStatic(p.body, false);
+                Matter.Body.setPosition(p.body, { x: p.homeX, y: p.homeY });
+                Matter.Body.setVelocity(p.body, { x: 0, y: 0 });
+                Matter.Body.setAngularVelocity(p.body, 0);
+                Matter.Body.setAngle(p.body, 0);
+                p.knocked = false;
+            }
+            resetBowlingBallForNextThrow();
+            updateBowlingUI();
+        }
+
+        function endBowlingGame() {
+            bowlingState = "done";
+            setTimeout(() => {
+                if (bowlingScore >= bowlingTargetScore && !bowlingAwardedBonus) {
+                    bowlingAwardedBonus = true;
+                    awardBowlingBonus();
+                } else {
+                    showBowlingResultModal();
+                }
+            }, 500);
+        }
+
+        async function awardBowlingBonus() {
+            try {
+                const playedRef = ref(db, `playedUsers/${currentPlayerName}`);
+                await runTransaction(playedRef, (cur) => {
+                    if (!cur) return { drawCount: 0, lastDrawTime: Date.now() };
+                    const dc = cur.drawCount || 0;
+                    return { ...cur, drawCount: Math.max(0, dc - 1) };
+                });
+
+                try {
+                    await push(ref(db, `drawRecords/${currentPlayerName}`), {
+                        type: "bowling-bonus",
+                        won: `🎳 保齡球達標：${bowlingScore} 分`,
+                        code: "",
+                        time: Date.now(),
+                        group: honorUnlockedGroup,
+                        showOnBoard: true
+                    });
+                } catch (e) { console.error(e); }
+
+                document.getElementById("modalTitle").innerText = "🎉 恭喜達標！";
+                document.getElementById("modalTitle").className = "text-2xl font-black mb-2 text-rose-500";
+                document.getElementById("modalPrizeName").innerText = `總分 ${bowlingScore} 分！`;
+                const pointsInfo = document.getElementById("modalPointsInfo");
+                if (pointsInfo) {
+                    pointsInfo.innerText = "🎁 獲得 1 次扭蛋抽獎機會！";
+                    pointsInfo.classList.remove("hidden");
+                }
+                document.getElementById("modalTicketCode").style.display = "none";
+                document.getElementById("copyHint").style.display = "none";
+                document.querySelector("#winModal button:last-child").innerText = "🎰 前往扭蛋機";
+                document.getElementById("winModal").style.display = "flex";
+                playWinSound();
+            } catch (e) {
+                console.error("保齡球獎勵失敗", e);
+                alert("獎勵處理失敗");
+            }
+        }
+
+        function showBowlingResultModal() {
+            const isWin = bowlingScore >= bowlingTargetScore;
+            document.getElementById("modalTitle").innerText = isWin ? "🎉 恭喜達標！" : "🎳 再接再厲！";
+            document.getElementById("modalTitle").className = `text-2xl font-black mb-2 ${isWin ? 'text-rose-500' : 'text-gray-500'}`;
+            document.getElementById("modalPrizeName").innerText = `總分 ${bowlingScore} 分（目標 ${bowlingTargetScore} 分）`;
+            const pointsInfo = document.getElementById("modalPointsInfo");
+            if (pointsInfo) pointsInfo.classList.add("hidden");
+            document.getElementById("modalTicketCode").style.display = "none";
+            document.getElementById("copyHint").style.display = "none";
+            document.querySelector("#winModal button:last-child").innerText = "收下結果";
+            document.getElementById("winModal").style.display = "flex";
+            if (isWin) playWinSound();
+        }
+
+        window.closeModal = function() {
             document.getElementById("winModal").style.display = "none";
             document.getElementById("luckyEgg").className = "gacha-lucky-egg";
             document.getElementById("modalTicketCode").style.display = "block";
             document.getElementById("copyHint").style.display = "block";
             const slotVisible = document.getElementById("slotSystemArea").style.display !== "none";
             const pachinkoVisible = document.getElementById("pachinkoSystemArea").style.display !== "none";
+            const bowlingVisible = document.getElementById("bowlingSystemArea").style.display !== "none";
             if (slotVisible) { showSlotSystem(); }
             else if (pachinkoVisible) { showPachinkoSystem(); }
+            else if (bowlingVisible) { showDrawSystem(); }
             else {
                 const drawCount = globalPlayedUsers[currentPlayerName]?.drawCount || 0;
                 const limit = getMaxDrawsForPlayer(currentPlayerName);
@@ -2247,7 +2945,10 @@
                 else { showPointsSystem(); document.getElementById("drawActionArea").classList.add("hidden"); document.getElementById("alreadyPlayedMsg").classList.remove("hidden"); }
                 isAdminMode = false;
             }
-        }
+        };
+
+        function clickTicket() { if (currentPrizeUrl && currentPrizeUrl.startsWith("http")) { window.open(currentPrizeUrl, "_blank"); } else if (currentPrizeUrl) { alert(currentPrizeUrl); } else { alert("無連結"); } }
+
         function openConfirmModal() {
             if (isDrawing) return;
             const name = document.getElementById("playerName").value;
