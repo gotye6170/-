@@ -562,6 +562,7 @@
         let bowlingLaneRight = 0;
         let bowlingMouseConfig = [];
         let bowlingAwardedBonus = false;
+        let bowlingPinParams = null;
 
         let audioCtx = null;
         let soundEnabled = true;
@@ -2232,45 +2233,91 @@
         function drawBowlingLane(ctx, w, h, l, r, t, b) {
             ctx.fillStyle = '#0a0a14';
             ctx.fillRect(0, 0, w, h);
+
+            const topInset = (r - l) * 0.08;
+            const laneTL = l + topInset;
+            const laneTR = r - topInset;
+            const laneBL = l;
+            const laneBR = r;
+
             const grad = ctx.createLinearGradient(0, b, 0, t);
-            grad.addColorStop(0, '#5a3a1a');
-            grad.addColorStop(0.5, '#8b5a2b');
-            grad.addColorStop(1, '#c8904a');
+            grad.addColorStop(0, '#7a4a20');
+            grad.addColorStop(0.5, '#b07840');
+            grad.addColorStop(1, '#e0b080');
+
+            ctx.beginPath();
+            ctx.moveTo(laneTL, t);
+            ctx.lineTo(laneTR, t);
+            ctx.lineTo(laneBR, b);
+            ctx.lineTo(laneBL, b);
+            ctx.closePath();
             ctx.fillStyle = grad;
-            ctx.fillRect(l, t, r - l, b - t);
+            ctx.fill();
+
             const stripes = 12;
-            const stripeW = (r - l) / stripes;
             for (let i = 0; i < stripes; i++) {
-                if (i % 2 === 0) {
-                    ctx.fillStyle = 'rgba(0,0,0,0.05)';
-                    ctx.fillRect(l + i * stripeW, t, stripeW, b - t);
-                }
-            }
-            const edgeGrad = ctx.createLinearGradient(l, 0, l + 22, 0);
-            edgeGrad.addColorStop(0, 'rgba(0,0,0,0.55)');
-            edgeGrad.addColorStop(1, 'rgba(0,0,0,0)');
-            ctx.fillStyle = edgeGrad;
-            ctx.fillRect(l, t, 22, b - t);
-            const edgeGrad2 = ctx.createLinearGradient(r, 0, r - 22, 0);
-            edgeGrad2.addColorStop(0, 'rgba(0,0,0,0.55)');
-            edgeGrad2.addColorStop(1, 'rgba(0,0,0,0)');
-            ctx.fillStyle = edgeGrad2;
-            ctx.fillRect(r - 22, t, 22, b - t);
-            ctx.fillStyle = 'rgba(255,255,255,0.05)';
-            const pinAreaH = (b - t) * 0.28;
-            ctx.fillRect(l, t, r - l, pinAreaH);
-            for (let i = 1; i <= 4; i++) {
-                const y = t + (b - t) * (i * 0.2);
-                ctx.strokeStyle = 'rgba(255,255,255,0.08)';
-                ctx.lineWidth = 1;
+                if (i % 2 === 1) continue;
+                const t1 = i / stripes;
+                const t2 = (i + 1) / stripes;
                 ctx.beginPath();
-                ctx.moveTo(l + 10, y);
-                ctx.lineTo(r - 10, y);
-                ctx.stroke();
+                ctx.moveTo(laneTL + (laneTR - laneTL) * t1, t);
+                ctx.lineTo(laneTL + (laneTR - laneTL) * t2, t);
+                ctx.lineTo(laneBL + (laneBR - laneBL) * t2, b);
+                ctx.lineTo(laneBL + (laneBR - laneBL) * t1, b);
+                ctx.closePath();
+                ctx.fillStyle = 'rgba(0,0,0,0.06)';
+                ctx.fill();
             }
-            ctx.strokeStyle = 'rgba(0,0,0,0.75)';
+
+            const farShade = ctx.createLinearGradient(0, t, 0, t + (b - t) * 0.35);
+            farShade.addColorStop(0, 'rgba(0,0,0,0.5)');
+            farShade.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.fillStyle = farShade;
+            ctx.beginPath();
+            ctx.moveTo(laneTL, t);
+            ctx.lineTo(laneTR, t);
+            ctx.lineTo(laneTR - (laneTR - laneTL) * 0.0, t + (b - t) * 0.35);
+            ctx.lineTo(laneTL, t + (b - t) * 0.35);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.fillStyle = 'rgba(0,0,0,0.6)';
+            ctx.beginPath();
+            ctx.moveTo(l, t);
+            ctx.lineTo(laneTL, t);
+            ctx.lineTo(laneBL, b);
+            ctx.lineTo(l, b);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.moveTo(r, t);
+            ctx.lineTo(laneTR, t);
+            ctx.lineTo(laneBR, b);
+            ctx.lineTo(r, b);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.strokeStyle = 'rgba(0,0,0,0.8)';
             ctx.lineWidth = 3;
-            ctx.strokeRect(l - 1.5, t - 1.5, (r - l) + 3, (b - t) + 3);
+            ctx.beginPath();
+            ctx.moveTo(laneTL, t);
+            ctx.lineTo(laneTR, t);
+            ctx.lineTo(laneBR, b);
+            ctx.lineTo(laneBL, b);
+            ctx.closePath();
+            ctx.stroke();
+
+            ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(laneTL, t + (b - t) * 0.05);
+            ctx.lineTo(laneTR, t + (b - t) * 0.05);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(laneTL + topInset, t + (b - t) * 0.32);
+            ctx.lineTo(laneTR - topInset, t + (b - t) * 0.32);
+            ctx.stroke();
         }
 
         function drawDefaultBowlingPin(ctx, r) {
@@ -2461,11 +2508,18 @@
                 Bodies.rectangle(renderWidth / 2, laneBottom + 40, renderWidth * 3, 80, { isStatic: true, render: inv, restitution: 0.15, friction: 0.1 })
             ]);
 
-            const pinSpacing = renderWidth * 0.078;
-            const rowSpacing = pinSpacing * 0.85;
+            const pinSpacing = renderWidth * 0.080;
+            const rowSpacing = renderWidth * 0.085;
             const pinRadius = pinSpacing * 0.42;
-            const pinAreaTop = laneTop + renderHeight * 0.08;
+            const pinAreaTop = laneTop + renderHeight * 0.10;
             const pinCenterX = renderWidth / 2;
+            bowlingPinParams = {
+                pinAreaTop: pinAreaTop,
+                pinSpacing: pinSpacing,
+                rowSpacing: rowSpacing,
+                pinRadius: pinRadius,
+                pinCenterX: pinCenterX
+            };
 
             bowlingPinRadius = pinRadius;
 
@@ -2483,9 +2537,10 @@
                 let count = 0;
                 const totalToBuild = Math.min(bowlingPinCount, 10);
                 const maxRows = 4;
+                const rowCounts = [1, 2, 3, 4];
                 for (let row = 0; row < maxRows && count < totalToBuild; row++) {
-                    const rowCount = row + 1;
-                    const rowY = pinAreaTop + row * rowSpacing;
+                    const rowCount = rowCounts[row];
+                    const rowY = pinAreaTop + (maxRows - 1 - row) * rowSpacing;
                     const rowStartX = pinCenterX - (rowCount - 1) * pinSpacing / 2;
                     for (let i = 0; i < rowCount && count < totalToBuild; i++) {
                         const x = rowStartX + i * pinSpacing;
@@ -2624,50 +2679,117 @@
             document.addEventListener('mouseup', endDrag);
             document.addEventListener('touchend', endDrag);
 
+
+            function getBowlingScale(y) {
+                if (bowlingLaneBottom === bowlingLaneTop) return 1;
+                let t = (y - bowlingLaneTop) / (bowlingLaneBottom - bowlingLaneTop);
+                t = Math.max(0, Math.min(1, t));
+                return 0.86 + t * 0.14;
+            }
+            
             function renderLoop() {
                 ctx2d.clearRect(0, 0, renderWidth, renderHeight);
                 drawBowlingLane(ctx2d, renderWidth, renderHeight, laneLeft, laneRight, laneTop, laneBottom);
+
+                for (const m of bowlingMice) {
+                    const scale = getBowlingScale(m.y);
+                    const drawR = m.radius * scale;
+                    ctx2d.save();
+                    ctx2d.translate(m.x, m.y);
+                    const bob = Math.sin(m.bobPhase) * drawR * 0.1;
+                    ctx2d.translate(0, bob);
+                    ctx2d.beginPath();
+                    ctx2d.ellipse(0, drawR * 0.75, drawR * 0.9, drawR * 0.25, 0, 0, Math.PI * 2);
+                    ctx2d.fillStyle = 'rgba(0,0,0,0.35)';
+                    ctx2d.fill();
+                    if (bowlingMouseImage && bowlingMouseImage.complete && bowlingMouseImage.naturalWidth > 0) {
+                        ctx2d.save();
+                        ctx2d.beginPath();
+                        ctx2d.arc(0, 0, drawR, 0, Math.PI * 2);
+                        ctx2d.clip();
+                        const size = drawR * 2.4;
+                        ctx2d.drawImage(bowlingMouseImage, -size / 2, -size / 2, size, size);
+                        ctx2d.restore();
+                        ctx2d.beginPath();
+                        ctx2d.arc(0, 0, drawR, 0, Math.PI * 2);
+                        ctx2d.strokeStyle = 'rgba(0,0,0,0.4)';
+                        ctx2d.lineWidth = 1;
+                        ctx2d.stroke();
+                    } else {
+                        drawDefaultBowlingMouse(ctx2d, drawR);
+                    }
+                    ctx2d.restore();
+                }
 
                 for (const p of bowlingPins) {
                     if (!p.body) continue;
                     const pos = p.body.position;
                     const ang = p.body.angle;
+                    const scale = getBowlingScale(pos.y);
+                    const drawR = p.radius * scale;
                     ctx2d.save();
                     ctx2d.translate(pos.x, pos.y);
-                    ctx2d.rotate(ang);
-                    if (bowlingPinImage && bowlingPinImage.complete && bowlingPinImage.naturalWidth > 0) {
-                        const size = p.radius * 3;
-                        ctx2d.drawImage(bowlingPinImage, -size / 2, -size / 2, size, size);
-                    } else {
-                        drawDefaultBowlingPin(ctx2d, p.radius);
+                    if (!p.knocked) {
+                        ctx2d.beginPath();
+                        ctx2d.ellipse(2, drawR * 0.6, drawR * 1.0, drawR * 0.35, 0, 0, Math.PI * 2);
+                        ctx2d.fillStyle = 'rgba(0,0,0,0.35)';
+                        ctx2d.fill();
                     }
-                    ctx2d.restore();
-                }
-
-                for (const m of bowlingMice) {
-                    ctx2d.save();
-                    ctx2d.translate(m.x, m.y);
-                    const bob = Math.sin(m.bobPhase) * m.radius * 0.1;
-                    ctx2d.translate(0, bob);
-                    if (bowlingMouseImage && bowlingMouseImage.complete && bowlingMouseImage.naturalWidth > 0) {
-                        const size = m.radius * 2.4;
-                        ctx2d.drawImage(bowlingMouseImage, -size / 2, -size / 2, size, size);
+                    ctx2d.rotate(ang);
+                    if (p.knocked) ctx2d.globalAlpha = 0.55;
+                    if (bowlingPinImage && bowlingPinImage.complete && bowlingPinImage.naturalWidth > 0) {
+                        ctx2d.save();
+                        ctx2d.beginPath();
+                        ctx2d.arc(0, 0, drawR, 0, Math.PI * 2);
+                        ctx2d.clip();
+                        const size = drawR * 2.4;
+                        ctx2d.drawImage(bowlingPinImage, -size / 2, -size / 2, size, size);
+                        ctx2d.restore();
+                        ctx2d.beginPath();
+                        ctx2d.arc(0, 0, drawR, 0, Math.PI * 2);
+                        ctx2d.strokeStyle = 'rgba(0,0,0,0.5)';
+                        ctx2d.lineWidth = 1.5;
+                        ctx2d.stroke();
                     } else {
-                        drawDefaultBowlingMouse(ctx2d, m.radius);
+                        drawDefaultBowlingPin(ctx2d, drawR);
                     }
                     ctx2d.restore();
                 }
 
                 if (bowlingBall) {
                     const bp = bowlingBall.position;
+                    const scale = getBowlingScale(bp.y);
+                    const drawR = BALL_RADIUS * scale;
                     ctx2d.save();
                     ctx2d.translate(bp.x, bp.y);
+                    ctx2d.beginPath();
+                    ctx2d.ellipse(2, drawR * 0.5, drawR * 1.05, drawR * 0.35, 0, 0, Math.PI * 2);
+                    ctx2d.fillStyle = 'rgba(0,0,0,0.35)';
+                    ctx2d.fill();
                     ctx2d.rotate(bowlingBall.angle);
                     if (bowlingBallImage && bowlingBallImage.complete && bowlingBallImage.naturalWidth > 0) {
-                        const size = BALL_RADIUS * 2.4;
+                        ctx2d.save();
+                        ctx2d.beginPath();
+                        ctx2d.arc(0, 0, drawR, 0, Math.PI * 2);
+                        ctx2d.clip();
+                        const size = drawR * 2;
                         ctx2d.drawImage(bowlingBallImage, -size / 2, -size / 2, size, size);
+                        ctx2d.restore();
+                        ctx2d.beginPath();
+                        ctx2d.arc(0, 0, drawR, 0, Math.PI * 2);
+                        ctx2d.strokeStyle = 'rgba(0,0,0,0.6)';
+                        ctx2d.lineWidth = 1.5;
+                        ctx2d.stroke();
+                        const hl = ctx2d.createRadialGradient(-drawR * 0.4, -drawR * 0.4, 0, -drawR * 0.4, -drawR * 0.4, drawR * 1.1);
+                        hl.addColorStop(0, 'rgba(255,255,255,0.6)');
+                        hl.addColorStop(0.5, 'rgba(255,255,255,0.15)');
+                        hl.addColorStop(1, 'rgba(255,255,255,0)');
+                        ctx2d.beginPath();
+                        ctx2d.arc(0, 0, drawR, 0, Math.PI * 2);
+                        ctx2d.fillStyle = hl;
+                        ctx2d.fill();
                     } else {
-                        drawDefaultBowlingBall(ctx2d, BALL_RADIUS);
+                        drawDefaultBowlingBall(ctx2d, drawR);
                     }
                     ctx2d.restore();
                 }
@@ -2790,13 +2912,12 @@
                 const pos = p.body.position;
                 const moved = Math.hypot(pos.x - p.homeX, pos.y - p.homeY);
                 const ang = Math.abs(p.body.angle);
-                if (moved > p.radius * 1.0 || ang > 0.5) {
+                if (moved > p.radius * 1.2 || ang > 0.6) {
                     p.knocked = true;
                     newKnocked++;
-                    if (p.body) {
-                        Matter.Composite.remove(bowlingEngine.world, p.body);
-                        p.body = null;
-                    }
+                    Matter.Body.setStatic(p.body, true);
+                    Matter.Body.setVelocity(p.body, { x: 0, y: 0 });
+                    Matter.Body.setAngularVelocity(p.body, 0);
                 }
             }
 
@@ -2806,26 +2927,34 @@
             if (newKnocked > 0) playPinHitSound();
             updateBowlingUI();
 
+            const standingCount = bowlingPins.filter(p => !p.knocked && p.body).length;
+
             if (bowlingBallInFrame === 1) {
-                if (bowlingPinsKnockedThisFrame >= bowlingPinCount) {
+                if (standingCount === 0 && bowlingPins.length > 0) {
                     bowlingScore += 10;
                     playStrikeSound();
                     updateBowlingUI();
-                    setTimeout(() => { advanceBowlingFrame(); }, 900);
+                    setTimeout(() => { advanceBowlingFrame(); }, 1400);
                     return;
                 }
                 setTimeout(() => {
+                    for (const p of bowlingPins) {
+                        if (p.knocked && p.body) {
+                            Matter.Composite.remove(bowlingEngine.world, p.body);
+                            p.body = null;
+                        }
+                    }
                     resetBowlingBallForNextThrow();
                     bowlingBallInFrame = 2;
                     updateBowlingUI();
-                }, 700);
+                }, 1100);
             } else {
-                if (bowlingPinsKnockedThisFrame >= bowlingPinCount) {
+                if (standingCount === 0 && bowlingPins.length > 0) {
                     bowlingScore += 5;
                     playStrikeSound();
                 }
                 updateBowlingUI();
-                setTimeout(() => { advanceBowlingFrame(); }, 900);
+                setTimeout(() => { advanceBowlingFrame(); }, 1400);
             }
         }
 
@@ -2850,15 +2979,46 @@
             bowlingFramePins = 0;
             bowlingPinsKnockedThisFrame = 0;
 
+            if (!bowlingEngine || !bowlingPinParams) return;
+
             for (const p of bowlingPins) {
-                if (!p.body) continue;
-                Matter.Body.setStatic(p.body, false);
-                Matter.Body.setPosition(p.body, { x: p.homeX, y: p.homeY });
-                Matter.Body.setVelocity(p.body, { x: 0, y: 0 });
-                Matter.Body.setAngularVelocity(p.body, 0);
-                Matter.Body.setAngle(p.body, 0);
-                p.knocked = false;
+                if (p.body) Matter.Composite.remove(bowlingEngine.world, p.body);
             }
+            bowlingPins = [];
+
+            const params = bowlingPinParams;
+            const Bodies = Matter.Bodies, Composite = Matter.Composite;
+            let count = 0;
+            const totalToBuild = Math.min(bowlingPinCount, 10);
+            const maxRows = 4;
+            const rowCounts = [1, 2, 3, 4];
+            for (let row = 0; row < maxRows && count < totalToBuild; row++) {
+                const rowCount = rowCounts[row];
+                const rowY = params.pinAreaTop + (maxRows - 1 - row) * params.rowSpacing;
+                const rowStartX = params.pinCenterX - (rowCount - 1) * params.pinSpacing / 2;
+                for (let i = 0; i < rowCount && count < totalToBuild; i++) {
+                    const x = rowStartX + i * params.pinSpacing;
+                    const body = Bodies.circle(x, rowY, params.pinRadius, {
+                        restitution: 0.55,
+                        friction: 0.02,
+                        frictionAir: 0.025,
+                        density: 0.0008,
+                        slop: 0.01,
+                        render: { visible: false },
+                        label: 'bowlingPin'
+                    });
+                    Composite.add(bowlingEngine.world, body);
+                    bowlingPins.push({
+                        body: body,
+                        homeX: x,
+                        homeY: rowY,
+                        knocked: false,
+                        radius: params.pinRadius
+                    });
+                    count++;
+                }
+            }
+
             resetBowlingBallForNextThrow();
             updateBowlingUI();
         }
